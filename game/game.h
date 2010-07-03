@@ -5,10 +5,10 @@
 #include "settings/plinfo.h"
 #include "world.h"
 
-typedef struct GameInfo {
-    const GameSetting *setting;
+typedef struct _GameInfo {
+    GameSetting *setting;
     int plsCount;
-    const PlInfo *plInfos;
+    PlInfo *plInfos;
 } GameInfo;
 
 void gameInitialize (const GameInfo *info, WorldItem *items);

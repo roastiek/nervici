@@ -5,7 +5,7 @@
 
 typedef struct _ModEntry {
     char *filename;
-    ModInfo *info;
+    const ModInfo *info;
 } ModEntry;
 
 const char *sys_get_profile ();

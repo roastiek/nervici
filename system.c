@@ -132,9 +132,9 @@ void sys_free_paths () {
     free (music_dir_home);
 }
 
-static ModInfo *load_mod_info (const char * filename) {
+static const ModInfo *load_mod_info (const char * filename) {
     void *handle;
-    ModInfo *result = NULL;
+    const ModInfo *result = NULL;
     
     handle = dlopen (filename, RTLD_NOW);
     if (!handle) {
@@ -157,7 +157,7 @@ static void scan_mods_path (const char *path, ModEntries *entries) {
     DIR *dir;
     struct dirent *ent;
     const char *suffix;
-    ModInfo *info;
+    const ModInfo *info;
     char *mod_file;
     ModEntry entry;
 
@@ -195,7 +195,6 @@ void sys_free_mods () {
     if (mod_entries.count > 0) {
         for (int e = 0; e < mod_entries.count; e++) {
             free (mod_entries.items[e].filename);
-            free (mod_entries.items[e].info);
         }
         free (mod_entries.items);
     }

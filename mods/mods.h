@@ -1,13 +1,13 @@
 #ifndef __MODS_H__
 #define __MODS_H__
 
-typedef struct ModInfo {
+typedef struct _ModInfo {
     const char *name;
     const char *autor;
     const char *rules;
 } ModInfo;
 
-typedef struct GameSetting {
+typedef struct _GameSetting {
     int playersCount;
     int startsCount;
     int rounds;
@@ -18,7 +18,7 @@ typedef struct GameSetting {
     int maxScore;
 } GameSetting;
 
-typedef ModInfo *(*pro_getModInfo) ();
+typedef const ModInfo *(*pro_getModInfo) ();
 typedef void (*pro_onGameStart) (const GameSetting *set);
 typedef void (*pro_onGameEnd) ();
 typedef void (*pro_onTimer) ();
