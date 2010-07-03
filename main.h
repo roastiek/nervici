@@ -7,12 +7,12 @@
 extern float icos[];
 extern float isin[];
 
-typedef struct FPoint {
+typedef struct _FPoint {
     float x;
     float y;
 } FPoint;
 
-typedef struct Point16 {
+typedef struct _Point16 {
     Uint16 x;
     Uint16 y;
 } Point16;

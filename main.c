@@ -24,7 +24,7 @@ static GameInfo gameinfo;
 static GameSetting gameset;
 static PlInfo infos[2];
 
-int initialize() {
+static int initialize() {
     int a;
 
     printf("intialize\n");
@@ -77,7 +77,7 @@ int initialize() {
     return 0;
 }
 
-int uninitialize() {
+static int uninitialize() {
     printf("unintialize\n");
     
     audioUninit ();
@@ -94,7 +94,7 @@ int uninitialize() {
     return 0;
 }
 
-int run () {
+static int run () {
     printf("run\n");
     
     WorldItem items[renderGetPlayerGroundWidth () * renderGetPlayerGroundHeight ()];
@@ -106,7 +106,7 @@ int run () {
 }
 
 int main (int argc, char *argv[]) {
-    printf ("main %d\n", sizeof (int));
+    printf ("main %ld\n", sizeof (int));
     
     initialize ();
     run ();

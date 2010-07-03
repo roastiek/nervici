@@ -14,11 +14,11 @@ static ModInfo info = {
 static const GameSetting *set;
 static int delta = -1;
 
-const ModInfo *getModInfo () {
+const ModInfo *get_mod_info () {
     return &info;
 }
 
-void onGameStart (const GameSetting *nset) {
+void on_game_start (const GameSetting *nset) {
     int p, s;
 
     set = nset;
@@ -36,19 +36,19 @@ void onGameStart (const GameSetting *nset) {
     setTimer (-3000);
 }
 
-void onGameEnd () {
+void on_game_end () {
 }
 
-void onTimer () {
+void on_timer () {
 }
 
-void onDeath (int plid) {
+void on_death (int plid) {
 }
 
-void beforeStep () {
+void before_step () {
 }
 
-void afterStep () {
+void after_step () {
     int p;
     
     for (p = 0; p < set->playersCount; p++) {
@@ -58,37 +58,37 @@ void afterStep () {
     }
 }
 
-void onPoziSmile (int smid, int lvl) {
+void on_pozi_smile (int smid, int lvl) {
 }
 
-void onNegaSmile (int smid, int lvl) {
+void on_nega_smile (int smid, int lvl) {
 }
 
-void onFlegSmile (int smid, int lvl) {
+void on_fleg_smile (int smid, int lvl) {
 }
 
-void onIronSmile (int smid, int lvl) {
+void on_iron_smile (int smid, int lvl) {
 }
 
-void onHamSmile (int smid, int lvl) {
+void on_ham_smile (int smid, int lvl) {
 }
 
-void onKilled (int plid, int murder) {
+void on_killed (int plid, int murder) {
 }
 
-void onKill (int plid,int victim) {
+void on_kill (int plid,int victim) {
 }
 
-void onWall (int plid) {
+void on_wall (int plid) {
 }
 
-void onSelfDeath (int plid) {
+void on_self_death (int plid) {
 }
 
-void onCleared (int plid) {
+void on_cleared (int plid) {
 }
 
-void onPlTimer (int plid) {
+void on_pl_timer (int plid) {
     startPl (plid);
     playMusic (0);
     setSemafor (1);

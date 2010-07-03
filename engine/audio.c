@@ -488,7 +488,7 @@ static int musicOpen(MusicType type) {
     }
 
     while (count < music[type].count) {
-        printf("music open %d/%d\n", count, music[type].count);
+        printf("music open %d/%ld\n", count, music[type].count);
         f = rand() % music[type].count;
         if (!music[type].items[f].played) {
             music[type].items[f].played = 1;

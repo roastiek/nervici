@@ -18,24 +18,24 @@ typedef struct _GameSetting {
     int maxScore;
 } GameSetting;
 
-typedef const ModInfo *(*pro_getModInfo) ();
-typedef void (*pro_onGameStart) (const GameSetting *set);
-typedef void (*pro_onGameEnd) ();
-typedef void (*pro_onTimer) ();
-typedef void (*pro_onDeath) (int plid);
-typedef void (*pro_beforeStep) ();
-typedef void (*pro_afterStep) ();
-typedef void (*pro_onPoziSmile) (int smid, int lvl);
-typedef void (*pro_onNegaSmile) (int smid, int lvl); 
-typedef void (*pro_onFlegSmile) (int smid, int lvl); 
-typedef void (*pro_onIronSmile) (int smid, int lvl); 
-typedef void (*pro_onHamSmile) (int smid, int lvl); 
-typedef void (*pro_onKilled) (int plid, int murder);
-typedef void (*pro_onKill) (int plid,int victim);
-typedef void (*pro_onWall) (int plid);
-typedef void (*pro_onSelfDeath) (int plid);
-typedef void (*pro_onCleared) (int plid);
-typedef void (*pro_onPlTimer) (int plid);
+typedef const ModInfo *(*ModGetModInfo) ();
+typedef void (*ModOnGameStart) (const GameSetting *set);
+typedef void (*ModOnGameEnd) ();
+typedef void (*ModOnTimer) ();
+typedef void (*ModOnDeath) (int plid);
+typedef void (*ModBeforeStep) ();
+typedef void (*ModAfterStep) ();
+typedef void (*ModOnPoziSmile) (int smid, int lvl);
+typedef void (*ModOnNegaSmile) (int smid, int lvl);
+typedef void (*ModOnFlegSmile) (int smid, int lvl);
+typedef void (*ModOnIronSmile) (int smid, int lvl);
+typedef void (*ModOnHamSmile) (int smid, int lvl);
+typedef void (*ModOnKilled) (int plid, int murder);
+typedef void (*ModOnKill) (int plid,int victim);
+typedef void (*ModOnWall) (int plid);
+typedef void (*ModOnSelfDeath) (int plid);
+typedef void (*ModOnCleared) (int plid);
+typedef void (*ModOnPlTimer) (int plid);
 
 
 #endif // __MODS_H__

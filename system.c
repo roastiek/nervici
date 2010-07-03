@@ -12,35 +12,35 @@
 #include "utils.h"
 
 #define PROFILE_DIR "/.nervici"
-#define PROF_FILE "/nervici.conf"
+#define PROFILE_FILE "/nervici.conf"
 #define HOME_MODS_DIR "/mods"
 #define HOME_FONTS_DIR "/fonts"
 #define HOME_SOUNDS_DIR "/sounds"
 #define HOME_MUSIC_DIR "/music"
 
-typedef struct ModEventEntries {
-    pro_onGameStart onGameStart;
-    pro_onGameEnd onGameEnd;
-    pro_onTimer onTimer;
-    pro_onDeath onDeath;
-    pro_beforeStep beforeStep;
-    pro_afterStep afterStep;
-    pro_onPoziSmile onPoziSmile;
-    pro_onNegaSmile onNegaSmile;
-    pro_onFlegSmile onFlegSmile;
-    pro_onIronSmile onIronSmile;
-    pro_onHamSmile onHamSmile;
-    pro_onKilled onKilled;
-    pro_onKill onKill;
-    pro_onWall onWall;
-    pro_onSelfDeath onSelfDeath;
-    pro_onCleared onCleared;
-    pro_onPlTimer onPlTimer;
-} ModEventEntries;
+typedef struct _ModEvents {
+    ModOnGameStart on_game_start;
+    ModOnGameEnd on_game_end;
+    ModOnTimer on_timer;
+    ModOnDeath on_death;
+    ModBeforeStep before_step;
+    ModAfterStep after_step;
+    ModOnPoziSmile on_pozi_smile;
+    ModOnNegaSmile on_nega_smile;
+    ModOnFlegSmile on_fleg_smile;
+    ModOnIronSmile on_iron_smile;
+    ModOnHamSmile on_ham_smile;
+    ModOnKilled on_killed;
+    ModOnKill on_kill;
+    ModOnWall on_wall;
+    ModOnSelfDeath on_self_death;
+    ModOnCleared on_cleared;
+    ModOnPlTimer on_pl_timer;
+} ModEvents;
 
 static char *home_dir = NULL;
 static char *profile_dir = NULL;
-static char *profile = NULL;
+static char *profile_file = NULL;
 static char *mods_dir = NULL;
 static char *mods_dir_home = NULL;
 static char *images_dir = NULL;
@@ -58,8 +58,8 @@ typedef struct {
 
 static ModEntries mod_entries = {0, NULL};
 
-static ModEventEntries modevent;
-static void *modhandle;
+static ModEvents mod_events;
+static void *mod_handle;
 
 static char *resolv_home_dir () {
     return str_copy (getenv ("HOME"));
@@ -70,7 +70,7 @@ static char *resolv_profile_dir () {
 }
 
 static char *resolv_profile_file () {
-    return str_concat (profile_dir, PROF_FILE);
+    return str_concat (profile_dir, PROFILE_FILE);
 }
 
 static char *resolv_dir (const char *dir) {
@@ -98,7 +98,7 @@ static char * resolv_dir_home (const char *dir) {
 void sys_init_paths () {
     home_dir = resolv_home_dir ();
     profile_dir = resolv_profile_dir ();
-    profile = resolv_profile_file ();
+    profile_file = resolv_profile_file ();
 
     mods_dir = resolv_dir (NERVICI_MODS_DIR);
     mods_dir_home = resolv_dir_home (HOME_MODS_DIR);
@@ -120,7 +120,7 @@ void sys_init_paths () {
 void sys_free_paths () {
     free (home_dir);
     free (profile_dir);
-    free (profile);
+    free (profile_file);
     free (mods_dir);
     free (mods_dir_home);
     free (images_dir);
@@ -142,9 +142,9 @@ static const ModInfo *load_mod_info (const char * filename) {
         return NULL;
     }
     
-    pro_getModInfo getMI;
-    long int fake = (long int) dlsym (handle, "getModInfo");
-    getMI = (pro_getModInfo) fake;
+    ModGetModInfo getMI;
+    long int fake = (long int) dlsym (handle, "get_mod_info");
+    getMI = (ModGetModInfo) fake;
     if (getMI != NULL) {
         result = getMI ();
     }
@@ -211,156 +211,156 @@ const ModEntry *sys_get_mod (size_t mid) {
 void sys_load_mod (size_t mid) {
     long int fake;
     
-    modhandle = dlopen (mod_entries.items[mid].filename, RTLD_NOW);
-    if (!modhandle) return;
+    mod_handle = dlopen (mod_entries.items[mid].filename, RTLD_NOW);
+    if (!mod_handle) return;
     
     printf ("load mod\n");
     
-    fake = (long int) dlsym (modhandle, "afterStep");
-    modevent.afterStep = (pro_afterStep) fake;
+    fake = (long int) dlsym (mod_handle, "after_step");
+    mod_events.after_step = (ModAfterStep) fake;
 
-    printf ("load mod %d\n", mod_entries.count);
+    printf ("load mod %ld\n", mod_entries.count);
 
-    fake = (long int) dlsym (modhandle, "beforeStep");
-    modevent.beforeStep = (pro_beforeStep) fake;
+    fake = (long int) dlsym (mod_handle, "before_step");
+    mod_events.before_step = (ModBeforeStep) fake;
 
-    fake = (long int) dlsym (modhandle, "onCleared");
-    modevent.onCleared = (pro_onCleared) fake;
+    fake = (long int) dlsym (mod_handle, "on_cleared");
+    mod_events.on_cleared = (ModOnCleared) fake;
 
-    fake = (long int) dlsym (modhandle, "onDeath");
-    modevent.onDeath = (pro_onDeath) fake;
+    fake = (long int) dlsym (mod_handle, "on_death");
+    mod_events.on_death = (ModOnDeath) fake;
 
-    fake = (long int) dlsym (modhandle, "onFlegSmile");
-    modevent.onFlegSmile = (pro_onFlegSmile) fake;
+    fake = (long int) dlsym (mod_handle, "on_fleg_smile");
+    mod_events.on_fleg_smile = (ModOnFlegSmile) fake;
 
-    fake = (long int) dlsym (modhandle, "onGameEnd");
-    modevent.onGameEnd = (pro_onGameEnd) fake;
+    fake = (long int) dlsym (mod_handle, "on_game_end");
+    mod_events.on_game_end = (ModOnGameEnd) fake;
 
-    fake = (long int) dlsym (modhandle, "onGameStart");
-    modevent.onGameStart = (pro_onGameStart) fake;
+    fake = (long int) dlsym (mod_handle, "on_game_start");
+    mod_events.on_game_start = (ModOnGameStart) fake;
 
-    fake = (long int) dlsym (modhandle, "onHamSmile");
-    modevent.onHamSmile = (pro_onHamSmile) fake;
+    fake = (long int) dlsym (mod_handle, "on_ham_smile");
+    mod_events.on_ham_smile = (ModOnHamSmile) fake;
 
-    fake = (long int) dlsym (modhandle, "onIronSmile");
-    modevent.onIronSmile = (pro_onIronSmile) fake;
+    fake = (long int) dlsym (mod_handle, "on_iron_smile");
+    mod_events.on_iron_smile = (ModOnIronSmile) fake;
 
-    fake = (long int) dlsym (modhandle, "onKill");
-    modevent.onKill = (pro_onKill) fake;
+    fake = (long int) dlsym (mod_handle, "on_kill");
+    mod_events.on_kill = (ModOnKill) fake;
 
-    fake = (long int) dlsym (modhandle, "onKilled");
-    modevent.onKilled = (pro_onKilled) fake;
+    fake = (long int) dlsym (mod_handle, "on_killed");
+    mod_events.on_killed = (ModOnKilled) fake;
 
-    fake = (long int) dlsym (modhandle, "onNegaSmile");
-    modevent.onNegaSmile = (pro_onNegaSmile) fake;
+    fake = (long int) dlsym (mod_handle, "on_nega_smile");
+    mod_events.on_nega_smile = (ModOnNegaSmile) fake;
 
-    fake = (long int) dlsym (modhandle, "onPlTimer");
-    modevent.onPlTimer = (pro_onPlTimer) fake;
+    fake = (long int) dlsym (mod_handle, "on_pl_timer");
+    mod_events.on_pl_timer = (ModOnPlTimer) fake;
 
-    fake = (long int) dlsym (modhandle, "onPoziSmile");
-    modevent.onPoziSmile = (pro_onPoziSmile) fake;
+    fake = (long int) dlsym (mod_handle, "on_pozi_smile");
+    mod_events.on_pozi_smile = (ModOnPoziSmile) fake;
 
-    fake = (long int) dlsym (modhandle, "onSelfDeath");
-    modevent.onSelfDeath = (pro_onSelfDeath) fake;
+    fake = (long int) dlsym (mod_handle, "on_self_death");
+    mod_events.on_self_death = (ModOnSelfDeath) fake;
 
-    fake = (long int) dlsym (modhandle, "onTimer");
-    modevent.onTimer = (pro_onTimer) fake;
+    fake = (long int) dlsym (mod_handle, "on_timer");
+    mod_events.on_timer = (ModOnTimer) fake;
 
-    fake = (long int) dlsym (modhandle, "onWall");
-    modevent.onWall = (pro_onWall) fake;
+    fake = (long int) dlsym (mod_handle, "on_wall");
+    mod_events.on_wall = (ModOnWall) fake;
 }
 
 void sys_unload_mod () {
-    dlclose (modhandle);
+    dlclose (mod_handle);
 }
 
 void sys_mod_on_game_start (const GameSetting *set) {
-    if (modevent.onGameStart != NULL) 
-        modevent.onGameStart (set);
+    if (mod_events.on_game_start != NULL)
+        mod_events.on_game_start (set);
 }
 
 void sys_mod_on_game_end () {
-    if (modevent.onGameEnd != NULL)
-        modevent.onGameEnd ();
+    if (mod_events.on_game_end != NULL)
+        mod_events.on_game_end ();
 }
 
 void sys_mod_on_timer () {
-    if (modevent.onTimer != NULL)
-        modevent.onTimer ();
+    if (mod_events.on_timer != NULL)
+        mod_events.on_timer ();
 }
 
 void sys_mod_on_death (int plid) {
-    if (modevent.onDeath != NULL)
-        modevent.onDeath (plid);
+    if (mod_events.on_death != NULL)
+        mod_events.on_death (plid);
 }
 
 void sys_mod_before_step () {
-    if (modevent.beforeStep != NULL)
-        modevent.beforeStep ();
+    if (mod_events.before_step != NULL)
+        mod_events.before_step ();
 }
 
 void sys_mod_after_step () {
-    if (modevent.afterStep != NULL)
-        modevent.afterStep ();
+    if (mod_events.after_step != NULL)
+        mod_events.after_step ();
 }
 
 void sys_mod_on_pozi_smile (int smid, int lvl) {
-    if (modevent.onPoziSmile != NULL)
-        modevent.onPoziSmile (smid, lvl);
+    if (mod_events.on_pozi_smile != NULL)
+        mod_events.on_pozi_smile (smid, lvl);
 }
 
 void sys_mod_on_nega_smile (int smid, int lvl) {
-    if (modevent.onNegaSmile != NULL) 
-        modevent.onNegaSmile (smid, lvl);
+    if (mod_events.on_nega_smile != NULL)
+        mod_events.on_nega_smile (smid, lvl);
 }
 
 void sys_mod_on_fleg_smile (int smid, int lvl) {
-    if (modevent.onFlegSmile != NULL)
-        modevent.onFlegSmile (smid, lvl);
+    if (mod_events.on_fleg_smile != NULL)
+        mod_events.on_fleg_smile (smid, lvl);
 }
 
 void sys_mod_on_iron_smile (int smid, int lvl) {
-    if (modevent.onIronSmile != NULL)
-        modevent.onIronSmile (smid, lvl);
+    if (mod_events.on_iron_smile != NULL)
+        mod_events.on_iron_smile (smid, lvl);
 }
 
 void sys_mod_on_ham_smile (int smid, int lvl) {
-    if (modevent.onHamSmile != NULL)
-        modevent.onHamSmile (smid, lvl);
+    if (mod_events.on_ham_smile != NULL)
+        mod_events.on_ham_smile (smid, lvl);
 }
 
 void sys_mod_on_killed (int plid, int murder) {
-    if (modevent.onKilled != NULL) 
-        modevent.onKilled (plid, murder);
+    if (mod_events.on_killed != NULL)
+        mod_events.on_killed (plid, murder);
 }
 
 void sys_mod_on_kill (int plid,int victim) {
-    if (modevent.onKill != NULL)
-        modevent.onKill (plid, victim);
+    if (mod_events.on_kill != NULL)
+        mod_events.on_kill (plid, victim);
 }
 
 void sys_mod_on_wall (int plid) {
-    if (modevent.onWall != NULL)
-        modevent.onWall (plid);
+    if (mod_events.on_wall != NULL)
+        mod_events.on_wall (plid);
 }
 
 void sys_mod_on_self_death (int plid) {
-    if (modevent.onSelfDeath != NULL)
-        modevent.onSelfDeath (plid);
+    if (mod_events.on_self_death != NULL)
+        mod_events.on_self_death (plid);
 }
 
 void sys_mod_on_cleared (int plid) {
-    if (modevent.onCleared != NULL)
-        modevent.onCleared (plid);
+    if (mod_events.on_cleared != NULL)
+        mod_events.on_cleared (plid);
 }
 
 void sys_mod_on_pl_timer (int plid) {
-    if (modevent.onPlTimer != NULL)
-        modevent.onPlTimer (plid);
+    if (mod_events.on_pl_timer != NULL)
+        mod_events.on_pl_timer (plid);
 }
 
-const char *sys_get_profile () {
-    return profile;
+const char *sys_get_profile_file () {
+    return profile_file;
 }
 
 const char *sys_get_images_dir () {

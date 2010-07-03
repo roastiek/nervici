@@ -8,7 +8,7 @@ typedef struct _ModEntry {
     const ModInfo *info;
 } ModEntry;
 
-const char *sys_get_profile ();
+const char *sys_get_profile_file ();
 const char *sys_get_images_dir ();
 const char *sys_get_fonts_dir ();
 const char *sys_get_fonts_dir_home ();
