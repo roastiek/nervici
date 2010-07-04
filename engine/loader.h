@@ -1,11 +1,19 @@
 #ifndef __LOADER_H__
 #define __LOADER_H__
 
+#include "audio.h"
+
+
 //#include "strutil.h"
 
-typedef enum ImageType {
+typedef enum _ImageType {
     imtNumbers, imtTimer, imtSemafor, imtHeart, imtCount
 } ImageType;
+
+inline _ImageType operator ++(_ImageType& it, int) {
+    it = (_ImageType) (it + 1);
+    return it;
+}
 
 typedef enum FontType {
     fntMono20, fntMono100, fntCount

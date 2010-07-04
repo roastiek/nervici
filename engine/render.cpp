@@ -1,5 +1,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <SDL/SDL_stdinc.h>
+#include <SDL/SDL_video.h>
 
 #include "render.h"
 #include "loader.h"
@@ -180,7 +182,7 @@ static SDL_Surface *renderCreatePlayerFace(Uint32 color) {
         SDL_LockSurface(result);
         int x;
         for (x = 0; x < 256; x++) {
-            Uint32 *pix = result->pixels;
+            Uint32 *pix = (Uint32*) result->pixels;
             pix[x] |= x * 0x1000000;
         }
         SDL_UnlockSurface(result);
@@ -245,10 +247,10 @@ void renderLoadPlayers(const GameInfo *info) {
     int p;
 
     plFaces.count = info->plsCount;
-    plFaces.items = malloc (sizeof (SDL_Surface*) * plFaces.count);
+    plFaces.items = (SDL_Surface**) malloc (sizeof (SDL_Surface*) * plFaces.count);
 
     plNumbers.count = info->plsCount;
-    plNumbers.items = malloc (sizeof (SDL_Surface*) * plFaces.count);
+    plNumbers.items = (SDL_Surface**) malloc (sizeof (SDL_Surface*) * plFaces.count);
 
     for (p = 0; p < info->plsCount; p++) {
         plFaces.items[p] = renderCreatePlayerFace(info->plInfos[p].color);

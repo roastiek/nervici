@@ -1,6 +1,8 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
+#include <SDL/SDL_video.h>
+#include <SDL/SDL_ttf.h>
 
 
 #include "utils.h"
@@ -27,7 +29,7 @@ Surfaces loadGameImages (TTF_Font *font) {
     ImageType i;
     
     result.count = imtCount;
-    result.items = malloc(sizeof (SDL_Surface*) * result.count);
+    result.items = (SDL_Surface**) malloc(sizeof (SDL_Surface*) * result.count);
     
     filename = str_bigger_copy(sys_get_images_dir(), 16);
     name_len = strlen (filename);
@@ -59,7 +61,7 @@ Fonts loadFonts () {
     char *filename;
 
     result.count = fntCount;
-    result.items = malloc (sizeof (TTF_Font*) * result.count);
+    result.items = (TTF_Font**) malloc (sizeof (TTF_Font*) * result.count);
     
     filename = str_concat(sys_get_fonts_dir_home(), baseFonts[0]);
 

@@ -10,10 +10,6 @@
 
 #include <sys/types.h>
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
 typedef char * String;
 typedef const char * UnownedString;
 
@@ -38,18 +34,14 @@ String str_bigger_copy (UnownedString source, size_t space);
  */
 String str_concat_path (UnownedString path, UnownedString file);
 
-#define array_append(array,item) (array).count++;\
-(array).items = realloc ((array).items, sizeof (item) * (array).count);\
+#define array_append(array,item,t) (array).count++;\
+(array).items = (t) realloc ((array).items, sizeof (item) * (array).count);\
 (array).items[(array).count - 1] = item
 
 /*typedef struct {
     size_t size;
     char *buffer;
 } CharBuffer;*/
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif	/* UTILS_H */
 

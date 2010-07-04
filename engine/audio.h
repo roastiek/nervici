@@ -22,6 +22,11 @@ typedef enum _MusicType {
     MT_Short, MT_Long, MT_Menu, MT_Stat, MT_Count
 } MusicType;
 
+inline _MusicType operator++(_MusicType &mt, int) {
+    mt = (_MusicType) (mt + 1);
+    return mt;
+}
+
 void music_play (MusicType type);
 
 void music_stop ();

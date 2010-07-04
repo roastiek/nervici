@@ -23,11 +23,11 @@ void world_initialize () {
     world.width = renderGetPlayerGroundWidth ();
     world.height = renderGetPlayerGroundHeight ();
     
-    world.items = malloc(sizeof(WorldItem) * world.width * world.height);
+    world.items = (WorldItem*) malloc(sizeof(WorldItem) * world.width * world.height);
     if (world.items == NULL) printf ("nom memoty\n");
     
     startsCount = 40;
-    starts = malloc (sizeof (Start) * startsCount);
+    starts = (Start *) malloc (sizeof (Start) * startsCount);
 
     x = (world.width >= world.height) ? world.height : world.width;
     x/= 2;

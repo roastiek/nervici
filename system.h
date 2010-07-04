@@ -106,5 +106,4 @@ void sys_mod_on_self_death (int plid);
 void sys_mod_on_cleared (int plid);
 void sys_mod_on_pl_timer (int plid);
 
-
 #endif // __SYSTEM_H__

@@ -14,6 +14,8 @@ static ModInfo info = {
 static const GameSetting *set;
 static int delta = -1;
 
+extern "C" {
+
 const ModInfo *get_mod_info () {
     return &info;
 }
@@ -95,3 +97,4 @@ void on_pl_timer (int plid) {
     nextRound ();
 }
 
+}

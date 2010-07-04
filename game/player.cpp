@@ -46,7 +46,7 @@ void playersInitialize (const GameInfo *info) {
     int pi;
 
     players.count = info->plsCount;
-    players.items = malloc (sizeof (Player) * players.count);
+    players.items = (Player*) malloc (sizeof (Player) * players.count);
 
     for (pi = 0; pi < players.count; pi++) {
         players.items[pi].ID = pi;
@@ -58,7 +58,7 @@ void playersInitialize (const GameInfo *info) {
         while (players.items[pi].size <= players.items[pi].maxLength) {
             players.items[pi].size+= 1024;
         }
-        players.items[pi].body = malloc (sizeof (Point16) * players.items[pi].size);
+        players.items[pi].body = (Point16*) malloc (sizeof (Point16) * players.items[pi].size);
         players.items[pi].length = 0;
         players.items[pi].head = 0;
         players.items[pi].timer = 0;
@@ -133,7 +133,7 @@ static void checkPlayerLength (Player *pl) {
     if (pl->maxLength == 0) {
         if (pl->length == pl->size) {
             pl->size+= 1024;
-            pl->body = realloc(pl->body, pl->size);
+            pl->body = (Point16*) realloc(pl->body, pl->size);
         }
     } else {
         if (pl->length >= pl->maxLength) 

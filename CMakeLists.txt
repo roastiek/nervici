@@ -28,18 +28,20 @@ SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${NERVICI_LIB_DIR}")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-SET (CMAKE_C_FLAGS "-O2")
+#SET (CMAKE_C_FLAGS "-O2")
+#SET (CMAKE_CXX_FLAGS "-O2")
 SET (CMAKE_C_FLAGS_DEBUG "-Wall -g -pg -pedantic -std=c99 -DUSE_WORKING_DIR -g3 -gdwarf-2")
+SET (CMAKE_CXX_FLAGS_DEBUG "-Wall -p -pedantic -DUSE_WORKING_DIR -g3 -gdwarf-2 -std=c++0x")
 SET (CMAKE_C_FLAGS_RELEASE "-Wall -DUSE_WORKING_DIR")
 
 CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-ADD_LIBRARY (mod_cervici SHARED mods/mod_cervici.c)
+ADD_LIBRARY (mod_cervici SHARED mods/mod_cervici.cpp)
 
-SET (NERVICI_ENGINE engine/render.c engine/audio.c engine/loader.c)
-SET (NERVICI_GAME game/world.c game/player.c game/game.c)
-SET (NERVICI_SETTINGS settings/setting.c settings/plinfo.c)
-SET (NERVICI_BASE main.c system.c utils.c)
+SET (NERVICI_ENGINE engine/render.cpp engine/audio.cpp engine/loader.cpp)
+SET (NERVICI_GAME game/world.cpp game/player.cpp game/game.cpp)
+SET (NERVICI_SETTINGS settings/setting.cpp settings/plinfo.cpp)
+SET (NERVICI_BASE main.cpp system.cpp utils.cpp)
 SET (NERVICI_SOURCE ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_SETTINGS})
 ADD_EXECUTABLE (nervici ${NERVICI_SOURCE})
 TARGET_LINK_LIBRARIES (nervici 

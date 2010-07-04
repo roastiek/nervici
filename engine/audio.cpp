@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <vorbisfile.h>
+#include <AL/al.h>
 
 #include "audio.h"
 #include "utils.h"
@@ -122,7 +123,7 @@ static void scan_sounds_dir (UnownedString path, SoundProfiles *profiles) {
             entry.directory = prof_path;
             entry.name = str_copy (ent->d_name);
 
-            array_append (*profiles, entry);
+            array_append (*profiles, entry, SoundProfile*);
         } else {
             free (prof_path);
         }
@@ -268,7 +269,7 @@ static void scan_music_dir (UnownedString path, MusicFiles *files, MusicType typ
         entry.filename = file_path;
         entry.played = 0;
 
-        array_append (*files, entry);
+        array_append (*files, entry, MusicFile*);
     }
 
     closedir (dir);
@@ -318,8 +319,8 @@ static void load_music () {
 
     free (dir_name);
 
-    mloader = malloc (setting.buffer);
-    musicBuffers = malloc (sizeof (ALuint) * setting.bfrCount);
+    mloader = (char *)malloc (setting.buffer);
+    musicBuffers = (ALuint*) malloc (sizeof (ALuint) * setting.bfrCount);
 
     alGenBuffers (setting.bfrCount, musicBuffers);
     alGenSources (1, &musicSource);
@@ -406,7 +407,7 @@ void audio_load_players (const GameInfo *info) {
     int si;
 
     sources.count = info->plsCount;
-    sources.items = malloc (sizeof (PlAudio) * sources.count);
+    sources.items = (PlAudio*) malloc (sizeof (PlAudio) * sources.count);
 
     for (si = 0; si < sources.count; si++) {
         alGenSources (1, &sources.items[si].source);

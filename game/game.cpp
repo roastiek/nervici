@@ -118,7 +118,7 @@ void gameRun () {
 
 void playMusic (int type) {
     printf ("music pl\n");
-    music_play (type % 2);
+    music_play ((MusicType) (type % 2));
 }
 
 void stopMusic () {

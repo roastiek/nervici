@@ -180,7 +180,7 @@ static void scan_mods_path (const char *path, ModEntries *entries) {
         if (info != NULL) {
             entry.filename = mod_file;
             entry.info = info;
-            array_append (*entries, entry);
+            array_append (*entries, entry, ModEntry*);
         } else {
             free (mod_file);
         }

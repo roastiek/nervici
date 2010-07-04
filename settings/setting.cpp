@@ -60,7 +60,7 @@ static SetSection *selectSection (const char *name) {
         curr = curr->next;
     }
 
-    SetSection *sec = malloc (sizeof (SetSection));
+    SetSection *sec = (SetSection*) malloc (sizeof (SetSection));
     sec->next = curr;
     last->next = sec;
     sec->name = str_copy (name);
@@ -93,11 +93,11 @@ static void addEntry (SetSection *sec, const char *key, const char *value) {
     }
 
     if (last != NULL) {
-        last->next = malloc (sizeof (SetEntry));
+        last->next = (SetEntry*) malloc (sizeof (SetEntry));
         last->next->next = curr;
         curr = last->next;
     } else {
-        sec->start = malloc (sizeof (SetEntry));
+        sec->start = (SetEntry*) malloc (sizeof (SetEntry));
         sec->start->next = curr;
         curr = sec->start;
     }
@@ -149,9 +149,9 @@ void setting_load () {
     FILE *stream;
     char *line;
     
-    directory = malloc (sizeof (struct SetSection));
+    directory = (SetSection*) malloc (sizeof (struct SetSection));
     directory->next = NULL;
-    directory->name = malloc (1);
+    directory->name = (char *) malloc (1);
     directory->name[0] = '\0';
     directory->start = NULL;
 
