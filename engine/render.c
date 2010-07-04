@@ -2,9 +2,7 @@
 #include <SDL_ttf.h>
 
 #include "render.h"
-
 #include "loader.h"
-//#include "strutil.h"
 #include "settings/setting.h"
 
 #define C_BACKGROUND    0x00442204
@@ -47,15 +45,15 @@ static const char *st_height = "height";
 static const char *st_fullscreen = "fullscreen";
 
 static void loadScreenSetting() {
-    sett.width = readInt(section, st_width, 1024);
-    sett.height = readInt(section, st_height, 768);
-    sett.fullscreen = readInt(section, st_fullscreen, 0);
+    sett.width = setting_read_int(section, st_width, 1024);
+    sett.height = setting_read_int(section, st_height, 768);
+    sett.fullscreen = setting_read_int(section, st_fullscreen, 0);
 }
 
 static void saveScreenSetting() {
-    writeInt(section, st_width, sett.width);
-    writeInt(section, st_height, sett.height);
-    writeInt(section, st_fullscreen, sett.fullscreen);
+    setting_write_int(section, st_width, sett.width);
+    setting_write_int(section, st_height, sett.height);
+    setting_write_int(section, st_fullscreen, sett.fullscreen);
 }
 
 static void innerArea(const SDL_Rect *outer, SDL_Rect *inner) {

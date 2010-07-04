@@ -17,14 +17,13 @@ static World world;
 static Start *starts;
 static int startsCount;
 
-void worldInitialize (WorldItem *items) {
+void world_initialize () {
     int x, s;
     
     world.width = renderGetPlayerGroundWidth ();
     world.height = renderGetPlayerGroundHeight ();
     
     world.items = malloc(sizeof(WorldItem) * world.width * world.height);
-    world.items = items;
     if (world.items == NULL) printf ("nom memoty\n");
     
     startsCount = 40;
@@ -41,13 +40,13 @@ void worldInitialize (WorldItem *items) {
     
 }
 
-void worldUninitialize () {
+void world_uninitialize () {
     free (starts);
     
     //free(world.items);
 }
 
-void worldClear () {
+void world_clear () {
     int x, y;
     
     for (y = world.width; y < world.width * (world.height - 1); y+= world.width) {
@@ -63,23 +62,23 @@ void worldClear () {
     }
 }
 
-int getWorldWidth () {
+int world_get_width () {
     return world.width;
 }
 
-int getWorldHeight () {
+int world_get_height () {
     return world.height;
 }
 
-WorldItem *getWorldItem (int x, int y) {
+WorldItem *world_get_item (int x, int y) {
     return &world.items[pos_(x, y)];
 }
 
-WorldItem *getWorldItemp (Point16 pos) {
+WorldItem *world_get_item_p (Point16 pos) {
     return &world.items[pos_(pos.x, pos.y)];
 }
 
-void checkStarts () {
+void world_check_starts () {
     int s, x, y, state, fx, fy;
     
     for (s = 0; s < startsCount; s++) {
@@ -95,7 +94,7 @@ void checkStarts () {
     }
 }
 
-const Start *getStart (int stid) {
+const Start *world_get_start (int stid) {
     Start *result = &starts[stid];
     if (result->ready) {
         result->ready = 0;
@@ -103,11 +102,11 @@ const Start *getStart (int stid) {
     } else return NULL;
 }
 
-int getStartsCount () {
+int world_get_starts_count () {
     return startsCount;
 }
 
-int findFreeStart () {
+int world_find_free_start () {
     int result;
     int avai = 0;
     int s;

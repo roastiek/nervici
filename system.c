@@ -51,13 +51,17 @@ static char *sounds_dir_home = NULL;
 static char *music_dir = NULL;
 static char *music_dir_home = NULL;
 
-typedef struct {
+typedef struct _ModEntry {
+    char *filename;
+    const ModInfo *info;
+} ModEntry;
+
+typedef struct _ModEntries {
     size_t count;
     ModEntry *items;
 } ModEntries;
 
-static ModEntries mod_entries = {0, NULL};
-
+static ModEntries mod_entries;
 static ModEvents mod_events;
 static void *mod_handle;
 
@@ -204,8 +208,8 @@ size_t sys_get_mods_count () {
     return mod_entries.count;
 }
 
-const ModEntry *sys_get_mod (size_t mid) {
-    return &mod_entries.items[mid];
+const ModInfo *sys_get_mod (size_t mid) {
+    return mod_entries.items[mid].info;
 }
 
 void sys_load_mod (size_t mid) {

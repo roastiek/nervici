@@ -3,9 +3,9 @@
 
 #include "utils.h"
 
-char *str_copy (const char *source) {
+String str_copy (UnownedString source) {
     size_t len;
-    char *result;
+    String result;
 
     len = strlen (source);
     result = malloc (len + 1);
@@ -14,10 +14,10 @@ char *str_copy (const char *source) {
     return result;
 }
 
-char *str_concat (const char *begin, const char *end) {
+String str_concat (UnownedString begin, UnownedString end) {
     size_t begin_len;
     size_t end_len;
-    char *result;
+    String result;
 
     begin_len = strlen(begin);
     end_len = strlen (end);
@@ -29,9 +29,9 @@ char *str_concat (const char *begin, const char *end) {
     return result;
 }
 
-char *str_bigger_copy (const char *source, size_t space) {
+String str_bigger_copy (UnownedString source, size_t space) {
     size_t len;
-    char *result;
+    String result;
 
     len = strlen (source);
     result = malloc (len + 1 + space);
@@ -40,10 +40,10 @@ char *str_bigger_copy (const char *source, size_t space) {
     return result;
 }
 
-char *str_concat_path (const char *path, const char *file) {
+String str_concat_path (UnownedString path, UnownedString file) {
     size_t path_len;
     size_t file_len;
-    char *result;
+    String result;
 
     path_len = strlen(path);
     file_len = strlen (file);

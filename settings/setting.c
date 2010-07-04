@@ -141,7 +141,7 @@ static SetSection *parseLine (SetSection *sec, char *line) {
     return sec;
 }
 
-void loadSettings () {
+void setting_load () {
     #define buffsize 1024
     char buffer[buffsize];
 
@@ -195,7 +195,7 @@ static void freeDirectory () {
     directory = NULL;
 }
 
-void saveSettings () {
+void setting_save () {
     struct SetSection *sec;
     struct SetEntry *ent;
     FILE *stream;
@@ -258,7 +258,7 @@ static struct SetEntry *findEntry (const SetSection *sec, const char *key) {
     return NULL;
 }
 
-int readInt (const char *section, const char *key, int def) {
+int setting_read_int (const char *section, const char *key, int def) {
     SetSection *sec;
     SetEntry *ent;
     int value = def;
@@ -274,7 +274,7 @@ int readInt (const char *section, const char *key, int def) {
     return value;
 }
 
-void writeInt (const char *section, const char *key, int value) {
+void setting_write_int (const char *section, const char *key, int value) {
     #define BUFF_LEN 16
     char buff[BUFF_LEN];
     SetSection *sec;
@@ -285,7 +285,7 @@ void writeInt (const char *section, const char *key, int value) {
     addEntry (sec, key, buff);
 }
 
-const char *readString (const char *section, const char *key, const char *def) {
+const char *setting_read_string (const char *section, const char *key, const char *def) {
     SetSection *sec;
     SetEntry *ent;
     
@@ -302,7 +302,7 @@ const char *readString (const char *section, const char *key, const char *def) {
     return ent->value;
 }
 
-void writeString (const char *section, const char *key, const char *value) {
+void setting_write_string (const char *section, const char *key, const char *value) {
     SetSection *sec;
     
     sec = selectSection (section);
@@ -329,7 +329,7 @@ void writeString (const char *section, const char *key, const char *value) {
     return count;
 }*/
 
-void deleteSection (const char *section) {
+void setting_delete_section (const char *section) {
     SetSection *curr = directory->next;
     SetSection *last = directory;
     SetEntry *ent, *e;
@@ -361,7 +361,7 @@ void deleteSection (const char *section) {
     }
 }
 
-void printDirectory () {
+void setting_print_directory () {
     SetSection *sec = directory;
     SetEntry *ent;
     
@@ -371,7 +371,6 @@ void printDirectory () {
         ent = sec->start;
         while (ent != NULL) {
             printf ("  %s = %s\n", ent->key, ent->value);
-            
             ent = ent->next;
         }
         

@@ -1,27 +1,27 @@
 #ifndef __PLINFO_H__
 #define __PLINFO_H__
 
-//#include "strutil.h"
+#include <sys/types.h>
 
-typedef enum PlTypes {
-    ptHuman, ptAI
+typedef enum _PlTypes {
+    PT_Human, PT_AI
 } PlTypes;
 
-typedef struct PlKeys {
+typedef struct _PlKeys {
     int left;
     int right;
     int jump;
 } PlKeys;
 
-typedef struct AIInfo {
+typedef struct _AIInfo {
     int id;
 } AIInfo;
 
-typedef struct PlInfo {
+typedef struct _PlInfo {
     int color;
     PlTypes type;
     char *name;
-    union control {
+    union {
         PlKeys keys;
         AIInfo ai;
     } control; 
@@ -29,10 +29,10 @@ typedef struct PlInfo {
     int pitch;
 } PlInfo;
 
-const PlInfo *getInfo (int idi);
-int getPlInfosCount ();
+size_t plinfo_get_count ();
+const PlInfo *plinfo_get (size_t idi);
 
-void loadPlInfos ();
-void savePlInfos ();
+void plinfo_load ();
+void plinfo_save ();
 
 #endif // __PLINFO_H__

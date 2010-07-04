@@ -25,7 +25,7 @@ void on_game_start (const GameSetting *nset) {
     
     for (p = 0; p < set->playersCount; p++) {
         printf ("game start %d\n", p);
-        s = findFreeStart ();
+        s = world_find_free_start ();
         if (s != -1) {
             givePlStart (p, s);
             setPlTimer (p, -1000);

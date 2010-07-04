@@ -10,42 +10,50 @@
 
 #include "main.h"
 
-typedef struct WIPlayer {
+typedef struct _WIPlayer {
     Uint8 type;
     Uint8 ID;
     Uint8 body;
     Uint16 order;
 } WIPlayer;
 
-typedef struct WISmile {
+typedef struct _WISmile {
     Uint8 type;
     Uint32 ID;
 } WISmile;
 
-typedef union WorldItem {
+typedef union _WorldItem {
     Uint8 type;
     WIPlayer player;
     WISmile smile;
 } WorldItem;
 
-typedef struct Start {
+typedef struct _Start {
     FPoint pos;
     int angle;
     int ready;
 } Start;
 
-void worldInitialize (WorldItem *items);
-void worldUninitialize ();
-void worldClear ();
+void world_initialize ();
 
-int getWorldWidth ();
-int getWorldHeight ();
-WorldItem *getWorldItem (int x, int y);
-WorldItem *getWorldItemp (Point16 pos);
+void world_uninitialize ();
 
-void checkStarts ();
-const Start *getStart (int stid);
-int getStartsCount ();
-int findFreeStart ();
+void world_clear ();
+
+int world_get_width ();
+
+int world_get_height ();
+
+WorldItem *world_get_item (int x, int y);
+
+WorldItem *world_get_item_p (Point16 pos);
+
+void world_check_starts ();
+
+const Start *world_get_start (int stid);
+
+int world_get_starts_count ();
+
+int world_find_free_start ();
 
 #endif

@@ -22,14 +22,14 @@ typedef struct Game {
 
 static Game game;
 
-void gameInitialize (const GameInfo *info, WorldItem *items) {
+void gameInitialize (const GameInfo *info) {
     printf ("gameInitialize\n");
     
     game.set = info->setting;
     setSpeed (info->setting->speed);
 
     renderDrawGameScreen ();
-    worldInitialize (items);
+    world_initialize ();
     playersInitialize (info);
 
     game.end = 0;
@@ -56,7 +56,7 @@ void gameUninitialize () {
     sys_unload_mod ();
 
     playersUninitialize();
-    worldUninitialize();
+    world_uninitialize();
 }
 
 void gameRun () {
@@ -87,11 +87,11 @@ void gameRun () {
         sys_mod_before_step ();
 
         game.live = playersStep ();
-        checkStarts ();        
+        world_check_starts ();
         
         sys_mod_after_step ();
 
-        musicUpdate ();
+        music_update ();
         
         if ((delta = game.speed + delay - SDL_GetTicks()) > 0 ) {
             SDL_Delay(delta);
@@ -109,7 +109,7 @@ void gameRun () {
         playersTimer (game.speed);
     }
     
-    musicStop ();
+    music_stop ();
     
     if (!game.abort) {
         renderDrawEnd ();
@@ -118,11 +118,11 @@ void gameRun () {
 
 void playMusic (int type) {
     printf ("music pl\n");
-    musicPlay (type % 2);
+    music_play (type % 2);
 }
 
 void stopMusic () {
-    musicStop ();
+    music_stop ();
 }
 
 void setSemafor (int state) {
@@ -142,7 +142,7 @@ int getRound () {
     return game.round;
 }
 void clearPlayerground () {
-    worldClear ();
+    world_clear ();
     renderClear ();
     playersClear ();
 }
@@ -159,7 +159,7 @@ void setSpeed (int speed) {
     game.speed = speed;
     if (game.speed < 6) game.speed = 6;
     if (game.speed > 24) game.speed = 24;
-    musicSetRate (12.0 / game.speed);
+    music_set_rate (12.0 / game.speed);
 }
 
 int livePlsCount () {

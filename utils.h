@@ -14,27 +14,38 @@
 extern "C" {
 #endif
 
-char *str_copy (const char *source);
+typedef char * String;
+typedef const char * UnownedString;
 
-char *str_concat (const char *begin, const char *end);
+/*
+ * produce excat copy of source
+ * must be freed
+ */
+String str_copy (UnownedString source);
+/*
+ * produce begin + end
+ * must be freed
+ */
+String str_concat (UnownedString begin, UnownedString end);
 /*
  * produce source, but result has allocated space bytes more then needed
+ * must be freed
  */
-char *str_bigger_copy (const char *source, size_t space);
+String str_bigger_copy (UnownedString source, size_t space);
 /*
  * produce path + '/' + file
+ * must be freed
  */
-char *str_concat_path (const char *path, const char *file);
-
+String str_concat_path (UnownedString path, UnownedString file);
 
 #define array_append(array,item) (array).count++;\
 (array).items = realloc ((array).items, sizeof (item) * (array).count);\
 (array).items[(array).count - 1] = item
 
-typedef struct {
+/*typedef struct {
     size_t size;
     char *buffer;
-} CharBuffer;
+} CharBuffer;*/
 
 #ifdef	__cplusplus
 }

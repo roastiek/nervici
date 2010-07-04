@@ -30,9 +30,9 @@ static int initialize() {
     printf("intialize\n");
 
     sys_init_paths ();
-    loadSettings ();
+    setting_load ();
     sys_find_mods ();
-    loadPlInfos ();
+    plinfo_load ();
     
 
     if (SDL_Init(0)) return 1;
@@ -43,7 +43,7 @@ static int initialize() {
     }
 
     if (renderInit ()) return 1;
-    audioInit ();
+    audio_initialize ();
 
     gameset.speed = 12;
     gameset.rounds = 10;
@@ -54,7 +54,7 @@ static int initialize() {
     infos[0].control.keys.left = SDLK_LEFT;
     infos[0].control.keys.right = SDLK_RIGHT;
     infos[0].control.keys.jump = SDLK_UP;
-    infos[0].type = ptHuman;
+    infos[0].type = PT_Human;
     infos[0].profil = "mucha";
     infos[0].pitch = 10;
 
@@ -63,7 +63,7 @@ static int initialize() {
     infos[1].control.keys.left = SDLK_KP1;
     infos[1].control.keys.right = SDLK_KP3;
     infos[1].control.keys.jump = SDLK_KP2;
-    infos[1].type = ptHuman;
+    infos[1].type = PT_Human;
     infos[1].profil = "broug";
     infos[1].pitch = 15;
 
@@ -80,15 +80,15 @@ static int initialize() {
 static int uninitialize() {
     printf("unintialize\n");
     
-    audioUninit ();
+    audio_uninitialize ();
     renderUninit();
     
     SDL_Quit ();
     
-    savePlInfos ();
+    plinfo_save ();
     sys_free_mods ();
-    printDirectory ();
-    saveSettings ();
+    setting_print_directory ();
+    setting_save ();
     sys_free_paths ();
 
     return 0;
@@ -97,8 +97,8 @@ static int uninitialize() {
 static int run () {
     printf("run\n");
     
-    WorldItem items[renderGetPlayerGroundWidth () * renderGetPlayerGroundHeight ()];
-    gameInitialize (&gameinfo, items);
+    //WorldItem items[renderGetPlayerGroundWidth () * renderGetPlayerGroundHeight ()];
+    gameInitialize (&gameinfo);
     gameRun ();
     gameUninitialize ();
 

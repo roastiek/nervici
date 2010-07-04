@@ -4,7 +4,7 @@
 void clearPlayerground ();
 void clearStatus ();
 void endGame ();
-int findFreeStart ();
+int world_find_free_start ();
 int getSpeed ();
 int livePlsCount ();
 void nextRound ();

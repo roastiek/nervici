@@ -66,13 +66,13 @@ void playersInitialize (const GameInfo *info) {
     }
 
     renderLoadPlayers (info);
-    audioLoadPlayers (info);
+    audio_load_players (info);
 }
 
 void playersUninitialize () {
     int pi;
 
-    audioFreePlayers ();
+    audio_free_players ();
     renderFreePlayers ();
 
     for (pi = 0; pi < players.count; pi++) {
@@ -114,7 +114,7 @@ static void clearPlayerBottom (Player *pl) {
     
     for (y = 0; y < 3; y++) {
         for (x = 0; x < 3; x++) {
-            item = getWorldItem (pos.x + x, pos.y + y);
+            item = world_get_item (pos.x + x, pos.y + y);
             
             if (item->type == IT_PLAYER && item->player.ID == pl->ID && item->player.order == pl->bottom) {
                 item->type = IT_FREE;
@@ -181,7 +181,7 @@ static int simpleTestFields (Point16 pos, Fields *fields) {
         for (x = 0; x < 3 && result; x++) {
             if ((*fields)[x][y] != 0) {
                 result&= pos.x + x >= 1 && pos.y + y >= 1 && 
-                    pos.x + x < getWorldWidth () - 1 && pos.y + y < getWorldHeight () - 1;
+                    pos.x + x < world_get_width () - 1 && pos.y + y < world_get_height () - 1;
             }
         }
     }
@@ -196,7 +196,7 @@ static int testFields (int plid, Point16 pos, Fields *fields) {
     for (y = 0; y < 3 && result; y++) {
         for (x = 0; x < 3 && result; x++) {
             if ((*fields)[x][y] != 0) {
-                item = getWorldItem (pos.x + x, pos.y + y);
+                item = world_get_item (pos.x + x, pos.y + y);
                 switch (item->type) {
                     case IT_FREE:
                     case IT_SOFT_SMILE:
@@ -238,7 +238,7 @@ static void processFields (Player *pl, Point16 pos, Fields *fields) {
         for (y = 0; y < 3; y++) {
             for (x = 0; x < 3; x++) {
                 if ((*fields)[x][y] != 0) {
-                    item = getWorldItem (pos.x + x, pos.y + y);
+                    item = world_get_item (pos.x + x, pos.y + y);
                     switch (item->type) {
                         case IT_FREE:
                             item->type = IT_PLAYER;
@@ -264,7 +264,7 @@ static void processFields (Player *pl, Point16 pos, Fields *fields) {
         int crashed = 0;
         for (y = 0; y < 3; y++) {
             for (x = 0; x < 3; x++) {
-                item = getWorldItem (pos.x + x, pos.y + y);
+                item = world_get_item (pos.x + x, pos.y + y);
                 switch (item->type) {
                     case IT_STONE:
                         if (!crashed) {
@@ -306,7 +306,7 @@ static void playerLive (Player *pl) {
     if (pl->keyst == ksRight) pl->angle = (pl->angle + 1) % angles;
     if (pl->jumptime == 0 && pl->keyst == ksJump) {
         pl->jumptime = JUMP_REPEAT;
-        audioPlayEffect (pl->ID, etHop);
+        audio_play_effect (pl->ID, ET_Hop);
     }
 
     pl->exact.x+= icos[pl->angle];
@@ -347,7 +347,7 @@ int playersStep () {
     keys = SDL_GetKeyState(NULL);
 
     for (pi = 0; pi < players.count; pi++) {
-        if (players.items[pi].info->type == ptHuman) {
+        if (players.items[pi].info->type == PT_Human) {
             if (players.items[pi].jumptime == 0 && keys[players.items[pi].info->control.keys.jump]) {
                 players.items[pi].keyst = ksJump;
             } else if (keys[players.items[pi].info->control.keys.left] && keys[players.items[pi].info->control.keys.right]) {
@@ -394,7 +394,7 @@ void givePlStart (int plid, int start) {
     Point16 pos;
     
     if (start >= 0) {
-        st = getStart (start);
+        st = world_get_start (start);
         if (st != NULL) {
             Player *pl = &(players.items[plid]);
             printf ("give pl start %d\n", pl->ID);
@@ -445,7 +445,7 @@ int isPlJumping (int plid) {
 }
 
 int isPlHuman (int plid) {
-    return players.items[plid].info->type == ptHuman;
+    return players.items[plid].info->type == PT_Human;
 }
 
 void killPl (int plid) {
@@ -473,7 +473,7 @@ void fastClearPl (int plid) {
                 clearPlayerBottom (pl);
             }
             pl->state = psErased;
-            checkStarts ();
+            world_check_starts ();
             break;
         default:
             break;
@@ -487,7 +487,7 @@ void cutPlAtLength (int plid, int length) {
     while (pl->length > 0) {
         clearPlayerBottom (pl);
     }
-    checkStarts ();
+    world_check_starts ();
 }
 
 void decPlMaxLength (int plid, unsigned int delta) {
