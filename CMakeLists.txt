@@ -19,7 +19,7 @@ FIND_PACKAGE (SDL_ttf REQUIRED)
 FIND_PACKAGE (OpenAL REQUIRED)
 INCLUDE (vorbis.cmake)
 #INCLUDE (ogg.cmake)
-INCLUDE_DIRECTORIES (${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR} ${SDLTTF_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR} ${VORBIS_INCLUDE_DIR} ${OGG_INCLUDE_DIR})
+INCLUDE_DIRECTORIES (${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR} ${SDLTTF_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR} ${VORBIS_INCLUDE_DIR} ${OGG_INCLUDE_DIR} "src")
 
 SET (CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
@@ -36,12 +36,12 @@ SET (CMAKE_C_FLAGS_RELEASE "-Wall -DUSE_WORKING_DIR")
 
 CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-ADD_LIBRARY (mod_cervici SHARED mods/mod_cervici.cpp)
+ADD_LIBRARY (mod_cervici SHARED src/mods/mod_cervici.cpp)
 
-SET (NERVICI_ENGINE engine/render.cpp engine/audio.cpp engine/loader.cpp)
-SET (NERVICI_GAME game/world.cpp game/player.cpp game/game.cpp)
-SET (NERVICI_SETTINGS settings/setting.cpp settings/plinfo.cpp)
-SET (NERVICI_BASE main.cpp system.cpp utils.cpp)
+SET (NERVICI_ENGINE src/engine/render.cpp src/engine/audio.cpp src/engine/loader.cpp)
+SET (NERVICI_GAME src/game/world.cpp src/game/player.cpp src/game/game.cpp)
+SET (NERVICI_SETTINGS src/settings/setting.cpp src/settings/plinfo.cpp)
+SET (NERVICI_BASE src/main.cpp src/system.cpp src/utils.cpp)
 SET (NERVICI_SOURCE ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_SETTINGS})
 ADD_EXECUTABLE (nervici ${NERVICI_SOURCE})
 TARGET_LINK_LIBRARIES (nervici 
