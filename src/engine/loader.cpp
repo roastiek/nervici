@@ -4,9 +4,6 @@
 #include <SDL/SDL_video.h>
 #include <SDL/SDL_ttf.h>
 
-
-#include "utils.h"
-
 #include "loader.h"
 #include "system.h"
 //#include "strutil.h"

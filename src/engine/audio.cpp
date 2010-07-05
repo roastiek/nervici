@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "audio.h"
-#include "utils.h"
 #include "system.h"
 #include "settings/setting.h"
 
@@ -104,7 +103,7 @@ static void scan_sounds_dir (const string& path, SoundProfiles& profiles) {
         if (valid) {
 //            memset (&entry.buffers, 0, sizeof (entry.buffers));
             entry.directory = prof_path;
-            entry.name = str_copy (ent->d_name);
+            entry.name = ent->d_name;
             profiles.push_back (entry);
         }
     }

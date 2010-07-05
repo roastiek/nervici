@@ -5,26 +5,24 @@
 #include <ctype.h>
 
 #include "setting.h"
-
-#include "utils.h"
 #include "system.h"
 
-typedef struct SetEntry {
-    struct SetEntry *next;
-    char *key;
-    char *value;
-} SetEntry;
+struct SetEntry {
+    SetEntry *next;
+    string key;
+    string value;
+};
 
-typedef struct SetSection {
-    struct SetSection *next;
-    char *name;
+struct SetSection {
+    SetSection *next;
+    string name;
     SetEntry *start;
-} SetSection;
+};
 
-static SetSection *directory = NULL;
+static SetSection* directory = NULL;
 static int changed;
 
-static char *readOneLine (FILE *stream, char *buffer, size_t size) {
+static char *read_one_line (FILE *stream, char *buffer, size_t size) {
     char *result;
     size_t len;
     
@@ -43,13 +41,13 @@ static char *readOneLine (FILE *stream, char *buffer, size_t size) {
     return result;
 }
 
-static SetSection *selectSection (const char *name) {
+static SetSection* select_section (const string& name) {
     SetSection *curr = directory;
     SetSection *last = NULL;
     int s;
     
     while (curr != NULL) {
-        s = strcasecmp (curr->name, name);
+        s = strcasecmp (curr->name.c_str (), name.c_str ());
         if (s == 0) {
             return curr;
         } else if (s > 0) {
@@ -60,27 +58,26 @@ static SetSection *selectSection (const char *name) {
         curr = curr->next;
     }
 
-    SetSection *sec = (SetSection*) malloc (sizeof (SetSection));
+    SetSection *sec = new SetSection;
     sec->next = curr;
     last->next = sec;
-    sec->name = str_copy (name);
+    sec->name = name;
     sec->start = NULL;  
     changed = 1;
 
     return sec;
 }
 
-static void addEntry (SetSection *sec, const char *key, const char *value) {
+static void add_entry (SetSection *sec, const string& key, const string& value) {
     SetEntry *curr = sec->start;
     SetEntry *last = NULL;
     int s;
     
     while (curr != NULL) {
-        s = strcasecmp (curr->key, key);
+        s = strcasecmp (curr->key.c_str (), key.c_str ());
         if (s == 0) {
-            if (strcmp (curr->value, value) != 0) {
-                free (curr->value);
-                curr->value = str_copy (value);
+            if (strcmp (curr->value.c_str (), value.c_str ()) != 0) {
+                curr->value = value;
                 changed = 1;
             }
             return;
@@ -93,21 +90,21 @@ static void addEntry (SetSection *sec, const char *key, const char *value) {
     }
 
     if (last != NULL) {
-        last->next = (SetEntry*) malloc (sizeof (SetEntry));
+        last->next = new SetEntry;
         last->next->next = curr;
         curr = last->next;
     } else {
-        sec->start = (SetEntry*) malloc (sizeof (SetEntry));
+        sec->start = new SetEntry;
         sec->start->next = curr;
         curr = sec->start;
     }
 
-    curr->key = str_copy (key);
-    curr->value = str_copy (value);
+    curr->key = key;
+    curr->value = value;
     changed = 1;
 }
 
-static SetSection *parseLine (SetSection *sec, char *line) {
+static SetSection *parse_line (SetSection *sec, char *line) {
     size_t len;
     char *key;
     char *value;
@@ -117,7 +114,7 @@ static SetSection *parseLine (SetSection *sec, char *line) {
     if (line[0] == '[' && line[len - 1] == ']') {
         line[len -1] = '\0';
         line = &line[1];
-        sec = selectSection (line);
+        sec = select_section (line);
     } else {
         key = line;
         value = strchr (line, '=');
@@ -135,7 +132,7 @@ static SetSection *parseLine (SetSection *sec, char *line) {
                 value = &value[1];
             }
             
-            addEntry (sec, key, value);
+            add_entry (sec, key, value);
         }
     }
     return sec;
@@ -160,10 +157,10 @@ void setting_load () {
     
     sec = directory;
     
-    line = readOneLine(stream, buffer, buffsize);
+    line = read_one_line(stream, buffer, buffsize);
     while (line != NULL) {
-        sec = parseLine (sec, line);
-        line = readOneLine(stream, buffer, buffsize);
+        sec = parse_line (sec, line);
+        line = read_one_line(stream, buffer, buffsize);
     }
     
     fclose (stream);
@@ -171,7 +168,7 @@ void setting_load () {
     changed = 0;
 }
 
-static void freeDirectory () {
+static void free_directory () {
     struct SetSection *s, *sec = directory;
     struct SetEntry *ent, *e;
     
@@ -183,13 +180,9 @@ static void freeDirectory () {
         while (ent != NULL) {
             e = ent;
             ent = ent->next;
-            
-            free (e->key);
-            free (e->value);
-            free (e);
+            delete e;
         }
-        free (s->name);
-        free (s);
+        delete s;
     }
     
     directory = NULL;
@@ -208,12 +201,12 @@ void setting_save () {
         sec = directory;
         while (sec != NULL) {
             if (sec->name[0] != '\0') {
-                fprintf (stream, "[%s]\n", sec->name);
+                fprintf (stream, "[%s]\n", sec->name.c_str ());
             }
         
             ent = sec->start;
             while (ent != NULL) {
-                fprintf (stream, "%s=%s\n", ent->key, ent->value);
+                fprintf (stream, "%s=%s\n", ent->key.c_str (), ent->value.c_str ());
                 ent = ent->next;
             }
             fprintf (stream, "\n");
@@ -223,15 +216,15 @@ void setting_save () {
         fclose (stream);
     }
     
-    freeDirectory ();
+    free_directory ();
 }
 
-static struct SetSection *findSection (const char *name) {
+static struct SetSection *find_section (const string& name) {
     struct SetSection *curr = directory;
     int s;
     
     while (curr != NULL) {
-        s = strcasecmp (curr->name, name);
+        s = strcasecmp (curr->name.c_str (), name.c_str ());
         if (s == 0) {
             return curr;
         } else if (s > 0) {
@@ -242,12 +235,12 @@ static struct SetSection *findSection (const char *name) {
     return NULL;
 }
 
-static struct SetEntry *findEntry (const SetSection *sec, const char *key) {
+static struct SetEntry *find_entry (const SetSection *sec, const string& key) {
     SetEntry *curr = sec->start;
     int s;
     
     while (curr != NULL) {
-        s = strcasecmp (curr->key, key);
+        s = strcasecmp (curr->key.c_str (), key.c_str ());
         if (s == 0) {
             return curr;
         } else if (s > 0) {
@@ -258,43 +251,43 @@ static struct SetEntry *findEntry (const SetSection *sec, const char *key) {
     return NULL;
 }
 
-int setting_read_int (const char *section, const char *key, int def) {
+int setting_read_int (const string& section, const string& key, int def) {
     SetSection *sec;
     SetEntry *ent;
     int value = def;
     
-    sec = findSection (section);
+    sec = find_section (section);
     if (sec == NULL) return def;
     
-    ent = findEntry (sec, key);
+    ent = find_entry (sec, key);
     if (ent == NULL) return def;
     
-    value = atoi (ent->value);
+    value = atoi (ent->value.c_str ());
     
     return value;
 }
 
-void setting_write_int (const char *section, const char *key, int value) {
+void setting_write_int (const string& section, const string& key, int value) {
     #define BUFF_LEN 16
     char buff[BUFF_LEN];
     SetSection *sec;
     
     snprintf (buff, BUFF_LEN, "%d", value);
     
-    sec = selectSection (section);
-    addEntry (sec, key, buff);
+    sec = select_section (section);
+    add_entry (sec, key, buff);
 }
 
-const char *setting_read_string (const char *section, const char *key, const char *def) {
+const string& setting_read_string (const string& section, const string& key, const string& def) {
     SetSection *sec;
     SetEntry *ent;
     
-    sec = findSection (section);
+    sec = find_section (section);
     if (sec == NULL) {
         return def;
     }
     
-    ent = findEntry (sec, key);
+    ent = find_entry (sec, key);
     if (ent == NULL) {
         return def;
     }
@@ -302,11 +295,11 @@ const char *setting_read_string (const char *section, const char *key, const cha
     return ent->value;
 }
 
-void setting_write_string (const char *section, const char *key, const char *value) {
+void setting_write_string (const string& section, const string& key, const string& value) {
     SetSection *sec;
     
-    sec = selectSection (section);
-    addEntry (sec, key, value);
+    sec = select_section (section);
+    add_entry (sec, key, value);
 }
 
 /*int findSections (String prefix, String **sections) {
@@ -329,7 +322,7 @@ void setting_write_string (const char *section, const char *key, const char *val
     return count;
 }*/
 
-void setting_delete_section (const char *section) {
+void setting_delete_section (const string& section) {
     SetSection *curr = directory->next;
     SetSection *last = directory;
     SetEntry *ent, *e;
@@ -337,19 +330,16 @@ void setting_delete_section (const char *section) {
     int s;
     
     while (curr != NULL) {
-        s = strcasecmp (curr->name, section);
+        s = strcasecmp (curr->name.c_str (), section.c_str ());
         if (s == 0) {
             last->next = curr->next;
-            free (curr->name);
             ent = curr->start;
             while (ent != NULL) {
                 e = ent;
                 ent = ent->next;
-                free (e->key);
-                free (e->value);
-                free (e);
+                delete e;
             }
-            free (curr);
+            delete curr;
             changed = 1;
             return;
         } else if (s > 0) {
@@ -366,11 +356,11 @@ void setting_print_directory () {
     SetEntry *ent;
     
     while (sec != NULL) {
-        printf ("[%s]\n", sec->name);
+        printf ("[%s]\n", sec->name.c_str ());
         
         ent = sec->start;
         while (ent != NULL) {
-            printf ("  %s = %s\n", ent->key, ent->value);
+            printf ("  %s = %s\n", ent->key.c_str (), ent->value.c_str ());
             ent = ent->next;
         }
         

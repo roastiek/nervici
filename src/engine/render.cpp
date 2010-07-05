@@ -33,7 +33,7 @@ static struct ScreenSet {
 static SDL_Surface *primary = NULL;
 static SDL_Surface *background = NULL;
 static SDL_Surface *merge = NULL;
-static SDL_Rect blit, dest, fill;
+static SDL_Rect blit, dest, fill_rect;
 
 static Surfaces plFaces;
 static Surfaces plNumbers;
@@ -126,16 +126,16 @@ int renderInit() {
     background = SDL_CreateRGBSurface(SDL_HWSURFACE, sett.width, sett.height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
     merge = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
 
-    fill.x = 0;
-    fill.y = 0;
-    fill.w = sett.width;
-    fill.h = sett.height;
-    SDL_FillRect(background, &fill, 0xffffff);
-    fill.x++;
-    fill.y++;
-    fill.w -= 2;
-    fill.h -= 2;
-    SDL_FillRect(background, &fill, 0x0);
+    fill_rect.x = 0;
+    fill_rect.y = 0;
+    fill_rect.w = sett.width;
+    fill_rect.h = sett.height;
+    SDL_FillRect(background, &fill_rect, 0xffffff);
+    fill_rect.x++;
+    fill_rect.y++;
+    fill_rect.w -= 2;
+    fill_rect.h -= 2;
+    SDL_FillRect(background, &fill_rect, 0x0);
 
     fonts = loadFonts();
     images = loadGameImages(fonts.items[fntMono20]);
@@ -172,12 +172,12 @@ static SDL_Surface *renderCreatePlayerFace(Uint32 color) {
     SDL_Surface *result;
     result = SDL_CreateRGBSurface(SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
     if (result != NULL) {
-        fill.x = 0;
-        fill.y = 0;
-        fill.w = 256;
-        fill.h = 1;
+        fill_rect.x = 0;
+        fill_rect.y = 0;
+        fill_rect.w = 256;
+        fill_rect.h = 1;
 
-        SDL_FillRect(result, &fill, color);
+        SDL_FillRect(result, &fill_rect, color);
 
         SDL_LockSurface(result);
         int x;

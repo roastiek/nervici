@@ -10,7 +10,6 @@
 
 #include "config.h"
 #include "system.h"
-#include "utils.h"
 
 #define PROFILE_DIR "/.nervici"
 #define PROFILE_FILE "/nervici.conf"
