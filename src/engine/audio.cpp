@@ -5,6 +5,7 @@
 #include <string.h>
 #include <vorbisfile.h>
 #include <AL/al.h>
+#include <vector>
 
 #include "audio.h"
 #include "utils.h"
@@ -18,15 +19,16 @@ static const char *wavs[] = {
 };
 
 typedef struct _SoundProfile {
-    String name;
-    String directory;
+    string name;
+    string directory;
     ALuint buffers[WAVS_COUNT];
 } SoundProfile;
 
-typedef struct _SoundProfiles {
+/*typedef struct _SoundProfiles {
     size_t count;
     SoundProfile *items;
-} SoundProfiles;
+} SoundProfiles;*/
+typedef vector<SoundProfile> SoundProfiles;
 
 static const char *section = "audio";
 static const char *st_sound = "sound";
@@ -60,79 +62,83 @@ typedef struct _PlAudio {
     int r;
 } PlAudio;
 
-typedef struct _PlAudios {
+/*typedef struct _PlAudios {
     size_t count;
     PlAudio *items;
-} PlAudios;
+} PlAudios;*/
+typedef vector<PlAudio> PlAudios;
 
 static PlAudios sources;
 
 typedef struct _MusicFile {
-    String filename;
+    string filename;
     int played;
 } MusicFile;
 
-typedef struct _MusicFiles {
+/*typedef struct _MusicFiles {
     size_t count;
     MusicFile *items;
-} MusicFiles;
+} MusicFiles;*/
+typedef vector<MusicFile> MusicFiles;
 
 static MusicFiles music[MT_Count];
 
-static void scan_sounds_dir (UnownedString path, SoundProfiles *profiles) {
+static void scan_sounds_dir (string path, SoundProfiles& profiles) {
     size_t path_len;
     int w;
     int valid;
     DIR *dir;
     struct dirent *ent;
     FILE *file;
-    String prof_path;
-    String wav_path;
+    string prof_path;
+    string wav_path;
     size_t prof_path_len;
     size_t wav_len;
     SoundProfile entry;
 
-    dir = opendir (path);
+    dir = opendir (path.c_str());
     if (dir == NULL) return;
 
-    path_len = strlen (path);
+    //path_len = strlen (path);
 
     for (ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
         if (ent->d_name[0] == '.') continue;
 
-        prof_path = str_concat_path (path, ent->d_name);
-        wav_path = str_bigger_copy (prof_path, 16);
-        prof_path_len = strlen (prof_path);
+        prof_path = path + '/' + ent->d_name;
+        /*wav_path = str_bigger_copy (prof_path, 16);
+        prof_path_len = strlen (prof_path);*/
 
         valid = 1;
         for (w = 0; w < WAVS_COUNT; w++) {
-            wav_len = strlen (wavs[w]);
-            memcpy (&wav_path[prof_path_len], wavs[w], wav_len + 1);
+            /*wav_len = strlen (wavs[w]);
+            memcpy (&wav_path[prof_path_len], wavs[w], wav_len + 1);*/
+            wav_path = prof_path + wavs[w];
 
-            file = fopen (wav_path, "rb");
+            file = fopen (wav_path.c_str(), "rb");
             if (file == NULL) {
                 valid = 0;
                 break;
             }
             fclose (file);
         }
-        free (wav_path);
+        //free (wav_path);
 
         if (valid) {
-            memset (&entry, 0, sizeof (entry));
+            memset (&entry.buffers, 0, sizeof (entry.buffers));
             entry.directory = prof_path;
             entry.name = str_copy (ent->d_name);
+            profiles.push_back (entry);
 
-            array_append (*profiles, entry, SoundProfile*);
-        } else {
-            free (prof_path);
+//            array_append (*profiles, entry, SoundProfile*);
+        /*} else {
+            free (prof_path);*/
         }
     }
 
     closedir (dir);
 }
 
-static ALuint load_wav (UnownedString filename) {
+static ALuint load_wav (string filename) {
     SDL_AudioSpec spec;
     Uint8 *data;
     Uint32 len;
@@ -140,7 +146,7 @@ static ALuint load_wav (UnownedString filename) {
 
     alGenBuffers (1, &result);
 
-    if (SDL_LoadWAV (filename, &spec, &data, &len) == NULL) return result;
+    if (SDL_LoadWAV (filename.c_str(), &spec, &data, &len) == NULL) return result;
     switch (spec.channels) {
         case 1:
             switch (spec.format) {
@@ -173,59 +179,57 @@ static ALuint load_wav (UnownedString filename) {
     return result;
 }
 
-static void load_buffers (SoundProfiles *profiles) {
+static void load_buffers (SoundProfiles& profiles) {
     int w;
     size_t dir_len;
-    char *filename;
-    SoundProfile *spi;
+    string filename;
 
-    for (int pi = 0; pi < profiles->count; pi++) {
-        spi = &profiles->items[pi];
+    for (int pi = 0; pi < profiles.size(); pi++) {
+        SoundProfile& spi = profiles[pi];
 
-        dir_len = strlen (spi->directory);
-        filename = str_bigger_copy (spi->directory, 16);
+        /*dir_len = strlen (spi->directory);
+        filename = str_bigger_copy (spi->directory, 16);*/
 
         for (w = 0; w < WAVS_COUNT; w++) {
-            memcpy (&filename[dir_len], wavs[w], strlen (wavs[w] + 1));
-            spi->buffers[w] = load_wav (filename);
+            //memcpy (&filename[dir_len], wavs[w], strlen (wavs[w] + 1));
+            filename = spi.directory + wavs[w];
+            spi.buffers[w] = load_wav (filename);
         }
 
-        free (filename);
+//        free (filename);
     }
 }
 
 static void load_wavs () {
     printf ("loadWavs\n");
 
-    sound_profiles.count = 0;
-    sound_profiles.items = NULL;
-    scan_sounds_dir (sys_get_sounds_dir (), &sound_profiles);
-    scan_sounds_dir (sys_get_sounds_dir_home (), &sound_profiles);
+/*    sound_profiles.count = 0;
+    sound_profiles.items = NULL;*/
+    scan_sounds_dir (sys_get_sounds_dir (), sound_profiles);
+    scan_sounds_dir (sys_get_sounds_dir_home (), sound_profiles);
 
-    load_buffers (&sound_profiles);
+    load_buffers (sound_profiles);
 }
 
 static void free_wavs () {
-    SoundProfile *spi;
-
-    for (int pi = 0; pi < sound_profiles.count; pi++) {
-        spi = &sound_profiles.items[pi];
-        free (spi->name);
-        free (spi->directory);
-        alDeleteBuffers (WAVS_COUNT, spi->buffers);
+    for (int pi = 0; pi < sound_profiles.size (); pi++) {
+        SoundProfile& spi = sound_profiles[pi];
+/*        free (spi->name);
+        free (spi->directory);*/
+        alDeleteBuffers (WAVS_COUNT, spi.buffers);
     }
-    sound_profiles.count = 0;
-    free (sound_profiles.items);
+    /*sound_profiles.count = 0;
+    free (sound_profiles.items);*/
 }
 
-static int ogg_get_length (UnownedString filename) {
+static int ogg_get_length (string filename) {
     OggVorbis_File file;
     int result;
     size_t len;
 
-    len = strlen (filename);
+    len = filename.length();
     char fn[len + 1];
-    memcpy (fn, filename, len + 1);
+    memcpy (fn, filename.c_str(), len + 1);
 
     if (ov_fopen (fn, &file)) return -1;
 
@@ -235,41 +239,41 @@ static int ogg_get_length (UnownedString filename) {
     return result;
 }
 
-static void scan_music_dir (UnownedString path, MusicFiles *files, MusicType type) {
+static void scan_music_dir (string path, MusicFiles& files, MusicType type) {
     DIR *dir;
     size_t path_len;
     struct dirent *ent;
     int len;
-    String file_path;
+    string file_path;
     MusicFile entry;
 
-    dir = opendir (path);
+    dir = opendir (path.c_str());
     if (dir == NULL) return;
 
-    path_len = strlen (path);
+    //path_len = strlen (path);
 
     for (ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
         if (ent->d_name[0] == '.') continue;
 
 
-        file_path = str_concat_path (path, ent->d_name);
+        file_path = path + '/' + ent->d_name;
 
         len = ogg_get_length (file_path);
 
         if (len <= 0) continue;
         if (type == MT_Short && len > 150) {
-            free (file_path);
+//            free (file_path);
             continue;
         }
         if (type == MT_Long && len <= 150) {
-            free (file_path);
+  //          free (file_path);
             continue;
         }
 
         entry.filename = file_path;
         entry.played = 0;
-
-        array_append (*files, entry, MusicFile*);
+        files.push_back(entry);
+/*        array_append (*files, entry, MusicFile*);*/
     }
 
     closedir (dir);
@@ -288,36 +292,38 @@ static int musicOpened = 0;
 
 static void load_music () {
     static const char suffixs[MT_Count][6] = {"/game", "/game", "/menu", "/stat"};
-    char *dir_name;
+    string dir_name;
     size_t dir_len;
     MusicType mt;
 
     printf ("loadMusic\n");
 
-    for (mt = MT_Short; mt < MT_Count; mt++) {
+/*    for (mt = MT_Short; mt < MT_Count; mt++) {
         music[mt].count = 0;
         music[mt].items = NULL;
-    }
+    }*/
 
-    dir_name = str_bigger_copy (sys_get_music_dir (), 8);
-    dir_len = strlen (dir_name);
-
-    for (mt = MT_Short; mt < MT_Count; mt++) {
-        memcpy (&dir_name[dir_len], suffixs[mt], strlen (suffixs[mt]) + 1);
-        scan_music_dir (dir_name, &music[mt], mt);
-    }
-
-    free (dir_name);
-
-    dir_name = str_bigger_copy (sys_get_music_dir_home (), 8);
-    dir_len = strlen (dir_name);
+    /*dir_name = str_bigger_copy (sys_get_music_dir (), 8);
+    dir_len = strlen (dir_name);*/
 
     for (mt = MT_Short; mt < MT_Count; mt++) {
-        memcpy (&dir_name[dir_len], suffixs[mt], strlen (suffixs[mt]) + 1);
-        scan_music_dir (dir_name, &music[mt], mt);
+        //memcpy (&dir_name[dir_len], suffixs[mt], strlen (suffixs[mt]) + 1);
+        dir_name = sys_get_music_dir() + suffixs[mt];
+        scan_music_dir (dir_name, music[mt], mt);
     }
 
-    free (dir_name);
+    //free (dir_name);
+
+    /*dir_name = str_bigger_copy (sys_get_music_dir_home (), 8);
+    dir_len = strlen (dir_name);*/
+
+    for (mt = MT_Short; mt < MT_Count; mt++) {
+//        memcpy (&dir_name[dir_len], suffixs[mt], strlen (suffixs[mt]) + 1);
+        dir_name = sys_get_music_dir_home() + suffixs[mt];
+        scan_music_dir (dir_name, music[mt], mt);
+    }
+
+//    free (dir_name);
 
     mloader = (char *)malloc (setting.buffer);
     musicBuffers = (ALuint*) malloc (sizeof (ALuint) * setting.bfrCount);
@@ -335,12 +341,12 @@ static void free_music () {
     MusicType mt;
     int mi;
 
-    for (mt = MT_Short; mt < MT_Count; mt++) {
-        for (mi = 0; mi < music[mt].count; mi++) {
+    /*for (mt = MT_Short; mt < MT_Count; mt++) {*/
+/*        for (mi = 0; mi < music[mt].count; mi++) {
             free (music[mt].items[mi].filename);
-        }
-        free (music[mt].items);
-    }
+        }*/
+        /*free (music[mt].items);
+    }*/
 
     alDeleteBuffers (setting.bfrCount, musicBuffers);
     alDeleteSources (1, &musicSource);
@@ -392,74 +398,78 @@ void audio_uninitialize () {
     alcCloseDevice (pDevice);
 }
 
-static int find_profil (const char *name) {
+static int find_profil (string name) {
     int si;
 
-    for (si = 0; si < sound_profiles.count; si++) {
-        if (strcasecmp (name, sound_profiles.items[si].name) == 0) {
+    for (si = 0; si < sound_profiles.size (); si++) {
+        if (strcasecmp (name.c_str(), sound_profiles[si].name.c_str()) == 0) {
             return si;
         }
     }
     return -1;
 }
 
-void audio_load_players (const GameInfo *info) {
+void audio_load_players (const GameInfo& info) {
     int si;
 
-    sources.count = info->plsCount;
-    sources.items = (PlAudio*) malloc (sizeof (PlAudio) * sources.count);
+    /*sources.count = info.plsCount;
+    sources.items = (PlAudio*) malloc (sizeof (PlAudio) * sources.count);*/
 
-    for (si = 0; si < sources.count; si++) {
-        alGenSources (1, &sources.items[si].source);
-        alSourcef (sources.items[si].source, AL_PITCH, (info->plInfos[si].pitch + 5) / 10.0);
-        alSourcef (sources.items[si].source, AL_GAIN, setting.sound / 20.0);
-        alSourcefv (sources.items[si].source, AL_VELOCITY, sourceVel);
-        alSourcefv (sources.items[si].source, AL_POSITION, sourcePos);
-        sources.items[si].prof = find_profil (info->plInfos[si].profil);
+    sources.clear();
+
+    for (si = 0; si < info.plsCount; si++) {
+        PlAudio entry;
+        alGenSources (1, &entry.source);
+        alSourcef (entry.source, AL_PITCH, (info.plInfos[si].pitch + 5) / 10.0);
+        alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
+        alSourcefv (entry.source, AL_VELOCITY, sourceVel);
+        alSourcefv (entry.source, AL_POSITION, sourcePos);
+        entry.prof = find_profil (info.plInfos[si].profil);
+        sources.push_back(entry);
     }
 }
 
 void audio_free_players () {
     int si;
 
-    for (si = 0; si < sources.count; si++) {
-        alSourceStop (sources.items[si].source);
-        alDeleteSources (1, &sources.items[si].source);
+    for (si = 0; si < sources.size (); si++) {
+        alSourceStop (sources[si].source);
+        alDeleteSources (1, &sources[si].source);
     }
 }
 
 void audio_play_effect (int plid, EffectType effect) {
     ALint play;
-    SoundProfile *spi;
+    //SoundProfile *spi;
     ALuint source;
 
-    if (sources.items[plid].prof >= 0) {
-        alGetSourcei (sources.items[plid].source, AL_SOURCE_STATE, &play);
+    if (sources[plid].prof >= 0) {
+        alGetSourcei (sources[plid].source, AL_SOURCE_STATE, &play);
 
-        spi = &sound_profiles.items[sources.items[plid].prof];
-        source = sources.items[plid].source;
+        SoundProfile& spi = sound_profiles[sources[plid].prof];
+        source = sources[plid].source;
 
         if (play != AL_PLAYING) {
             switch (effect) {
                 case ET_Hop:
-                    alSourcei (source, AL_BUFFER, spi->buffers[0]);
+                    alSourcei (source, AL_BUFFER, spi.buffers[0]);
                     break;
                 case ET_Jau:
-                    alSourcei (source, AL_BUFFER, spi->buffers[1 + (sources.items[plid].r % 2)]);
-                    sources.items[plid].r++;
+                    alSourcei (source, AL_BUFFER, spi.buffers[1 + (sources[plid].r % 2)]);
+                    sources[plid].r++;
                     break;
                 case ET_Self:
-                    alSourcei (source, AL_BUFFER, spi->buffers[3]);
+                    alSourcei (source, AL_BUFFER, spi.buffers[3]);
                     break;
                 case ET_SmilePlus:
-                    alSourcei (source, AL_BUFFER, spi->buffers[4]);
+                    alSourcei (source, AL_BUFFER, spi.buffers[4]);
                     break;
                 case ET_SmileMinus:
-                    alSourcei (source, AL_BUFFER, spi->buffers[5]);
+                    alSourcei (source, AL_BUFFER, spi.buffers[5]);
                     break;
                 case ET_Wall:
-                    alSourcei (source, AL_BUFFER, spi->buffers[6 + (sources.items[plid].r % 2)]);
-                    sources.items[plid].r++;
+                    alSourcei (source, AL_BUFFER, spi.buffers[6 + (sources[plid].r % 2)]);
+                    sources[plid].r++;
                     break;
             }
 
@@ -474,25 +484,25 @@ static int music_open (MusicType type) {
     int mi;
 
     count = 0;
-    for (mi = 0; mi < music[type].count; mi++) {
-        count += music[type].items[mi].played & 1;
+    for (mi = 0; mi < music[type].size (); mi++) {
+        count += music[type][mi].played & 1;
     }
 
-    if (count == music[type].count) {
-        for (mi = 0; mi < music[type].count; mi++) {
-            music[type].items[mi].played = 0;
+    if (count == music[type].size ()) {
+        for (mi = 0; mi < music[type].size (); mi++) {
+            music[type][mi].played = 0;
         }
         count = 0;
     }
 
-    while (count < music[type].count) {
-        printf ("music open %d/%ld\n", count, music[type].count);
-        f = rand () % music[type].count;
-        if (!music[type].items[f].played) {
-            music[type].items[f].played = 1;
+    while (count < music[type].size ()) {
+        printf ("music open %d/%ld\n", count, music[type].size ());
+        f = rand () % music[type].size ();
+        if (!music[type][f].played) {
+            music[type][f].played = 1;
             count++;
 
-            op = ov_fopen (music[type].items[f].filename, &musicFile);
+            op = ov_fopen ((char *)music[type][f].filename.c_str(), &musicFile);
             if (op) continue;
 
             musicInfo = ov_info (&musicFile, -1);

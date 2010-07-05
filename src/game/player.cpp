@@ -35,34 +35,42 @@ typedef struct Player {
     int maxLength;
 } Player;
 
-typedef struct {
+typedef struct _Players {
     size_t count;
     Player *items;
+    Player& operator[] (size_t i) {
+        return items[i];
+    }
 } Players;
+
 
 static Players players;
 
-void playersInitialize (const GameInfo *info) {
+void players_initialize (const GameInfo& info) {
     int pi;
+    //Player& pli;
 
-    players.count = info->plsCount;
-    players.items = (Player*) malloc (sizeof (Player) * players.count);
+    players.count = info.plsCount;
+//    players.items = (Player*) malloc (sizeof (Player) * players.count);
+    players.items = new Player[players.count];
 
     for (pi = 0; pi < players.count; pi++) {
-        players.items[pi].ID = pi;
-        players.items[pi].info = &info->plInfos[pi];
-        players.items[pi].score = 0;
-        players.items[pi].order = pi;
-        players.items[pi].maxLength = info->setting->maxLength;
-        players.items[pi].size = 1024;
-        while (players.items[pi].size <= players.items[pi].maxLength) {
-            players.items[pi].size+= 1024;
+        Player& pli = players[pi];
+
+        pli.ID = pi;
+        pli.info = &info.plInfos[pi];
+        pli.score = 0;
+        pli.order = pi;
+        pli.maxLength = info.setting->maxLength;
+        pli.size = 1024;
+        while (pli.size <= pli.maxLength) {
+            pli.size+= 1024;
         }
-        players.items[pi].body = (Point16*) malloc (sizeof (Point16) * players.items[pi].size);
-        players.items[pi].length = 0;
-        players.items[pi].head = 0;
-        players.items[pi].timer = 0;
-        players.items[pi].state = psErased;
+        pli.body = (Point16*) malloc (sizeof (Point16) * pli.size);
+        pli.length = 0;
+        pli.head = 0;
+        pli.timer = 0;
+        pli.state = psErased;
     }
 
     renderLoadPlayers (info);
@@ -76,10 +84,10 @@ void playersUninitialize () {
     renderFreePlayers ();
 
     for (pi = 0; pi < players.count; pi++) {
-        free (players.items[pi].body);
+        free (players[pi].body);
     }
 
-    free (players.items);
+    delete [] (players.items);
 }
 
 void playersClear () {

@@ -11,7 +11,7 @@ void audio_initialize ();
 
 void audio_uninitialize ();
 
-void audio_load_players (const GameInfo *info);
+void audio_load_players (const GameInfo& info);
 
 void audio_free_players ();
 

@@ -15,7 +15,8 @@ typedef enum KeySt {
     ksNone, ksLeft, ksRight, ksJump, ksPower
 } KeySt;
 
-void playersInitialize (const GameInfo *info);
+void players_initialize (const GameInfo& info);
+
 void playersUninitialize ();
 int playersStep ();
 void  playersTimer (int speed);

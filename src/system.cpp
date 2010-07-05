@@ -6,6 +6,7 @@
 #include <strings.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
+#include <vector>
 
 #include "config.h"
 #include "system.h"
@@ -38,65 +39,67 @@ typedef struct _ModEvents {
     ModOnPlTimer on_pl_timer;
 } ModEvents;
 
-static char *home_dir = NULL;
-static char *profile_dir = NULL;
-static char *profile_file = NULL;
-static char *mods_dir = NULL;
-static char *mods_dir_home = NULL;
-static char *images_dir = NULL;
-static char *fonts_dir = NULL;
-static char *fonts_dir_home = NULL;
-static char *sounds_dir = NULL;
-static char *sounds_dir_home = NULL;
-static char *music_dir = NULL;
-static char *music_dir_home = NULL;
+static string home_dir;
+static string profile_dir;
+static string profile_file;
+static string mods_dir;
+static string mods_dir_home;
+static string images_dir;
+static string fonts_dir;
+static string fonts_dir_home;
+static string sounds_dir;
+static string sounds_dir_home;
+static string music_dir;
+static string music_dir_home;
 
 typedef struct _ModEntry {
-    char *filename;
+    string filename;
     const ModInfo *info;
 } ModEntry;
 
-typedef struct _ModEntries {
+/*typedef struct _ModEntries {
     size_t count;
     ModEntry *items;
-} ModEntries;
+} ModEntries;*/
+
+typedef vector<ModEntry> ModEntries;
 
 static ModEntries mod_entries;
 static ModEvents mod_events;
 static void *mod_handle;
 
-static char *resolv_home_dir () {
-    return str_copy (getenv ("HOME"));
+static string resolv_home_dir () {
+    return getenv ("HOME");
 }
 
-static char *resolv_profile_dir () {
-    return str_concat (home_dir, PROFILE_DIR);
+static string resolv_profile_dir () {
+    return home_dir + PROFILE_DIR;
 }
 
-static char *resolv_profile_file () {
-    return str_concat (profile_dir, PROFILE_FILE);
+static string resolv_profile_file () {
+    return profile_dir + PROFILE_FILE;
 }
 
-static char *resolv_dir (const char *dir) {
-    char * result;
+static string resolv_dir (string dir) {
+    string result;
     
     #ifdef USE_WORKING_DIR
 
     char *cwd = getcwd (NULL, 0);
-    result = str_concat (cwd, dir);
+    result = cwd + dir;
     free (cwd);
 
     #else
 
-    result = str_concat (NERVICI_PREFIX, dir);
+    result = NERVICI_PREFIX + dir;
 
     #endif
     
     return result;
 }
 
-static char * resolv_dir_home (const char *dir) {
-    return str_concat (profile_dir, dir);
+static string resolv_dir_home (string dir) {
+    return profile_dir + dir;
 }
 
 void sys_init_paths () {
@@ -114,33 +117,33 @@ void sys_init_paths () {
     music_dir = resolv_dir (NERVICI_MUSIC_DIR);
     music_dir_home = resolv_dir_home (HOME_MUSIC_DIR);
 
-    mkdir (profile_dir, 0755);
-    mkdir (mods_dir_home, 0755);
-    mkdir (fonts_dir_home, 0755);
-    mkdir (sounds_dir_home, 0755);
-    mkdir (music_dir_home, 0755);
+    mkdir (profile_dir.c_str(), 0755);
+    mkdir (mods_dir_home.c_str(), 0755);
+    mkdir (fonts_dir_home.c_str(), 0755);
+    mkdir (sounds_dir_home.c_str(), 0755);
+    mkdir (music_dir_home.c_str(), 0755);
 }
 
 void sys_free_paths () {
-    free (home_dir);
-    free (profile_dir);
-    free (profile_file);
-    free (mods_dir);
-    free (mods_dir_home);
-    free (images_dir);
-    free (fonts_dir);
-    free (fonts_dir_home);
-    free (sounds_dir);
-    free (sounds_dir_home);
-    free (music_dir);
-    free (music_dir_home);
+    /*home_dir;
+    profile_dir = NULL;
+    profile_file = NULL;
+    mods_dir = NULL;
+    mods_dir_home = NULL;
+    images_dir = NULL;
+    fonts_dir = NULL;
+    fonts_dir_home = NULL;
+    sounds_dir = NULL;
+    sounds_dir_home = NULL;
+    music_dir = NULL;
+    music_dir_home = NULL;*/
 }
 
-static const ModInfo *load_mod_info (const char * filename) {
+static const ModInfo *load_mod_info (string filename) {
     void *handle;
     const ModInfo *result = NULL;
     
-    handle = dlopen (filename, RTLD_NOW);
+    handle = dlopen (filename.c_str(), RTLD_NOW);
     if (!handle) {
         printf ("load mod  info %s\n", dlerror ());
         return NULL;
@@ -157,15 +160,15 @@ static const ModInfo *load_mod_info (const char * filename) {
     return result;
 }
 
-static void scan_mods_path (const char *path, ModEntries *entries) {
+static void scan_mods_path (string path, ModEntries& entries) {
     DIR *dir;
     struct dirent *ent;
     const char *suffix;
     const ModInfo *info;
-    char *mod_file;
+    string mod_file;
     ModEntry entry;
 
-    dir = opendir (path);
+    dir = opendir (path.c_str ());
     if (dir == NULL) return;
     
     for (ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
@@ -174,15 +177,15 @@ static void scan_mods_path (const char *path, ModEntries *entries) {
         if (suffix == NULL) continue;
         if (strcasecmp (suffix, ".so") != 0) continue;    
 
-        mod_file = str_concat_path (path, ent->d_name);
+        mod_file = path + '/' + ent->d_name;
 
         info = load_mod_info (mod_file);
         if (info != NULL) {
             entry.filename = mod_file;
             entry.info = info;
-            array_append (*entries, entry, ModEntry*);
-        } else {
-            free (mod_file);
+//            array_append (*entries, entry, ModEntry*);
+            //entries.count++;
+            entries.push_back(entry);
         }
         
     }
@@ -191,31 +194,34 @@ static void scan_mods_path (const char *path, ModEntries *entries) {
 }
 
 void sys_find_mods () {
-    scan_mods_path (mods_dir, &mod_entries);
-    scan_mods_path (mods_dir_home, &mod_entries);
+    /*mod_entries.count = 0;
+    mod_entries.items = new ModEntry[0];*/
+
+    scan_mods_path (mods_dir, mod_entries);
+    scan_mods_path (mods_dir_home, mod_entries);
 }
 
 void sys_free_mods () {
-    if (mod_entries.count > 0) {
-        for (int e = 0; e < mod_entries.count; e++) {
+    /*if (mod_entries.count > 0) {*/
+        /*for (int e = 0; e < mod_entries.count; e++) {
             free (mod_entries.items[e].filename);
-        }
-        free (mod_entries.items);
-    }
+        }*/
+/*        free (mod_entries.items);
+    }*/
 }
 
 size_t sys_get_mods_count () {
-    return mod_entries.count;
+    return mod_entries.size();
 }
 
 const ModInfo *sys_get_mod (size_t mid) {
-    return mod_entries.items[mid].info;
+    return mod_entries[mid].info;
 }
 
 void sys_load_mod (size_t mid) {
     long int fake;
     
-    mod_handle = dlopen (mod_entries.items[mid].filename, RTLD_NOW);
+    mod_handle = dlopen (mod_entries[mid].filename.c_str(), RTLD_NOW);
     if (!mod_handle) return;
     
     printf ("load mod\n");
@@ -223,7 +229,7 @@ void sys_load_mod (size_t mid) {
     fake = (long int) dlsym (mod_handle, "after_step");
     mod_events.after_step = (ModAfterStep) fake;
 
-    printf ("load mod %ld\n", mod_entries.count);
+    printf ("load mod %ld\n", mod_entries.size());
 
     fake = (long int) dlsym (mod_handle, "before_step");
     mod_events.before_step = (ModBeforeStep) fake;
@@ -363,34 +369,34 @@ void sys_mod_on_pl_timer (int plid) {
         mod_events.on_pl_timer (plid);
 }
 
-const char *sys_get_profile_file () {
+string sys_get_profile_file () {
     return profile_file;
 }
 
-const char *sys_get_images_dir () {
+string sys_get_images_dir () {
     return images_dir;
 }
 
-const char *sys_get_fonts_dir () {
+string sys_get_fonts_dir () {
     return fonts_dir;
 }
 
-const char *sys_get_fonts_dir_home () {
+string sys_get_fonts_dir_home () {
     return fonts_dir_home;
 }
 
-const char *sys_get_sounds_dir () {
+string sys_get_sounds_dir () {
     return sounds_dir;
 }
 
-const char *sys_get_sounds_dir_home () {
+string sys_get_sounds_dir_home () {
     return sounds_dir_home;
 }
 
-const char *sys_get_music_dir () {
+string sys_get_music_dir () {
     return music_dir;
 }
 
-const char *sys_get_music_dir_home () {
+string sys_get_music_dir_home () {
     return music_dir_home;
 }

@@ -243,18 +243,18 @@ static SDL_Surface *renderCreateNumbers(int color, int team) {
     return result;
 }
 
-void renderLoadPlayers(const GameInfo *info) {
+void renderLoadPlayers(const GameInfo& info) {
     int p;
 
-    plFaces.count = info->plsCount;
+    plFaces.count = info.plsCount;
     plFaces.items = (SDL_Surface**) malloc (sizeof (SDL_Surface*) * plFaces.count);
 
-    plNumbers.count = info->plsCount;
+    plNumbers.count = info.plsCount;
     plNumbers.items = (SDL_Surface**) malloc (sizeof (SDL_Surface*) * plFaces.count);
 
-    for (p = 0; p < info->plsCount; p++) {
-        plFaces.items[p] = renderCreatePlayerFace(info->plInfos[p].color);
-        plNumbers.items[p] = renderCreateNumbers(info->plInfos[p].color, 0x00);
+    for (p = 0; p < info.plsCount; p++) {
+        plFaces.items[p] = renderCreatePlayerFace(info.plInfos[p].color);
+        plNumbers.items[p] = renderCreateNumbers(info.plInfos[p].color, 0x00);
     }
 
 }

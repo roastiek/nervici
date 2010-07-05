@@ -22,15 +22,15 @@ typedef struct Game {
 
 static Game game;
 
-void gameInitialize (const GameInfo *info) {
+void gameInitialize (const GameInfo& info) {
     printf ("gameInitialize\n");
     
-    game.set = info->setting;
-    setSpeed (info->setting->speed);
+    game.set = info.setting;
+    setSpeed (info.setting->speed);
 
     renderDrawGameScreen ();
     world_initialize ();
-    playersInitialize (info);
+    players_initialize (info);
 
     game.end = 0;
     game.abort = 0;

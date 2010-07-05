@@ -98,7 +98,7 @@ static int run () {
     printf("run\n");
     
     //WorldItem items[renderGetPlayerGroundWidth () * renderGetPlayerGroundHeight ()];
-    gameInitialize (&gameinfo);
+    gameInitialize (gameinfo);
     gameRun ();
     gameUninitialize ();
 

@@ -8,7 +8,7 @@
 int renderInit();
 void renderUninit();
 
-void renderLoadPlayers (const GameInfo *info);
+void renderLoadPlayers (const GameInfo& info);
 void renderFreePlayers ();
 
 void renderClear ();

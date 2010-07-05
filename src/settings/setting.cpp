@@ -155,7 +155,7 @@ void setting_load () {
     directory->name[0] = '\0';
     directory->start = NULL;
 
-    stream = fopen (sys_get_profile_file() , "rt");
+    stream = fopen (sys_get_profile_file().c_str() , "rt");
     if (stream == NULL) return;
     
     sec = directory;
@@ -201,7 +201,7 @@ void setting_save () {
     FILE *stream;
 
     if (changed) {
-        stream = fopen (sys_get_profile_file (), "wt");
+        stream = fopen (sys_get_profile_file ().c_str(), "wt");
         if (stream == NULL) return;
     
     

@@ -11,7 +11,7 @@ typedef struct _GameInfo {
     PlInfo *plInfos;
 } GameInfo;
 
-void gameInitialize (const GameInfo *info);
+void gameInitialize (const GameInfo& info);
 void gameRun ();
 void gameUninitialize ();
 

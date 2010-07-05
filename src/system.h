@@ -1,40 +1,43 @@
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
 
+#include <string>
 #include "mods/mods.h"
+
+using namespace std;
 
 /*
  * location of ~/.nervici/nervici.conf
  */
-const char *sys_get_profile_file ();
+string sys_get_profile_file ();
 /*
  * location of share/nervici/images
  */
-const char *sys_get_images_dir ();
+string sys_get_images_dir ();
 /*
  * location of share/nervici/fonts
  */
-const char *sys_get_fonts_dir ();
+string sys_get_fonts_dir ();
 /*
  * location of ~/.nervici/fonts
  */
-const char *sys_get_fonts_dir_home ();
+string sys_get_fonts_dir_home ();
 /*
  * location of share/nervici/sound
  */
-const char *sys_get_sounds_dir ();
+string sys_get_sounds_dir ();
 /*
  * location of ~/.nervici/sounds
  */
-const char *sys_get_sounds_dir_home ();
+string sys_get_sounds_dir_home ();
 /*
  * location of share/nervici/fonts
  */
-const char *sys_get_music_dir ();
+string sys_get_music_dir ();
 /*
  * location of ~/.nervici/sounds
  */
-const char *sys_get_music_dir_home ();
+string sys_get_music_dir_home ();
 
 /*
  * populate all system paths
