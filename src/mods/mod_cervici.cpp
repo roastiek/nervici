@@ -29,13 +29,13 @@ void on_game_start (const GameSetting *nset) {
         printf ("game start %d\n", p);
         s = world_find_free_start ();
         if (s != -1) {
-            givePlStart (p, s);
-            setPlTimer (p, -1000);
+            give_pl_start (p, s);
+            set_pl_timer (p, -1000);
         }
     }
     printf ("game start\n");
     
-    setTimer (-3000);
+    set_timer (-3000);
 }
 
 void on_game_end () {
@@ -54,8 +54,8 @@ void after_step () {
     int p;
     
     for (p = 0; p < set->playersCount; p++) {
-        if (isPlLive (p)) {
-            incPlScore (p, 1);
+        if (is_pl_live (p)) {
+            inc_pl_score (p, 1);
         }
     }
 }
@@ -91,10 +91,10 @@ void on_cleared (int plid) {
 }
 
 void on_pl_timer (int plid) {
-    startPl (plid);
-    playMusic (0);
-    setSemafor (1);
-    nextRound ();
+    start_pl (plid);
+    play_music (0);
+    set_semafor (1);
+    next_round ();
 }
 
 }

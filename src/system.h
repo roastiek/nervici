@@ -9,35 +9,35 @@ using namespace std;
 /*
  * location of ~/.nervici/nervici.conf
  */
-string sys_get_profile_file ();
+const string& sys_get_profile_file ();
 /*
  * location of share/nervici/images
  */
-string sys_get_images_dir ();
+const string& sys_get_images_dir ();
 /*
  * location of share/nervici/fonts
  */
-string sys_get_fonts_dir ();
+const string& sys_get_fonts_dir ();
 /*
  * location of ~/.nervici/fonts
  */
-string sys_get_fonts_dir_home ();
+const string& sys_get_fonts_dir_home ();
 /*
  * location of share/nervici/sound
  */
-string sys_get_sounds_dir ();
+const string& sys_get_sounds_dir ();
 /*
  * location of ~/.nervici/sounds
  */
-string sys_get_sounds_dir_home ();
+const string& sys_get_sounds_dir_home ();
 /*
  * location of share/nervici/fonts
  */
-string sys_get_music_dir ();
+const string& sys_get_music_dir ();
 /*
  * location of ~/.nervici/sounds
  */
-string sys_get_music_dir_home ();
+const string& sys_get_music_dir_home ();
 
 /*
  * populate all system paths

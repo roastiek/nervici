@@ -5,29 +5,44 @@
 #include "settings/plinfo.h"
 #include "world.h"
 
-typedef struct _GameInfo {
+struct GameInfo {
     GameSetting *setting;
     int plsCount;
     PlInfo *plInfos;
-} GameInfo;
+};
 
-void gameInitialize (const GameInfo& info);
-void gameRun ();
-void gameUninitialize ();
+void game_initialize (const GameInfo& info);
 
-void clearPlayerground ();
-void clearStatus ();
-void endGame ();
-int getSpeed ();
-int livePlsCount ();
-void nextRound ();
-void playMusic (int type);
-int getRound ();
-void setSemafor (int state);
-void setSpeed (int speed);
-void setTimer (int time);
-void stopMusic ();
-void gameWait (int time);
-void waitForSpace ();
+void game_run ();
+
+void game_uninitialize ();
+
+void clear_playerground ();
+
+void clear_status ();
+
+void end_game ();
+
+int get_speed ();
+
+int live_pls_count ();
+
+void next_round ();
+
+void play_music (int type);
+
+int get_round ();
+
+void set_semafor (int state);
+
+void set_speed (int speed);
+
+void set_timer (int time);
+
+void stop_music ();
+
+void game_wait (int time);
+
+void wait_for_space ();
 
 #endif

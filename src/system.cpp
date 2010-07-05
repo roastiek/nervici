@@ -57,11 +57,6 @@ typedef struct _ModEntry {
     const ModInfo *info;
 } ModEntry;
 
-/*typedef struct _ModEntries {
-    size_t count;
-    ModEntry *items;
-} ModEntries;*/
-
 typedef vector<ModEntry> ModEntries;
 
 static ModEntries mod_entries;
@@ -80,7 +75,7 @@ static string resolv_profile_file () {
     return profile_dir + PROFILE_FILE;
 }
 
-static string resolv_dir (string dir) {
+static string resolv_dir (const string& dir) {
     string result;
     
     #ifdef USE_WORKING_DIR
@@ -98,7 +93,7 @@ static string resolv_dir (string dir) {
     return result;
 }
 
-static string resolv_dir_home (string dir) {
+static string resolv_dir_home (const string& dir) {
     return profile_dir + dir;
 }
 
@@ -139,7 +134,7 @@ void sys_free_paths () {
     music_dir_home = NULL;*/
 }
 
-static const ModInfo *load_mod_info (string filename) {
+static const ModInfo *load_mod_info (const string& filename) {
     void *handle;
     const ModInfo *result = NULL;
     
@@ -160,7 +155,7 @@ static const ModInfo *load_mod_info (string filename) {
     return result;
 }
 
-static void scan_mods_path (string path, ModEntries& entries) {
+static void scan_mods_path (const string& path, ModEntries& entries) {
     DIR *dir;
     struct dirent *ent;
     const char *suffix;
@@ -183,8 +178,6 @@ static void scan_mods_path (string path, ModEntries& entries) {
         if (info != NULL) {
             entry.filename = mod_file;
             entry.info = info;
-//            array_append (*entries, entry, ModEntry*);
-            //entries.count++;
             entries.push_back(entry);
         }
         
@@ -194,20 +187,11 @@ static void scan_mods_path (string path, ModEntries& entries) {
 }
 
 void sys_find_mods () {
-    /*mod_entries.count = 0;
-    mod_entries.items = new ModEntry[0];*/
-
     scan_mods_path (mods_dir, mod_entries);
     scan_mods_path (mods_dir_home, mod_entries);
 }
 
 void sys_free_mods () {
-    /*if (mod_entries.count > 0) {*/
-        /*for (int e = 0; e < mod_entries.count; e++) {
-            free (mod_entries.items[e].filename);
-        }*/
-/*        free (mod_entries.items);
-    }*/
 }
 
 size_t sys_get_mods_count () {
@@ -369,34 +353,34 @@ void sys_mod_on_pl_timer (int plid) {
         mod_events.on_pl_timer (plid);
 }
 
-string sys_get_profile_file () {
+const string& sys_get_profile_file () {
     return profile_file;
 }
 
-string sys_get_images_dir () {
+const string& sys_get_images_dir () {
     return images_dir;
 }
 
-string sys_get_fonts_dir () {
+const string& sys_get_fonts_dir () {
     return fonts_dir;
 }
 
-string sys_get_fonts_dir_home () {
+const string& sys_get_fonts_dir_home () {
     return fonts_dir_home;
 }
 
-string sys_get_sounds_dir () {
+const string& sys_get_sounds_dir () {
     return sounds_dir;
 }
 
-string sys_get_sounds_dir_home () {
+const string& sys_get_sounds_dir_home () {
     return sounds_dir_home;
 }
 
-string sys_get_music_dir () {
+const string& sys_get_music_dir () {
     return music_dir;
 }
 
-string sys_get_music_dir_home () {
+const string& sys_get_music_dir_home () {
     return music_dir_home;
 }

@@ -18,23 +18,19 @@ static const char *wavs[] = {
     "/smileminus.wav", "/wall1.wav", "/wall2.wav"
 };
 
+static const char *section = "audio";
+static const char *st_sound = "sound";
+static const char *st_music = "music";
+static const char *st_buffer = "buffer";
+static const char *st_bfrCount = "bfrCount";
+
 typedef struct _SoundProfile {
     string name;
     string directory;
     ALuint buffers[WAVS_COUNT];
 } SoundProfile;
 
-/*typedef struct _SoundProfiles {
-    size_t count;
-    SoundProfile *items;
-} SoundProfiles;*/
 typedef vector<SoundProfile> SoundProfiles;
-
-static const char *section = "audio";
-static const char *st_sound = "sound";
-static const char *st_music = "music";
-static const char *st_buffer = "buffer";
-static const char *st_bfrCount = "bfrCount";
 
 typedef struct _AudioSetting {
     int sound;
@@ -42,6 +38,21 @@ typedef struct _AudioSetting {
     int buffer;
     int bfrCount;
 } AudioSetting;
+
+typedef struct _PlAudio {
+    int prof;
+    ALuint source;
+    int r;
+} PlAudio;
+
+typedef vector<PlAudio> PlAudios;
+
+typedef struct _MusicFile {
+    string filename;
+    int played;
+} MusicFile;
+
+typedef vector<MusicFile> MusicFiles;
 
 static ALfloat sourcePos[] = {0.0, 0.0, 0.0};
 static ALfloat sourceVel[] = {0.0, 0.0, 0.0};
@@ -56,35 +67,11 @@ static SoundProfiles sound_profiles;
 
 static AudioSetting setting;
 
-typedef struct _PlAudio {
-    int prof;
-    ALuint source;
-    int r;
-} PlAudio;
-
-/*typedef struct _PlAudios {
-    size_t count;
-    PlAudio *items;
-} PlAudios;*/
-typedef vector<PlAudio> PlAudios;
-
 static PlAudios sources;
-
-typedef struct _MusicFile {
-    string filename;
-    int played;
-} MusicFile;
-
-/*typedef struct _MusicFiles {
-    size_t count;
-    MusicFile *items;
-} MusicFiles;*/
-typedef vector<MusicFile> MusicFiles;
 
 static MusicFiles music[MT_Count];
 
-static void scan_sounds_dir (string path, SoundProfiles& profiles) {
-    size_t path_len;
+static void scan_sounds_dir (const string& path, SoundProfiles& profiles) {
     int w;
     int valid;
     DIR *dir;
@@ -92,26 +79,18 @@ static void scan_sounds_dir (string path, SoundProfiles& profiles) {
     FILE *file;
     string prof_path;
     string wav_path;
-    size_t prof_path_len;
-    size_t wav_len;
     SoundProfile entry;
 
     dir = opendir (path.c_str());
     if (dir == NULL) return;
 
-    //path_len = strlen (path);
-
     for (ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
         if (ent->d_name[0] == '.') continue;
 
         prof_path = path + '/' + ent->d_name;
-        /*wav_path = str_bigger_copy (prof_path, 16);
-        prof_path_len = strlen (prof_path);*/
 
         valid = 1;
         for (w = 0; w < WAVS_COUNT; w++) {
-            /*wav_len = strlen (wavs[w]);
-            memcpy (&wav_path[prof_path_len], wavs[w], wav_len + 1);*/
             wav_path = prof_path + wavs[w];
 
             file = fopen (wav_path.c_str(), "rb");
@@ -121,24 +100,19 @@ static void scan_sounds_dir (string path, SoundProfiles& profiles) {
             }
             fclose (file);
         }
-        //free (wav_path);
 
         if (valid) {
-            memset (&entry.buffers, 0, sizeof (entry.buffers));
+//            memset (&entry.buffers, 0, sizeof (entry.buffers));
             entry.directory = prof_path;
             entry.name = str_copy (ent->d_name);
             profiles.push_back (entry);
-
-//            array_append (*profiles, entry, SoundProfile*);
-        /*} else {
-            free (prof_path);*/
         }
     }
 
     closedir (dir);
 }
 
-static ALuint load_wav (string filename) {
+static ALuint load_wav (const string& filename) {
     SDL_AudioSpec spec;
     Uint8 *data;
     Uint32 len;
@@ -181,30 +155,21 @@ static ALuint load_wav (string filename) {
 
 static void load_buffers (SoundProfiles& profiles) {
     int w;
-    size_t dir_len;
     string filename;
 
-    for (int pi = 0; pi < profiles.size(); pi++) {
+    for (size_t pi = 0; pi < profiles.size(); pi++) {
         SoundProfile& spi = profiles[pi];
 
-        /*dir_len = strlen (spi->directory);
-        filename = str_bigger_copy (spi->directory, 16);*/
-
         for (w = 0; w < WAVS_COUNT; w++) {
-            //memcpy (&filename[dir_len], wavs[w], strlen (wavs[w] + 1));
             filename = spi.directory + wavs[w];
             spi.buffers[w] = load_wav (filename);
         }
-
-//        free (filename);
     }
 }
 
 static void load_wavs () {
     printf ("loadWavs\n");
 
-/*    sound_profiles.count = 0;
-    sound_profiles.items = NULL;*/
     scan_sounds_dir (sys_get_sounds_dir (), sound_profiles);
     scan_sounds_dir (sys_get_sounds_dir_home (), sound_profiles);
 
@@ -212,23 +177,20 @@ static void load_wavs () {
 }
 
 static void free_wavs () {
-    for (int pi = 0; pi < sound_profiles.size (); pi++) {
+    for (size_t pi = 0; pi < sound_profiles.size (); pi++) {
         SoundProfile& spi = sound_profiles[pi];
-/*        free (spi->name);
-        free (spi->directory);*/
         alDeleteBuffers (WAVS_COUNT, spi.buffers);
     }
-    /*sound_profiles.count = 0;
-    free (sound_profiles.items);*/
 }
 
-static int ogg_get_length (string filename) {
+static double ogg_get_length (const string& filename) {
     OggVorbis_File file;
-    int result;
+    double result;
     size_t len;
+    char *fn;
 
     len = filename.length();
-    char fn[len + 1];
+    fn = (char *) alloca(len + 1);
     memcpy (fn, filename.c_str(), len + 1);
 
     if (ov_fopen (fn, &file)) return -1;
@@ -239,22 +201,18 @@ static int ogg_get_length (string filename) {
     return result;
 }
 
-static void scan_music_dir (string path, MusicFiles& files, MusicType type) {
+static void scan_music_dir (const string& path, MusicFiles& files, MusicType type) {
     DIR *dir;
-    size_t path_len;
     struct dirent *ent;
-    int len;
+    double len;
     string file_path;
     MusicFile entry;
 
     dir = opendir (path.c_str());
     if (dir == NULL) return;
 
-    //path_len = strlen (path);
-
     for (ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
         if (ent->d_name[0] == '.') continue;
-
 
         file_path = path + '/' + ent->d_name;
 
@@ -262,18 +220,15 @@ static void scan_music_dir (string path, MusicFiles& files, MusicType type) {
 
         if (len <= 0) continue;
         if (type == MT_Short && len > 150) {
-//            free (file_path);
             continue;
         }
         if (type == MT_Long && len <= 150) {
-  //          free (file_path);
             continue;
         }
 
         entry.filename = file_path;
         entry.played = 0;
         files.push_back(entry);
-/*        array_append (*files, entry, MusicFile*);*/
     }
 
     closedir (dir);
@@ -293,37 +248,19 @@ static int musicOpened = 0;
 static void load_music () {
     static const char suffixs[MT_Count][6] = {"/game", "/game", "/menu", "/stat"};
     string dir_name;
-    size_t dir_len;
     MusicType mt;
 
     printf ("loadMusic\n");
 
-/*    for (mt = MT_Short; mt < MT_Count; mt++) {
-        music[mt].count = 0;
-        music[mt].items = NULL;
-    }*/
-
-    /*dir_name = str_bigger_copy (sys_get_music_dir (), 8);
-    dir_len = strlen (dir_name);*/
-
     for (mt = MT_Short; mt < MT_Count; mt++) {
-        //memcpy (&dir_name[dir_len], suffixs[mt], strlen (suffixs[mt]) + 1);
         dir_name = sys_get_music_dir() + suffixs[mt];
         scan_music_dir (dir_name, music[mt], mt);
     }
 
-    //free (dir_name);
-
-    /*dir_name = str_bigger_copy (sys_get_music_dir_home (), 8);
-    dir_len = strlen (dir_name);*/
-
     for (mt = MT_Short; mt < MT_Count; mt++) {
-//        memcpy (&dir_name[dir_len], suffixs[mt], strlen (suffixs[mt]) + 1);
         dir_name = sys_get_music_dir_home() + suffixs[mt];
         scan_music_dir (dir_name, music[mt], mt);
     }
-
-//    free (dir_name);
 
     mloader = (char *)malloc (setting.buffer);
     musicBuffers = (ALuint*) malloc (sizeof (ALuint) * setting.bfrCount);
@@ -334,7 +271,6 @@ static void load_music () {
     alSourcefv (musicSource, AL_POSITION, sourcePos);
     alSourcefv (musicSource, AL_VELOCITY, sourceVel);
     alSourcef (musicSource, AL_GAIN, setting.music / 20.0);
-
 }
 
 static void free_music () {

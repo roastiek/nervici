@@ -22,11 +22,11 @@ typedef struct Game {
 
 static Game game;
 
-void gameInitialize (const GameInfo& info) {
+void game_initialize (const GameInfo& info) {
     printf ("gameInitialize\n");
     
     game.set = info.setting;
-    setSpeed (info.setting->speed);
+    set_speed (info.setting->speed);
 
     renderDrawGameScreen ();
     world_initialize ();
@@ -38,28 +38,28 @@ void gameInitialize (const GameInfo& info) {
     game.live = 0;
     game.timer = 0;
 
-    setSemafor (-1);
+    set_semafor (-1);
     renderDrawRound (game.round);
 
-    clearPlayerground ();
+    clear_playerground ();
 
     sys_load_mod (0);
     sys_mod_on_game_start (game.set);
     
-    game.live = playerGetLivesCount ();
+    game.live = player_get_lives_count ();
 }
 
-void gameUninitialize () {
+void game_uninitialize () {
     printf ("gameUninitialize\n");
 
     sys_mod_on_game_end ();
     sys_unload_mod ();
 
-    playersUninitialize();
+    players_uninitialize();
     world_uninitialize();
 }
 
-void gameRun () {
+void game_run () {
     SDL_Event event;
     Sint32 delay, delta;
 
@@ -86,7 +86,7 @@ void gameRun () {
         
         sys_mod_before_step ();
 
-        game.live = playersStep ();
+        game.live = players_step ();
         world_check_starts ();
         
         sys_mod_after_step ();
@@ -106,7 +106,7 @@ void gameRun () {
                 sys_mod_on_timer ();
             }
         } else game.timer+= game.speed;
-        playersTimer (game.speed);
+        players_timer (game.speed);
     }
     
     music_stop ();
@@ -116,57 +116,57 @@ void gameRun () {
     }
 }
 
-void playMusic (int type) {
+void play_music (int type) {
     printf ("music pl\n");
     music_play ((MusicType) (type % 2));
 }
 
-void stopMusic () {
+void stop_music () {
     music_stop ();
 }
 
-void setSemafor (int state) {
+void set_semafor (int state) {
     renderDrawSemafor (state);
 }
 
-void setTimer (int time) {
+void set_timer (int time) {
     game.timer = time;
 }
 
-void nextRound () {
+void next_round () {
     game.round++;
     renderDrawRound (game.round);
 }
 
-int getRound () {
+int get_round () {
     return game.round;
 }
-void clearPlayerground () {
+void clear_playerground () {
     world_clear ();
     renderClear ();
-    playersClear ();
+    players_clear ();
 }
 
-void endGame () {
+void end_game () {
     game.end = 1;
 }
 
-int getSpeed () {
+int get_speed () {
     return game.speed; 
 }
 
-void setSpeed (int speed) {
+void set_speed (int speed) {
     game.speed = speed;
     if (game.speed < 6) game.speed = 6;
     if (game.speed > 24) game.speed = 24;
     music_set_rate (12.0 / game.speed);
 }
 
-int livePlsCount () {
+int live_pls_count () {
     return game.live;
 }
 
-void gameWait (int time) {
+void game_wait (int time) {
     int delay;
     SDL_Event event;
     
@@ -189,7 +189,7 @@ void gameWait (int time) {
     }
 }
 
-void waitForSpace () {
+void wait_for_space () {
     SDL_Event event;
     
     while (!game.end && !game.abort) {
