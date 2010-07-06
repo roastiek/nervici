@@ -1,6 +1,7 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
+#include "mods/nervici.h"
 #include "mods/mods.h"
 #include "settings/plinfo.h"
 #include "world.h"

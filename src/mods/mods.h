@@ -1,6 +1,10 @@
 #ifndef __MODS_H__
 #define __MODS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _ModInfo {
     const char *name;
     const char *autor;
@@ -37,5 +41,8 @@ typedef void (*ModOnSelfDeath) (int plid);
 typedef void (*ModOnCleared) (int plid);
 typedef void (*ModOnPlTimer) (int plid);
 
+#ifdef	__cplusplus
+}
+#endif
 
 #endif // __MODS_H__

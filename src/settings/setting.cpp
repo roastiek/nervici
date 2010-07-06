@@ -1,8 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 #include <string.h>
-#include <strings.h>
-#include <ctype.h>
+//#include <strings.h>
+//#include <ctype.h>
 #include <iostream>
 #include <fstream>
 
@@ -328,11 +328,11 @@ void setting_print_directory () {
     SetEntry *ent;
 
     while (sec != NULL) {
-        printf ("[%s]\n", sec->name.c_str ());
+        cout << '[' << sec->name.c_str () << "]\n";
 
         ent = sec->first_entry;
         while (ent != NULL) {
-            printf ("  %s = %s\n", ent->key.c_str (), ent->value.c_str ());
+            cout << "  " << ent->key.c_str () << " = " << ent->value.c_str () << '\n';
             ent = ent->next;
         }
 

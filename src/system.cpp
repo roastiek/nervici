@@ -1,15 +1,18 @@
 #include <dirent.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
+//#include <stdio.h>
+//#include <unistd.h>
+//#include <stdlib.h>
 #include <string.h>
-#include <strings.h>
+//#include <strings.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
 #include <vector>
+#include <iostream>
 
 #include "config.h"
 #include "system.h"
+
+using namespace std;
 
 #define PROFILE_DIR "/.nervici"
 #define PROFILE_FILE "/nervici.conf"
@@ -18,7 +21,7 @@
 #define HOME_SOUNDS_DIR "/sounds"
 #define HOME_MUSIC_DIR "/music"
 
-typedef struct _ModEvents {
+struct ModEvents {
     ModOnGameStart on_game_start;
     ModOnGameEnd on_game_end;
     ModOnTimer on_timer;
@@ -36,7 +39,7 @@ typedef struct _ModEvents {
     ModOnSelfDeath on_self_death;
     ModOnCleared on_cleared;
     ModOnPlTimer on_pl_timer;
-} ModEvents;
+};
 
 static string home_dir;
 static string profile_dir;
@@ -139,7 +142,7 @@ static const ModInfo *load_mod_info (const string& filename) {
     
     handle = dlopen (filename.c_str(), RTLD_NOW);
     if (!handle) {
-        printf ("load mod  info %s\n", dlerror ());
+        cerr << "load mod  info " << dlerror () << '\n';
         return NULL;
     }
     
@@ -204,15 +207,14 @@ const ModInfo *sys_get_mod (size_t mid) {
 void sys_load_mod (size_t mid) {
     long int fake;
     
+    cout << __func__ << '\n';
+
     mod_handle = dlopen (mod_entries[mid].filename.c_str(), RTLD_NOW);
     if (!mod_handle) return;
     
-    printf ("load mod\n");
-    
+  
     fake = (long int) dlsym (mod_handle, "after_step");
     mod_events.after_step = (ModAfterStep) fake;
-
-    printf ("load mod %ld\n", mod_entries.size());
 
     fake = (long int) dlsym (mod_handle, "before_step");
     mod_events.before_step = (ModBeforeStep) fake;

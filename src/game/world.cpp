@@ -1,9 +1,11 @@
 #include <SDL.h>
 #include <math.h>
+#include <iostream>
 
 #include "world.h"
-
 #include "engine/render.h"
+
+using namespace std;
 
 static Uint16 width;
 static Uint16 height;
@@ -21,7 +23,9 @@ void world_initialize () {
 
     //world.items = (WorldItem*) malloc(sizeof(WorldItem) * world.width * world.height);
     items = new WorldItem[width * height];
-    if (items == NULL) printf ("nom memoty\n");
+    if (items == NULL) {
+        cerr << "nom memoty\n";
+    }
 
     startsCount = 40;
     starts = (Start *) malloc (sizeof (Start) * startsCount);
@@ -111,8 +115,6 @@ int world_find_free_start () {
     for (s = 0; s < startsCount; s++) {
         avai += starts[s].ready;
     }
-
-    printf ("find free start %d\n", avai);
 
     if (avai > 0) {
         do {

@@ -30,13 +30,13 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 #SET (CMAKE_C_FLAGS "-O2")
 #SET (CMAKE_CXX_FLAGS "-O2")
-SET (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -pg -pedantic -DUSE_WORKING_DIR -g3 -gdwarf-2 -std=c99")
+SET (CMAKE_C_FLAGS_DEBUG "-Wall -pg -pedantic -DUSE_WORKING_DIR -g3 -gdwarf-2 -std=c99")
 SET (CMAKE_CXX_FLAGS_DEBUG "-Wall -pg -pedantic -DUSE_WORKING_DIR -g3 -gdwarf-2 -std=c++0x")
 SET (CMAKE_C_FLAGS_RELEASE "-Wall -DUSE_WORKING_DIR")
 
 CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-ADD_LIBRARY (mod_cervici SHARED src/mods/mod_cervici.cpp)
+ADD_LIBRARY (mod_cervici SHARED src/mods/mod_cervici.c)
 
 SET (NERVICI_ENGINE src/engine/render.cpp src/engine/audio.cpp src/engine/loader.cpp)
 SET (NERVICI_GAME src/game/world.cpp src/game/player.cpp src/game/game.cpp)

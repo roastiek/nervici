@@ -1,6 +1,10 @@
 #ifndef __NERVICI_H__
 #define __NERVICI_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void clear_playerground ();
 
 void clear_status ();
@@ -69,5 +73,8 @@ void set_pl_timer (int plid, int time);
 
 void start_pl (int plid);
 
+#ifdef	__cplusplus
+}
+#endif
 
 #endif // __NERVICI_H__

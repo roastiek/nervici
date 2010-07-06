@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <math.h>
-#include <stdio.h>
+//#include <stdio.h>
+#include <iostream>
 
 #include "game.h"
 #include "player.h"
@@ -9,6 +10,8 @@
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "system.h"
+
+using namespace std;
 
 typedef struct Game {
     const GameSetting *set;
@@ -23,7 +26,7 @@ typedef struct Game {
 static Game game;
 
 void game_initialize (const GameInfo& info) {
-    printf ("gameInitialize\n");
+    cout << __func__ << '\n';
     
     game.set = info.setting;
     set_speed (info.setting->speed);
@@ -50,7 +53,7 @@ void game_initialize (const GameInfo& info) {
 }
 
 void game_uninitialize () {
-    printf ("gameUninitialize\n");
+    cout << __func__ << '\n';
 
     sys_mod_on_game_end ();
     sys_unload_mod ();
@@ -63,7 +66,7 @@ void game_run () {
     SDL_Event event;
     Sint32 delay, delta;
 
-    printf ("gameRun\n");
+    cout << __func__ << '\n';
     delay = SDL_GetTicks();
 
     while (!game.end && !game.abort) {
@@ -102,7 +105,7 @@ void game_run () {
             game.timer+= game.speed;
             if (game.timer >= 0) {
                 game.timer = 0;
-                printf ("timer\n");
+                cout << "timer\n";
                 sys_mod_on_timer ();
             }
         } else game.timer+= game.speed;
@@ -117,7 +120,7 @@ void game_run () {
 }
 
 void play_music (int type) {
-    printf ("music pl\n");
+    cout << __func__ << '\n';
     music_play ((MusicType) (type % 2));
 }
 

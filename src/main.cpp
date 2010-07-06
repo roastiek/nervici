@@ -1,7 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
+//#include <stdlib.h>
+//#include <stdio.h>
 #include <math.h>
 #include <SDL.h>
+#include <iostream>
 
 #include "main.h"
 #include "game/game.h"
@@ -12,6 +13,8 @@
 #include "settings/setting.h"
 #include "settings/plinfo.h"
 #include "engine/audio.h"
+
+using namespace std;
 
 #ifndef M_PI
 #define M_PI 3.141f
@@ -27,7 +30,7 @@ static PlInfo infos[2];
 static int initialize() {
     int a;
 
-    printf("intialize\n");
+    cout << __func__ << '\n';
 
     sys_init_paths ();
     setting_load ();
@@ -39,8 +42,8 @@ static int initialize() {
     if (SDL_Init(0)) return 1;
     
     for (a = 0; a < angles; a++) {
-        icos[a] = floorf (cosf(M_PI * 2  * a / angles) * digits) / digits;
-        isin[a] = floorf (sinf(M_PI * 2  * a / angles) * digits) / digits;
+        icos[a] = floor (cos(M_PI * 2  * a / angles) * digits) / digits;
+        isin[a] = floor (sin(M_PI * 2  * a / angles) * digits) / digits;
     }
 
     if (render_initialize ()) return 1;
@@ -79,7 +82,7 @@ static int initialize() {
 }
 
 static int uninitialize() {
-    printf("unintialize\n");
+    cout << __func__ << '\n';
     
     audio_uninitialize ();
     render_uninitialize();
@@ -96,7 +99,7 @@ static int uninitialize() {
 }
 
 static int run () {
-    printf("run\n");
+    cout << __func__ << '\n';
     
     //WorldItem items[renderGetPlayerGroundWidth () * renderGetPlayerGroundHeight ()];
     game_initialize (gameinfo);
@@ -107,7 +110,6 @@ static int run () {
 }
 
 int main (int argc, char *argv[]) {
-    printf ("main %ld\n", sizeof (int));
     
     initialize ();
     run ();

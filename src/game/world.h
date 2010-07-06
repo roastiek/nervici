@@ -9,6 +9,7 @@
 #define IT_HARD_SMILE   5
 
 #include "main.h"
+#include "mods/nervici.h"
 
 struct WIPlayer {
     Uint8 ID;

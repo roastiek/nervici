@@ -2,10 +2,11 @@
 #include <alc.h>
 #include <SDL.h>
 #include <dirent.h>
-#include <string.h>
+//#include <string.h>
 #include <vorbisfile.h>
 #include <AL/al.h>
 #include <vector>
+#include <iostream>
 
 #include "audio.h"
 #include "system.h"
@@ -167,7 +168,7 @@ static void load_buffers (SoundProfiles& profiles) {
 }
 
 static void load_wavs () {
-    printf ("loadWavs\n");
+    cout << __func__ << '\n';
 
     scan_sounds_dir (sys_get_sounds_dir (), sound_profiles);
     scan_sounds_dir (sys_get_sounds_dir_home (), sound_profiles);
@@ -249,7 +250,7 @@ static void load_music () {
     string dir_name;
     MusicType mt;
 
-    printf ("loadMusic\n");
+    cout << __func__ << '\n';
 
     for (mt = MT_Short; mt < MT_Count; mt++) {
         dir_name = sys_get_music_dir() + suffixs[mt];
@@ -281,7 +282,7 @@ static void free_music () {
 }
 
 static void load_audio_setting () {
-    printf ("loadAudioSetting\n");
+    cout << __func__ << '\n';
 
     setting.sound = setting_read_int (section, st_sound, 20);
     setting.music = setting_read_int (section, st_music, 20);
@@ -297,7 +298,7 @@ static void save_audio_setting () {
 }
 
 void audio_initialize () {
-    printf ("audioInit\n");
+    cout << __func__ << '\n';
     pDevice = alcOpenDevice (NULL);
     pContext = alcCreateContext (pDevice, NULL);
     alcMakeContextCurrent (pContext);
@@ -417,7 +418,7 @@ static int music_open (MusicType type) {
     }
 
     while (count < music[type].size ()) {
-        printf ("music open %ld/%ld\n", count, music[type].size ());
+        cout << "music open " << count << '/' << music[type].size () << '\n';
         f = rand () % music[type].size ();
         if (!music[type][f].played) {
             music[type][f].played = 1;

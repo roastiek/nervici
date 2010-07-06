@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <math.h>
 #include <vector>
+#include <iostream>
 
 #include "player.h"
 #include "world.h"
@@ -230,14 +231,14 @@ void Player::add_part (Point16 part) {
             head++;
             head %= size;
             length++;
-        } else fprintf (stderr, "error: not enough bodysize");
+        } else cerr << "error: not enough bodysize\n";
     } else {
         if (length < maxLength) {
             body[head] = part;
             head++;
             head %= size;
             length++;
-        } else fprintf (stderr, "error: not enough maxlength");
+        } else cerr << "error: not enough maxlength\n";
     }
 }
 
@@ -319,7 +320,7 @@ void Player::give_start (int start) {
     if (start >= 0) {
         st = world_get_start (start);
         if (st != NULL) {
-            printf ("give pl start %d %d\n", ID, st->angle);
+            cout << "give pl start " << ID << ' ' <<  st->angle << '\n';
 
             exact = st->pos;
             angle = st->angle;
