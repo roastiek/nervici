@@ -264,9 +264,7 @@ void render_load_players (const GameInfo& info) {
 }
 
 void render_free_players () {
-    int p;
-
-    for (p = 0; p < plFaces.count; p++) {
+    for (size_t p = 0; p < plFaces.count; p++) {
         SDL_FreeSurface (plFaces.items[p]);
         SDL_FreeSurface (plNumbers.items[p]);
     }

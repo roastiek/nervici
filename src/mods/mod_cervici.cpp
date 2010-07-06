@@ -12,7 +12,7 @@ static ModInfo info = {
 };
 
 static const GameSetting *set;
-static int delta = -1;
+//static int delta = -1;
 
 extern "C" {
 

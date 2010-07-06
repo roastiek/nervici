@@ -273,16 +273,6 @@ static void load_music () {
 }
 
 static void free_music () {
-    MusicType mt;
-    int mi;
-
-    /*for (mt = MT_Short; mt < MT_Count; mt++) {*/
-/*        for (mi = 0; mi < music[mt].count; mi++) {
-            free (music[mt].items[mi].filename);
-        }*/
-        /*free (music[mt].items);
-    }*/
-
     alDeleteBuffers (setting.bfrCount, musicBuffers);
     alDeleteSources (1, &musicSource);
 
@@ -334,9 +324,7 @@ void audio_uninitialize () {
 }
 
 static int find_profil (string name) {
-    int si;
-
-    for (si = 0; si < sound_profiles.size (); si++) {
+    for (size_t si = 0; si < sound_profiles.size (); si++) {
         if (strcasecmp (name.c_str(), sound_profiles[si].name.c_str()) == 0) {
             return si;
         }
@@ -365,9 +353,7 @@ void audio_load_players (const GameInfo& info) {
 }
 
 void audio_free_players () {
-    int si;
-
-    for (si = 0; si < sources.size (); si++) {
+    for (size_t si = 0; si < sources.size (); si++) {
         alSourceStop (sources[si].source);
         alDeleteSources (1, &sources[si].source);
     }
@@ -414,24 +400,24 @@ void audio_play_effect (int plid, EffectType effect) {
 }
 
 static int music_open (MusicType type) {
-    int f, count;
+    int f;
     int op;
-    int mi;
+    size_t count;
 
     count = 0;
-    for (mi = 0; mi < music[type].size (); mi++) {
+    for (size_t mi = 0; mi < music[type].size (); mi++) {
         count += music[type][mi].played & 1;
     }
 
     if (count == music[type].size ()) {
-        for (mi = 0; mi < music[type].size (); mi++) {
+        for (size_t mi = 0; mi < music[type].size (); mi++) {
             music[type][mi].played = 0;
         }
         count = 0;
     }
 
     while (count < music[type].size ()) {
-        printf ("music open %d/%ld\n", count, music[type].size ());
+        printf ("music open %ld/%ld\n", count, music[type].size ());
         f = rand () % music[type].size ();
         if (!music[type][f].played) {
             music[type][f].played = 1;

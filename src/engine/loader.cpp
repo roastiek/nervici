@@ -43,9 +43,7 @@ Surfaces loadGameImages (TTF_Font *font) {
 }
 
 void freeGameImages (Surfaces images) {
-    int si;
-
-    for (si = 0; si < images.count; si++) {
+    for (size_t si = 0; si < images.count; si++) {
         SDL_FreeSurface(images.items[si]);
     }
 
@@ -79,9 +77,7 @@ Fonts loadFonts () {
 }
 
 void freeFonts (Fonts fonts) {
-    int fi;
-
-    for (fi = 0; fi < fonts.count; fi++) {
+    for (size_t fi = 0; fi < fonts.count; fi++) {
         TTF_CloseFont(fonts.items[fi]);
     }
 

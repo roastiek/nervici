@@ -27,7 +27,7 @@ void set_timer (int time);
 
 void stop_music ();
 
-void game_wait (int time);
+void game_wait (size_t time);
 
 void wait_for_space ();
 

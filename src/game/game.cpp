@@ -166,8 +166,8 @@ int live_pls_count () {
     return game.live;
 }
 
-void game_wait (int time) {
-    int delay;
+void game_wait (size_t time) {
+    size_t delay;
     SDL_Event event;
     
     delay = SDL_GetTicks();

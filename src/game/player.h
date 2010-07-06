@@ -21,7 +21,7 @@ private:
     int ID;
     const PlInfo* info;
     PlState state;
-    int head;
+    size_t head;
     size_t size;
 
     FPoint exact;
@@ -35,9 +35,9 @@ private:
     int timer;
 
     Point16 *body;
-    int length;
-    int bottom;
-    int maxLength;
+    size_t length;
+    size_t bottom;
+    size_t maxLength;
 
     void clear_bottom ();
     void check_length ();
@@ -68,11 +68,11 @@ public:
     int get_score () const;
     bool is_jumping () const;
     bool is_human () const;
-    int get_max_length () const;
-    int get_length () const;
+    size_t get_max_length () const;
+    size_t get_length () const;
     int get_id () const;
     PlState get_state () const;
-    int get_head () const;
+    size_t get_head () const;
     size_t get_size () const;
     bool is_live () const;
 };

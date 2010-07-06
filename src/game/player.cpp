@@ -365,7 +365,7 @@ PlState Player::get_state () const {
     return state;
 }
 
-int Player::get_head () const {
+size_t Player::get_head () const {
     return head;
 }
 
@@ -403,11 +403,11 @@ void Player::dec_max_length (size_t delta) {
     maxLength = maxlen;
 }
 
-int Player::get_max_length () const {
+size_t Player::get_max_length () const {
     return maxLength;
 }
 
-int Player::get_length () const {
+size_t Player::get_length () const {
     return length;
 }
 
@@ -416,8 +416,8 @@ int Player::get_id () const {
 }
 
 void Player::inc_max_length (size_t delta) {
-    int maxlen = maxLength + delta;
-    int inc = 0;
+    size_t maxlen = maxLength + delta;
+    size_t inc = 0;
 
     while (size + inc <= maxlen) {
         inc += 1024;
@@ -483,12 +483,10 @@ void players_initialize (const GameInfo& info) {
 }
 
 void players_uninitialize () {
-    int pi;
-
     audio_free_players ();
     render_free_players ();
 
-    for (pi = 0; pi < players.size (); pi++) {
+    for (size_t pi = 0; pi < players.size (); pi++) {
         players[pi].uninitialize ();
     }
 
@@ -496,29 +494,24 @@ void players_uninitialize () {
 }
 
 void players_clear () {
-    int pi;
-
-    for (pi = 0; pi < players.size (); pi++) {
+    for (size_t pi = 0; pi < players.size (); pi++) {
         players[pi].clear_state_only ();
     }
 }
 
 void players_timer (int speed) {
-    int pi;
-
-    for (pi = 0; pi < players.size (); pi++) {
+    for (size_t pi = 0; pi < players.size (); pi++) {
         players[pi].timer_func (speed);
     }
 }
 
 int players_step () {
-    int pi;
     Uint8 *keys;
     int result = 0;
 
     keys = SDL_GetKeyState (NULL);
 
-    for (pi = 0; pi < players.size (); pi++) {
+    for (size_t pi = 0; pi < players.size (); pi++) {
         result+= players[pi].step (keys);
         //result += (players[pi].state == psLive);
     }
@@ -527,10 +520,9 @@ int players_step () {
 }
 
 int player_get_lives_count () {
-    int pi;
     int result = 0;
 
-    for (pi = 0; pi < players.size (); pi++) {
+    for (size_t pi = 0; pi < players.size (); pi++) {
         result += players[pi].is_live ();
     }
 
