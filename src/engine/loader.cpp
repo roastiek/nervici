@@ -7,12 +7,12 @@
 #include "loader.h"
 #include "system.h"
 
-static const char *gameImages[] = {
+static const char* const gameImages[] = {
     "/semafor.png",
     "/heart.png"
 };
 
-static const char *baseFonts[] = {
+static const char* const baseFonts[] = {
     "/mono.ttf"
 };
 
@@ -21,6 +21,7 @@ void load_game_images (Surfaces& images, TTF_Font* font) {
     const SDL_Color bg = {0, 0, 0};
     string filename;
     ImageType i;
+
 
     images.resize (imtCount);
 

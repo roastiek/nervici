@@ -19,9 +19,9 @@ static Players players;
 
 void calcFields (const FPoint& pos, Fields& fields) {
     fields[1][1] = 255;
-    fields[2][1] = 255 * (pos.x - floorf (pos.x));
+    fields[2][1] = 255 * (pos.x - floor (pos.x));
     fields[0][1] = 255 - fields[2][1];
-    fields[1][2] = 255 * (pos.y - floorf (pos.y));
+    fields[1][2] = 255 * (pos.y - floor (pos.y));
     fields[1][0] = 255 - fields[1][2];
     fields[0][0] = fields[0][1] * fields[1][0] / 255;
     fields[2][0] = fields[2][1] * fields[1][0] / 255;

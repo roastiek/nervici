@@ -21,30 +21,28 @@ void world_initialize () {
     width = render_get_playerground_width ();
     height = render_get_playerground_height ();
 
-    //world.items = (WorldItem*) malloc(sizeof(WorldItem) * world.width * world.height);
     items = new WorldItem[width * height];
     if (items == NULL) {
         cerr << "nom memoty\n";
     }
 
     startsCount = 40;
-    starts = (Start *) malloc (sizeof (Start) * startsCount);
+    starts = new Start[startsCount];
 
     x = (width >= height) ? height : width;
     x /= 2;
     for (s = 0; s < startsCount; s++) {
         starts[s].angle = s * 2;
-        starts[s].pos.x = floorf ((width / 2 - (x * icos[starts[s].angle] * 0.8)) * digits) / digits;
-        starts[s].pos.y = floorf ((height / 2 - (x * isin[starts[s].angle] * 0.8)) * digits) / digits;
+        starts[s].pos.x = floor ((width / 2 - (x * icos[starts[s].angle] * 0.8)) * digits) / digits;
+        starts[s].pos.y = floor ((height / 2 - (x * isin[starts[s].angle] * 0.8)) * digits) / digits;
         starts[s].ready = 1;
     }
 
 }
 
 void world_uninitialize () {
-    free (starts);
-
-    //free(world.items);
+    delete [] starts;
+    delete [] items;
 }
 
 void world_clear () {

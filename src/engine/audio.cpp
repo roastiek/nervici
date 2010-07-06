@@ -13,44 +13,44 @@
 #include "settings/setting.h"
 
 #define WAVS_COUNT 8
-static const char *wavs[] = {
+static const char* const wavs[] = {
     "/hop.wav", "/jau1.wav", "/jau2.wav", "/self.wav", "/smileplus.wav",
     "/smileminus.wav", "/wall1.wav", "/wall2.wav"
 };
 
-static const char *section = "audio";
-static const char *st_sound = "sound";
-static const char *st_music = "music";
-static const char *st_buffer = "buffer";
-static const char *st_bfrCount = "bfrCount";
+static const char* const section = "audio";
+static const char* const st_sound = "sound";
+static const char* const st_music = "music";
+static const char* const st_buffer = "buffer";
+static const char* const st_bfrCount = "bfrCount";
 
-typedef struct _SoundProfile {
+struct SoundProfile {
     string name;
     string directory;
     ALuint buffers[WAVS_COUNT];
-} SoundProfile;
+};
 
 typedef vector<SoundProfile> SoundProfiles;
 
-typedef struct _AudioSetting {
+struct AudioSetting {
     int sound;
     int music;
     int buffer;
     int bfrCount;
-} AudioSetting;
+};
 
-typedef struct _PlAudio {
+struct PlAudio {
     int prof;
     ALuint source;
     int r;
-} PlAudio;
+};
 
 typedef vector<PlAudio> PlAudios;
 
-typedef struct _MusicFile {
+struct MusicFile {
     string filename;
     int played;
-} MusicFile;
+};
 
 typedef vector<MusicFile> MusicFiles;
 
@@ -102,7 +102,6 @@ static void scan_sounds_dir (const string& path, SoundProfiles& profiles) {
         }
 
         if (valid) {
-//            memset (&entry.buffers, 0, sizeof (entry.buffers));
             entry.directory = prof_path;
             entry.name = ent->d_name;
             profiles.push_back (entry);
@@ -246,7 +245,7 @@ static bool musicLoop = false;
 static bool musicOpened = false;
 
 static void load_music () {
-    static const char suffixs[MT_Count][6] = {"/game", "/game", "/menu", "/stat"};
+    static const char* const suffixs[MT_Count] = {"/game", "/game", "/menu", "/stat"};
     string dir_name;
     MusicType mt;
 
@@ -262,8 +261,8 @@ static void load_music () {
         scan_music_dir (dir_name, music[mt], mt);
     }
 
-    mloader = (char *)malloc (setting.buffer);
-    musicBuffers = (ALuint*) malloc (sizeof (ALuint) * setting.bfrCount);
+    mloader = new char[setting.buffer];
+    musicBuffers = new ALuint[setting.bfrCount];
 
     alGenBuffers (setting.bfrCount, musicBuffers);
     alGenSources (1, &musicSource);
@@ -277,8 +276,8 @@ static void free_music () {
     alDeleteBuffers (setting.bfrCount, musicBuffers);
     alDeleteSources (1, &musicSource);
 
-    free (mloader);
-    free (musicBuffers);
+    delete [] mloader;
+    delete [] musicBuffers;
 }
 
 static void load_audio_setting () {
@@ -335,9 +334,6 @@ static int find_profil (string name) {
 
 void audio_load_players (const GameInfo& info) {
     int si;
-
-    /*sources.count = info.plsCount;
-    sources.items = (PlAudio*) malloc (sizeof (PlAudio) * sources.count);*/
 
     sources.clear();
 

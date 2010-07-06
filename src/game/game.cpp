@@ -13,7 +13,7 @@
 
 using namespace std;
 
-typedef struct Game {
+struct Game {
     const GameSetting *set;
     int round;
     int end;
@@ -21,7 +21,7 @@ typedef struct Game {
     int live;
     int speed;
     int timer;
-} Game;
+};
 
 static Game game;
 
