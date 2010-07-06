@@ -28,7 +28,6 @@ void calcFields (const FPoint& pos, Fields& fields) {
     fields[2][2] = fields[1][2] * fields[2][1] / 255;
 }
 
-
 static int simpleTestFields (const Point16& pos, const Fields& fields) {
     int result = 1;
     int x, y;
@@ -47,23 +46,22 @@ static int simpleTestFields (const Point16& pos, const Fields& fields) {
 static int testFields (int plid, const Point16& pos, const Fields& fields) {
     int result = 1;
     int x, y;
-    WorldItem *item;
 
     for (y = 0; y < 3 && result; y++) {
         for (x = 0; x < 3 && result; x++) {
             if (fields[x][y] != 0) {
-                item = world_get_item (pos.x + x, pos.y + y);
-                switch (item->type) {
+                WorldItem& item = world_get_item (pos.x + x, pos.y + y);
+                switch (item.type) {
                     case IT_FREE:
                     case IT_SOFT_SMILE:
                         continue;
                     case IT_PLAYER:
                     {
                         Player *pl = &(players[plid]);
-                        result &= (item->player.ID == plid) && (
-                                (item->player.order < pl->get_head ())
-                                ? pl->get_head () - item->player.order <= 4
-                                : pl->get_head () + item->player.order - 4 <= pl->get_size ()
+                        result &= (item.player.ID == plid) && (
+                                (item.player.order < pl->get_head ())
+                                ? pl->get_head () - item.player.order <= 4
+                                : pl->get_head () + item.player.order - 4 <= pl->get_size ()
                                 );
 
                         /*                    if (item->player.ID == plid) {
@@ -89,30 +87,29 @@ static int testFields (int plid, const Point16& pos, const Fields& fields) {
 
 static void processFields (Player *pl, const Point16& pos, const Fields& fields) {
     int x, y;
-    WorldItem *item;
 
     if (pl->get_state () == psLive || pl->get_state () == psStart) {
         for (y = 0; y < 3; y++) {
             for (x = 0; x < 3; x++) {
                 if (fields[x][y] != 0) {
-                    item = world_get_item (pos.x + x, pos.y + y);
-                    switch (item->type) {
+                    WorldItem& item = world_get_item (pos.x + x, pos.y + y);
+                    switch (item.type) {
                         case IT_FREE:
-                            item->type = IT_PLAYER;
-                            item->player.ID = pl->get_id ();
-                            item->player.body = fields[x][y];
-                            item->player.order = pl->get_head ();
+                            item.type = IT_PLAYER;
+                            item.player.ID = pl->get_id ();
+                            item.player.body = fields[x][y];
+                            item.player.order = pl->get_head ();
                             break;
                         case IT_PLAYER:
-                            if (item->player.body < fields[x][y]) {
-                                item->player.body = fields[x][y];
-                                item->player.order = pl->get_head ();
+                            if (item.player.body < fields[x][y]) {
+                                item.player.body = fields[x][y];
+                                item.player.order = pl->get_head ();
                             }
                             break;
                         case IT_SOFT_SMILE:
                             break;
                     }
-                    renderDrawWorldItem (pos.x + x, pos.y + y, item);
+                    render_draw_world_item (pos.x + x, pos.y + y, item);
                 }
             }
         }
@@ -121,8 +118,8 @@ static void processFields (Player *pl, const Point16& pos, const Fields& fields)
         int crashed = 0;
         for (y = 0; y < 3; y++) {
             for (x = 0; x < 3; x++) {
-                item = world_get_item (pos.x + x, pos.y + y);
-                switch (item->type) {
+                WorldItem& item = world_get_item (pos.x + x, pos.y + y);
+                switch (item.type) {
                     case IT_STONE:
                         if (!crashed) {
                             crashed = 1;
@@ -149,7 +146,7 @@ static void processFields (Player *pl, const Point16& pos, const Fields& fields)
         }
     }
 
-    renderUpdateFace (pos.x, pos.y);
+    render_update_face (pos.x, pos.y);
 
 }
 
@@ -190,7 +187,6 @@ void Player::timer_func (int speed) {
 }
 
 void Player::clear_bottom () {
-    WorldItem *item;
     Point16 pos;
     int x, y;
 
@@ -198,15 +194,15 @@ void Player::clear_bottom () {
 
     for (y = 0; y < 3; y++) {
         for (x = 0; x < 3; x++) {
-            item = world_get_item (pos.x + x, pos.y + y);
+            WorldItem& item = world_get_item (pos.x + x, pos.y + y);
 
-            if (item->type == IT_PLAYER && item->player.ID == ID && item->player.order == bottom) {
-                item->type = IT_FREE;
-                renderDrawWorldItem (pos.x + x, pos.y + y, item);
+            if (item.type == IT_PLAYER && item.player.ID == ID && item.player.order == bottom) {
+                item.type = IT_FREE;
+                render_draw_world_item (pos.x + x, pos.y + y, item);
             }
         }
     }
-    renderUpdateFace (pos.x, pos.y);
+    render_update_face (pos.x, pos.y);
 
     bottom++;
     bottom %= size;
@@ -290,13 +286,13 @@ void Player::clear_step () {
 
 int Player::step (const Uint8 *keys) {
     if (info->type == PT_Human) {
-        if (jumptime == 0 && keys[info->control.keys.jump]) {
+        if (jumptime == 0 && keys[info->keys.jump]) {
             keyst = ksJump;
-        } else if (keys[info->control.keys.left] && keys[info->control.keys.right]) {
+        } else if (keys[info->keys.left] && keys[info->keys.right]) {
             keyst = ksPower;
-        } else if (keys[info->control.keys.left]) {
+        } else if (keys[info->keys.left]) {
             keyst = ksLeft;
-        } else if (keys[info->control.keys.right]) {
+        } else if (keys[info->keys.right]) {
             keyst = ksRight;
         } else {
             keyst = ksNone;
@@ -323,7 +319,7 @@ void Player::give_start (int start) {
     if (start >= 0) {
         st = world_get_start (start);
         if (st != NULL) {
-            printf ("give pl start %d\n", ID);
+            printf ("give pl start %d %d\n", ID, st->angle);
 
             exact = st->pos;
             angle = st->angle;
@@ -482,7 +478,7 @@ void players_initialize (const GameInfo& info) {
         players[pi].initialize (pi, info);
     }
 
-    renderLoadPlayers (info);
+    render_load_players (info);
     audio_load_players (info);
 }
 
@@ -490,7 +486,7 @@ void players_uninitialize () {
     int pi;
 
     audio_free_players ();
-    renderFreePlayers ();
+    render_free_players ();
 
     for (pi = 0; pi < players.size (); pi++) {
         players[pi].uninitialize ();

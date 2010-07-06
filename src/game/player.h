@@ -19,7 +19,7 @@ typedef Uint8 Fields[3][3];
 struct Player {
 private:
     int ID;
-    const PlInfo *info;
+    const PlInfo* info;
     PlState state;
     int head;
     size_t size;

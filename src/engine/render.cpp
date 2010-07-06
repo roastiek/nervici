@@ -13,7 +13,7 @@
 #define C_TEXT          0x00ffd5d5
 #define C_ACTIVETEXT    0x00d5d5ff
 
-static struct GameScreen {
+struct GameScreen {
     SDL_Rect score;
     SDL_Rect team;
     SDL_Rect round;
@@ -22,13 +22,17 @@ static struct GameScreen {
     SDL_Rect timer;
     SDL_Rect statustext;
     SDL_Rect playerground;
-} gsInner, gsOuter;
+};
 
-static struct ScreenSet {
+struct ScreenSet {
     int width;
     int height;
     int fullscreen;
-} sett;
+};
+
+static GameScreen gs_inner, gs_outer;
+
+static ScreenSet setting;
 
 static SDL_Surface *primary = NULL;
 static SDL_Surface *background = NULL;
@@ -46,204 +50,204 @@ static const char *st_width = "width";
 static const char *st_height = "height";
 static const char *st_fullscreen = "fullscreen";
 
-static void loadScreenSetting() {
-    sett.width = setting_read_int(section, st_width, 1024);
-    sett.height = setting_read_int(section, st_height, 768);
-    sett.fullscreen = setting_read_int(section, st_fullscreen, 0);
+static void loadScreenSetting () {
+    setting.width = setting_read_int (section, st_width, 1024);
+    setting.height = setting_read_int (section, st_height, 768);
+    setting.fullscreen = setting_read_int (section, st_fullscreen, 0);
 }
 
-static void saveScreenSetting() {
-    setting_write_int(section, st_width, sett.width);
-    setting_write_int(section, st_height, sett.height);
-    setting_write_int(section, st_fullscreen, sett.fullscreen);
+static void saveScreenSetting () {
+    setting_write_int (section, st_width, setting.width);
+    setting_write_int (section, st_height, setting.height);
+    setting_write_int (section, st_fullscreen, setting.fullscreen);
 }
 
-static void innerArea(const SDL_Rect *outer, SDL_Rect *inner) {
-    inner->x = outer->x + 1;
-    inner->y = outer->y + 1;
-    inner->w = outer->w - 2;
-    inner->h = outer->h - 2;
+static void innerArea (const SDL_Rect& outer, SDL_Rect& inner) {
+    inner.x = outer.x + 1;
+    inner.y = outer.y + 1;
+    inner.w = outer.w - 2;
+    inner.h = outer.h - 2;
 }
 
-static void initGameScreen() {
+static void initGameScreen () {
 #define inner 6
 #define outer 7
 
-    gsOuter.semafor.w = 146;
-    gsOuter.semafor.x = sett.width - gsOuter.semafor.w - outer;
-    gsOuter.semafor.h = 26;
-    gsOuter.semafor.y = outer;
-    innerArea(&gsOuter.semafor, &gsInner.semafor);
+    gs_outer.semafor.w = 146;
+    gs_outer.semafor.x = setting.width - gs_outer.semafor.w - outer;
+    gs_outer.semafor.h = 26;
+    gs_outer.semafor.y = outer;
+    innerArea (gs_outer.semafor, gs_inner.semafor);
 
-    gsOuter.round = gsOuter.semafor;
-    gsOuter.round.y = sett.height - gsOuter.round.h - outer;
-    innerArea(&gsOuter.round, &gsInner.round);
+    gs_outer.round = gs_outer.semafor;
+    gs_outer.round.y = setting.height - gs_outer.round.h - outer;
+    innerArea (gs_outer.round, gs_inner.round);
 
-    gsOuter.team = gsOuter.semafor;
-    gsOuter.team.h = 180;
-    gsOuter.team.y = gsOuter.round.y - gsOuter.team.h - inner;
-    innerArea(&gsOuter.team, &gsInner.team);
+    gs_outer.team = gs_outer.semafor;
+    gs_outer.team.h = 180;
+    gs_outer.team.y = gs_outer.round.y - gs_outer.team.h - inner;
+    innerArea (gs_outer.team, gs_inner.team);
 
-    gsOuter.score = gsOuter.semafor;
-    gsOuter.score.h = gsOuter.team.y - gsOuter.semafor.y - gsOuter.semafor.h - 2 * inner;
-    gsOuter.score.y = gsOuter.semafor.y + gsOuter.semafor.h + inner;
-    innerArea(&gsOuter.score, &gsInner.score);
+    gs_outer.score = gs_outer.semafor;
+    gs_outer.score.h = gs_outer.team.y - gs_outer.semafor.y - gs_outer.semafor.h - 2 * inner;
+    gs_outer.score.y = gs_outer.semafor.y + gs_outer.semafor.h + inner;
+    innerArea (gs_outer.score, gs_inner.score);
 
-    gsOuter.status.w = gsOuter.semafor.x - outer - inner;
-    gsOuter.status.x = outer;
-    gsOuter.status.h = 26;
-    gsOuter.status.y = outer;
-    innerArea(&gsOuter.status, &gsInner.status);
+    gs_outer.status.w = gs_outer.semafor.x - outer - inner;
+    gs_outer.status.x = outer;
+    gs_outer.status.h = 26;
+    gs_outer.status.y = outer;
+    innerArea (gs_outer.status, gs_inner.status);
 
-    gsOuter.timer = gsOuter.status;
-    gsOuter.timer.w = images.items[imtTimer]->w / 12 * 8 + 8;
-    gsOuter.timer.x = gsOuter.status.x + gsOuter.status.w - gsOuter.timer.w;
-    innerArea(&gsOuter.timer, &gsInner.timer);
+    gs_outer.timer = gs_outer.status;
+    gs_outer.timer.w = images.items[imtTimer]->w / 12 * 8 + 8;
+    gs_outer.timer.x = gs_outer.status.x + gs_outer.status.w - gs_outer.timer.w;
+    innerArea (gs_outer.timer, gs_inner.timer);
 
-    gsOuter.statustext = gsOuter.status;
-    gsOuter.statustext.w -= gsOuter.timer.w;
-    innerArea(&gsOuter.statustext, &gsInner.statustext);
+    gs_outer.statustext = gs_outer.status;
+    gs_outer.statustext.w -= gs_outer.timer.w;
+    innerArea (gs_outer.statustext, gs_inner.statustext);
 
-    gsOuter.playerground = gsOuter.status;
-    gsOuter.playerground.h = sett.height - gsOuter.status.h - 2 * outer - inner;
-    gsOuter.playerground.y += gsOuter.status.h + inner;
-    innerArea(&gsOuter.playerground, &gsInner.playerground);
+    gs_outer.playerground = gs_outer.status;
+    gs_outer.playerground.h = setting.height - gs_outer.status.h - 2 * outer - inner;
+    gs_outer.playerground.y += gs_outer.status.h + inner;
+    innerArea (gs_outer.playerground, gs_inner.playerground);
 }
 
-int renderInit() {
+int render_initialize () {
     int flag;
-    loadScreenSetting();
+    loadScreenSetting ();
 
-    if (SDL_InitSubSystem(SDL_INIT_VIDEO)) return 1;
-    TTF_Init();
+    if (SDL_InitSubSystem (SDL_INIT_VIDEO)) return 1;
+    TTF_Init ();
 
     flag = SDL_HWSURFACE;
-    if (sett.fullscreen) flag |= SDL_FULLSCREEN;
+    if (setting.fullscreen) flag |= SDL_FULLSCREEN;
 
-    primary = SDL_SetVideoMode(sett.width, sett.height, 32, flag);
+    primary = SDL_SetVideoMode (setting.width, setting.height, 32, flag);
     if (primary == NULL) return 1;
 
-    background = SDL_CreateRGBSurface(SDL_HWSURFACE, sett.width, sett.height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
-    merge = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
+    background = SDL_CreateRGBSurface (SDL_HWSURFACE, setting.width, setting.height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
+    merge = SDL_CreateRGBSurface (SDL_HWSURFACE, 1, 1, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
 
     fill_rect.x = 0;
     fill_rect.y = 0;
-    fill_rect.w = sett.width;
-    fill_rect.h = sett.height;
-    SDL_FillRect(background, &fill_rect, 0xffffff);
+    fill_rect.w = setting.width;
+    fill_rect.h = setting.height;
+    SDL_FillRect (background, &fill_rect, 0xffffff);
     fill_rect.x++;
     fill_rect.y++;
     fill_rect.w -= 2;
     fill_rect.h -= 2;
-    SDL_FillRect(background, &fill_rect, 0x0);
+    SDL_FillRect (background, &fill_rect, 0x0);
 
-    fonts = loadFonts();
-    images = loadGameImages(fonts.items[fntMono20]);
-    initGameScreen();
+    fonts = loadFonts ();
+    images = loadGameImages (fonts.items[fntMono20]);
+    initGameScreen ();
 
     return 0;
 }
 
-void renderUninit() {
-    freeGameImages(images);
-    freeFonts(fonts);
+void render_uninitialize () {
+    freeGameImages (images);
+    freeFonts (fonts);
 
-    if (merge != NULL) SDL_FreeSurface(merge);
-    if (background != NULL) SDL_FreeSurface(background);
-    if (primary != NULL) SDL_FreeSurface(primary);
+    if (merge != NULL) SDL_FreeSurface (merge);
+    if (background != NULL) SDL_FreeSurface (background);
+    if (primary != NULL) SDL_FreeSurface (primary);
 
-    TTF_Quit();
-    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+    TTF_Quit ();
+    SDL_QuitSubSystem (SDL_INIT_VIDEO);
 
-    saveScreenSetting();
+    saveScreenSetting ();
 }
 
-static Uint32 getPixel(SDL_Surface *face, int x, int y) {
+static Uint32 getPixel (SDL_Surface *face, int x, int y) {
     Uint32 *row = (Uint32*) ((Uint8*) face->pixels + y * face->pitch);
     return row[x];
 }
 
-static void putPixel(SDL_Surface *face, int x, int y, Uint32 p) {
+static void putPixel (SDL_Surface *face, int x, int y, Uint32 p) {
     Uint32 *row = (Uint32*) ((Uint8*) face->pixels + y * face->pitch);
     row[x] = p;
 }
 
-static SDL_Surface *renderCreatePlayerFace(Uint32 color) {
+static SDL_Surface *renderCreatePlayerFace (Uint32 color) {
     SDL_Surface *result;
-    result = SDL_CreateRGBSurface(SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
     if (result != NULL) {
         fill_rect.x = 0;
         fill_rect.y = 0;
         fill_rect.w = 256;
         fill_rect.h = 1;
 
-        SDL_FillRect(result, &fill_rect, color);
+        SDL_FillRect (result, &fill_rect, color);
 
-        SDL_LockSurface(result);
+        SDL_LockSurface (result);
         int x;
         for (x = 0; x < 256; x++) {
             Uint32 *pix = (Uint32*) result->pixels;
             pix[x] |= x * 0x1000000;
         }
-        SDL_UnlockSurface(result);
+        SDL_UnlockSurface (result);
     }
     return result;
 }
 
-static SDL_Surface *renderCreateNumbers(int color, int team) {
-    SDL_Surface *result = SDL_CreateRGBSurface(SDL_HWSURFACE,
+static SDL_Surface *renderCreateNumbers (int color, int team) {
+    SDL_Surface *result = SDL_CreateRGBSurface (SDL_HWSURFACE,
             images.items[imtNumbers]->w + 80,
             images.items[imtNumbers]->h, 32, 0xff, 0xff00, 0xff0000, 0);
-    SDL_Surface *temp = SDL_CreateRGBSurface(SDL_HWSURFACE,
+    SDL_Surface *temp = SDL_CreateRGBSurface (SDL_HWSURFACE,
             images.items[imtNumbers]->w + 80,
             images.items[imtNumbers]->h, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
     int x, y;
     Uint32 p;
 
-    SDL_LockSurface(temp);
-    SDL_LockSurface(images.items[imtHeart]);
+    SDL_LockSurface (temp);
+    SDL_LockSurface (images.items[imtHeart]);
     for (y = 0; y < 20; y++) {
         for (x = 0; x < 20; x++) {
-            p = getPixel(images.items[imtHeart], x + 80, y) & 0xff000000;
-            putPixel(temp, x + images.items[imtNumbers]->w, y, p | team);
-            putPixel(temp, x + images.items[imtNumbers]->w + 20, y, p | team);
-            putPixel(temp, x + images.items[imtNumbers]->w + 40, y, p | team);
-            putPixel(temp, x + images.items[imtNumbers]->w + 60, y, p | team);
+            p = getPixel (images.items[imtHeart], x + 80, y) & 0xff000000;
+            putPixel (temp, x + images.items[imtNumbers]->w, y, p | team);
+            putPixel (temp, x + images.items[imtNumbers]->w + 20, y, p | team);
+            putPixel (temp, x + images.items[imtNumbers]->w + 40, y, p | team);
+            putPixel (temp, x + images.items[imtNumbers]->w + 60, y, p | team);
         }
     }
-    SDL_UnlockSurface(images.items[imtHeart]);
-    SDL_UnlockSurface(temp);
+    SDL_UnlockSurface (images.items[imtHeart]);
+    SDL_UnlockSurface (temp);
 
-    SDL_BlitSurface(temp, NULL, result, NULL);
+    SDL_BlitSurface (temp, NULL, result, NULL);
 
-    SDL_FillRect(temp, NULL, 0xff000000);
+    SDL_FillRect (temp, NULL, 0xff000000);
 
-    SDL_LockSurface(temp);
-    SDL_LockSurface(images.items[imtNumbers]);
+    SDL_LockSurface (temp);
+    SDL_LockSurface (images.items[imtNumbers]);
     for (y = 0; y < images.items[imtNumbers]->h; y++) {
         for (x = 0; x < images.items[imtNumbers]->w; x++) {
-            p = getPixel(images.items[imtNumbers], x, y) & 0xff000000;
-            putPixel(temp, x, y, p | color);
+            p = getPixel (images.items[imtNumbers], x, y) & 0xff000000;
+            putPixel (temp, x, y, p | color);
         }
     }
-    SDL_UnlockSurface(images.items[imtNumbers]);
-    SDL_LockSurface(images.items[imtHeart]);
+    SDL_UnlockSurface (images.items[imtNumbers]);
+    SDL_LockSurface (images.items[imtHeart]);
     for (y = 0; y < 20; y++) {
         for (x = 0; x < 80; x++) {
-            p = getPixel(images.items[imtHeart], x, y) & 0xff000000;
-            putPixel(temp, x + images.items[imtNumbers]->w, y, p | color);
+            p = getPixel (images.items[imtHeart], x, y) & 0xff000000;
+            putPixel (temp, x + images.items[imtNumbers]->w, y, p | color);
         }
     }
-    SDL_UnlockSurface(images.items[imtHeart]);
-    SDL_UnlockSurface(temp);
+    SDL_UnlockSurface (images.items[imtHeart]);
+    SDL_UnlockSurface (temp);
 
-    SDL_BlitSurface(temp, NULL, result, NULL);
-    SDL_FreeSurface(temp);
+    SDL_BlitSurface (temp, NULL, result, NULL);
+    SDL_FreeSurface (temp);
 
     return result;
 }
 
-void renderLoadPlayers(const GameInfo& info) {
+void render_load_players (const GameInfo& info) {
     int p;
 
     plFaces.count = info.plsCount;
@@ -253,96 +257,96 @@ void renderLoadPlayers(const GameInfo& info) {
     plNumbers.items = (SDL_Surface**) malloc (sizeof (SDL_Surface*) * plFaces.count);
 
     for (p = 0; p < info.plsCount; p++) {
-        plFaces.items[p] = renderCreatePlayerFace(info.plInfos[p].color);
-        plNumbers.items[p] = renderCreateNumbers(info.plInfos[p].color, 0x00);
+        plFaces.items[p] = renderCreatePlayerFace (info.plInfos[p].color);
+        plNumbers.items[p] = renderCreateNumbers (info.plInfos[p].color, 0x00);
     }
 
 }
 
-void renderFreePlayers() {
+void render_free_players () {
     int p;
 
     for (p = 0; p < plFaces.count; p++) {
-        SDL_FreeSurface(plFaces.items[p]);
-        SDL_FreeSurface(plNumbers.items[p]);
+        SDL_FreeSurface (plFaces.items[p]);
+        SDL_FreeSurface (plNumbers.items[p]);
     }
 
     free (plFaces.items);
     free (plNumbers.items);
 }
 
-void renderClear() {
-    blit.x = gsOuter.playerground.x;
-    blit.y = gsOuter.playerground.y;
-    SDL_BlitSurface(background, &gsOuter.playerground, primary, &blit);
-    SDL_UpdateRects(primary, 1, &blit);
+void render_clear () {
+    blit.x = gs_outer.playerground.x;
+    blit.y = gs_outer.playerground.y;
+    SDL_BlitSurface (background, &gs_outer.playerground, primary, &blit);
+    SDL_UpdateRects (primary, 1, &blit);
 }
 
-void renderDrawWorldItem(Uint16 x, Uint16 y, WorldItem *item) {
+void render_draw_world_item (Uint16 x, Uint16 y, const WorldItem& item) {
     static SDL_Rect drawsrc = {0, 0, 1, 1};
     static SDL_Rect drawdest = {0, 0, 1, 1};
 
-    drawdest.x = x + gsOuter.playerground.x;
-    drawdest.y = y + gsOuter.playerground.y;
-    SDL_BlitSurface(background, &drawdest, primary, &drawdest);
+    drawdest.x = x + gs_outer.playerground.x;
+    drawdest.y = y + gs_outer.playerground.y;
+    SDL_BlitSurface (background, &drawdest, primary, &drawdest);
 
-    switch (item->type) {
+    switch (item.type) {
         case IT_PLAYER:
-            drawsrc.x = item->player.body;
-            SDL_BlitSurface(plFaces.items[item->player.ID], &drawsrc, primary, &drawdest);
+            drawsrc.x = item.player.body;
+            SDL_BlitSurface (plFaces.items[item.player.ID], &drawsrc, primary, &drawdest);
             break;
     }
 }
 
-void renderUpdateFace(int x, int y) {
-    SDL_UpdateRect(primary, x + gsOuter.playerground.x, y + gsOuter.playerground.y, 3, 3);
+void render_update_face (int x, int y) {
+    SDL_UpdateRect (primary, x + gs_outer.playerground.x, y + gs_outer.playerground.y, 3, 3);
 }
 
-void renderDrawGameScreen() {
-    SDL_FillRect(background, NULL, C_BACKGROUND);
-    SDL_FillRect(background, &gsOuter.score, C_HIGHGROUND);
-    SDL_FillRect(background, &gsOuter.team, C_HIGHGROUND);
-    SDL_FillRect(background, &gsOuter.status, C_HIGHGROUND);
-    SDL_FillRect(background, &gsOuter.semafor, C_HIGHGROUND);
-    SDL_FillRect(background, &gsOuter.round, C_HIGHGROUND);
-    SDL_FillRect(background, &gsOuter.playerground, C_HIGHGROUND);
+void render_draw_game_screen () {
+    SDL_FillRect (background, NULL, C_BACKGROUND);
+    SDL_FillRect (background, &gs_outer.score, C_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.team, C_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.status, C_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.semafor, C_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.round, C_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.playerground, C_HIGHGROUND);
 
-    SDL_FillRect(background, &gsInner.score, 0);
-    SDL_FillRect(background, &gsInner.team, 0);
-    SDL_FillRect(background, &gsInner.status, 0);
-    SDL_FillRect(background, &gsInner.semafor, 0);
-    SDL_FillRect(background, &gsInner.round, 0);
-    SDL_FillRect(background, &gsInner.playerground, 0);
+    SDL_FillRect (background, &gs_inner.score, 0);
+    SDL_FillRect (background, &gs_inner.team, 0);
+    SDL_FillRect (background, &gs_inner.status, 0);
+    SDL_FillRect (background, &gs_inner.semafor, 0);
+    SDL_FillRect (background, &gs_inner.round, 0);
+    SDL_FillRect (background, &gs_inner.playerground, 0);
 
-    SDL_BlitSurface(background, NULL, primary, NULL);
-    SDL_Flip(primary);
+    SDL_BlitSurface (background, NULL, primary, NULL);
+    SDL_Flip (primary);
 }
 
-void renderUpdateScreen() {
-    SDL_UpdateRect(primary, 0, 0, 0, 0);
+void render_update_screen () {
+    SDL_UpdateRect (primary, 0, 0, 0, 0);
 }
 
-void renderDrawSemafor(int state) {
+void render_draw_semafor (int state) {
     static SDL_Rect src = {0, 0, 21, 18};
     int s;
 
-    dest.x = gsOuter.semafor.x + 19;
-    dest.y = gsOuter.semafor.y + 4;
+    dest.x = gs_outer.semafor.x + 19;
+    dest.y = gs_outer.semafor.y + 4;
     src.y = 0;
     for (s = 0; s < 3; s++) {
         src.x = ((state >= s) && (state < 3)) ? 0 : 21;
-        SDL_BlitSurface(images.items[imtSemafor], &src, primary, &dest);
+        SDL_BlitSurface (images.items[imtSemafor], &src, primary, &dest);
         dest.x += 29;
     }
 
     src.x = (state >= 3) ? 0 : 21;
     src.y = 19;
-    SDL_BlitSurface(images.items[imtSemafor], &src, primary, &dest);
+    SDL_BlitSurface (images.items[imtSemafor], &src, primary, &dest);
 
-    SDL_UpdateRects(primary, 1, &gsInner.semafor);
+    SDL_UpdateRects (primary, 1, &gs_inner.semafor);
 }
 
-static void drawScore(int y, SDL_Surface *numbers, int score, PlState state, int ironized) {
+static void drawScore (int y, SDL_Surface *numbers, int score, PlState state, int ironized) {
 #define xoff 4
 #define yoff 4
     static SDL_Rect src, dest;
@@ -365,12 +369,12 @@ static void drawScore(int y, SDL_Surface *numbers, int score, PlState state, int
             break;
     }
 
-    dest.x = gsOuter.score.x + xoff;
+    dest.x = gs_outer.score.x + xoff;
     dest.y = y + yoff;
-    SDL_BlitSurface(numbers, &src, primary, &dest);
+    SDL_BlitSurface (numbers, &src, primary, &dest);
 
     cl = images.items[imtNumbers]->w / 12;
-    xl = gsOuter.score.w - 9 * cl - xoff;
+    xl = gs_outer.score.w - 9 * cl - xoff;
     src.y = 0;
     src.w = cl;
     src.h = images.items[imtNumbers]->h;
@@ -378,31 +382,31 @@ static void drawScore(int y, SDL_Surface *numbers, int score, PlState state, int
         while (score > 99999999) score /= 10;
         for (c = 0; c < 8 && (score > 0 || c == 0); c++) {
             src.x = cl * (score % 10);
-            dest.x = gsOuter.score.x + cl * (8 - c) + xl;
-            SDL_BlitSurface(numbers, &src, primary, &dest);
+            dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+            SDL_BlitSurface (numbers, &src, primary, &dest);
             score /= 10;
         }
         for (; c < 8; c++) {
             src.x = cl * 11;
-            dest.x = gsOuter.score.x + cl * (8 - c) + xl;
-            SDL_BlitSurface(numbers, &src, primary, &dest);
+            dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+            SDL_BlitSurface (numbers, &src, primary, &dest);
         }
     } else {
         while (score < -9999999) score /= 10;
         for (c = 0; c < 8 && score < 0; c++) {
             src.x = cl * ((-score) % 10);
-            dest.x = gsOuter.score.x + cl * (8 - c) + xl;
-            SDL_BlitSurface(numbers, &src, primary, &dest);
+            dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+            SDL_BlitSurface (numbers, &src, primary, &dest);
             score /= 10;
         }
         src.x = cl * 10;
-        dest.x = gsOuter.score.x + cl * (8 - c) + xl;
-        SDL_BlitSurface(numbers, &src, primary, &dest);
+        dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+        SDL_BlitSurface (numbers, &src, primary, &dest);
         c++;
         for (; c < 8; c++) {
             src.x = cl * 11;
-            dest.x = gsOuter.score.x + cl * (8 - c) + xl;
-            SDL_BlitSurface(numbers, &src, primary, &dest);
+            dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+            SDL_BlitSurface (numbers, &src, primary, &dest);
         }
     }
     for (c = 0; c < 7 && score; c++) {
@@ -411,21 +415,21 @@ static void drawScore(int y, SDL_Surface *numbers, int score, PlState state, int
             src.x = cl * (score % 10);
         }
     }
-    SDL_UpdateRect(primary, gsOuter.score.x, dest.y, gsOuter.score.w, numbers->h);
+    SDL_UpdateRect (primary, gs_outer.score.x, dest.y, gs_outer.score.w, numbers->h);
 }
 
-void renderDrawPlayerScore(int plid, int score, PlState state, int order, int ironized) {
-    drawScore(gsOuter.score.y + order * images.items[imtNumbers]->h, plNumbers.items[plid], score, state, ironized);
+void render_draw_player_score (int plid, int score, PlState state, int order, int ironized) {
+    drawScore (gs_outer.score.y + order * images.items[imtNumbers]->h, plNumbers.items[plid], score, state, ironized);
 }
 
-void renderDrawRound(int round) {
+void render_draw_round (int round) {
     static const SDL_Color fg = {255, 255, 255};
     static const SDL_Color bg = {0, 0, 0};
     static char tt[] = "kolo:   ";
-    SDL_Rect dest = gsInner.round;
+    SDL_Rect dest = gs_inner.round;
     SDL_Surface *text;
 
-    SDL_BlitSurface(background, &dest, primary, &dest);
+    SDL_BlitSurface (background, &dest, primary, &dest);
 
     while (round > 99) round /= 10;
     if (round > 9) {
@@ -436,33 +440,33 @@ void renderDrawRound(int round) {
         tt[7] = ' ';
     }
 
-    text = TTF_RenderText_Shaded(fonts.items[fntMono20], tt, fg, bg);
+    text = TTF_RenderText_Shaded (fonts.items[fntMono20], tt, fg, bg);
     dest.x += (dest.w - text->w) / 2;
-    SDL_BlitSurface(text, NULL, primary, &dest);
-    SDL_FreeSurface(text);
+    SDL_BlitSurface (text, NULL, primary, &dest);
+    SDL_FreeSurface (text);
 
-    SDL_UpdateRects(primary, 1, &dest);
+    SDL_UpdateRects (primary, 1, &dest);
 }
 
-void renderDrawEnd() {
-    SDL_Rect dest = gsOuter.playerground;
+void render_draw_end () {
+    SDL_Rect dest = gs_outer.playerground;
     static const SDL_Color fg = {255, 255, 127};
     SDL_Surface *text;
 
-    text = TTF_RenderText_Blended(fonts.items[fntMono100], "The Konec", fg);
+    text = TTF_RenderText_Blended (fonts.items[fntMono100], "The Konec", fg);
     dest.x += (dest.w - text->w) / 2;
     dest.y += (dest.h - text->h) / 2;
 
-    SDL_BlitSurface(text, NULL, primary, &dest);
-    SDL_FreeSurface(text);
+    SDL_BlitSurface (text, NULL, primary, &dest);
+    SDL_FreeSurface (text);
 
-    SDL_UpdateRects(primary, 1, &dest);
+    SDL_UpdateRects (primary, 1, &dest);
 }
 
-int renderGetPlayerGroundWidth() {
-    return gsOuter.playerground.w;
+int render_get_playerground_width () {
+    return gs_outer.playerground.w;
 }
 
-int renderGetPlayerGroundHeight() {
-    return gsOuter.playerground.h;
+int render_get_playerground_height () {
+    return gs_outer.playerground.h;
 }

@@ -28,7 +28,7 @@ void game_initialize (const GameInfo& info) {
     game.set = info.setting;
     set_speed (info.setting->speed);
 
-    renderDrawGameScreen ();
+    render_draw_game_screen ();
     world_initialize ();
     players_initialize (info);
 
@@ -39,7 +39,7 @@ void game_initialize (const GameInfo& info) {
     game.timer = 0;
 
     set_semafor (-1);
-    renderDrawRound (game.round);
+    render_draw_round (game.round);
 
     clear_playerground ();
 
@@ -112,7 +112,7 @@ void game_run () {
     music_stop ();
     
     if (!game.abort) {
-        renderDrawEnd ();
+        render_draw_end ();
     }
 }
 
@@ -126,7 +126,7 @@ void stop_music () {
 }
 
 void set_semafor (int state) {
-    renderDrawSemafor (state);
+    render_draw_semafor (state);
 }
 
 void set_timer (int time) {
@@ -135,7 +135,7 @@ void set_timer (int time) {
 
 void next_round () {
     game.round++;
-    renderDrawRound (game.round);
+    render_draw_round (game.round);
 }
 
 int get_round () {
@@ -143,7 +143,7 @@ int get_round () {
 }
 void clear_playerground () {
     world_clear ();
-    renderClear ();
+    render_clear ();
     players_clear ();
 }
 

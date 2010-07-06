@@ -42,7 +42,7 @@ static int initialize() {
         isin[a] = floorf (sinf(M_PI * 2  * a / angles) * digits) / digits;
     }
 
-    if (renderInit ()) return 1;
+    if (render_initialize ()) return 1;
     audio_initialize ();
 
     gameset.speed = 12;
@@ -51,18 +51,18 @@ static int initialize() {
 
     infos[0].color = 0xff8040;
     infos[0].name = "bobo";
-    infos[0].control.keys.left = SDLK_LEFT;
-    infos[0].control.keys.right = SDLK_RIGHT;
-    infos[0].control.keys.jump = SDLK_UP;
+    infos[0].keys.left = SDLK_LEFT;
+    infos[0].keys.right = SDLK_RIGHT;
+    infos[0].keys.jump = SDLK_UP;
     infos[0].type = PT_Human;
     infos[0].profil = "mucha";
     infos[0].pitch = 10;
 
     infos[1].color = 0x80ffff;
     infos[1].name = "mucha";
-    infos[1].control.keys.left = SDLK_KP1;
-    infos[1].control.keys.right = SDLK_KP3;
-    infos[1].control.keys.jump = SDLK_KP2;
+    infos[1].keys.left = SDLK_KP1;
+    infos[1].keys.right = SDLK_KP3;
+    infos[1].keys.jump = SDLK_KP2;
     infos[1].type = PT_Human;
     infos[1].profil = "broug";
     infos[1].pitch = 15;
@@ -81,7 +81,7 @@ static int uninitialize() {
     printf("unintialize\n");
     
     audio_uninitialize ();
-    renderUninit();
+    render_uninitialize();
     
     SDL_Quit ();
     

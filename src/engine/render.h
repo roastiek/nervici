@@ -5,25 +5,34 @@
 #include "game/world.h"
 #include "game/player.h"
 
-int renderInit();
-void renderUninit();
+int render_initialize();
 
-void renderLoadPlayers (const GameInfo& info);
-void renderFreePlayers ();
+void render_uninitialize();
 
-void renderClear ();
+void render_load_players (const GameInfo& info);
 
-void renderUpdateFace(int x, int y);
-void renderDrawWorldItem (Uint16 x, Uint16 y, WorldItem *item);
+void render_free_players ();
 
-void renderDrawGameScreen ();
-void renderUpdateScreen ();
-void renderDrawSemafor (int state);
-void renderDrawPlayerScore (int plid, int score, PlState state, int order, int ironized);
-void renderDrawRound (int round);
-void renderDrawEnd ();
+void render_clear ();
 
-int renderGetPlayerGroundWidth ();
-int renderGetPlayerGroundHeight ();
+void render_update_face(int x, int y);
+
+void render_draw_world_item (Uint16 x, Uint16 y, const WorldItem& item);
+
+void render_draw_game_screen ();
+
+void render_update_screen ();
+
+void render_draw_semafor (int state);
+
+void render_draw_player_score (int plid, int score, PlState state, int order, int ironized);
+
+void render_draw_round (int round);
+
+void render_draw_end ();
+
+int render_get_playerground_width ();
+
+int render_get_playerground_height ();
 
 #endif

@@ -6,7 +6,6 @@
 
 #include "loader.h"
 #include "system.h"
-//#include "strutil.h"
 
 static const char *gameImages[] = {
     "/semafor.png",
@@ -22,7 +21,6 @@ Surfaces loadGameImages (TTF_Font *font) {
     const SDL_Color color = {255, 255, 255};
     const SDL_Color bg = {0, 0, 0};
     string filename;
-    size_t name_len;
     ImageType i;
     
     result.count = imtCount;
