@@ -38,6 +38,7 @@ private:
     size_t length;
     size_t bottom;
     size_t maxLength;
+    bool ironized;
 
     void clear_bottom ();
     void check_length ();
@@ -75,6 +76,8 @@ public:
     size_t get_head () const;
     size_t get_size () const;
     bool is_live () const;
+    bool is_ironized () const;
+    int get_order () const;
 };
 
 void players_initialize (const GameInfo& info);

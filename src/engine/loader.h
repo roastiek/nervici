@@ -1,38 +1,33 @@
 #ifndef __LOADER_H__
 #define __LOADER_H__
 
-#include "audio.h"
+#include <vector>
 
+using namespace std;
 
-//#include "strutil.h"
-
-typedef enum _ImageType {
+enum ImageType {
     imtNumbers, imtTimer, imtSemafor, imtHeart, imtCount
-} ImageType;
+};
 
-inline _ImageType operator ++(_ImageType& it, int) {
-    it = (_ImageType) (it + 1);
+inline ImageType operator ++(ImageType& it, int) {
+    it = (ImageType) (it + 1);
     return it;
 }
 
-typedef enum FontType {
+enum FontType {
     fntMono20, fntMono100, fntCount
-} FontType;
+};
 
-typedef struct {
-    size_t count;
-    SDL_Surface **items;
-} Surfaces;
+typedef vector<SDL_Surface*> Surfaces;
 
-typedef struct {
-    size_t count;
-    TTF_Font **items;
-} Fonts;
+typedef vector<TTF_Font*> Fonts;
 
-Surfaces loadGameImages (TTF_Font *font);
-void freeGameImages (Surfaces images);
+void load_game_images (Surfaces& images, TTF_Font* font);
 
-Fonts loadFonts ();
-void freeFonts (Fonts fonts);
+void free_game_images (Surfaces& images);
+
+void load_fonts (Fonts& fonts);
+
+void free_fonts (Fonts& fonts);
 
 #endif // __LOADER_H__

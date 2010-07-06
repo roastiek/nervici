@@ -241,8 +241,8 @@ static ALenum musicFormat;
 static float musicRate = 1.0;
 static MusicType musicType = MT_Count;
 static char *mloader = NULL;
-static int musicLoop = 0;
-static int musicOpened = 0;
+static bool musicLoop = false;
+static bool musicOpened = false;
 
 static void load_music () {
     static const char suffixs[MT_Count][6] = {"/game", "/game", "/menu", "/stat"};
@@ -437,7 +437,7 @@ static int music_open (MusicType type) {
                 continue;
             }
 
-            musicOpened = 1;
+            musicOpened = true;
             return 0;
         }
     }
@@ -448,7 +448,7 @@ static int music_open (MusicType type) {
 static void music_close () {
     if (musicOpened) {
         ov_clear (&musicFile);
-        musicOpened = 0;
+        musicOpened = false;
     }
 }
 
@@ -495,7 +495,7 @@ void music_play (MusicType type) {
     }
 
     alSourcePlay (musicSource);
-    musicLoop = 1;
+    musicLoop = true;
 }
 
 void music_stop () {
@@ -510,7 +510,7 @@ void music_stop () {
     }
 
     music_close ();
-    musicLoop = 0;
+    musicLoop = false;
 }
 
 void music_update () {

@@ -31,6 +31,7 @@ static int initialize() {
 
     sys_init_paths ();
     setting_load ();
+    setting_print_directory ();
     sys_find_mods ();
     plinfo_load ();
     

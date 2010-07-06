@@ -16,70 +16,52 @@ static const char *baseFonts[] = {
     "/mono.ttf"
 };
 
-Surfaces loadGameImages (TTF_Font *font) {
-    Surfaces result;
+void load_game_images (Surfaces& images, TTF_Font* font) {
     const SDL_Color color = {255, 255, 255};
     const SDL_Color bg = {0, 0, 0};
     string filename;
     ImageType i;
-    
-    result.count = imtCount;
-    result.items = (SDL_Surface**) malloc(sizeof (SDL_Surface*) * result.count);
-    
-    /*filename = str_bigger_copy(sys_get_images_dir(), 16);
-    name_len = strlen (filename);*/
+
+    images.resize (imtCount);
 
     for (i = imtSemafor; i < imtCount; i++) {
-        //memcpy (filename + name_len, gameImages[i - imtSemafor], strlen (gameImages[i - imtSemafor]) + 1);
         filename = sys_get_images_dir() + gameImages[i - imtSemafor];
-        result.items[i] = IMG_Load (filename.c_str());
-    }
-    //free (filename);
-
-    result.items[imtNumbers] = TTF_RenderText_Blended (font, "0123456789- ", color);
-    result.items[imtTimer] = TTF_RenderText_Shaded (font, "0123456789:.", color, bg);
-
-    return result;
-}
-
-void freeGameImages (Surfaces images) {
-    for (size_t si = 0; si < images.count; si++) {
-        SDL_FreeSurface(images.items[si]);
+        images[i] = IMG_Load (filename.c_str());
     }
 
-    free (images.items);
+    images[imtNumbers] = TTF_RenderText_Blended (font, "0123456789- ", color);
+    images[imtTimer] = TTF_RenderText_Shaded (font, "0123456789:.", color, bg);
 }
 
-Fonts loadFonts () {
-    Fonts result;
+void free_game_images (Surfaces& images) {
+    for (size_t si = 0; si < images.size (); si++) {
+        SDL_FreeSurface(images[si]);
+    }
+
+    images.clear ();
+}
+
+void load_fonts (Fonts& fonts) {
     string filename;
 
-    result.count = fntCount;
-    result.items = (TTF_Font**) malloc (sizeof (TTF_Font*) * result.count);
+    fonts.resize (fntCount);
     
     filename = sys_get_fonts_dir_home() + baseFonts[0];
 
-    result.items[fntMono20] = TTF_OpenFont (filename.c_str(), 20);
-    result.items[fntMono100] = TTF_OpenFont (filename.c_str(), 100);
+    fonts[fntMono20] = TTF_OpenFont (filename.c_str(), 20);
+    fonts[fntMono100] = TTF_OpenFont (filename.c_str(), 100);
     
-    //free (filename);
-
     filename = sys_get_fonts_dir() + baseFonts[0];
 
-    if (result.items[fntMono20] == NULL)
-        result.items[fntMono20] = TTF_OpenFont (filename.c_str(), 20);
-    if (result.items[fntMono100] == NULL)
-        result.items[fntMono100] = TTF_OpenFont (filename.c_str(), 100);
-
-    //free (filename);
-
-    return result;
+    if (fonts[fntMono20] == NULL)
+        fonts[fntMono20] = TTF_OpenFont (filename.c_str(), 20);
+    if (fonts[fntMono100] == NULL)
+        fonts[fntMono100] = TTF_OpenFont (filename.c_str(), 100);
 }
 
-void freeFonts (Fonts fonts) {
-    for (size_t fi = 0; fi < fonts.count; fi++) {
-        TTF_CloseFont(fonts.items[fi]);
+void free_fonts (Fonts& fonts) {
+    for (size_t fi = 0; fi < fonts.size (); fi++) {
+        TTF_CloseFont(fonts[fi]);
     }
-
-    free (fonts.items);
+    fonts.clear ();
 }

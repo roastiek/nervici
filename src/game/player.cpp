@@ -373,6 +373,14 @@ size_t Player::get_size () const {
     return size;
 }
 
+bool Player::is_ironized () const {
+    return ironized;
+}
+
+int Player::get_order () const {
+    return order;
+}
+
 void Player::fast_clear () {
     switch (state) {
         case psStart:
