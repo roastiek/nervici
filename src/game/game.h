@@ -3,17 +3,18 @@
 
 #include <vector>
 
-#include "mods/nervici.h"
-#include "mods/mods.h"
-#include "settings/plinfo.h"
-//#include "world.h"
 
 using namespace std;
+
+#include "mods/mods.h"
+#include "settings/plinfo.h"
 
 struct GameInfo {
     GameSetting *setting;
     vector<PlInfo> pl_infos;
 };
+
+#include "mods/nervici.h"
 
 void game_initialize (const GameInfo& info);
 

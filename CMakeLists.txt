@@ -39,7 +39,7 @@ CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINAR
 ADD_LIBRARY (mod_cervici SHARED src/mods/mod_cervici.c)
 
 SET (NERVICI_ENGINE src/engine/render.cpp src/engine/audio.cpp src/engine/loader.cpp)
-SET (NERVICI_GAME src/game/world.cpp src/game/player.cpp src/game/game.cpp)
+SET (NERVICI_GAME src/game/world.cpp src/game/player.cpp src/game/players.cpp src/game/game.cpp)
 SET (NERVICI_SETTINGS src/settings/setting.cpp src/settings/plinfo.cpp)
 SET (NERVICI_BASE src/main.cpp src/system.cpp src/mods/nervici.cpp)
 SET (NERVICI_SOURCE ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_SETTINGS})

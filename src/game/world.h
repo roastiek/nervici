@@ -8,11 +8,9 @@
 #define IT_SOFT_SMILE   4
 #define IT_HARD_SMILE   5
 
-typedef uint8_t Fields[3][3];
-
 #include "main.h"
-#include "mods/nervici.h"
-#include "player.h"
+
+typedef uint8_t Fields[3][3];
 
 struct WIPlayer {
     uint8_t ID;
@@ -39,6 +37,8 @@ struct Start {
     int angle;
     int ready;
 };
+
+#include "mods/nervici.h"
 
 void world_initialize();
 

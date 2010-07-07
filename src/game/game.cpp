@@ -4,13 +4,13 @@
 #include <iostream>
 #include <time.h>
 
-#include "game.h"
-#include "player.h"
-
-#include "world.h"
+#include "game/players.h"
+#include "game/world.h"
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "system.h"
+
+#include "game.h"
 
 using namespace std;
 

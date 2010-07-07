@@ -17,7 +17,7 @@ void render_clear ();
 
 void render_update_face(int x, int y);
 
-void render_queue_world_item (Uint16 x, Uint16 y);
+void render_queue_world_item (uint16_t x, uint16_t y);
 
 void render_draw_world_items ();
 

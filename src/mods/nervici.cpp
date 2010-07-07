@@ -1,5 +1,5 @@
 #include "nervici.h"
-#include "game/player.h"
+#include "game/players.h"
 
 /*void clear_playerground () {
 }*/
