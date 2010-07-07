@@ -49,10 +49,9 @@ static int initialize() {
     if (render_initialize ()) return 1;
     audio_initialize ();
 
-    gameset.speed = 12;
+    gameset.speed = base_speed;
     gameset.rounds = 3;
     gameset.maxLength = 0;
-
 
     gameinfo.setting = &gameset;
     gameinfo.pl_infos.resize (2);

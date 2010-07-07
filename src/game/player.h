@@ -1,10 +1,13 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
+struct Player;
+
 #include "settings/plinfo.h"
 #include "main.h"
 #include "game/game.h"
 #include "mods/nervici.h"
+#include "world.h"
 
 /*
  * PS_Start - player has got a start position and is ready to be started
@@ -30,8 +33,6 @@ typedef enum PlState {
 typedef enum KeySt {
     KS_None, KS_Left, KS_Right, KS_Jump, KS_Power
 } KeySt;
-
-typedef Uint8 Fields[3][3];
 
 struct Player {
 private:
@@ -76,10 +77,12 @@ private:
     size_t bottom;
     bool ironized;
 
+    vector<Point16> updates;
+
     void clear_bottom ();
     void check_length ();
     void live ();
-    bool test_fields (Point16 pos, Fields& fields);
+    void process_fields (const Point16& pos, const Fields& fields);
 public:
     void initialize (int ID, const GameInfo& plinfo);
     void uninitialize ();
@@ -103,7 +106,7 @@ public:
     /*
      * add part to players body
      */
-    void add_part (Point16 part);
+    void add_part (const Point16& part);
     /*
      * player claims start, draw one dot and set state to PS_Start
      */
@@ -152,6 +155,8 @@ public:
      * draw player's score
      */
     void update_score ();
+
+    void render_head ();
 
     int get_score () const;
     bool is_jumping () const;
@@ -221,5 +226,8 @@ void set_pl_timer (int plid, int time);
 
 void start_pl (int plid);
 
+int live_pls_count ();
+
+void players_render_head ();
     
 #endif

@@ -32,7 +32,7 @@ void world_initialize () {
     x = (width >= height) ? height : width;
     x /= 2;
     for (s = 0; s < startsCount; s++) {
-        starts[s].angle = s * 2;
+        starts[s].angle = s * angles / startsCount;
         starts[s].pos.x = floor ((width / 2 - (x * icos[starts[s].angle] * 0.8)) * digits) / digits;
         starts[s].pos.y = floor ((height / 2 - (x * isin[starts[s].angle] * 0.8)) * digits) / digits;
         starts[s].ready = 1;
@@ -122,3 +122,122 @@ int world_find_free_start () {
     }
     return -1;
 }
+
+void world_calc_fields (const FPoint& pos, Fields& fields) {
+    fields[1][1] = 255;
+    fields[2][1] = 255 * (pos.x - floor (pos.x));
+    fields[0][1] = 255 - fields[2][1];
+    fields[1][2] = 255 * (pos.y - floor (pos.y));
+    fields[1][0] = 255 - fields[1][2];
+    fields[0][0] = fields[0][1] * fields[1][0] / 255;
+    fields[2][0] = fields[2][1] * fields[1][0] / 255;
+    fields[0][2] = fields[0][1] * fields[1][2] / 255;
+    fields[2][2] = fields[1][2] * fields[2][1] / 255;
+}
+
+int world_simple_test_fields (const Point16& pos, const Fields& fields) {
+    int result = 1;
+    int x, y;
+
+    for (y = 0; y < 3 && result; y++) {
+        for (x = 0; x < 3 && result; x++) {
+            if (fields[x][y] != 0) {
+                result &= pos.x + x >= 1 && pos.y + y >= 1 &&
+                        pos.x + x < world_get_width () - 1 && pos.y + y < world_get_height () - 1;
+            }
+        }
+    }
+    return result;
+}
+
+int world_test_fields (const Player* pl, const Point16& pos, const Fields& fields) {
+    int result = 1;
+    int x, y;
+
+    for (y = 0; y < 3 && result; y++) {
+        for (x = 0; x < 3 && result; x++) {
+            if (fields[x][y] != 0) {
+                WorldItem& item = world_get_item (pos.x + x, pos.y + y);
+                switch (item.type) {
+                    case IT_FREE:
+                    case IT_SOFT_SMILE:
+                        continue;
+                    case IT_PLAYER:
+                    
+                        result &= (item.player.ID == pl->get_id ()) && (
+                                (item.player.order < pl->get_head ())
+                                ? pl->get_head () - item.player.order <= 8
+                                : pl->get_head () + item.player.order - 8 <= pl->get_size ()
+                                );
+
+                        /*                    if (item->player.ID == plid) {
+                                                if (item->player.order < pl->head) {
+                                                    result&= pl->head - item->player.order <= 4;
+                                                } else {
+                                                    result&= pl->head + item->player.order - 4 <= pl->bodysize;
+                                                }
+                                            } else {
+                                                result = 0;
+                                            }*/
+                        break;
+                    
+                    default:
+                        result = 0;
+                        break;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+/*void world_simple_process_fields (Player *pl, const Point16& pos, const Fields& fields) {
+    bool crashed = false;
+    for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < 3; x++) {
+            WorldItem& item = world_get_item (pos.x + x, pos.y + y);
+            switch (item.type) {
+                case IT_STONE:
+                    crashed = true;
+                    break;
+                case IT_WALL:
+                    crashed = true;
+                    break;
+                case IT_PLAYER:
+                    crashed = true;
+                    break;
+                case IT_HARD_SMILE:
+                    crashed = true;
+                    break;
+            }
+        }
+    }
+}*/
+
+void world_process_fields (const Player* pl, const Point16& pos, const Fields& fields) {
+    for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < 3; x++) {
+            if (fields[x][y] != 0) {
+                WorldItem& item = world_get_item (pos.x + x, pos.y + y);
+                switch (item.type) {
+                    case IT_FREE:
+                        item.type = IT_PLAYER;
+                        item.player.ID = pl->get_id ();
+                        item.player.body = fields[x][y];
+                        item.player.order = pl->get_head ();
+                        break;
+                    case IT_PLAYER:
+                        if (item.player.body < fields[x][y]) {
+                            item.player.body = fields[x][y];
+                            item.player.order = pl->get_head ();
+                        }
+                        break;
+                    case IT_SOFT_SMILE:
+                        break;
+                }
+                render_draw_world_item (pos.x + x, pos.y + y, item);
+            }
+        }
+    }
+}
+

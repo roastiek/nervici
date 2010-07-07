@@ -8,8 +8,11 @@
 #define IT_SOFT_SMILE   4
 #define IT_HARD_SMILE   5
 
+typedef Uint8 Fields[3][3];
+
 #include "main.h"
 #include "mods/nervici.h"
+#include "player.h"
 
 struct WIPlayer {
     Uint8 ID;
@@ -57,5 +60,13 @@ const Start* world_get_start(int stid);
 int world_get_starts_count();
 
 int world_find_free_start();
+
+void world_calc_fields (const FPoint& pos, Fields& fields);
+
+int world_simple_test_fields (const Point16& pos, const Fields& fields);
+
+int world_test_fields (const Player* pl, const Point16& pos, const Fields& fields);
+
+void world_process_fields (const Player* pl, const Point16& pos, const Fields& fields);
 
 #endif

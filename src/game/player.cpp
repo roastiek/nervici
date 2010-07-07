@@ -10,145 +10,36 @@
 #include "engine/audio.h"
 #include "system.h"
 
-#define JUMP_LENGTH 12
-#define JUMP_REPEAT 40
+#define JUMP_LENGTH 24
+#define JUMP_REPEAT 80
 
 typedef vector<Player> Players;
 
 static Players players;
 
-void calcFields (const FPoint& pos, Fields& fields) {
-    fields[1][1] = 255;
-    fields[2][1] = 255 * (pos.x - floor (pos.x));
-    fields[0][1] = 255 - fields[2][1];
-    fields[1][2] = 255 * (pos.y - floor (pos.y));
-    fields[1][0] = 255 - fields[1][2];
-    fields[0][0] = fields[0][1] * fields[1][0] / 255;
-    fields[2][0] = fields[2][1] * fields[1][0] / 255;
-    fields[0][2] = fields[0][1] * fields[1][2] / 255;
-    fields[2][2] = fields[1][2] * fields[2][1] / 255;
-}
+void Player::process_fields (const Point16& pos, const Fields& fields) {
+    if (state == PS_Live || state == PS_Start) {
+        world_process_fields (this, pos, fields);
+        add_part (pos);
 
-static int simpleTestFields (const Point16& pos, const Fields& fields) {
-    int result = 1;
-    int x, y;
-
-    for (y = 0; y < 3 && result; y++) {
-        for (x = 0; x < 3 && result; x++) {
-            if (fields[x][y] != 0) {
-                result &= pos.x + x >= 1 && pos.y + y >= 1 &&
-                        pos.x + x < world_get_width () - 1 && pos.y + y < world_get_height () - 1;
-            }
+        bool add = true;
+        for (size_t ui = 0; ui < updates.size () && add; ui++) {
+            const Point16& upos = updates[ui];
+            add&= (upos.x == pos.x && upos.y == pos.y);
+        }
+        if (add) {
+            updates.push_back (pos);
+        //render_update_face (pos.x, pos.y);
         }
     }
-    return result;
 }
 
-static int testFields (int plid, const Point16& pos, const Fields& fields) {
-    int result = 1;
-    int x, y;
-
-    for (y = 0; y < 3 && result; y++) {
-        for (x = 0; x < 3 && result; x++) {
-            if (fields[x][y] != 0) {
-                WorldItem& item = world_get_item (pos.x + x, pos.y + y);
-                switch (item.type) {
-                    case IT_FREE:
-                    case IT_SOFT_SMILE:
-                        continue;
-                    case IT_PLAYER:
-                    {
-                        Player *pl = &(players[plid]);
-                        result &= (item.player.ID == plid) && (
-                                (item.player.order < pl->get_head ())
-                                ? pl->get_head () - item.player.order <= 4
-                                : pl->get_head () + item.player.order - 4 <= pl->get_size ()
-                                );
-
-                        /*                    if (item->player.ID == plid) {
-                                                if (item->player.order < pl->head) {
-                                                    result&= pl->head - item->player.order <= 4;
-                                                } else {
-                                                    result&= pl->head + item->player.order - 4 <= pl->bodysize;
-                                                }
-                                            } else {
-                                                result = 0;
-                                            }*/
-                        break;
-                    }
-                    default:
-                        result = 0;
-                        break;
-                }
-            }
-        }
+void Player::render_head () {
+    for (size_t ui = 0; ui < updates.size (); ui++) {
+        const Point16& pos = updates[ui];
+        render_update_face (pos.x, pos.y);
     }
-    return result;
-}
-
-static void processFields (Player *pl, const Point16& pos, const Fields& fields) {
-    int x, y;
-
-    if (pl->get_state () == PS_Live || pl->get_state () == PS_Start) {
-        for (y = 0; y < 3; y++) {
-            for (x = 0; x < 3; x++) {
-                if (fields[x][y] != 0) {
-                    WorldItem& item = world_get_item (pos.x + x, pos.y + y);
-                    switch (item.type) {
-                        case IT_FREE:
-                            item.type = IT_PLAYER;
-                            item.player.ID = pl->get_id ();
-                            item.player.body = fields[x][y];
-                            item.player.order = pl->get_head ();
-                            break;
-                        case IT_PLAYER:
-                            if (item.player.body < fields[x][y]) {
-                                item.player.body = fields[x][y];
-                                item.player.order = pl->get_head ();
-                            }
-                            break;
-                        case IT_SOFT_SMILE:
-                            break;
-                    }
-                    render_draw_world_item (pos.x + x, pos.y + y, item);
-                }
-            }
-        }
-        pl->add_part (pos);
-    } else {
-        int crashed = 0;
-        for (y = 0; y < 3; y++) {
-            for (x = 0; x < 3; x++) {
-                WorldItem& item = world_get_item (pos.x + x, pos.y + y);
-                switch (item.type) {
-                    case IT_STONE:
-                        if (!crashed) {
-                            crashed = 1;
-                        }
-                        break;
-                    case IT_WALL:
-                        if (!crashed) {
-                            crashed = 1;
-                        }
-                        break;
-                    case IT_PLAYER:
-                        if (!crashed) {
-                            crashed = 1;
-                        }
-                        break;
-                    case IT_HARD_SMILE:
-                        if (!crashed) {
-                            crashed = 1;
-                        }
-                        break;
-                }
-                //                renderDrawWorldItem(pos.x + x, pos.y + y, item, pl->face);
-            }
-        }
-    }
-
-    render_update_face (pos.x, pos.y);
-
+    updates.clear ();
 }
 
 void Player::initialize (int ID, const GameInfo& info) {
@@ -161,7 +52,7 @@ void Player::initialize (int ID, const GameInfo& info) {
     while (size <= max_length) {
         size += 1024;
     }
-    body = (Point16*) malloc (sizeof (Point16) * size);
+    body = new Point16[size];
     length = 0;
     head = 0;
     timer = 0;
@@ -169,7 +60,7 @@ void Player::initialize (int ID, const GameInfo& info) {
 }
 
 void Player::uninitialize () {
-    free (body);
+    delete [] body;
 }
 
 void Player::erase () {
@@ -214,7 +105,10 @@ void Player::check_length () {
     if (max_length == 0) {
         if (length == size) {
             size += 1024;
-            body = (Point16*) realloc (body, size);
+            Point16 *new_body = new Point16[size];
+            memcpy (new_body, body, length);
+            delete [] body;
+            body = new_body;
         }
     } else {
         if (length >= max_length)
@@ -224,7 +118,7 @@ void Player::check_length () {
     }
 }
 
-void Player::add_part (Point16 part) {
+void Player::add_part (const Point16& part) {
     if (max_length == 0) {
         if (length < size) {
             body[head] = part;
@@ -255,8 +149,8 @@ void Player::live () {
         audio_play_effect (ID, ET_Hop);
     }
 
-    exact.x += icos[angle];
-    exact.y += isin[angle];
+    exact.x += icos[angle] / 2;
+    exact.y += isin[angle] / 2;
 
     if (jumptime > 0) {
         jumptime--;
@@ -264,14 +158,14 @@ void Player::live () {
 
     pos.x = exact.x - 1;
     pos.y = exact.y - 1;
-    calcFields (exact, fields);
+    world_calc_fields (exact, fields);
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
-        survive = testFields (ID, pos, fields);
+        survive = world_test_fields (this, pos, fields);
         if (!survive) state = PS_Death;
-        processFields (this, pos, fields);
+        process_fields (pos, fields);
     } else {
-        survive = simpleTestFields (pos, fields);
+        survive = world_simple_test_fields (pos, fields);
         if (!survive) state = PS_Death;
     }
 }
@@ -330,10 +224,11 @@ void Player::give_start (int start) {
             jumptime = 0;
             length = 0;
 
-            calcFields (exact, fields);
+            world_calc_fields (exact, fields);
             pos.x = exact.x - 1;
             pos.y = exact.y - 1;
-            processFields (this, pos, fields);
+            process_fields (pos, fields);
+            render_head ();
         }
     }
 }
@@ -628,4 +523,18 @@ void set_pl_max_lenght (int plid, unsigned int length) {
 
 void set_pl_timer (int plid, int time) {
     players[plid].set_timer (time);
+}
+
+int live_pls_count () {
+    int result = 0;
+    for (size_t pi = 0; pi < players.size (); pi++) {
+        result+= players[pi].is_live ();
+    }
+    return result;
+}
+
+void players_render_head () {
+    for (size_t pi = 0; pi < players.size (); pi++) {
+        players[pi].render_head ();
+    }
 }

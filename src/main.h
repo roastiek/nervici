@@ -2,19 +2,20 @@
 #define __MAIN_H__
 
 #define digits 1000
-#define angles 80
+#define angles 160
+#define base_speed 12
 
 extern float icos[];
 extern float isin[];
 
-typedef struct _FPoint {
+struct FPoint {
     float x;
     float y;
-} FPoint;
+};
 
-typedef struct _Point16 {
+struct Point16 {
     Uint16 x;
     Uint16 y;
-} Point16;
+};
 
 #endif

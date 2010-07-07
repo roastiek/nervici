@@ -56,8 +56,6 @@ static void begin_start_procedure () {
 }
 
 void on_game_start (const GameSetting *nset) {
-    int p, s;
-
     set = nset;
 
     begin_start_procedure ();

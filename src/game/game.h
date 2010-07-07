@@ -6,7 +6,7 @@
 #include "mods/nervici.h"
 #include "mods/mods.h"
 #include "settings/plinfo.h"
-#include "world.h"
+//#include "world.h"
 
 using namespace std;
 
@@ -28,8 +28,6 @@ void clear_status ();
 void end_game ();
 
 int get_speed ();
-
-int live_pls_count ();
 
 void next_round ();
 
