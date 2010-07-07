@@ -150,7 +150,7 @@ int world_simple_test_fields (const Point16& pos, const Fields& fields) {
     return result;
 }
 
-int world_test_fields (const Player* pl, const Point16& pos, const Fields& fields) {
+int world_test_fields (const Point16& pos, const Fields& fields, int id, size_t head, size_t size) {
     int result = 1;
     int x, y;
 
@@ -164,10 +164,10 @@ int world_test_fields (const Player* pl, const Point16& pos, const Fields& field
                         continue;
                     case IT_PLAYER:
 
-                        result &= (item.player.ID == pl->get_id ()) && (
-                                (item.player.order < pl->get_head ())
-                                ? pl->get_head () - item.player.order <= 8
-                                : pl->get_head () + item.player.order - 8 <= pl->get_size ()
+                        result &= (item.player.ID == id) && (
+                                (item.player.order < head)
+                                ? head - item.player.order <= 8
+                                : head + item.player.order - 8 <= size
                                 );
 
                         /*                    if (item->player.ID == plid) {
@@ -191,7 +191,7 @@ int world_test_fields (const Player* pl, const Point16& pos, const Fields& field
     return result;
 }
 
-void world_write_player_head (const Player* pl, const Point16& pos, const Fields& fields) {
+void world_write_player_head (const Point16& pos, const Fields& fields, int id, size_t head) {
     for (int y = 0; y < 3; y++) {
         for (int x = 0; x < 3; x++) {
             if (fields[x][y] != 0) {
@@ -199,14 +199,14 @@ void world_write_player_head (const Player* pl, const Point16& pos, const Fields
                 switch (item.type) {
                     case IT_FREE:
                         item.type = IT_PLAYER;
-                        item.player.ID = pl->get_id ();
+                        item.player.ID = id;
                         item.player.body = fields[x][y];
-                        item.player.order = pl->get_head ();
+                        item.player.order = head;
                         break;
                     case IT_PLAYER:
-                        if (item.player.ID == pl->get_id () && item.player.body < fields[x][y]) {
+                        if (item.player.ID == id && item.player.body < fields[x][y]) {
                             item.player.body = fields[x][y];
-                            item.player.order = pl->get_head ();
+                            item.player.order = head;
                         }
                         break;
                     case IT_SOFT_SMILE:

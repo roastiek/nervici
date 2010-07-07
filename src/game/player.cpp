@@ -1,3 +1,6 @@
+#ifndef __PLAYER_CPP__
+#define __PLAYER_CPP__
+
 #include <SDL.h>
 #include <math.h>
 #include <vector>
@@ -10,16 +13,14 @@
 #include "engine/audio.h"
 #include "system.h"
 
-#define JUMP_LENGTH 24
-#define JUMP_REPEAT 80
+//typedef vector<Player> Players;
 
-typedef vector<Player> Players;
-
-static Players players;
+//Players players;
+vector<Player> Players::players;
 
 void Player::process_fields (const FPoint& epos, const Point16& pos, const Fields& fields) {
     if (state == PS_Live || state == PS_Start) {
-        world_write_player_head (this, pos, fields);
+        world_write_player_head (pos, fields, id, head);
         add_part (epos);
 
         bool add = true;
@@ -43,7 +44,7 @@ void Player::render_head () {
 }
 
 void Player::initialize (int ID, const GameInfo& info) {
-    this->ID = ID;
+    this->id = ID;
     this->info = &info.pl_infos[ID];
     score = 0;
     order = ID;
@@ -57,6 +58,7 @@ void Player::initialize (int ID, const GameInfo& info) {
     head = 0;
     timer = 0;
     state = PS_Erased;
+    ironized = false;
 }
 
 void Player::uninitialize () {
@@ -73,7 +75,7 @@ void Player::timer_func (int speed) {
         timer += speed;
         if (timer >= 0) {
             timer = 0;
-            sys_mod_on_pl_timer (ID);
+            sys_mod_on_pl_timer (id);
         }
     } else timer += speed;
 }
@@ -176,7 +178,7 @@ void Player::live () {
     if (keyst == KS_Right) angle = (angle + 1) % angles;
     if (jumptime == 0 && keyst == KS_Jump) {
         jumptime = JUMP_REPEAT;
-        audio_play_effect (ID, ET_Hop);
+        audio_play_effect (id, ET_Hop);
     }
 
     exact.x += icos[angle] / 2;
@@ -191,7 +193,7 @@ void Player::live () {
     world_calc_fields (exact, fields);
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
-        survive = world_test_fields (this, pos, fields);
+        survive = world_test_fields (pos, fields, id, head, size);
         if (!survive) state = PS_Death;
         process_fields (exact, pos, fields);
     } else {
@@ -203,7 +205,7 @@ void Player::live () {
 void Player::clear_step () {
     if (length == 0) {
         state = PS_Erased;
-        sys_mod_on_cleared (ID);
+        sys_mod_on_cleared (id);
     } else {
         clear_bottom ();
     }
@@ -244,7 +246,7 @@ void Player::give_start (int start) {
     if (start >= 0) {
         st = world_get_start (start);
         if (st != NULL) {
-            cout << "give pl start " << ID << ' ' << st->angle << '\n';
+            cout << "give pl start " << id << ' ' << st->angle << '\n';
 
             exact = st->pos;
             angle = st->angle;
@@ -276,38 +278,6 @@ void Player::set_score (int value) {
     score = value;
 }
 
-int Player::get_score () const {
-    return score;
-}
-
-bool Player::is_jumping () const {
-    return jumptime > JUMP_REPEAT - JUMP_LENGTH;
-}
-
-bool Player::is_human () const {
-    return info->type == PT_Human;
-}
-
-PlState Player::get_state () const {
-    return state;
-}
-
-size_t Player::get_head () const {
-    return head;
-}
-
-size_t Player::get_size () const {
-    return size;
-}
-
-bool Player::is_ironized () const {
-    return ironized;
-}
-
-int Player::get_order () const {
-    return order;
-}
-
 void Player::fast_clear () {
     switch (state) {
         case PS_Start:
@@ -337,18 +307,6 @@ void Player::dec_max_length (size_t delta) {
     if (maxlen < 0) maxlen = 0;
 
     max_length = maxlen;
-}
-
-size_t Player::get_max_length () const {
-    return max_length;
-}
-
-size_t Player::get_length () const {
-    return length;
-}
-
-int Player::get_id () const {
-    return ID;
 }
 
 void Player::inc_max_length (size_t delta) {
@@ -385,10 +343,6 @@ void Player::start () {
         state = PS_Live;
 }
 
-bool Player::is_live () const {
-    return state == PS_Live;
-}
-
 void Player::kill () {
     switch (state) {
         case PS_Start:
@@ -416,7 +370,7 @@ void Player::update_score () {
     render_draw_player_score (this);
 }
 
-void players_initialize (const GameInfo& info) {
+void Players::initialize (const GameInfo& info) {
     players.resize (info.pl_infos.size ());
 
     for (size_t pi = 0; pi < info.pl_infos.size (); pi++) {
@@ -427,36 +381,36 @@ void players_initialize (const GameInfo& info) {
     audio_load_players (info);
 }
 
-void players_uninitialize () {
+void Players::uninitialize () {
     audio_free_players ();
     render_free_players ();
 
-    for (size_t pi = 0; pi < players.size (); pi++) {
-        players[pi].uninitialize ();
+    for (size_t pi = 0; pi < Players::players.size (); pi++) {
+        Players::players[pi].uninitialize ();
     }
 
-    players.clear ();
+    Players::players.clear ();
 }
 
-void players_erase () {
+void Players::erase () {
     for (size_t pi = 0; pi < players.size (); pi++) {
         players[pi].erase ();
     }
 }
 
-void players_update_score () {
+void Players::update_score () {
     for (size_t pi = 0; pi < players.size (); pi++) {
         players[pi].update_score ();
     }
 }
 
-void players_timer (int speed) {
+void Players::timer (int speed) {
     for (size_t pi = 0; pi < players.size (); pi++) {
         players[pi].timer_func (speed);
     }
 }
 
-int players_step () {
+int Players::step () {
     Uint8 *keys;
     int result = 0;
 
@@ -470,7 +424,7 @@ int players_step () {
     return result;
 }
 
-int player_get_lives_count () {
+int Players::get_lives_count () {
     int result = 0;
 
     for (size_t pi = 0; pi < players.size (); pi++) {
@@ -480,83 +434,83 @@ int player_get_lives_count () {
     return result;
 }
 
-void give_pl_start (int plid, int start) {
+void Players::give_pl_start (int plid, int start) {
     players[plid].give_start (start);
 }
 
-void start_pl (int plid) {
+void Players::start_pl (int plid) {
     players[plid].start ();
 }
 
-int is_pl_live (int plid) {
+int Players::is_pl_live (int plid) {
     return players[plid].is_live ();
 }
 
-void inc_pl_score (int plid, int delta) {
+void Players::inc_pl_score (int plid, int delta) {
     players[plid].inc_score (delta);
 }
 
-void dec_pl_score (int plid, int delta) {
+void Players::dec_pl_score (int plid, int delta) {
     players[plid].dec_score (delta);
 }
 
-void set_pl_score (int plid, int score) {
+void Players::set_pl_score (int plid, int score) {
     players[plid].set_score (score);
 }
 
-int get_pl_score (int plid) {
+int Players::get_pl_score (int plid) {
     return players[plid].get_score ();
 }
 
-int is_pl_jumping (int plid) {
+int Players::is_pl_jumping (int plid) {
     return players[plid].is_jumping ();
 }
 
-int is_pl_human (int plid) {
+int Players::is_pl_human (int plid) {
     return players[plid].is_human ();
 }
 
-void kill_pl (int plid) {
+void Players::kill_pl (int plid) {
     players[plid].kill ();
 }
 
-void clear_pl (int plid) {
+void Players::clear_pl (int plid) {
     players[plid].clear ();
 }
 
-void fast_clear_pl (int plid) {
+void Players::fast_clear_pl (int plid) {
     players[plid].fast_clear ();
 }
 
-void cut_pl_at_length (int plid, int length) {
+void Players::cut_pl_at_length (int plid, int length) {
     players[plid].cut_at_length (length);
 }
 
-void dec_pl_max_length (int plid, unsigned int delta) {
+void Players::dec_pl_max_length (int plid, unsigned int delta) {
     players[plid].dec_max_length (delta);
 }
 
-int get_pl_max_length (int plid) {
+int Players::get_pl_max_length (int plid) {
     return players[plid].get_max_length ();
 }
 
-int get_pl_length (int plid) {
+int Players::get_pl_length (int plid) {
     return players[plid].get_length ();
 }
 
-void inc_pl_max_length (int plid, unsigned int delta) {
+void Players::inc_pl_max_length (int plid, unsigned int delta) {
     players[plid].inc_max_length (delta);
 }
 
-void set_pl_max_lenght (int plid, unsigned int length) {
+void Players::set_pl_max_length (int plid, unsigned int length) {
     players[plid].set_max_length (length);
 }
 
-void set_pl_timer (int plid, int time) {
+void Players::set_pl_timer (int plid, int time) {
     players[plid].set_timer (time);
 }
 
-int live_pls_count () {
+int Players::live_pls_count () {
     int result = 0;
     for (size_t pi = 0; pi < players.size (); pi++) {
         result += players[pi].is_live ();
@@ -564,8 +518,10 @@ int live_pls_count () {
     return result;
 }
 
-void players_render_head () {
+void Players::render_head () {
     for (size_t pi = 0; pi < players.size (); pi++) {
         players[pi].render_head ();
     }
 }
+
+#endif

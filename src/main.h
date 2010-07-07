@@ -14,8 +14,8 @@ struct FPoint {
 };
 
 struct Point16 {
-    Uint16 x;
-    Uint16 y;
+    uint16_t x;
+    uint16_t y;
 };
 
 #endif

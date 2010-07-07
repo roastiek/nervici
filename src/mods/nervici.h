@@ -1,6 +1,8 @@
 #ifndef __NERVICI_H__
 #define __NERVICI_H__
 
+#include "sys/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -71,7 +73,7 @@ int is_pl_live (int plid);
 
 void kill_pl (int plid);
 
-void set_pl_max_lenght (int plid, unsigned int length);
+void set_pl_max_length (int plid, unsigned int length);
 
 void set_pl_score (int plid, int score);
 

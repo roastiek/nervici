@@ -35,7 +35,7 @@ void game_initialize (const GameInfo& info) {
 
     render_draw_game_screen ();
     world_initialize ();
-    players_initialize (info);
+    Players::initialize (info);
 
     game.end = 0;
     game.abort = 0;
@@ -58,7 +58,7 @@ void game_uninitialize () {
 
     sys_unload_mod ();
 
-    players_uninitialize ();
+    Players::uninitialize ();
     world_uninitialize ();
 }
 
@@ -99,18 +99,18 @@ void game_run () {
         }
 
         sys_mod_before_step ();
-        players_step ();
+        Players::step ();
         world_check_starts ();
         sys_mod_after_step ();
 
         sys_mod_before_step ();
-        players_step ();
+        Players::step ();
         world_check_starts ();
         sys_mod_after_step ();
 
         render_draw_world_items ();
-        players_update_score ();
-        players_render_head ();
+        Players::update_score ();
+        Players::render_head ();
 
         music_update ();
 
@@ -124,7 +124,7 @@ void game_run () {
                 sys_mod_on_timer ();
             }
         } else game.timer += game.speed;
-        players_timer (game.speed);
+        Players::timer (game.speed);
         steps++;
     }
 
@@ -166,7 +166,7 @@ int get_round () {
 void clear_playerground () {
     world_clear ();
     render_clear ();
-    players_erase ();
+    Players::erase ();
 }
 
 void end_game () {

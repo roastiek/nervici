@@ -9,6 +9,9 @@ struct Player;
 #include "mods/nervici.h"
 #include "world.h"
 
+#define JUMP_LENGTH 24
+#define JUMP_REPEAT 80
+
 /*
  * PS_Start - player has got a start position and is ready to be started
  *            one dot is drawn
@@ -36,7 +39,7 @@ typedef enum KeySt {
 
 struct Player {
 private:
-    int ID;
+    int id;
     const PlInfo* info;
     PlState state;
 
@@ -83,9 +86,9 @@ private:
     void clear_bottom ();
     void check_length ();
     void live ();
-    void process_fields (const FPoint& epos, const Point16& pos, const Fields& fields);
+    void process_fields (const FPoint& epos, const Point16& pos, const Fields & fields);
 public:
-    void initialize (int ID, const GameInfo& plinfo);
+    void initialize (int ID, const GameInfo & plinfo);
     void uninitialize ();
     /*
      * Set state to PS_Erased
@@ -103,11 +106,11 @@ public:
      * make one player step, depending on state
      * do only something in PS_Live or PS_Clear states
      */
-    int step (const Uint8 *keys);
+    int step (const uint8_t * keys);
     /*
      * add part to players body
      */
-    void add_part (const FPoint& part);
+    void add_part (const FPoint & part);
     /*
      * player claims start, draw one dot and set state to PS_Start
      */
@@ -159,76 +162,113 @@ public:
 
     void render_head ();
 
-    int get_score () const;
-    bool is_jumping () const;
-    bool is_human () const;
-    size_t get_max_length () const;
-    size_t get_length () const;
-    int get_id () const;
-    PlState get_state () const;
-    size_t get_head () const;
-    size_t get_size () const;
-    bool is_live () const;
-    bool is_ironized () const;
-    int get_order () const;
+    int get_score () const {
+        return score;
+    }
+
+    bool is_jumping () const {
+        return jumptime > JUMP_REPEAT - JUMP_LENGTH;
+    }
+
+    bool is_human () const {
+        return info->type == PT_Human;
+    }
+
+    size_t get_max_length () const {
+        return max_length;
+    }
+
+    size_t get_length () const {
+        return length;
+    }
+
+    int get_id () const {
+        return id;
+    }
+
+    PlState get_state () const {
+        return state;
+    }
+
+    bool is_live () const {
+        return state == PS_Live || state == PS_Start;
+    }
+
+    bool is_ironized () const {
+        return ironized;
+    }
+
+    int get_order () const {
+        return order;
+    }
 };
 
-void players_initialize (const GameInfo& info);
+struct Players {
+private:
+    static vector<Player> players;
+public:
 
-void players_uninitialize ();
+    static void initialize (const GameInfo & info);
 
-int players_step ();
+    static void uninitialize ();
 
-void players_update_score ();
+    static int step ();
 
-void players_timer (int speed);
+    static void update_score ();
 
-int player_get_count ();
+    static void timer (int speed);
 
-int player_get_lives_count ();
+    static int get_count ();
 
-void players_erase ();
+    static int get_lives_count ();
 
-void clear_pl (int plid);
+    static void erase ();
 
-void cut_pl_at_length (int plid, int length);
+    static void clear_pl (int plid);
 
-void dec_pl_max_length (int plid, unsigned int delta);
+    static void cut_pl_at_length (int plid, int length);
 
-void dec_pl_score (int plid, int delta);
+    static void dec_pl_max_length (int plid, unsigned int delta);
 
-void fast_clear_pl (int plid);
+    static void dec_pl_score (int plid, int delta);
 
-int get_pl_length (int plid);
+    static void fast_clear_pl (int plid);
 
-int get_pl_max_length (int plid);
+    static int get_pl_length (int plid);
 
-int get_pl_score (int plid);
+    static int get_pl_max_length (int plid);
 
-void give_pl_start (int plid, int start);
+    static int get_pl_score (int plid);
 
-void inc_pl_max_length (int plid, unsigned int delta);
+    static void give_pl_start (int plid, int start);
 
-void inc_pl_score (int plid, int delta);
+    static void inc_pl_max_length (int plid, unsigned int delta);
 
-int is_pl_human (int plid);
+    static void inc_pl_score (int plid, int delta);
 
-int is_pl_jumping (int plid);
+    static int is_pl_human (int plid);
 
-int is_pl_live (int plid);
+    static int is_pl_jumping (int plid);
 
-void kill_pl (int plid);
+    static int is_pl_live (int plid);
 
-void set_pl_max_lenght (int plid, unsigned int length);
+    static void kill_pl (int plid);
 
-void set_pl_score (int plid, int score);
+    static void set_pl_max_length (int plid, unsigned int length);
 
-void set_pl_timer (int plid, int time);
+    static void set_pl_score (int plid, int score);
 
-void start_pl (int plid);
+    static void set_pl_timer (int plid, int time);
 
-int live_pls_count ();
+    static void start_pl (int plid);
 
-void players_render_head ();
-    
+    static int live_pls_count ();
+
+    static void render_head ();
+};
+
+
+
+
+
 #endif

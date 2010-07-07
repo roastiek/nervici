@@ -8,24 +8,24 @@
 #define IT_SOFT_SMILE   4
 #define IT_HARD_SMILE   5
 
-typedef Uint8 Fields[3][3];
+typedef uint8_t Fields[3][3];
 
 #include "main.h"
 #include "mods/nervici.h"
 #include "player.h"
 
 struct WIPlayer {
-    Uint8 ID;
-    Uint8 body;
-    Uint16 order;
+    uint8_t ID;
+    uint8_t body;
+    uint16_t order;
 };
 
 struct WISmile {
-    Uint32 ID;
+    uint32_t ID;
 };
 
 struct WorldItem {
-    Uint8 type;
+    uint8_t type;
     bool changed;
 
     union {
@@ -66,9 +66,9 @@ void world_calc_fields (const FPoint& pos, Fields& fields);
 
 int world_simple_test_fields (const Point16& pos, const Fields& fields);
 
-int world_test_fields (const Player* pl, const Point16& pos, const Fields& fields);
+int world_test_fields (const Point16& pos, const Fields& fields, int id, size_t head, size_t size);
 
-void world_write_player_head (const Player* pl, const Point16& pos, const Fields& fields);
+void world_write_player_head (const Point16& pos, const Fields& fields, int id, size_t head);
 
 void world_rewrite_player_bottom (const Point16& pos, const Fields& fields, int id, int bottom, int new_bottom);
 
