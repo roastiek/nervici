@@ -255,13 +255,11 @@ static SDL_Surface* render_create_numbers (int color, int team) {
 }
 
 void render_load_players (const GameInfo& info) {
-    int p;
+    pl_images.resize (info.pl_infos.size ());
 
-    pl_images.resize (info.plsCount);
-
-    for (p = 0; p < info.plsCount; p++) {
-        pl_images[p].face = render_create_player_face (info.plInfos[p].color);
-        pl_images[p].numbers = render_create_numbers (info.plInfos[p].color, 0x00);
+    for (size_t p = 0; p < info.pl_infos.size (); p++) {
+        pl_images[p].face = render_create_player_face (info.pl_infos[p].color);
+        pl_images[p].numbers = render_create_numbers (info.pl_infos[p].color, 0x00);
     }
 
 }
@@ -333,12 +331,12 @@ void render_draw_semafor (int state) {
     dest.y = gs_outer.semafor.y + 4;
     src.y = 0;
     for (s = 0; s < 3; s++) {
-        src.x = ((state >= s) && (state < 3)) ? 0 : 21;
+        src.x = ((state & 1 << s)) ? 0 : 21;
         SDL_BlitSurface (images[imtSemafor], &src, primary, &dest);
         dest.x += 29;
     }
 
-    src.x = (state >= 3) ? 0 : 21;
+    src.x = (state & SEMAFOR_G1) ? 0 : 21;
     src.y = 19;
     SDL_BlitSurface (images[imtSemafor], &src, primary, &dest);
 
@@ -357,10 +355,10 @@ static void draw_score (int y, SDL_Surface *numbers, int score, PlState state, b
     src.w = 20;
 
     switch (state) {
-        case psLive:
+        case PS_Live:
             src.x += (ironized) ? 20 : 0;
             break;
-        case psClear:
+        case PS_Clear:
             src.x += 40;
             break;
         default:
@@ -417,8 +415,8 @@ static void draw_score (int y, SDL_Surface *numbers, int score, PlState state, b
     SDL_UpdateRect (primary, gs_outer.score.x, dest.y, gs_outer.score.w, numbers->h);
 }
 
-void render_draw_player_score (const Player& pl) {
-    draw_score (gs_outer.score.y + pl.get_order() * images[imtNumbers]->h, pl_images[pl.get_id()].numbers, pl.get_score (), pl.get_state (), pl.is_ironized ());
+void render_draw_player_score (const Player* pl) {
+    draw_score (gs_outer.score.y + pl->get_order() * images[imtNumbers]->h, pl_images[pl->get_id()].numbers, pl->get_score (), pl->get_state (), pl->is_ironized ());
 }
 
 void render_draw_round (int round) {

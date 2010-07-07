@@ -12,28 +12,55 @@ static ModInfo info = {
 };
 
 static const GameSetting *set;
-//static int delta = -1;
 
 const ModInfo *get_mod_info () {
     return &info;
+}
+
+#define WAIT_TIME 800
+
+static void begin_start_procedure () {
+    int sid;
+
+    set_semafor (SEMAFOR_R1);
+    game_wait (WAIT_TIME);
+
+    for (int pi = 0; pi < set->playersCount; pi++) {
+        if (is_pl_human (pi)) {
+            sid = world_find_free_start ();
+            if (sid != -1) {
+                give_pl_start (pi, sid);
+            }
+        }
+    }
+    set_semafor (SEMAFOR_R1 | SEMAFOR_R2);
+    game_wait (WAIT_TIME);
+
+
+    for (int pi = 0; pi < set->playersCount; pi++) {
+        if (!is_pl_human (pi)) {
+            sid = world_find_free_start ();
+            if (sid != -1) {
+                give_pl_start (pi, sid);
+            }
+        }
+    }
+    set_semafor (SEMAFOR_R1 | SEMAFOR_R2 | SEMAFOR_R3);
+    game_wait (WAIT_TIME);
+
+    play_music (0);
+    for (int pi = 0; pi < set->playersCount; pi++) {
+        start_pl (pi);
+    }
+    set_semafor (SEMAFOR_G1);
 }
 
 void on_game_start (const GameSetting *nset) {
     int p, s;
 
     set = nset;
-    
-    for (p = 0; p < set->playersCount; p++) {
-        printf ("game start %d\n", p);
-        s = world_find_free_start ();
-        if (s != -1) {
-            give_pl_start (p, s);
-            set_pl_timer (p, -1000);
-        }
-    }
-    printf ("game start\n");
-    
-    set_timer (-3000);
+
+    begin_start_procedure ();
 }
 
 void on_game_end () {
@@ -50,10 +77,25 @@ void before_step () {
 
 void after_step () {
     int p;
-    
+
     for (p = 0; p < set->playersCount; p++) {
         if (is_pl_live (p)) {
             inc_pl_score (p, 1);
+        }
+    }
+
+    if (live_pls_count () <= 0) {
+        stop_music ();
+        set_semafor (SEMAFOR_OF);
+
+        if (get_round () == set->rounds) {
+            end_game ();
+        } else {
+            wait_for_space ();
+
+            clear_playerground ();
+            next_round ();
+            begin_start_procedure ();
         }
     }
 }
@@ -76,7 +118,7 @@ void on_ham_smile (int smid, int lvl) {
 void on_killed (int plid, int murder) {
 }
 
-void on_kill (int plid,int victim) {
+void on_kill (int plid, int victim) {
 }
 
 void on_wall (int plid) {
@@ -89,8 +131,4 @@ void on_cleared (int plid) {
 }
 
 void on_pl_timer (int plid) {
-    start_pl (plid);
-    play_music (0);
-    set_semafor (1);
-    next_round ();
 }

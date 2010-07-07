@@ -3,9 +3,9 @@
 
 #include "game/game.h"
 
-typedef enum _EffectType {
+enum EffectType {
     ET_Hop, ET_Jau, ET_Self, ET_SmilePlus, ET_SmileMinus, ET_Wall
-} EffectType;
+};
 
 void audio_initialize ();
 
@@ -18,12 +18,12 @@ void audio_free_players ();
 void audio_play_effect (int plid, EffectType effect);
 
 
-typedef enum _MusicType {
+enum MusicType {
     MT_Short, MT_Long, MT_Menu, MT_Stat, MT_Count
-} MusicType;
+};
 
-inline _MusicType operator++(_MusicType &mt, int) {
-    mt = (_MusicType) (mt + 1);
+inline MusicType operator++(MusicType &mt, int) {
+    mt = (MusicType) (mt + 1);
     return mt;
 }
 

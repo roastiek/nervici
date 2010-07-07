@@ -94,6 +94,8 @@ void game_run () {
         
         sys_mod_after_step ();
 
+        players_update_score ();
+
         music_update ();
         
         if ((delta = game.speed + delay - SDL_GetTicks()) > 0 ) {
@@ -147,7 +149,7 @@ int get_round () {
 void clear_playerground () {
     world_clear ();
     render_clear ();
-    players_clear ();
+    players_erase ();
 }
 
 void end_game () {
@@ -195,7 +197,7 @@ void game_wait (size_t time) {
 void wait_for_space () {
     SDL_Event event;
     
-    while (!game.end && !game.abort) {
+    while (!game.abort) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:

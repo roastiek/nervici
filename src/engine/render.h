@@ -25,7 +25,7 @@ void render_update_screen ();
 
 void render_draw_semafor (int state);
 
-void render_draw_player_score (const Player& pl);
+void render_draw_player_score (const Player* pl);
 
 void render_draw_round (int round);
 

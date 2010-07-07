@@ -1,15 +1,18 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
+#include <vector>
+
 #include "mods/nervici.h"
 #include "mods/mods.h"
 #include "settings/plinfo.h"
 #include "world.h"
 
+using namespace std;
+
 struct GameInfo {
     GameSetting *setting;
-    int plsCount;
-    PlInfo *plInfos;
+    vector<PlInfo> pl_infos;
 };
 
 void game_initialize (const GameInfo& info);

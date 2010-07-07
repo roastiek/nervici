@@ -333,18 +333,16 @@ static int find_profil (string name) {
 }
 
 void audio_load_players (const GameInfo& info) {
-    int si;
-
     sources.clear();
 
-    for (si = 0; si < info.plsCount; si++) {
+    for (size_t si = 0; si < info.pl_infos.size (); si++) {
         PlAudio entry;
         alGenSources (1, &entry.source);
-        alSourcef (entry.source, AL_PITCH, (info.plInfos[si].pitch + 5) / 10.0);
+        alSourcef (entry.source, AL_PITCH, (info.pl_infos[si].pitch + 5) / 10.0);
         alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
         alSourcefv (entry.source, AL_VELOCITY, sourceVel);
         alSourcefv (entry.source, AL_POSITION, sourcePos);
-        entry.prof = find_profil (info.plInfos[si].profil);
+        entry.prof = find_profil (info.pl_infos[si].profil);
         sources.push_back(entry);
     }
 }
