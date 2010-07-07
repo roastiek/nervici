@@ -108,6 +108,7 @@ void game_run () {
         world_check_starts ();
         sys_mod_after_step ();
 
+        render_draw_world_items ();
         players_update_score ();
         players_render_head ();
 

@@ -51,6 +51,9 @@ static PlayersSurfaces pl_images;
 static Surfaces images;
 static Fonts fonts;
 
+//pojd me do hymen
+static vector<Point16> items_queue;
+
 static const char *const section = "screen";
 static const char *const st_width = "width";
 static const char *const st_height = "height";
@@ -279,20 +282,37 @@ void render_clear () {
     SDL_UpdateRects (primary, 1, &blit);
 }
 
-void render_draw_world_item (Uint16 x, Uint16 y, const WorldItem& item) {
+void render_draw_world_items () {
     static SDL_Rect drawsrc = {0, 0, 1, 1};
     static SDL_Rect drawdest = {0, 0, 1, 1};
 
-    drawdest.x = x + gs_outer.playerground.x;
-    drawdest.y = y + gs_outer.playerground.y;
-    SDL_BlitSurface (background, &drawdest, primary, &drawdest);
+    for (size_t i = 0; i < items_queue.size (); i++) {
+        const Point16& pos = items_queue[i];
+        WorldItem& item = world_get_item_p (pos);
+        if (item.changed) {
+            drawdest.x = pos.x + gs_outer.playerground.x;
+            drawdest.y = pos.y + gs_outer.playerground.y;
+            SDL_BlitSurface (background, &drawdest, primary, &drawdest);
 
-    switch (item.type) {
-        case IT_PLAYER:
-            drawsrc.x = item.player.body;
-            SDL_BlitSurface (pl_images[item.player.ID].face, &drawsrc, primary, &drawdest);
-            break;
+            switch (item.type) {
+                case IT_PLAYER:
+                    drawsrc.x = item.player.body;
+                    SDL_BlitSurface (pl_images[item.player.ID].face, &drawsrc, primary, &drawdest);
+                    break;
+            }
+            item.changed = false;
+        }
     }
+    items_queue.clear ();
+}
+
+void render_queue_world_item (Uint16 x, Uint16 y) {
+    static Point16 pos;
+    pos.x = x;
+    pos.y = y;
+
+    items_queue.push_back (pos);
+    world_get_item (x, y).changed = true;
 }
 
 void render_update_face (int x, int y) {
@@ -416,7 +436,7 @@ static void draw_score (int y, SDL_Surface *numbers, int score, PlState state, b
 }
 
 void render_draw_player_score (const Player* pl) {
-    draw_score (gs_outer.score.y + pl->get_order() * images[imtNumbers]->h, pl_images[pl->get_id()].numbers, pl->get_score (), pl->get_state (), pl->is_ironized ());
+    draw_score (gs_outer.score.y + pl->get_order () * images[imtNumbers]->h, pl_images[pl->get_id ()].numbers, pl->get_score (), pl->get_state (), pl->is_ironized ());
 }
 
 void render_draw_round (int round) {

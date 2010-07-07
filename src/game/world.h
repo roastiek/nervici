@@ -26,6 +26,7 @@ struct WISmile {
 
 struct WorldItem {
     Uint8 type;
+    bool changed;
 
     union {
         WIPlayer player;
@@ -67,6 +68,8 @@ int world_simple_test_fields (const Point16& pos, const Fields& fields);
 
 int world_test_fields (const Player* pl, const Point16& pos, const Fields& fields);
 
-void world_process_fields (const Player* pl, const Point16& pos, const Fields& fields);
+void world_write_player_head (const Player* pl, const Point16& pos, const Fields& fields);
+
+void world_rewrite_player_bottom (const Point16& pos, const Fields& fields, int id, int bottom, int new_bottom);
 
 #endif

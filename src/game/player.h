@@ -45,6 +45,7 @@ private:
     int jumptime;
     KeySt keyst;
     Fields fields;
+    Fields help_fields;
 
     int score;
     int order;
@@ -53,7 +54,7 @@ private:
     /*
      * Player body
      */
-    Point16 *body;
+    FPoint *body;
     /*
      * size of body
      */
@@ -82,7 +83,7 @@ private:
     void clear_bottom ();
     void check_length ();
     void live ();
-    void process_fields (const Point16& pos, const Fields& fields);
+    void process_fields (const FPoint& epos, const Point16& pos, const Fields& fields);
 public:
     void initialize (int ID, const GameInfo& plinfo);
     void uninitialize ();
@@ -106,7 +107,7 @@ public:
     /*
      * add part to players body
      */
-    void add_part (const Point16& part);
+    void add_part (const FPoint& part);
     /*
      * player claims start, draw one dot and set state to PS_Start
      */

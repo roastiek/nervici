@@ -108,7 +108,9 @@ static int run () {
 }
 
 int main (int argc, char *argv[]) {
-    
+
+    cout << sizeof (WorldItem) << '\n';
+
     initialize ();
     run ();
     uninitialize ();

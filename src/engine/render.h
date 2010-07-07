@@ -17,7 +17,9 @@ void render_clear ();
 
 void render_update_face(int x, int y);
 
-void render_draw_world_item (Uint16 x, Uint16 y, const WorldItem& item);
+void render_queue_world_item (Uint16 x, Uint16 y);
+
+void render_draw_world_items ();
 
 void render_draw_game_screen ();
 

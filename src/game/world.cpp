@@ -163,7 +163,7 @@ int world_test_fields (const Player* pl, const Point16& pos, const Fields& field
                     case IT_SOFT_SMILE:
                         continue;
                     case IT_PLAYER:
-                    
+
                         result &= (item.player.ID == pl->get_id ()) && (
                                 (item.player.order < pl->get_head ())
                                 ? pl->get_head () - item.player.order <= 8
@@ -180,7 +180,7 @@ int world_test_fields (const Player* pl, const Point16& pos, const Fields& field
                                                 result = 0;
                                             }*/
                         break;
-                    
+
                     default:
                         result = 0;
                         break;
@@ -191,30 +191,7 @@ int world_test_fields (const Player* pl, const Point16& pos, const Fields& field
     return result;
 }
 
-/*void world_simple_process_fields (Player *pl, const Point16& pos, const Fields& fields) {
-    bool crashed = false;
-    for (int y = 0; y < 3; y++) {
-        for (int x = 0; x < 3; x++) {
-            WorldItem& item = world_get_item (pos.x + x, pos.y + y);
-            switch (item.type) {
-                case IT_STONE:
-                    crashed = true;
-                    break;
-                case IT_WALL:
-                    crashed = true;
-                    break;
-                case IT_PLAYER:
-                    crashed = true;
-                    break;
-                case IT_HARD_SMILE:
-                    crashed = true;
-                    break;
-            }
-        }
-    }
-}*/
-
-void world_process_fields (const Player* pl, const Point16& pos, const Fields& fields) {
+void world_write_player_head (const Player* pl, const Point16& pos, const Fields& fields) {
     for (int y = 0; y < 3; y++) {
         for (int x = 0; x < 3; x++) {
             if (fields[x][y] != 0) {
@@ -227,7 +204,7 @@ void world_process_fields (const Player* pl, const Point16& pos, const Fields& f
                         item.player.order = pl->get_head ();
                         break;
                     case IT_PLAYER:
-                        if (item.player.body < fields[x][y]) {
+                        if (item.player.ID == pl->get_id () && item.player.body < fields[x][y]) {
                             item.player.body = fields[x][y];
                             item.player.order = pl->get_head ();
                         }
@@ -235,7 +212,30 @@ void world_process_fields (const Player* pl, const Point16& pos, const Fields& f
                     case IT_SOFT_SMILE:
                         break;
                 }
-                render_draw_world_item (pos.x + x, pos.y + y, item);
+                render_queue_world_item (pos.x + x, pos.y + y);
+            }
+        }
+    }
+}
+
+void world_rewrite_player_bottom (const Point16& pos, const Fields& fields, int id, int bottom, int new_bottom) {
+    for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < 3; x++) {
+            WorldItem& item = world_get_item (pos.x + x, pos.y + y);
+            switch (item.type) {
+                case IT_PLAYER:
+                    if (item.player.ID == id && item.player.order == bottom) {
+                        if (fields[x][y] != 0) {
+                            item.player.body = fields[x][y];
+                            item.player.order = new_bottom;
+                        } else {
+                            item.type = IT_FREE;
+                        }
+                        render_queue_world_item (pos.x + x, pos.y + y);
+                    }
+                    break;
+                case IT_SOFT_SMILE:
+                    break;
             }
         }
     }

@@ -17,19 +17,19 @@ typedef vector<Player> Players;
 
 static Players players;
 
-void Player::process_fields (const Point16& pos, const Fields& fields) {
+void Player::process_fields (const FPoint& epos, const Point16& pos, const Fields& fields) {
     if (state == PS_Live || state == PS_Start) {
-        world_process_fields (this, pos, fields);
-        add_part (pos);
+        world_write_player_head (this, pos, fields);
+        add_part (epos);
 
         bool add = true;
         for (size_t ui = 0; ui < updates.size () && add; ui++) {
             const Point16& upos = updates[ui];
-            add&= (upos.x == pos.x && upos.y == pos.y);
+            add &= (upos.x == pos.x && upos.y == pos.y);
         }
         if (add) {
             updates.push_back (pos);
-        //render_update_face (pos.x, pos.y);
+            //render_update_face (pos.x, pos.y);
         }
     }
 }
@@ -52,7 +52,7 @@ void Player::initialize (int ID, const GameInfo& info) {
     while (size <= max_length) {
         size += 1024;
     }
-    body = new Point16[size];
+    body = new FPoint[size];
     length = 0;
     head = 0;
     timer = 0;
@@ -79,25 +79,55 @@ void Player::timer_func (int speed) {
 }
 
 void Player::clear_bottom () {
-    Point16 pos;
-    int x, y;
+    size_t new_bottom;
 
-    pos = body[bottom];
+    FPoint& pos = body[bottom];
+    new_bottom = (bottom + 1) % size;
+    world_calc_fields (body[new_bottom], fields);
 
-    for (y = 0; y < 3; y++) {
+    if ((int)body[new_bottom].x > (int)body[bottom].x) {
+        for (int y = 0; y < 3; y++) {
+            fields[2][y] = fields[1][y];
+            fields[1][y] = fields[0][y];
+            fields[0][y] = 0;
+        }
+    } else if ((int)body[new_bottom].x < (int)body[bottom].x) {
+        for (int y = 0; y < 3; y++) {
+            fields[0][y] = fields[1][y];
+            fields[1][y] = fields[2][y];
+            fields[2][y] = 0;
+        }
+    }
+    if ((int)body[new_bottom].y > (int)body[bottom].y) {
+        for (int x = 0; x < 3; x++) {
+            fields[x][2] = fields[x][1];
+            fields[x][1] = fields[x][0];
+            fields[x][0] = 0;
+        }
+    } else if ((int)body[new_bottom].y < (int)body[bottom].y) {
+        for (int x = 0; x < 3; x++) {
+            fields[x][0] = fields[x][1];
+            fields[x][1] = fields[x][2];
+            fields[x][2] = 0;
+        }
+    }
+
+    /*for (y = 0; y < 3; y++) {
         for (x = 0; x < 3; x++) {
             WorldItem& item = world_get_item (pos.x + x, pos.y + y);
 
             if (item.type == IT_PLAYER && item.player.ID == ID && item.player.order == bottom) {
                 item.type = IT_FREE;
                 render_draw_world_item (pos.x + x, pos.y + y, item);
+                help_fields[x][y] = 1;
+            } else {
+                help_fields[x][y] = 0;
             }
         }
-    }
-    render_update_face (pos.x, pos.y);
+    }*/
+    render_update_face (pos.x - 1, pos.y - 1);
 
-    bottom++;
-    bottom %= size;
+    bottom = new_bottom;
     length--;
 }
 
@@ -105,8 +135,8 @@ void Player::check_length () {
     if (max_length == 0) {
         if (length == size) {
             size += 1024;
-            Point16 *new_body = new Point16[size];
-            memcpy (new_body, body, length);
+            FPoint *new_body = new FPoint[size];
+            memcpy (new_body, body, length * sizeof (FPoint));
             delete [] body;
             body = new_body;
         }
@@ -118,7 +148,7 @@ void Player::check_length () {
     }
 }
 
-void Player::add_part (const Point16& part) {
+void Player::add_part (const FPoint& part) {
     if (max_length == 0) {
         if (length < size) {
             body[head] = part;
@@ -163,7 +193,7 @@ void Player::live () {
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
         survive = world_test_fields (this, pos, fields);
         if (!survive) state = PS_Death;
-        process_fields (pos, fields);
+        process_fields (exact, pos, fields);
     } else {
         survive = world_simple_test_fields (pos, fields);
         if (!survive) state = PS_Death;
@@ -227,7 +257,8 @@ void Player::give_start (int start) {
             world_calc_fields (exact, fields);
             pos.x = exact.x - 1;
             pos.y = exact.y - 1;
-            process_fields (pos, fields);
+            process_fields (exact, pos, fields);
+            render_draw_world_items ();
             render_head ();
         }
     }
@@ -528,7 +559,7 @@ void set_pl_timer (int plid, int time) {
 int live_pls_count () {
     int result = 0;
     for (size_t pi = 0; pi < players.size (); pi++) {
-        result+= players[pi].is_live ();
+        result += players[pi].is_live ();
     }
     return result;
 }
