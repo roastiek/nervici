@@ -45,9 +45,10 @@ void Player::initialize (int ID, const GameInfo& info) {
     score = 0;
     order = ID;
     max_length = info.setting->maxLength;
-    size = 1024;
+    size = 0xff;
     while (size <= max_length) {
-        size += 1024;
+        size*= 2;
+        size++;
     }
     body = new FPoint[size];
     length = 0;

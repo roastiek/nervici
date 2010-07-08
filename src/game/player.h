@@ -62,24 +62,24 @@ private:
     /*
      * size of body
      */
-    size_t size;
+    uint16_t size;
     /*
      * length of player <= size
      */
-    size_t length;
+    uint16_t length;
     /*
      * max_length > 0 -> length <= max_length
      * mex_length <= 0 -> unlimited length
      */
-    size_t max_length;
+    uint16_t max_length;
     /*
      * index of first part
      */
-    size_t head;
+    uint16_t head;
     /*
      * index of last part
      */
-    size_t bottom;
+    uint16_t bottom;
     bool ironized;
 
     vector<Point16> updates;
