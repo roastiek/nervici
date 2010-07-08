@@ -10,10 +10,6 @@
 
 #include "player.h"
 
-//typedef vector<Player> Players;
-
-//Players players;
-
 void Player::process_fields (const FPoint& epos, const Point& pos, const Fields& fields) {
     if (state == PS_Live || state == PS_Start) {
         World::write_player_head (pos, fields, id, head);
@@ -81,18 +77,33 @@ void Player::clear_bottom () {
     updates.push_back (pos);
 
     bottom++;
-    bottom%= size;
+    bottom %= size;
     length--;
+}
+
+void Player::resize (plsize_tu new_size) {
+    if (new_size > size) {
+        FPoint *new_body = new FPoint[new_size];
+        plsize_tu delta = new_size - size;
+
+        if (head > bottom) {
+            memcpy (new_body, body, length * sizeof (FPoint));
+        } else {
+            memcpy (new_body, body, (head + 1) * sizeof (FPoint));
+            memcpy (&new_body[bottom + delta], &body[bottom], (size - bottom) * sizeof (FPoint));
+            bottom+= delta;
+        }
+
+        delete [] body;
+        size = new_size;
+        body = new_body;
+    }
 }
 
 void Player::check_length () {
     if (max_length == 0) {
         if (length == size) {
-            size += 1024;
-            FPoint *new_body = new FPoint[size];
-            memcpy (new_body, body, length * sizeof (FPoint));
-            delete [] body;
-            body = new_body;
+            resize (size * 2 + 1);
         }
     } else {
         if (length >= max_length)
@@ -260,15 +271,16 @@ void Player::dec_max_length (plsize_tu delta) {
 }
 
 void Player::inc_max_length (plsize_tu delta) {
-    size_t maxlen = max_length + delta;
-    size_t inc = 0;
+    plsize_tu maxlen = max_length + delta;
+    plsize_tu new_size = size;
 
-    while (size + inc <= maxlen) {
-        inc += 1024;
+    while (new_size < maxlen) {
+         new_size*= 2;
+         new_size++;
     }
-    /* Do'nt know what is this suppossed to do
-     * if (inc != 0) inc_max_length (inc);
-     */
+
+    resize (new_size);
+
     max_length = maxlen;
 }
 

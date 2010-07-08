@@ -59,9 +59,15 @@ private:
     vector<Point> updates;
 
     void clear_bottom ();
+
     void check_length ();
+
     void live ();
+    
     void process_fields (const FPoint& epos, const Point& pos, const Fields & fields);
+
+    void resize (plsize_tu new_size);
+
 public:
     void initialize (plid_tu ID, const GameInfo & plinfo);
     void uninitialize ();
