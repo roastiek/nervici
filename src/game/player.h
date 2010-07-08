@@ -53,7 +53,10 @@ private:
      * index of last part
      */
     plsize_tu bottom;
+
     bool ironized;
+
+    vector<Point> updates;
 
     void clear_bottom ();
     void check_length ();
@@ -135,7 +138,7 @@ public:
         Render::draw_player_score (id, order, score, state, ironized);
     }
 
-    void render_head ();
+    void update_body ();
 
     score_ti get_score () const {
         return score;

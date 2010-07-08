@@ -44,7 +44,7 @@ struct AudioSetting {
 
 struct MusicFile {
     string filename;
-    int played;
+    bool played;
 };
 
 struct PlAudio {

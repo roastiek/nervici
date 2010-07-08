@@ -83,7 +83,7 @@ public:
 
     static void write_player_head (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
 
-    static void rewrite_player_bottom (const Point& pos, const Fields& fields, plid_tu id, plsize_tu bottom, plsize_tu new_bottom);
+    static void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom);
 
     static void queue_item (wsize_tu x, wsize_tu y);
 

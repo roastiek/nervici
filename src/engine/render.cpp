@@ -288,8 +288,8 @@ void Render::draw_world_items_queue (vector<Point>& queue) {
 }
 
 void Render::update_player (wsize_tu x, wsize_tu y) {
-    SDL_UpdateRect (primary, x + gs_outer.playerground.x - 1,
-            y + gs_outer.playerground.y - 1, 5, 5);
+    SDL_UpdateRect (primary, x + gs_outer.playerground.x, 
+            y + gs_outer.playerground.y, 3, 3);
 }
 
 void Render::draw_game_screen () {

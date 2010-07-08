@@ -104,8 +104,9 @@ void Game::run () {
         System::mod_after_step ();
 
         World::render_queue ();
-        Players::render_head ();
+        Players::update_bodies ();
         Players::update_score ();
+        //Render::update_screen ();
 
         Audio::music_update ();
 
@@ -144,7 +145,7 @@ void Game::wait (timer_ti time) {
     int rest = time;
 
     World::render_queue ();
-    Players::render_head ();
+    Players::update_bodies ();
     Players::update_score ();
 
     while (!end && !abort && rest > 0) {
@@ -170,7 +171,7 @@ void Game::wait_for_space () {
     SDL_Event event;
 
     World::render_queue ();
-    Players::render_head ();
+    Players::update_bodies ();
     Players::update_score ();
 
     while (!abort) {

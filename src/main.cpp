@@ -50,7 +50,7 @@ static int initialize() {
 
     gameset.speed = base_speed;
     gameset.rounds = 3;
-    gameset.maxLength = 0;
+    gameset.maxLength = 500;
     gameset.startsCount = World::get_starts_count ();
 
     gameinfo.setting = &gameset;

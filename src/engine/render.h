@@ -60,6 +60,10 @@ public:
 
     static void update_player (wsize_tu x, wsize_tu y);
 
+    static void update_player (const Point& pos) {
+        update_player (pos.x, pos.y);
+    }
+
     static void draw_world_items_queue (vector<Point>& queue);
 
     static void draw_game_screen ();

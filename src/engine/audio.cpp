@@ -187,7 +187,7 @@ static void scan_music_dir (const string& path, vector<MusicFile>& files, MusicT
         }
 
         entry.filename = file_path;
-        entry.played = 0;
+        entry.played = false;
         files.push_back (entry);
     }
 
@@ -368,12 +368,12 @@ bool Audio::music_open (MusicType type) {
 
     count = 0;
     for (size_t mi = 0; mi < music[type].size (); mi++) {
-        count += music[type][mi].played & 1;
+        count += music[type][mi].played;
     }
 
     if (count == music[type].size ()) {
         for (size_t mi = 0; mi < music[type].size (); mi++) {
-            music[type][mi].played = 0;
+            music[type][mi].played = false;
         }
         count = 0;
     }
@@ -382,7 +382,7 @@ bool Audio::music_open (MusicType type) {
         cout << "music open " << count << '/' << music[type].size () << '\n';
         f = rand () % music[type].size ();
         if (!music[type][f].played) {
-            music[type][f].played = 1;
+            music[type][f].played = true;
             count++;
 
             op = ov_fopen ((char *) music[type][f].filename.c_str (), &music_file);

@@ -18,11 +18,15 @@ void Player::process_fields (const FPoint& epos, const Point& pos, const Fields&
     if (state == PS_Live || state == PS_Start) {
         World::write_player_head (pos, fields, id, head);
         add_part (epos);
+        updates.push_back (pos);
     }
 }
 
-void Player::render_head () {
-    Render::update_player (exact.x - 2, exact.y - 2);
+void Player::update_body () {
+    for (size_t ui = 0; ui < updates.size (); ui++) {
+        Render::update_player (updates[ui]);
+    }
+    updates.clear ();
 }
 
 void Player::initialize (plid_tu ID, const GameInfo& info) {
@@ -33,13 +37,14 @@ void Player::initialize (plid_tu ID, const GameInfo& info) {
     max_length = info.setting->maxLength;
     size = 0xff;
     while (size <= max_length) {
-        size*= 2;
+        size *= 2;
         size++;
     }
     body = new FPoint[size];
     length = 0;
     head = 0;
     timer = 0;
+    bottom = 0;
     state = PS_Erased;
     ironized = false;
 }
@@ -51,6 +56,8 @@ void Player::uninitialize () {
 void Player::erase () {
     state = PS_Erased;
     length = 0;
+    bottom = 0;
+    head = 0;
 }
 
 void Player::timer_func (timer_ti speed) {
@@ -64,55 +71,17 @@ void Player::timer_func (timer_ti speed) {
 }
 
 void Player::clear_bottom () {
-    size_t new_bottom;
+    Point pos;
 
-    FPoint& pos = body[bottom];
-    new_bottom = (bottom + 1) % size;
-    World::calc_fields (body[new_bottom], fields);
+    pos.x = body[bottom].x - 1;
+    pos.y = body[bottom].y - 1;
 
-    if ((int)body[new_bottom].x > (int)body[bottom].x) {
-        for (int y = 0; y < 3; y++) {
-            fields[2][y] = fields[1][y];
-            fields[1][y] = fields[0][y];
-            fields[0][y] = 0;
-        }
-    } else if ((int)body[new_bottom].x < (int)body[bottom].x) {
-        for (int y = 0; y < 3; y++) {
-            fields[0][y] = fields[1][y];
-            fields[1][y] = fields[2][y];
-            fields[2][y] = 0;
-        }
-    }
-    if ((int)body[new_bottom].y > (int)body[bottom].y) {
-        for (int x = 0; x < 3; x++) {
-            fields[x][2] = fields[x][1];
-            fields[x][1] = fields[x][0];
-            fields[x][0] = 0;
-        }
-    } else if ((int)body[new_bottom].y < (int)body[bottom].y) {
-        for (int x = 0; x < 3; x++) {
-            fields[x][0] = fields[x][1];
-            fields[x][1] = fields[x][2];
-            fields[x][2] = 0;
-        }
-    }
+    World::rewrite_player_bottom (pos, id, bottom);
 
-    /*for (y = 0; y < 3; y++) {
-        for (x = 0; x < 3; x++) {
-            WorldItem& item = world_get_item (pos.x + x, pos.y + y);
+    updates.push_back (pos);
 
-            if (item.type == IT_PLAYER && item.player.ID == ID && item.player.order == bottom) {
-                item.type = IT_FREE;
-                render_draw_world_item (pos.x + x, pos.y + y, item);
-                help_fields[x][y] = 1;
-            } else {
-                help_fields[x][y] = 0;
-            }
-        }
-    }*/
-    Render::update_player (pos.x - 1, pos.y - 1);
-
-    bottom = new_bottom;
+    bottom++;
+    bottom%= size;
     length--;
 }
 
@@ -210,14 +179,14 @@ int Player::step (const Uint8 *keys) {
     }
 
     switch (state) {
-        case PS_Live:
-            live ();
-            break;
-        case PS_Clear:
-            clear_step ();
-            break;
-        default:
-            break;
+    case PS_Live:
+        live ();
+        break;
+    case PS_Clear:
+        clear_step ();
+        break;
+    default:
+        break;
     }
     return state == PS_Live;
 }
@@ -229,7 +198,7 @@ void Player::give_start (startid_tu start) {
     if (start >= 0) {
         st = World::get_start (start);
         if (st != NULL) {
-            cout << "give pl start " << (int)id << ' ' << (int)st->angle << '\n';
+            cout << "give pl start " << (int) id << ' ' << (int) st->angle << '\n';
 
             exact = st->pos;
             angle = st->angle;
@@ -261,17 +230,17 @@ void Player::set_score (score_ti value) {
 
 void Player::fast_clear () {
     switch (state) {
-        case PS_Start:
-        case PS_Death:
-        case PS_Clear:
-            while (length > 0) {
-                clear_bottom ();
-            }
-            state = PS_Erased;
-            World::check_starts ();
-            break;
-        default:
-            break;
+    case PS_Start:
+    case PS_Death:
+    case PS_Clear:
+        while (length > 0) {
+            clear_bottom ();
+        }
+        state = PS_Erased;
+        World::check_starts ();
+        break;
+    default:
+        break;
     }
 }
 
@@ -326,24 +295,24 @@ void Player::start () {
 
 void Player::kill () {
     switch (state) {
-        case PS_Start:
-        case PS_Live:
-            state = PS_Death;
-            break;
-        default:
-            break;
+    case PS_Start:
+    case PS_Live:
+        state = PS_Death;
+        break;
+    default:
+        break;
     }
 }
 
 void Player::clear () {
     switch (state) {
-        case PS_Start:
-        case PS_Death:
-        case PS_Clear:
-            state = PS_Clear;
-            break;
-        default:
-            break;
+    case PS_Start:
+    case PS_Death:
+    case PS_Clear:
+        state = PS_Clear;
+        break;
+    default:
+        break;
     }
 }
 

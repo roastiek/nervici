@@ -196,25 +196,17 @@ void World::write_player_head (const Point& pos, const Fields& fields,
     }
 }
 
-void World::rewrite_player_bottom (const Point& pos, const Fields& fields, 
-        plid_tu id, plsize_tu bottom, plsize_tu new_bottom) {
+void World::rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
     
-    for (int x = 0; x < 3; x++) {
-        for (int y = 0; y < 3; y++) {
+    for (wsize_tu x = 0; x < 3; x++) {
+        for (wsize_tu y = 0; y < 3; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
             switch (item.type) {
                 case IT_PLAYER:
                     if (item.player.ID == id && item.player.order == bottom) {
-                        if (fields[x][y] != 0) {
-                            item.player.body = fields[x][y];
-                            item.player.order = new_bottom;
-                        } else {
-                            item.type = IT_FREE;
-                        }
+                        item.type = IT_FREE;
                         queue_item (pos.x + x, pos.y + y);
                     }
-                    break;
-                case IT_SOFT_SMILE:
                     break;
             }
         }
@@ -223,8 +215,8 @@ void World::rewrite_player_bottom (const Point& pos, const Fields& fields,
 
 void World::queue_item (wsize_tu x, wsize_tu y) {
     Point pos = {x, y};
-    pos.x = x;
-    pos.y = y;
+    /*pos.x = x;
+    pos.y = y;*/
 
     items_queue.push_back (pos);
     World::get_item (x, y).changed = true;

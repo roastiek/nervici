@@ -48,9 +48,9 @@ public:
         return result;
     }
 
-    static void render_head () {
+    static void update_bodies () {
         for (plid_tu pi = 0; pi < players.size (); pi++) {
-            players[pi].render_head ();
+            players[pi].update_body ();
         }
     }
 
