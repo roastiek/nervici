@@ -56,9 +56,9 @@ public:
 
     static void free_players ();
 
-    static void clear ();
+    static void clear_playerground ();
 
-    static void update_face (wsize_tu x, wsize_tu y);
+    static void update_player (wsize_tu x, wsize_tu y);
 
     static void draw_world_items_queue (vector<Point>& queue);
 

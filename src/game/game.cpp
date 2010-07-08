@@ -107,7 +107,7 @@ void Game::run () {
         Players::render_head ();
         Players::update_score ();
 
-        music_update ();
+        Audio::music_update ();
 
         sleep (speed);
 
@@ -123,7 +123,7 @@ void Game::run () {
         steps++;
     }
 
-    music_stop ();
+    Audio::music_stop ();
 
     if (!abort) {
         Render::draw_end ();
@@ -136,7 +136,7 @@ void Game::set_speed (timer_ti value) {
     speed = value;
     if (speed < base_speed / 2) speed = base_speed / 2;
     if (speed > base_speed * 2) speed = base_speed * 2;
-    music_set_rate ((base_speed * 1.0) / speed);
+    Audio::music_set_rate ((base_speed * 1.0) / speed);
 }
 
 void Game::wait (timer_ti time) {
@@ -206,15 +206,15 @@ void Game::next_round () {
 }
 
 void Game::play_music (int type) {
-    music_play ((MusicType) (type % 2));
+    Audio::music_play ((MusicType) (type % 2));
 }
 
 void Game::stop_music () {
-    music_stop ();
+    Audio::music_stop ();
 }
 
 void Game::clear_playerground () {
     World::clear ();
-    Render::clear ();
+    Render::clear_playerground ();
     Players::erase ();
 }

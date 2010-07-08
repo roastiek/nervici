@@ -13,7 +13,6 @@
 
 #include "audio.h"
 
-#define WAVS_COUNT 8
 static const char* const wavs[] = {
     "/hop.wav", "/jau1.wav", "/jau2.wav", "/self.wav", "/smileplus.wav",
     "/smileminus.wav", "/wall1.wav", "/wall2.wav"
@@ -25,54 +24,31 @@ static const char* const st_music = "music";
 static const char* const st_buffer = "buffer";
 static const char* const st_bfrCount = "bfrCount";
 
-struct SoundProfile {
-    string name;
-    string directory;
-    ALuint buffers[WAVS_COUNT];
-};
+float Audio::music_rate = 1.0;
+bool Audio::music_loop = false;
+bool Audio::music_opened = false;
+OggVorbis_File Audio::music_file;
+vorbis_info *Audio::music_info;
+ALuint *Audio::music_buffers;
+ALuint Audio::music_source;
+ALenum Audio::music_format;
+MusicType Audio::music_type = MT_Count;
+char *Audio::music_loader = NULL;
+ALCdevice* Audio::device;
+ALCcontext* Audio::context;
+AudioSetting Audio::setting;
+vector<SoundProfile> Audio::sound_profiles;
+vector<PlAudio> Audio::sounds;
+vector<MusicFile> Audio::music[MT_Count];
 
-typedef vector<SoundProfile> SoundProfiles;
+static ALfloat source_pos[] = {0.0, 0.0, 0.0};
+static ALfloat source_vel[] = {0.0, 0.0, 0.0};
 
-struct AudioSetting {
-    int sound;
-    int music;
-    int buffer;
-    int bfrCount;
-};
+static ALfloat listener_pos[] = {0.0, 0.0, 0.0};
+static ALfloat listener_vel[] = {0.0, 0.0, 0.0};
+static ALfloat listener_ori[] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0};
 
-struct PlAudio {
-    int prof;
-    ALuint source;
-    int r;
-};
-
-typedef vector<PlAudio> PlAudios;
-
-struct MusicFile {
-    string filename;
-    int played;
-};
-
-typedef vector<MusicFile> MusicFiles;
-
-static ALfloat sourcePos[] = {0.0, 0.0, 0.0};
-static ALfloat sourceVel[] = {0.0, 0.0, 0.0};
-
-static ALCdevice* pDevice;
-static ALCcontext* pContext;
-static ALfloat ListenerPos[] = {0.0, 0.0, 0.0};
-static ALfloat ListenerVel[] = {0.0, 0.0, 0.0};
-static ALfloat ListenerOri[] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0};
-
-static SoundProfiles sound_profiles;
-
-static AudioSetting setting;
-
-static PlAudios sources;
-
-static MusicFiles music[MT_Count];
-
-static void scan_sounds_dir (const string& path, SoundProfiles& profiles) {
+static void scan_sounds_dir (const string& path, vector<SoundProfile>& profiles) {
     int w;
     int valid;
     DIR *dir;
@@ -82,7 +58,7 @@ static void scan_sounds_dir (const string& path, SoundProfiles& profiles) {
     string wav_path;
     SoundProfile entry;
 
-    dir = opendir (path.c_str());
+    dir = opendir (path.c_str ());
     if (dir == NULL) return;
 
     for (ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
@@ -94,7 +70,7 @@ static void scan_sounds_dir (const string& path, SoundProfiles& profiles) {
         for (w = 0; w < WAVS_COUNT; w++) {
             wav_path = prof_path + wavs[w];
 
-            file = fopen (wav_path.c_str(), "rb");
+            file = fopen (wav_path.c_str (), "rb");
             if (file == NULL) {
                 valid = 0;
                 break;
@@ -120,7 +96,7 @@ static ALuint load_wav (const string& filename) {
 
     alGenBuffers (1, &result);
 
-    if (SDL_LoadWAV (filename.c_str(), &spec, &data, &len) == NULL) return result;
+    if (SDL_LoadWAV (filename.c_str (), &spec, &data, &len) == NULL) return result;
     switch (spec.channels) {
         case 1:
             switch (spec.format) {
@@ -153,11 +129,11 @@ static ALuint load_wav (const string& filename) {
     return result;
 }
 
-static void load_buffers (SoundProfiles& profiles) {
+static void load_buffers (vector<SoundProfile>& profiles) {
     int w;
     string filename;
 
-    for (size_t pi = 0; pi < profiles.size(); pi++) {
+    for (size_t pi = 0; pi < profiles.size (); pi++) {
         SoundProfile& spi = profiles[pi];
 
         for (w = 0; w < WAVS_COUNT; w++) {
@@ -167,31 +143,15 @@ static void load_buffers (SoundProfiles& profiles) {
     }
 }
 
-static void load_wavs () {
-    cout << __func__ << '\n';
-
-    scan_sounds_dir (System::get_sounds_dir (), sound_profiles);
-    scan_sounds_dir (System::get_sounds_dir_home (), sound_profiles);
-
-    load_buffers (sound_profiles);
-}
-
-static void free_wavs () {
-    for (size_t pi = 0; pi < sound_profiles.size (); pi++) {
-        SoundProfile& spi = sound_profiles[pi];
-        alDeleteBuffers (WAVS_COUNT, spi.buffers);
-    }
-}
-
 static double ogg_get_length (const string& filename) {
     OggVorbis_File file;
     double result;
     size_t len;
     char *fn;
 
-    len = filename.length();
-    fn = (char *) alloca(len + 1);
-    memcpy (fn, filename.c_str(), len + 1);
+    len = filename.length ();
+    fn = (char *) alloca (len + 1);
+    memcpy (fn, filename.c_str (), len + 1);
 
     if (ov_fopen (fn, &file)) return -1;
 
@@ -201,14 +161,14 @@ static double ogg_get_length (const string& filename) {
     return result;
 }
 
-static void scan_music_dir (const string& path, MusicFiles& files, MusicType type) {
+static void scan_music_dir (const string& path, vector<MusicFile>& files, MusicType type) {
     DIR *dir;
     struct dirent *ent;
     double len;
     string file_path;
     MusicFile entry;
 
-    dir = opendir (path.c_str());
+    dir = opendir (path.c_str ());
     if (dir == NULL) return;
 
     for (ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
@@ -228,24 +188,30 @@ static void scan_music_dir (const string& path, MusicFiles& files, MusicType typ
 
         entry.filename = file_path;
         entry.played = 0;
-        files.push_back(entry);
+        files.push_back (entry);
     }
 
     closedir (dir);
 }
 
-static OggVorbis_File musicFile;
-static vorbis_info *musicInfo;
-static ALuint *musicBuffers;
-static ALuint musicSource;
-static ALenum musicFormat;
-static float musicRate = 1.0;
-static MusicType musicType = MT_Count;
-static char *mloader = NULL;
-static bool musicLoop = false;
-static bool musicOpened = false;
 
-static void load_music () {
+void Audio::init_wavs () {
+    cout << __func__ << '\n';
+
+    scan_sounds_dir (System::get_sounds_dir (), sound_profiles);
+    scan_sounds_dir (System::get_sounds_dir_home (), sound_profiles);
+
+    load_buffers (sound_profiles);
+}
+
+void Audio::free_wavs () {
+    for (size_t pi = 0; pi < sound_profiles.size (); pi++) {
+        SoundProfile& spi = sound_profiles[pi];
+        alDeleteBuffers (WAVS_COUNT, spi.buffers);
+    }
+}
+
+void Audio::init_music () {
     static const char* const suffixs[MT_Count] = {"/game", "/game", "/menu", "/stat"};
     string dir_name;
     MusicType mt;
@@ -253,118 +219,118 @@ static void load_music () {
     cout << __func__ << '\n';
 
     for (mt = MT_Short; mt < MT_Count; mt++) {
-        dir_name = System::get_music_dir() + suffixs[mt];
+        dir_name = System::get_music_dir () + suffixs[mt];
         scan_music_dir (dir_name, music[mt], mt);
     }
 
     for (mt = MT_Short; mt < MT_Count; mt++) {
-        dir_name = System::get_music_dir_home() + suffixs[mt];
+        dir_name = System::get_music_dir_home () + suffixs[mt];
         scan_music_dir (dir_name, music[mt], mt);
     }
 
-    mloader = new char[setting.buffer];
-    musicBuffers = new ALuint[setting.bfrCount];
+    music_loader = new char[setting.buffer];
+    music_buffers = new ALuint[setting.bfrs_count];
 
-    alGenBuffers (setting.bfrCount, musicBuffers);
-    alGenSources (1, &musicSource);
+    alGenBuffers (setting.bfrs_count, music_buffers);
+    alGenSources (1, &music_source);
 
-    alSourcefv (musicSource, AL_POSITION, sourcePos);
-    alSourcefv (musicSource, AL_VELOCITY, sourceVel);
-    alSourcef (musicSource, AL_GAIN, setting.music / 20.0);
+    alSourcefv (music_source, AL_POSITION, source_pos);
+    alSourcefv (music_source, AL_VELOCITY, source_vel);
+    alSourcef (music_source, AL_GAIN, setting.music / 20.0);
 }
 
-static void free_music () {
-    alDeleteBuffers (setting.bfrCount, musicBuffers);
-    alDeleteSources (1, &musicSource);
+void Audio::free_music () {
+    alDeleteBuffers (setting.bfrs_count, music_buffers);
+    alDeleteSources (1, &music_source);
 
-    delete [] mloader;
-    delete [] musicBuffers;
+    delete [] music_loader;
+    delete [] music_buffers;
 }
 
-static void load_audio_setting () {
+void Audio::load_setting () {
     cout << __func__ << '\n';
 
     setting.sound = Setting::read_int (section, st_sound, 20);
     setting.music = Setting::read_int (section, st_music, 20);
     setting.buffer = Setting::read_int (section, st_buffer, 0x10000);
-    setting.bfrCount = Setting::read_int (section, st_bfrCount, 2);
+    setting.bfrs_count = Setting::read_int (section, st_bfrCount, 2);
 }
 
-static void save_audio_setting () {
+void Audio::save_setting () {
     Setting::write_int (section, st_sound, setting.sound);
     Setting::write_int (section, st_music, setting.music);
     Setting::write_int (section, st_buffer, setting.buffer);
-    Setting::write_int (section, st_bfrCount, setting.bfrCount);
+    Setting::write_int (section, st_bfrCount, setting.bfrs_count);
 }
 
-void audio_initialize () {
+void Audio::initialize () {
     cout << __func__ << '\n';
-    pDevice = alcOpenDevice (NULL);
-    pContext = alcCreateContext (pDevice, NULL);
-    alcMakeContextCurrent (pContext);
+    device = alcOpenDevice (NULL);
+    context = alcCreateContext (device, NULL);
+    alcMakeContextCurrent (context);
 
-    alListenerfv (AL_POSITION, ListenerPos);
-    alListenerfv (AL_VELOCITY, ListenerVel);
-    alListenerfv (AL_ORIENTATION, ListenerOri);
+    alListenerfv (AL_POSITION, listener_pos);
+    alListenerfv (AL_VELOCITY, listener_vel);
+    alListenerfv (AL_ORIENTATION, listener_ori);
 
-    load_audio_setting ();
+    load_setting ();
 
-    load_wavs ();
-    load_music ();
+    init_wavs ();
+    init_music ();
 }
 
-void audio_uninitialize () {
-    save_audio_setting ();
+void Audio::uninitialize () {
+    save_setting ();
 
     free_music ();
     free_wavs ();
 
     alcMakeContextCurrent (NULL);
-    alcDestroyContext (pContext);
-    alcCloseDevice (pDevice);
+    alcDestroyContext (context);
+    alcCloseDevice (device);
 }
 
-static int find_profil (string name) {
+int Audio::find_profil (const string& name) {
     for (size_t si = 0; si < sound_profiles.size (); si++) {
-        if (strcasecmp (name.c_str(), sound_profiles[si].name.c_str()) == 0) {
+        if (strcasecmp (name.c_str (), sound_profiles[si].name.c_str ()) == 0) {
             return si;
         }
     }
     return -1;
 }
 
-void audio_load_players (const GameInfo& info) {
-    sources.clear();
+void Audio::load_players (const GameInfo& info) {
+    sounds.clear ();
 
     for (size_t si = 0; si < info.pl_infos.size (); si++) {
         PlAudio entry;
         alGenSources (1, &entry.source);
         alSourcef (entry.source, AL_PITCH, (info.pl_infos[si].pitch + 5) / 10.0);
         alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
-        alSourcefv (entry.source, AL_VELOCITY, sourceVel);
-        alSourcefv (entry.source, AL_POSITION, sourcePos);
+        alSourcefv (entry.source, AL_VELOCITY, source_vel);
+        alSourcefv (entry.source, AL_POSITION, source_pos);
         entry.prof = find_profil (info.pl_infos[si].profil);
-        sources.push_back(entry);
+        sounds.push_back (entry);
     }
 }
 
-void audio_free_players () {
-    for (size_t si = 0; si < sources.size (); si++) {
-        alSourceStop (sources[si].source);
-        alDeleteSources (1, &sources[si].source);
+void Audio::free_players () {
+    for (size_t si = 0; si < sounds.size (); si++) {
+        alSourceStop (sounds[si].source);
+        alDeleteSources (1, &sounds[si].source);
     }
 }
 
-void audio_play_effect (int plid, EffectType effect) {
+void Audio::play_effect (plid_tu plid, EffectType effect) {
     ALint play;
     //SoundProfile *spi;
     ALuint source;
 
-    if (sources[plid].prof >= 0) {
-        alGetSourcei (sources[plid].source, AL_SOURCE_STATE, &play);
+    if (sounds[plid].prof >= 0) {
+        alGetSourcei (sounds[plid].source, AL_SOURCE_STATE, &play);
 
-        SoundProfile& spi = sound_profiles[sources[plid].prof];
-        source = sources[plid].source;
+        SoundProfile& spi = sound_profiles[sounds[plid].prof];
+        source = sounds[plid].source;
 
         if (play != AL_PLAYING) {
             switch (effect) {
@@ -372,8 +338,8 @@ void audio_play_effect (int plid, EffectType effect) {
                     alSourcei (source, AL_BUFFER, spi.buffers[0]);
                     break;
                 case ET_Jau:
-                    alSourcei (source, AL_BUFFER, spi.buffers[1 + (sources[plid].r % 2)]);
-                    sources[plid].r++;
+                    alSourcei (source, AL_BUFFER, spi.buffers[1 + (sounds[plid].r % 2)]);
+                    sounds[plid].r++;
                     break;
                 case ET_Self:
                     alSourcei (source, AL_BUFFER, spi.buffers[3]);
@@ -385,8 +351,8 @@ void audio_play_effect (int plid, EffectType effect) {
                     alSourcei (source, AL_BUFFER, spi.buffers[5]);
                     break;
                 case ET_Wall:
-                    alSourcei (source, AL_BUFFER, spi.buffers[6 + (sources[plid].r % 2)]);
-                    sources[plid].r++;
+                    alSourcei (source, AL_BUFFER, spi.buffers[6 + (sounds[plid].r % 2)]);
+                    sounds[plid].r++;
                     break;
             }
 
@@ -395,7 +361,7 @@ void audio_play_effect (int plid, EffectType effect) {
     }
 }
 
-static int music_open (MusicType type) {
+bool Audio::music_open (MusicType type) {
     int f;
     int op;
     size_t count;
@@ -419,117 +385,114 @@ static int music_open (MusicType type) {
             music[type][f].played = 1;
             count++;
 
-            op = ov_fopen ((char *)music[type][f].filename.c_str(), &musicFile);
+            op = ov_fopen ((char *) music[type][f].filename.c_str (), &music_file);
             if (op) continue;
 
-            musicInfo = ov_info (&musicFile, -1);
+            music_info = ov_info (&music_file, -1);
 
-            if (musicInfo->channels == 1)
-                musicFormat = AL_FORMAT_MONO16;
-            else if (musicInfo->channels == 2)
-                musicFormat = AL_FORMAT_STEREO16;
+            if (music_info->channels == 1)
+                music_format = AL_FORMAT_MONO16;
+            else if (music_info->channels == 2)
+                music_format = AL_FORMAT_STEREO16;
             else {
-                ov_clear (&musicFile);
+                ov_clear (&music_file);
                 continue;
             }
 
-            musicOpened = true;
-            return 0;
+            music_opened = true;
+            return true;
         }
     }
 
-    return -1;
+    return false;
 }
 
-static void music_close () {
-    if (musicOpened) {
-        ov_clear (&musicFile);
-        musicOpened = false;
+void Audio::music_close () {
+    if (music_opened) {
+        ov_clear (&music_file);
+        music_opened = false;
     }
 }
 
-static int music_stream (ALuint buffer) {
+int Audio::music_stream (ALuint buffer) {
     int size = 0;
     int section;
     int result;
     int bs;
 
     bs = setting.buffer / 2;
-    while (bs - 1024 >= (setting.buffer / 2) * musicRate) bs -= 1024;
-    while (bs < (setting.buffer / 2) * musicRate) bs += 1024;
+    while (bs - 1024 >= (setting.buffer / 2) * music_rate) bs -= 1024;
+    while (bs < (setting.buffer / 2) * music_rate) bs += 1024;
 
     while (size < bs) {
-        result = ov_read (&musicFile, mloader + size, bs - size, 0, 2, 1, &section);
+        result = ov_read (&music_file, music_loader + size, bs - size, 0, 2, 1, &section);
 
         if (result > 0) size += result;
         else return result;
     }
 
-    alBufferData (buffer, musicFormat, mloader, size, musicInfo->rate * musicRate);
+    alBufferData (buffer, music_format, music_loader, size, music_info->rate * music_rate);
     return size;
 }
 
-void music_play (MusicType type) {
+void Audio::music_play (MusicType type) {
     ALenum state;
     int b;
 
-    alGetSourcei (musicSource, AL_SOURCE_STATE, &state);
+    alGetSourcei (music_source, AL_SOURCE_STATE, &state);
     if (state == AL_PLAYING) {
-        if (musicType == type) return;
+        if (music_type == type) return;
     }
 
     music_stop ();
 
-    musicType = type;
-    if (music_open (type)) return;
+    music_type = type;
+    if (!music_open (type)) return;
 
-    for (b = 0; b < setting.bfrCount; b++) {
-        if (music_stream (musicBuffers[b]) <= 0) {
+    for (b = 0; b < setting.bfrs_count; b++) {
+        if (music_stream (music_buffers[b]) <= 0) {
             break;
         }
-        alSourceQueueBuffers (musicSource, 1, &musicBuffers[b]);
+        alSourceQueueBuffers (music_source, 1, &music_buffers[b]);
     }
 
-    alSourcePlay (musicSource);
-    musicLoop = true;
+    alSourcePlay (music_source);
+    music_loop = true;
 }
 
-void music_stop () {
+void Audio::music_stop () {
     int queued;
     ALuint buffer;
 
-    alSourceStop (musicSource);
-    alGetSourcei (musicSource, AL_BUFFERS_QUEUED, &queued);
+    alSourceStop (music_source);
+    alGetSourcei (music_source, AL_BUFFERS_QUEUED, &queued);
 
     for (; queued > 0; queued--) {
-        alSourceUnqueueBuffers (musicSource, 1, &buffer);
+        alSourceUnqueueBuffers (music_source, 1, &buffer);
     }
 
     music_close ();
-    musicLoop = false;
+    music_loop = false;
 }
 
-void music_update () {
+void Audio::music_update () {
     int processed;
     ALenum state;
     ALuint buffer;
 
-    alGetSourcei (musicSource, AL_SOURCE_STATE, &state);
+    alGetSourcei (music_source, AL_SOURCE_STATE, &state);
     if (state == AL_PLAYING) {
 
-        alGetSourcei (musicSource, AL_BUFFERS_PROCESSED, &processed);
+        alGetSourcei (music_source, AL_BUFFERS_PROCESSED, &processed);
 
         for (; processed > 0; processed--) {
-            alSourceUnqueueBuffers (musicSource, 1, &buffer);
+            alSourceUnqueueBuffers (music_source, 1, &buffer);
             if (music_stream (buffer) > 0)
-                alSourceQueueBuffers (musicSource, 1, &buffer);
+                alSourceQueueBuffers (music_source, 1, &buffer);
         }
-    } else if (musicLoop) {
-        music_play (musicType);
+    } else if (music_loop) {
+        Audio::music_play (music_type);
     }
 
 }
 
-void music_set_rate (float rate) {
-    musicRate = rate;
-}

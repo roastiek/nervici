@@ -15,11 +15,11 @@ void Players::initialize (const GameInfo& info) {
     }
 
     Render::load_players (info);
-    audio_load_players (info);
+    Audio::load_players (info);
 }
 
 void Players::uninitialize () {
-    audio_free_players ();
+    Audio::free_players ();
     Render::free_players ();
 
     for (size_t pi = 0; pi < Players::players.size (); pi++) {

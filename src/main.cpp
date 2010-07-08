@@ -46,7 +46,7 @@ static int initialize() {
     }
 
     if (Render::initialize ()) return 1;
-    audio_initialize ();
+    Audio::initialize ();
 
     gameset.speed = base_speed;
     gameset.rounds = 3;
@@ -83,7 +83,7 @@ static int initialize() {
 static int uninitialize() {
     cout << __func__ << '\n';
     
-    audio_uninitialize ();
+    Audio::uninitialize ();
     Render::uninitialize();
     
     SDL_Quit ();

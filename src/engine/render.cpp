@@ -256,7 +256,7 @@ void Render::free_players () {
     pl_images.clear ();
 }
 
-void Render::clear () {
+void Render::clear_playerground () {
     blit.x = gs_outer.playerground.x;
     blit.y = gs_outer.playerground.y;
     SDL_BlitSurface (background, &gs_outer.playerground, primary, &blit);
@@ -287,7 +287,7 @@ void Render::draw_world_items_queue (vector<Point>& queue) {
     queue.clear ();
 }
 
-void Render::update_face (wsize_tu x, wsize_tu y) {
+void Render::update_player (wsize_tu x, wsize_tu y) {
     SDL_UpdateRect (primary, x + gs_outer.playerground.x - 1,
             y + gs_outer.playerground.y - 1, 5, 5);
 }

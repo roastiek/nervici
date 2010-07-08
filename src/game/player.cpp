@@ -22,7 +22,7 @@ void Player::process_fields (const FPoint& epos, const Point& pos, const Fields&
 }
 
 void Player::render_head () {
-    Render::update_face (exact.x - 2, exact.y - 2);
+    Render::update_player (exact.x - 2, exact.y - 2);
 }
 
 void Player::initialize (plid_tu ID, const GameInfo& info) {
@@ -110,7 +110,7 @@ void Player::clear_bottom () {
             }
         }
     }*/
-    Render::update_face (pos.x - 1, pos.y - 1);
+    Render::update_player (pos.x - 1, pos.y - 1);
 
     bottom = new_bottom;
     length--;
@@ -161,7 +161,7 @@ void Player::live () {
     if (keyst == KS_Right) angle = (angle + 1) % angles;
     if (jumptime == 0 && keyst == KS_Jump) {
         jumptime = JUMP_REPEAT;
-        audio_play_effect (id, ET_Hop);
+        Audio::play_effect (id, ET_Hop);
     }
 
     exact.x += icos[angle] / 2;
