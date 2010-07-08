@@ -28,6 +28,8 @@ private:
 
     static struct timespec time;
 
+    static Uint32 sdl_time;
+
     static void sleep (timer_ti pause);
 public:
     static void initialize (const GameInfo & info);

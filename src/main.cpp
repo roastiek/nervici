@@ -25,7 +25,6 @@ float isin[angles];
 
 static GameInfo gameinfo;
 static GameSetting gameset;
-//static PlInfo infos[2];
 
 static int initialize() {
     int a;

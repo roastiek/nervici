@@ -21,6 +21,7 @@ bool Game::abort;
 timer_ti Game::speed;
 timer_ti Game::timer;
 struct timespec Game::time;
+Uint32 Game::sdl_time;
 
 void Game::initialize (const GameInfo& info) {
     cout << __func__ << '\n';
@@ -57,12 +58,17 @@ void Game::uninitialize () {
 }
 
 void Game::sleep (timer_ti pause) {
-    time.tv_nsec += 1000 * 1000 * pause;
+    /*time.tv_nsec += 1000 * 1000 * pause;
     if (time.tv_nsec >= 1000 * 1000 * 1000) {
         time.tv_sec++;
         time.tv_nsec -= 1000 * 1000 * 1000;
     }
-    clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &time, NULL);
+    clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &time, NULL);*/
+    sdl_time+= pause;
+    timer_ti delta = sdl_time - SDL_GetTicks ();
+    if (delta > 0) {
+        SDL_Delay (delta);
+    }
 }
 
 void Game::run () {
@@ -71,7 +77,8 @@ void Game::run () {
 
     cout << __func__ << '\n';
 
-    clock_gettime (CLOCK_REALTIME, &time);
+    //clock_gettime (CLOCK_REALTIME, &time);
+    sdl_time = SDL_GetTicks ();
     Players::update_score ();
     System::mod_on_game_start (&set);
 
