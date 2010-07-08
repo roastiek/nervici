@@ -2,16 +2,11 @@
 #define __NERVICI_H__
 
 #include "int_type.h"
+#include "engine/render_semafor.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define SEMAFOR_OF 0x0
-#define SEMAFOR_R1 0x1
-#define SEMAFOR_R2 0x2
-#define SEMAFOR_R3 0x4
-#define SEMAFOR_G1 0x8
 
 void clear_playerground ();
 

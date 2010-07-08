@@ -14,13 +14,13 @@ void Players::initialize (const GameInfo& info) {
         players[pi].initialize (pi, info);
     }
 
-    render_load_players (info);
+    Render::load_players (info);
     audio_load_players (info);
 }
 
 void Players::uninitialize () {
     audio_free_players ();
-    render_free_players ();
+    Render::free_players ();
 
     for (size_t pi = 0; pi < Players::players.size (); pi++) {
         Players::players[pi].uninitialize ();

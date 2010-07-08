@@ -6,25 +6,14 @@
 #include <iostream>
 #include <fstream>
 
-#include "setting.h"
 #include "system.h"
 
-struct SetEntry {
-    SetEntry *next;
-    string key;
-    string value;
-};
+#include "setting.h"
 
-struct SetSection {
-    SetSection *next;
-    string name;
-    SetEntry *first_entry;
-};
+SetSection* Setting::directory;
+bool Setting::changed;
 
-static SetSection* directory = NULL;
-static bool changed;
-
-static SetSection* select_section (const string& name) {
+SetSection* Setting::select_section (const string& name) {
     SetSection *curr = directory;
     SetSection *last = NULL;
     int s;
@@ -51,7 +40,7 @@ static SetSection* select_section (const string& name) {
     return sec;
 }
 
-static void add_entry (SetSection *sec, const string& key, const string& value) {
+void Setting::add_entry (SetSection *sec, const string& key, const string& value) {
     SetEntry *curr = sec->first_entry;
     SetEntry *last = NULL;
     int s;
@@ -87,7 +76,7 @@ static void add_entry (SetSection *sec, const string& key, const string& value) 
     changed = true;
 }
 
-static SetSection *parse_line (SetSection *sec, const string& line) {
+SetSection *Setting::parse_line (SetSection *sec, const string& line) {
     size_t pos, len;
     string key;
     string value;
@@ -118,7 +107,7 @@ static SetSection *parse_line (SetSection *sec, const string& line) {
     return sec;
 }
 
-void setting_load () {
+void Setting::load () {
     struct SetSection *sec;
     string line;
     ifstream stream;
@@ -129,7 +118,7 @@ void setting_load () {
     directory->name[0] = '\0';
     directory->first_entry = NULL;
 
-    stream.open (sys_get_profile_file ().c_str (), ios::in);
+    stream.open (System::get_profile_file ().c_str (), ios::in);
 
     sec = directory;
 
@@ -142,7 +131,7 @@ void setting_load () {
     changed = false;
 }
 
-static void free_directory () {
+void Setting::free_directory () {
     struct SetSection *s, *sec = directory;
     struct SetEntry *ent, *e;
 
@@ -162,14 +151,14 @@ static void free_directory () {
     directory = NULL;
 }
 
-void setting_save () {
+void Setting::save () {
     SetSection *sec;
     SetEntry *ent;
     ofstream stream;
 
 
     if (changed) {
-        stream.open (sys_get_profile_file ().c_str (), ios::out | ios::trunc);
+        stream.open (System::get_profile_file ().c_str (), ios::out | ios::trunc);
 
         for (sec = directory; sec != NULL; sec = sec->next) {
             if (sec->name[0] == '\0') {
@@ -188,11 +177,10 @@ void setting_save () {
 
         stream.close ();
     }
-    free_directory ();
 }
 
-static struct SetSection *find_section (const string& name) {
-    struct SetSection *curr = directory;
+SetSection *Setting::find_section (const string& name) {
+    SetSection *curr = directory;
     int s;
 
     while (curr != NULL) {
@@ -207,7 +195,7 @@ static struct SetSection *find_section (const string& name) {
     return NULL;
 }
 
-static struct SetEntry *find_entry (const SetSection *sec, const string& key) {
+SetEntry *Setting::find_entry (const SetSection *sec, const string& key) {
     SetEntry *curr = sec->first_entry;
     int s;
 
@@ -223,7 +211,7 @@ static struct SetEntry *find_entry (const SetSection *sec, const string& key) {
     return NULL;
 }
 
-int setting_read_int (const string& section, const string& key, int def) {
+int Setting::read_int (const string& section, const string& key, int def) {
     SetSection *sec;
     SetEntry *ent;
     int value = def;
@@ -239,7 +227,7 @@ int setting_read_int (const string& section, const string& key, int def) {
     return value;
 }
 
-void setting_write_int (const string& section, const string& key, int value) {
+void Setting::write_int (const string& section, const string& key, int value) {
 #define BUFF_LEN 16
     char buff[BUFF_LEN];
     SetSection *sec;
@@ -250,7 +238,7 @@ void setting_write_int (const string& section, const string& key, int value) {
     add_entry (sec, key, buff);
 }
 
-const string& setting_read_string (const string& section, const string& key, const string& def) {
+const string& Setting::read_string (const string& section, const string& key, const string& def) {
     SetSection *sec;
     SetEntry *ent;
 
@@ -267,7 +255,7 @@ const string& setting_read_string (const string& section, const string& key, con
     return ent->value;
 }
 
-void setting_write_string (const string& section, const string& key, const string& value) {
+void Setting::write_string (const string& section, const string& key, const string& value) {
     SetSection *sec;
 
     sec = select_section (section);
@@ -294,7 +282,7 @@ void setting_write_string (const string& section, const string& key, const strin
     return count;
 }*/
 
-void setting_delete_section (const string& section) {
+void Setting::delete_section (const string& section) {
     SetSection *curr = directory->next;
     SetSection *last = directory;
     SetEntry *ent, *e;
@@ -323,7 +311,7 @@ void setting_delete_section (const string& section) {
     }
 }
 
-void setting_print_directory () {
+void Setting::print_directory () {
     SetSection *sec = directory;
     SetEntry *ent;
 

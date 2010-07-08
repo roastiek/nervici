@@ -2,9 +2,9 @@
 
 #include "setting.h"
 
-void plinfo_load () {
+void PlInfos::load () {
     
 }   
 
-void plinfo_save () {
+void PlInfos::save () {
 }

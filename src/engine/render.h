@@ -1,40 +1,90 @@
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
-#include "game/game.h"
-#include "game/world.h"
-#include "game/player.h"
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <vector>
 
-int render_initialize();
+using namespace std;
 
-void render_uninitialize();
+#include "int_type.h"
+#include "game/game_defs.h"
+#include "game/player_defs.h"
+#include "main.h"
 
-void render_load_players (const GameInfo& info);
+#include "render_defs.h"
+#include "render_semafor.h"
 
-void render_free_players ();
+struct Render {
+private:
+    static SDL_Surface *primary;
 
-void render_clear ();
+    static SDL_Surface *background;
 
-void render_update_face(int x, int y);
+    static SDL_Surface *merge;
 
-void render_queue_world_item (wsize_tu x, wsize_tu y);
+    static SDL_Rect blit, dest, fill_rect;
 
-void render_draw_world_items ();
+    static vector<PlayerSurfaces> pl_images;
 
-void render_draw_game_screen ();
+    static vector<SDL_Surface*> images;
 
-void render_update_screen ();
+    static vector<TTF_Font*> fonts;
 
-void render_draw_semafor (int state);
+    static GameScreen gs_inner, gs_outer;
 
-void render_draw_player_score (const Player* pl);
+    static ScreenSet setting;
 
-void render_draw_round (int round);
+    static void init_game_screen ();
 
-void render_draw_end ();
+    static SDL_Surface * create_player_face (Uint32 color);
 
-int render_get_playerground_width ();
+    static SDL_Surface * create_numbers (Uint32 color, Uint32 team);
 
-int render_get_playerground_height ();
+    static void draw_score (int y, SDL_Surface *numbers, score_ti score, PlState state, bool ironized);
+
+    static void load_screen_setting ();
+
+    static void save_screen_setting ();
+
+public:
+    static bool initialize ();
+
+    static void uninitialize ();
+
+    static void load_players (const GameInfo & info);
+
+    static void free_players ();
+
+    static void clear ();
+
+    static void update_face (wsize_tu x, wsize_tu y);
+
+    static void draw_world_items_queue (vector<Point>& queue);
+
+    static void draw_game_screen ();
+
+    static void update_screen ();
+
+    static void draw_semafor (int state);
+
+    static void draw_player_score (plid_tu plid, plid_tu order, score_ti score,
+            PlState state, bool ironized) {
+        SDL_Surface *numbers = pl_images[plid].numbers;
+        draw_score (gs_outer.score.y + order * numbers->h, numbers, score, state, ironized);
+    }
+
+    static void draw_round (round_tu round);
+
+    static void draw_end ();
+
+    static wsize_tu get_playerground_width () {
+        return gs_outer.playerground.w;
+    }
+
+    static wsize_tu get_playerground_height () {
+        return gs_outer.playerground.h;
+    }
+};
 
 #endif

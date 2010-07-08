@@ -8,9 +8,10 @@
 #include <vector>
 #include <iostream>
 
-#include "audio.h"
 #include "system.h"
 #include "settings/setting.h"
+
+#include "audio.h"
 
 #define WAVS_COUNT 8
 static const char* const wavs[] = {
@@ -169,8 +170,8 @@ static void load_buffers (SoundProfiles& profiles) {
 static void load_wavs () {
     cout << __func__ << '\n';
 
-    scan_sounds_dir (sys_get_sounds_dir (), sound_profiles);
-    scan_sounds_dir (sys_get_sounds_dir_home (), sound_profiles);
+    scan_sounds_dir (System::get_sounds_dir (), sound_profiles);
+    scan_sounds_dir (System::get_sounds_dir_home (), sound_profiles);
 
     load_buffers (sound_profiles);
 }
@@ -252,12 +253,12 @@ static void load_music () {
     cout << __func__ << '\n';
 
     for (mt = MT_Short; mt < MT_Count; mt++) {
-        dir_name = sys_get_music_dir() + suffixs[mt];
+        dir_name = System::get_music_dir() + suffixs[mt];
         scan_music_dir (dir_name, music[mt], mt);
     }
 
     for (mt = MT_Short; mt < MT_Count; mt++) {
-        dir_name = sys_get_music_dir_home() + suffixs[mt];
+        dir_name = System::get_music_dir_home() + suffixs[mt];
         scan_music_dir (dir_name, music[mt], mt);
     }
 
@@ -283,17 +284,17 @@ static void free_music () {
 static void load_audio_setting () {
     cout << __func__ << '\n';
 
-    setting.sound = setting_read_int (section, st_sound, 20);
-    setting.music = setting_read_int (section, st_music, 20);
-    setting.buffer = setting_read_int (section, st_buffer, 0x10000);
-    setting.bfrCount = setting_read_int (section, st_bfrCount, 2);
+    setting.sound = Setting::read_int (section, st_sound, 20);
+    setting.music = Setting::read_int (section, st_music, 20);
+    setting.buffer = Setting::read_int (section, st_buffer, 0x10000);
+    setting.bfrCount = Setting::read_int (section, st_bfrCount, 2);
 }
 
 static void save_audio_setting () {
-    setting_write_int (section, st_sound, setting.sound);
-    setting_write_int (section, st_music, setting.music);
-    setting_write_int (section, st_buffer, setting.buffer);
-    setting_write_int (section, st_bfrCount, setting.bfrCount);
+    Setting::write_int (section, st_sound, setting.sound);
+    Setting::write_int (section, st_music, setting.music);
+    Setting::write_int (section, st_buffer, setting.buffer);
+    Setting::write_int (section, st_bfrCount, setting.bfrCount);
 }
 
 void audio_initialize () {

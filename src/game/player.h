@@ -3,42 +3,13 @@
 
 #include <stdint.h>
 
-struct Player;
-
-
-#define JUMP_LENGTH 24
-#define JUMP_REPEAT 80
-
-/*
- * PS_Start - player has got a start position and is ready to be started
- *            one dot is drawn
- * PS_Live  - player start moving from start
- * PS_Death - player has happily lived, but now is death, but his corpose remain
- * PS_Clear - player corpse start decaing from the oldest parts
- * PS_Erased- whole corse is gone
- *
- * All players stats in state PS_Erased
- * PS_Erased -> PS_Start
- * PS_Start -> PS_Live
- * PS_Start -> PS_Death
- * PS_Start -> PS_Clear
- * PS_Live -> PS_Death
- * PS_Live -> PS_Clear
- * PS_Clear -> PS_Erased
- */
-typedef enum PlState {
-    PS_Start, PS_Live, PS_Death, PS_Clear, PS_Erased
-} PlState;
-
-typedef enum KeySt {
-    KS_None, KS_Left, KS_Right, KS_Jump, KS_Power
-} KeySt;
-
-#include "settings/plinfo.h"
+#include "settings/plinfo_defs.h"
 #include "main.h"
-#include "game/game.h"
-#include "mods/nervici.h"
-#include "game/world.h"
+#include "game/game_defs.h"
+#include "game/world_defs.h"
+#include "engine/render.h"
+
+#include "player_defs.h"
 
 struct Player {
 private:
@@ -83,8 +54,6 @@ private:
      */
     plsize_tu bottom;
     bool ironized;
-
-    vector<Point> updates;
 
     void clear_bottom ();
     void check_length ();
@@ -158,10 +127,13 @@ public:
      * start clearing player corpose
      */
     void clear ();
+
     /*
      * draw player's score
      */
-    void update_score ();
+    void update_score () {
+        Render::draw_player_score (id, order, score, state, ironized);
+    }
 
     void render_head ();
 

@@ -1,6 +1,8 @@
 #ifndef __MODS_H__
 #define __MODS_H__
 
+#include "int_type.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,7 +28,7 @@ typedef const ModInfo *(*ModGetModInfo) ();
 typedef void (*ModOnGameStart) (const GameSetting *set);
 typedef void (*ModOnGameEnd) ();
 typedef void (*ModOnTimer) ();
-typedef void (*ModOnDeath) (int plid);
+typedef void (*ModOnDeath) (plid_tu plid);
 typedef void (*ModBeforeStep) ();
 typedef void (*ModAfterStep) ();
 typedef void (*ModOnPoziSmile) (int smid, int lvl);
@@ -34,12 +36,12 @@ typedef void (*ModOnNegaSmile) (int smid, int lvl);
 typedef void (*ModOnFlegSmile) (int smid, int lvl);
 typedef void (*ModOnIronSmile) (int smid, int lvl);
 typedef void (*ModOnHamSmile) (int smid, int lvl);
-typedef void (*ModOnKilled) (int plid, int murder);
-typedef void (*ModOnKill) (int plid,int victim);
-typedef void (*ModOnWall) (int plid);
-typedef void (*ModOnSelfDeath) (int plid);
-typedef void (*ModOnCleared) (int plid);
-typedef void (*ModOnPlTimer) (int plid);
+typedef void (*ModOnKilled) (plid_tu plid, plid_tu murder);
+typedef void (*ModOnKill) (plid_tu plid, plid_tu victim);
+typedef void (*ModOnWall) (plid_tu plid);
+typedef void (*ModOnSelfDeath) (plid_tu plid);
+typedef void (*ModOnCleared) (plid_tu plid);
+typedef void (*ModOnPlTimer) (plid_tu plid);
 
 #ifdef	__cplusplus
 }

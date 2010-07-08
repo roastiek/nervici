@@ -3,12 +3,12 @@
 #include <vector>
 #include <iostream>
 
-#include "player.h"
 #include "world.h"
-
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "system.h"
+
+#include "player.h"
 
 //typedef vector<Player> Players;
 
@@ -18,25 +18,11 @@ void Player::process_fields (const FPoint& epos, const Point& pos, const Fields&
     if (state == PS_Live || state == PS_Start) {
         World::write_player_head (pos, fields, id, head);
         add_part (epos);
-
-        bool add = true;
-        for (size_t ui = 0; ui < updates.size () && add; ui++) {
-            const Point& upos = updates[ui];
-            add &= (upos.x == pos.x && upos.y == pos.y);
-        }
-        if (add) {
-            updates.push_back (pos);
-            //render_update_face (pos.x, pos.y);
-        }
     }
 }
 
 void Player::render_head () {
-    for (size_t ui = 0; ui < updates.size (); ui++) {
-        const Point& pos = updates[ui];
-        render_update_face (pos.x, pos.y);
-    }
-    updates.clear ();
+    Render::update_face (exact.x - 2, exact.y - 2);
 }
 
 void Player::initialize (plid_tu ID, const GameInfo& info) {
@@ -72,7 +58,7 @@ void Player::timer_func (timer_ti speed) {
         timer += speed;
         if (timer >= 0) {
             timer = 0;
-            sys_mod_on_pl_timer (id);
+            System::mod_on_pl_timer (id);
         }
     } else timer += speed;
 }
@@ -124,7 +110,7 @@ void Player::clear_bottom () {
             }
         }
     }*/
-    render_update_face (pos.x - 1, pos.y - 1);
+    Render::update_face (pos.x - 1, pos.y - 1);
 
     bottom = new_bottom;
     length--;
@@ -202,7 +188,7 @@ void Player::live () {
 void Player::clear_step () {
     if (length == 0) {
         state = PS_Erased;
-        sys_mod_on_cleared (id);
+        System::mod_on_cleared (id);
     } else {
         clear_bottom ();
     }
@@ -257,8 +243,6 @@ void Player::give_start (startid_tu start) {
             pos.x = exact.x - 1;
             pos.y = exact.y - 1;
             process_fields (exact, pos, fields);
-            render_draw_world_items ();
-            render_head ();
         }
     }
 }
@@ -363,7 +347,7 @@ void Player::clear () {
     }
 }
 
-void Player::update_score () {
-    render_draw_player_score (this);
-}
+/*void Player::update_score () {
+    Render::draw_player_score (id, order, score, state, ironized);
+}*/
 

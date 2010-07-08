@@ -5,46 +5,12 @@
 
 using namespace std;
 
-#define IT_FREE         0
-#define IT_PLAYER       1
-#define IT_STONE        2
-#define IT_WALL         3
-#define IT_SOFT_SMILE   4
-#define IT_HARD_SMILE   5
 
 #include "main.h"
+#include "engine/render.h"
 
-typedef plpart_tu Fields[3][3];
+#include "world_defs.h"
 
-struct WIPlayer {
-    plid_tu ID; 
-    plpart_tu body;
-    plsize_tu order;
-};
-
-struct WISmile {
-    uint32_t ID;
-};
-
-struct WorldItem {
-    uint8_t type;
-    bool changed;
-
-    union {
-        WIPlayer player;
-        WISmile smile;
-    };
-};
-
-struct Start {
-    FPoint pos;
-    uint8_t angle;
-    bool ready;
-};
-
-struct World;
-
-#include "mods/nervici.h"
 
 /*
  * World items are stored in World::__items, but accessed through World::items,
@@ -73,6 +39,8 @@ private:
     static WorldItem* __items;
 
     static vector<Start> starts;
+
+    static vector<Point> items_queue;
 
 public:
     static void initialize ();
@@ -116,6 +84,12 @@ public:
     static void write_player_head (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
 
     static void rewrite_player_bottom (const Point& pos, const Fields& fields, plid_tu id, plsize_tu bottom, plsize_tu new_bottom);
+
+    static void queue_item (wsize_tu x, wsize_tu y);
+
+    static void render_queue () {
+        Render::draw_world_items_queue (items_queue);
+    }
 };
 
 

@@ -32,11 +32,10 @@ static int initialize() {
 
     cout << __func__ << '\n';
 
-    sys_init_paths ();
-    setting_load ();
-    setting_print_directory ();
-    sys_find_mods ();
-    plinfo_load ();
+    System::init_paths ();
+    Setting::load ();
+    System::find_mods ();
+    PlInfos::load ();
     
 
     if (SDL_Init(0)) return 1;
@@ -46,7 +45,7 @@ static int initialize() {
         isin[a] = floor (sin(M_PI * 2  * a / angles) * digits) / digits;
     }
 
-    if (render_initialize ()) return 1;
+    if (Render::initialize ()) return 1;
     audio_initialize ();
 
     gameset.speed = base_speed;
@@ -85,15 +84,15 @@ static int uninitialize() {
     cout << __func__ << '\n';
     
     audio_uninitialize ();
-    render_uninitialize();
+    Render::uninitialize();
     
     SDL_Quit ();
     
-    plinfo_save ();
-    sys_free_mods ();
-    setting_print_directory ();
-    setting_save ();
-    sys_free_paths ();
+    PlInfos::save ();
+    System::free_mods ();
+    Setting::save ();
+    Setting::free_directory ();
+    System::free_paths ();
 
     return 0;
 }

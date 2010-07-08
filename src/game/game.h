@@ -6,17 +6,11 @@
 
 using namespace std;
 
-struct GameInfo;
-struct Game;
-
 #include "mods/mods.h"
-#include "settings/plinfo.h"
-#include "mods/nervici.h"
+#include "settings/plinfo_defs.h"
+//#include "mods/nervici.h"
 
-struct GameInfo {
-    GameSetting *setting;
-    vector<PlInfo> pl_infos;
-};
+#include "game_defs.h"
 
 struct Game {
 private:

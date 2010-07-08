@@ -5,29 +5,19 @@
 
 using namespace std;
 
-enum ImageType {
-    imtNumbers, imtTimer, imtSemafor, imtHeart, imtCount
+#include "loader_defs.h"
+
+struct Loader {
+private:
+
+public:
+    static void load_game_images (vector<SDL_Surface*>& images, TTF_Font* font);
+
+    static void free_game_images (vector<SDL_Surface*>& images);
+
+    static void load_fonts (vector<TTF_Font*>& fonts);
+
+    static void free_fonts (vector<TTF_Font*>& fonts);
 };
-
-inline ImageType operator ++(ImageType& it, int) {
-    it = (ImageType) (it + 1);
-    return it;
-}
-
-enum FontType {
-    fntMono20, fntMono100, fntCount
-};
-
-typedef vector<SDL_Surface*> Surfaces;
-
-typedef vector<TTF_Font*> Fonts;
-
-void load_game_images (Surfaces& images, TTF_Font* font);
-
-void free_game_images (Surfaces& images);
-
-void load_fonts (Fonts& fonts);
-
-void free_fonts (Fonts& fonts);
 
 #endif // __LOADER_H__

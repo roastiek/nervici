@@ -5,22 +5,43 @@
 
 using namespace std;
 
-void setting_load();
+#include "setting_defs.h"
 
-void setting_save();
+struct Setting {
+private:
+    static SetSection* directory;
 
-void setting_print_directory();
+    static bool changed;
 
-int setting_read_int(const string& section, const string& key, int def);
+    static SetSection * select_section (const string & name);
 
-void setting_write_int(const string& section, const string& key, int value);
+    static void add_entry (SetSection *sec, const string& key, const string & value);
 
-const string& setting_read_string(const string& section, const string& key, const string& def);
+    static SetSection * parse_line (SetSection *sec, const string & line);
 
-void setting_write_string(const string& section, const string& key, const string& value);
+    static SetSection *find_section (const string& name);
 
-//int findSections(const char * prefix, const char ***sections);
+    static SetEntry *find_entry (const SetSection *sec, const string& key);
+    
+public:
+    static void load ();
 
-void setting_delete_section(const string& section);
+    static void save ();
+
+    static void print_directory ();
+
+    static void free_directory ();
+
+    static int read_int (const string& section, const string& key, int def);
+
+    static void write_int (const string& section, const string& key, int value);
+
+    static const string & read_string (const string& section, const string& key, const string & def);
+
+    static void write_string (const string& section, const string& key, const string & value);
+
+    static void delete_section (const string & section);
+};
+
 
 #endif // __SETTING_H__

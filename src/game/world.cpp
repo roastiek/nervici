@@ -5,22 +5,23 @@
 using namespace std;
 
 #include "engine/render.h"
-#include "world.h"
 
+#include "world.h"
 
 wsize_tu World::width;
 wsize_tu World::height;
 WorldItem** World::items;
 WorldItem* World::__items;
 vector<Start> World::starts;
+vector<Point> World::items_queue;
 
 //#define pos_(X,Y) (width * Y + X)
 
 void World::initialize () {
     int x;
 
-    width = render_get_playerground_width ();
-    height = render_get_playerground_height ();
+    width = Render::get_playerground_width ();
+    height = Render::get_playerground_height ();
 
 
     __items = new WorldItem[width * height];
@@ -189,7 +190,7 @@ void World::write_player_head (const Point& pos, const Fields& fields,
                     case IT_SOFT_SMILE:
                         break;
                 }
-                render_queue_world_item (pos.x + x, pos.y + y);
+                queue_item (pos.x + x, pos.y + y);
             }
         }
     }
@@ -210,7 +211,7 @@ void World::rewrite_player_bottom (const Point& pos, const Fields& fields,
                         } else {
                             item.type = IT_FREE;
                         }
-                        render_queue_world_item (pos.x + x, pos.y + y);
+                        queue_item (pos.x + x, pos.y + y);
                     }
                     break;
                 case IT_SOFT_SMILE:
@@ -218,5 +219,14 @@ void World::rewrite_player_bottom (const Point& pos, const Fields& fields,
             }
         }
     }
+}
+
+void World::queue_item (wsize_tu x, wsize_tu y) {
+    Point pos = {x, y};
+    pos.x = x;
+    pos.y = y;
+
+    items_queue.push_back (pos);
+    World::get_item (x, y).changed = true;
 }
 

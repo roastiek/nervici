@@ -6,38 +6,20 @@
 
 using namespace std;
 
-enum PlTypes {
-    PT_Human, PT_AI
+#include "plinfo_defs.h"
+
+struct PlInfos {
+private:
+
+public:
+    static void load ();
+
+    static void save ();
+
+    size_t get_count ();
+
+    const PlInfo& get (size_t idi);
 };
 
-struct PlKeys {
-    int left;
-    int right;
-    int jump;
-};
-
-struct AIInfo {
-    int id;
-};
-
-struct PlInfo {
-    int color;
-    PlTypes type;
-    string name;
-    union {
-        PlKeys keys;
-        AIInfo ai;
-    }; 
-    string profil;
-    int pitch;
-};
-
-size_t plinfo_get_count ();
-
-const PlInfo& plinfo_get (size_t idi);
-
-void plinfo_load ();
-
-void plinfo_save ();
 
 #endif // __PLINFO_H__

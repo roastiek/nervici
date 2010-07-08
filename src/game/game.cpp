@@ -3,16 +3,16 @@
 //#include <stdio.h>
 #include <iostream>
 
+using namespace std;
+
 #include "game/players.h"
 #include "game/world.h"
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "system.h"
-
-#include "game.h"
 #include "int_type.h"
 
-using namespace std;
+#include "game.h"
 
 GameSetting Game::set;
 round_tu Game::round;
@@ -28,7 +28,7 @@ void Game::initialize (const GameInfo& info) {
     set = *info.setting;
     set_speed (info.setting->speed);
 
-    render_draw_game_screen ();
+    Render::draw_game_screen ();
     World::initialize ();
     Players::initialize (info);
 
@@ -40,17 +40,17 @@ void Game::initialize (const GameInfo& info) {
     timer = 0;
 
     set_semafor (SEMAFOR_OF);
-    render_draw_round (round);
+    Render::draw_round (round);
 
     clear_playerground ();
 
-    sys_load_mod (0);
+    System::load_mod (0);
 }
 
 void Game::uninitialize () {
     cout << __func__ << '\n';
 
-    sys_unload_mod ();
+    System::unload_mod ();
 
     Players::uninitialize ();
     World::uninitialize ();
@@ -72,7 +72,8 @@ void Game::run () {
     cout << __func__ << '\n';
 
     clock_gettime (CLOCK_REALTIME, &time);
-    sys_mod_on_game_start (&set);
+    Players::update_score ();
+    System::mod_on_game_start (&set);
 
     while (!end && !abort) {
         while (SDL_PollEvent (&event)) {
@@ -92,19 +93,19 @@ void Game::run () {
             }
         }
 
-        sys_mod_before_step ();
+        System::mod_before_step ();
         Players::step ();
         World::check_starts ();
-        sys_mod_after_step ();
+        System::mod_after_step ();
 
-        sys_mod_before_step ();
+        System::mod_before_step ();
         Players::step ();
         World::check_starts ();
-        sys_mod_after_step ();
+        System::mod_after_step ();
 
-        render_draw_world_items ();
-        Players::update_score ();
+        World::render_queue ();
         Players::render_head ();
+        Players::update_score ();
 
         music_update ();
 
@@ -115,7 +116,7 @@ void Game::run () {
             if (timer >= 0) {
                 timer = 0;
                 cout << "timer\n";
-                sys_mod_on_timer ();
+                System::mod_on_timer ();
             }
         } else timer += speed;
         Players::timer (speed);
@@ -125,10 +126,10 @@ void Game::run () {
     music_stop ();
 
     if (!abort) {
-        render_draw_end ();
+        Render::draw_end ();
     }
 
-    sys_mod_on_game_end ();
+    System::mod_on_game_end ();
 }
 
 void Game::set_speed (timer_ti value) {
@@ -141,6 +142,10 @@ void Game::set_speed (timer_ti value) {
 void Game::wait (timer_ti time) {
     SDL_Event event;
     int rest = time;
+
+    World::render_queue ();
+    Players::render_head ();
+    Players::update_score ();
 
     while (!end && !abort && rest > 0) {
 
@@ -163,6 +168,10 @@ void Game::wait (timer_ti time) {
 
 void Game::wait_for_space () {
     SDL_Event event;
+
+    World::render_queue ();
+    Players::render_head ();
+    Players::update_score ();
 
     while (!abort) {
         while (SDL_PollEvent (&event)) {
@@ -188,12 +197,12 @@ void Game::wait_for_space () {
 }
 
 void Game::set_semafor (int state) {
-    render_draw_semafor (state);
+    Render::draw_semafor (state);
 }
 
 void Game::next_round () {
     round++;
-    render_draw_round (round);
+    Render::draw_round (round);
 }
 
 void Game::play_music (int type) {
@@ -206,6 +215,6 @@ void Game::stop_music () {
 
 void Game::clear_playerground () {
     World::clear ();
-    render_clear ();
+    Render::clear ();
     Players::erase ();
 }
