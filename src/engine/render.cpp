@@ -2,6 +2,9 @@
 #include <SDL_ttf.h>
 #include <SDL/SDL_stdinc.h>
 #include <SDL/SDL_video.h>
+#include <iostream>
+
+using namespace std;
 
 #include "render.h"
 #include "loader.h"
@@ -52,7 +55,7 @@ static Surfaces images;
 static Fonts fonts;
 
 //pojd me do hymen
-static vector<Point16> items_queue;
+static vector<Point> items_queue;
 
 static const char *const section = "screen";
 static const char *const st_width = "width";
@@ -287,8 +290,8 @@ void render_draw_world_items () {
     static SDL_Rect drawdest = {0, 0, 1, 1};
 
     for (size_t i = 0; i < items_queue.size (); i++) {
-        const Point16& pos = items_queue[i];
-        WorldItem& item = world_get_item_p (pos);
+        const Point& pos = items_queue[i];
+        WorldItem& item = World::get_item (pos);
         if (item.changed) {
             drawdest.x = pos.x + gs_outer.playerground.x;
             drawdest.y = pos.y + gs_outer.playerground.y;
@@ -306,16 +309,17 @@ void render_draw_world_items () {
     items_queue.clear ();
 }
 
-void render_queue_world_item (Uint16 x, Uint16 y) {
-    static Point16 pos;
+void render_queue_world_item (wsize_tu x, wsize_tu y) {
+    static Point pos;
     pos.x = x;
     pos.y = y;
 
     items_queue.push_back (pos);
-    world_get_item (x, y).changed = true;
+    World::get_item (x, y).changed = true;
 }
 
 void render_update_face (int x, int y) {
+    //SDL_UpdateRect (primary, 0, 0, 1024, 768);
     SDL_UpdateRect (primary, x + gs_outer.playerground.x, y + gs_outer.playerground.y, 3, 3);
 }
 

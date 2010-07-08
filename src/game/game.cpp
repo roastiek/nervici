@@ -2,7 +2,6 @@
 #include <math.h>
 //#include <stdio.h>
 #include <iostream>
-#include <time.h>
 
 #include "game/players.h"
 #include "game/world.h"
@@ -11,85 +10,80 @@
 #include "system.h"
 
 #include "game.h"
+#include "int_type.h"
 
 using namespace std;
 
-struct Game {
-    const GameSetting *set;
-    int round;
-    int end;
-    int abort;
-    //    int live;
-    int speed;
-    int timer;
-    struct timespec time;
-};
+GameSetting Game::set;
+round_tu Game::round;
+bool Game::end;
+bool Game::abort;
+timer_ti Game::speed;
+timer_ti Game::timer;
+struct timespec Game::time;
 
-static Game game;
-
-void game_initialize (const GameInfo& info) {
+void Game::initialize (const GameInfo& info) {
     cout << __func__ << '\n';
 
-    game.set = info.setting;
+    set = *info.setting;
     set_speed (info.setting->speed);
 
     render_draw_game_screen ();
-    world_initialize ();
+    World::initialize ();
     Players::initialize (info);
 
-    game.end = 0;
-    game.abort = 0;
-    game.round = 1;
-    //    game.live = 0;
-    game.timer = 0;
+    set.startsCount = World::get_starts_count ();
+
+    end = false;
+    abort = false;
+    round = 1;
+    timer = 0;
 
     set_semafor (SEMAFOR_OF);
-    render_draw_round (game.round);
+    render_draw_round (round);
 
     clear_playerground ();
 
     sys_load_mod (0);
-
-    //    game.live = player_get_lives_count ();
 }
 
-void game_uninitialize () {
+void Game::uninitialize () {
     cout << __func__ << '\n';
 
     sys_unload_mod ();
 
     Players::uninitialize ();
-    world_uninitialize ();
+    World::uninitialize ();
 }
 
-static void sleep (int time) {
-    game.time.tv_nsec += 1000 * 1000 * time;
-    if (game.time.tv_nsec >= 1000 * 1000 * 1000) {
-        game.time.tv_sec++;
-        game.time.tv_nsec -= 1000 * 1000 * 1000;
+void Game::sleep (timer_ti pause) {
+    time.tv_nsec += 1000 * 1000 * pause;
+    if (time.tv_nsec >= 1000 * 1000 * 1000) {
+        time.tv_sec++;
+        time.tv_nsec -= 1000 * 1000 * 1000;
     }
-    clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &game.time, NULL);
+    clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &time, NULL);
 }
 
-void game_run () {
+void Game::run () {
     SDL_Event event;
     size_t steps = 0;
 
     cout << __func__ << '\n';
 
-    clock_gettime (CLOCK_REALTIME, &game.time);
-    sys_mod_on_game_start (game.set);
+    clock_gettime (CLOCK_REALTIME, &time);
+    sys_mod_on_game_start (&set);
 
-    while (!game.end && !game.abort) {
+    while (!end && !abort) {
         while (SDL_PollEvent (&event)) {
             switch (event.type) {
                 case SDL_QUIT:
-                    game.abort = 1;
+                    abort = true;
                     break;
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
                         case SDLK_ESCAPE:
-                            game.abort = 1;
+                            abort = true;
                             break;
                         default:
                             break;
@@ -100,12 +94,12 @@ void game_run () {
 
         sys_mod_before_step ();
         Players::step ();
-        world_check_starts ();
+        World::check_starts ();
         sys_mod_after_step ();
 
         sys_mod_before_step ();
         Players::step ();
-        world_check_starts ();
+        World::check_starts ();
         sys_mod_after_step ();
 
         render_draw_world_items ();
@@ -114,90 +108,50 @@ void game_run () {
 
         music_update ();
 
-        sleep (game.speed);
+        sleep (speed);
 
-        if (game.timer < 0) {
-            game.timer += game.speed;
-            if (game.timer >= 0) {
-                game.timer = 0;
+        if (timer < 0) {
+            timer += speed;
+            if (timer >= 0) {
+                timer = 0;
                 cout << "timer\n";
                 sys_mod_on_timer ();
             }
-        } else game.timer += game.speed;
-        Players::timer (game.speed);
+        } else timer += speed;
+        Players::timer (speed);
         steps++;
     }
 
     music_stop ();
 
-    if (!game.abort) {
+    if (!abort) {
         render_draw_end ();
     }
 
     sys_mod_on_game_end ();
 }
 
-void play_music (int type) {
-    cout << __func__ << '\n';
-    music_play ((MusicType) (type % 2));
+void Game::set_speed (timer_ti value) {
+    speed = value;
+    if (speed < base_speed / 2) speed = base_speed / 2;
+    if (speed > base_speed * 2) speed = base_speed * 2;
+    music_set_rate ((base_speed * 1.0) / speed);
 }
 
-void stop_music () {
-    music_stop ();
-}
-
-void set_semafor (int state) {
-    render_draw_semafor (state);
-}
-
-void set_timer (int time) {
-    game.timer = time;
-}
-
-void next_round () {
-    game.round++;
-    render_draw_round (game.round);
-}
-
-int get_round () {
-    return game.round;
-}
-
-void clear_playerground () {
-    world_clear ();
-    render_clear ();
-    Players::erase ();
-}
-
-void end_game () {
-    game.end = 1;
-}
-
-int get_speed () {
-    return game.speed;
-}
-
-void set_speed (int speed) {
-    game.speed = speed;
-    if (game.speed < base_speed / 2) game.speed = base_speed / 2;
-    if (game.speed > base_speed * 2) game.speed = base_speed * 2;
-    music_set_rate ((base_speed * 1.0) / game.speed);
-}
-
-void game_wait (size_t time) {
+void Game::wait (timer_ti time) {
     SDL_Event event;
     int rest = time;
 
-    while (!game.end && !game.abort && rest > 0) {
+    while (!end && !abort && rest > 0) {
 
         while (SDL_PollEvent (&event)) {
             switch (event.type) {
                 case SDL_QUIT:
-                    game.abort = 1;
+                    abort = true;
                     break;
                 case SDL_KEYDOWN:
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        game.abort = 1;
+                        abort = true;
                     }
                     break;
             }
@@ -207,19 +161,19 @@ void game_wait (size_t time) {
     }
 }
 
-void wait_for_space () {
+void Game::wait_for_space () {
     SDL_Event event;
 
-    while (!game.abort) {
+    while (!abort) {
         while (SDL_PollEvent (&event)) {
             switch (event.type) {
                 case SDL_QUIT:
-                    game.abort = 1;
+                    abort = 1;
                     break;
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
                         case SDLK_ESCAPE:
-                            game.abort = 1;
+                            abort = 1;
                             break;
                         case SDLK_SPACE:
                             return;
@@ -231,4 +185,27 @@ void wait_for_space () {
         }
         sleep (5);
     }
+}
+
+void Game::set_semafor (int state) {
+    render_draw_semafor (state);
+}
+
+void Game::next_round () {
+    round++;
+    render_draw_round (round);
+}
+
+void Game::play_music (int type) {
+    music_play ((MusicType) (type % 2));
+}
+
+void Game::stop_music () {
+    music_stop ();
+}
+
+void Game::clear_playerground () {
+    World::clear ();
+    render_clear ();
+    Players::erase ();
 }

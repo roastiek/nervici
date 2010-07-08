@@ -52,6 +52,7 @@ static int initialize() {
     gameset.speed = base_speed;
     gameset.rounds = 3;
     gameset.maxLength = 0;
+    gameset.startsCount = World::get_starts_count ();
 
     gameinfo.setting = &gameset;
     gameinfo.pl_infos.resize (2);
@@ -73,6 +74,7 @@ static int initialize() {
     gameinfo.pl_infos[1].type = PT_Human;
     gameinfo.pl_infos[1].profil = "broug";
     gameinfo.pl_infos[1].pitch = 15;
+
 
     srand (SDL_GetTicks ());
     
@@ -100,16 +102,16 @@ static int run () {
     cout << __func__ << '\n';
     
     //WorldItem items[renderGetPlayerGroundWidth () * renderGetPlayerGroundHeight ()];
-    game_initialize (gameinfo);
-    game_run ();
-    game_uninitialize ();
+    Game::initialize (gameinfo);
+    Game::run ();
+    Game::uninitialize ();
 
     return 0;
 }
 
 int main (int argc, char *argv[]) {
 
-    cout << sizeof (WorldItem) << '\n';
+    cout << sizeof (Point) << '\n';
 
     initialize ();
     run ();

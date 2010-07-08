@@ -1,6 +1,10 @@
 #ifndef __WORLD_H__
 #define __WORLD_H__
 
+#include <vector>
+
+using namespace std;
+
 #define IT_FREE         0
 #define IT_PLAYER       1
 #define IT_STONE        2
@@ -10,12 +14,12 @@
 
 #include "main.h"
 
-typedef uint8_t Fields[3][3];
+typedef plpart_tu Fields[3][3];
 
 struct WIPlayer {
-    uint8_t ID;
-    uint8_t body;
-    uint16_t order;
+    plid_tu ID; 
+    plpart_tu body;
+    plsize_tu order;
 };
 
 struct WISmile {
@@ -34,42 +38,85 @@ struct WorldItem {
 
 struct Start {
     FPoint pos;
-    int angle;
-    int ready;
+    uint8_t angle;
+    bool ready;
 };
+
+struct World;
 
 #include "mods/nervici.h"
 
-void world_initialize();
+/*
+ * World items are stored in World::__items, but accessed through World::items,
+ * which should work as index
+ * It should be possible to allocate standard two dimesonal array,
+ * but this solution need only one big allocation and the space will be contineous
+ */
 
-void world_uninitialize();
+/*
+ * daleko bliz
+ */
 
-void world_clear();
+struct World {
+private:
+    static wsize_tu width;
 
-int world_get_width();
+    static wsize_tu height;
 
-int world_get_height();
+    /*
+     * index for items
+     */
+    static WorldItem** items;
+    /*
+     * real storage of items
+     */
+    static WorldItem* __items;
 
-WorldItem& world_get_item(int x, int y);
+    static vector<Start> starts;
 
-WorldItem& world_get_item_p(const Point16& pos);
+public:
+    static void initialize ();
 
-void world_check_starts();
+    static void uninitialize ();
 
-const Start* world_get_start(int stid);
+    static void clear ();
 
-int world_get_starts_count();
+    static wsize_tu get_width () {
+        return width;
+    }
 
-int world_find_free_start();
+    static wsize_tu get_height () {
+        return height;
+    }
 
-void world_calc_fields (const FPoint& pos, Fields& fields);
+    static WorldItem & get_item (wsize_tu x, wsize_tu y) {
+        return items[x][y];
+    }
 
-int world_simple_test_fields (const Point16& pos, const Fields& fields);
+    static WorldItem & get_item (const Point & pos) {
+        return items[pos.x][pos.y];
+    }
 
-int world_test_fields (const Point16& pos, const Fields& fields, int id, size_t head, size_t size);
+    static void check_starts ();
 
-void world_write_player_head (const Point16& pos, const Fields& fields, int id, size_t head);
+    static const Start * get_start (startid_tu stid);
 
-void world_rewrite_player_bottom (const Point16& pos, const Fields& fields, int id, int bottom, int new_bottom);
+    static size_t get_starts_count () {
+        return starts.size ();
+    }
+
+    static startid_tu find_free_start ();
+
+    static void calc_fields (const FPoint& pos, Fields & fields);
+
+    static bool simple_test_fields (const Point& pos, const Fields & fields);
+
+    static bool test_fields (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head, plsize_tu size);
+
+    static void write_player_head (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
+
+    static void rewrite_player_bottom (const Point& pos, const Fields& fields, plid_tu id, plsize_tu bottom, plsize_tu new_bottom);
+};
+
 
 #endif

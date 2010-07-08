@@ -2,50 +2,80 @@
 #define __GAME_H__
 
 #include <vector>
-
+#include <time.h>
 
 using namespace std;
 
+struct GameInfo;
+struct Game;
+
 #include "mods/mods.h"
 #include "settings/plinfo.h"
+#include "mods/nervici.h"
 
 struct GameInfo {
     GameSetting *setting;
     vector<PlInfo> pl_infos;
 };
 
-#include "mods/nervici.h"
+struct Game {
+private:
+    static GameSetting set;
 
-void game_initialize (const GameInfo& info);
+    static round_tu round;
 
-void game_run ();
+    static bool end;
 
-void game_uninitialize ();
+    static bool abort;
 
-void clear_playerground ();
+    static timer_ti speed;
 
-void clear_status ();
+    static timer_ti timer;
 
-void end_game ();
+    static struct timespec time;
 
-int get_speed ();
+    static void sleep (timer_ti pause);
+public:
+    static void initialize (const GameInfo & info);
 
-void next_round ();
+    static void run ();
 
-void play_music (int type);
+    static void uninitialize ();
 
-int get_round ();
+    static void clear_playerground ();
 
-void set_semafor (int state);
+    static void clear_status ();
 
-void set_speed (int speed);
+    static void end_game () {
+        end = true;
+    }
 
-void set_timer (int time);
+    static timer_ti get_speed () {
+        return speed;
+    }
 
-void stop_music ();
+    static void next_round ();
 
-void game_wait (int time);
+    static void play_music (int type);
 
-void wait_for_space ();
+    static round_tu get_round () {
+        return round;
+    }
+
+    static void set_semafor (int state);
+
+    static void set_speed (timer_ti value);
+
+    static void set_timer (timer_ti value) {
+        timer = value;
+    }
+
+    static void stop_music ();
+
+    static void wait (timer_ti time);
+
+    static void wait_for_space ();
+};
+
 
 #endif

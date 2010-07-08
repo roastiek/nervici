@@ -28,7 +28,7 @@ static void begin_start_procedure () {
     for (int pi = 0; pi < set->playersCount; pi++) {
         if (is_pl_human (pi)) {
             sid = world_find_free_start ();
-            if (sid != -1) {
+            if (sid < set->startsCount) {
                 give_pl_start (pi, sid);
             }
         }
@@ -40,7 +40,7 @@ static void begin_start_procedure () {
     for (int pi = 0; pi < set->playersCount; pi++) {
         if (!is_pl_human (pi)) {
             sid = world_find_free_start ();
-            if (sid != -1) {
+            if (sid < set->startsCount) {
                 give_pl_start (pi, sid);
             }
         }

@@ -14,14 +14,14 @@
 
 //Players players;
 
-void Player::process_fields (const FPoint& epos, const Point16& pos, const Fields& fields) {
+void Player::process_fields (const FPoint& epos, const Point& pos, const Fields& fields) {
     if (state == PS_Live || state == PS_Start) {
-        world_write_player_head (pos, fields, id, head);
+        World::write_player_head (pos, fields, id, head);
         add_part (epos);
 
         bool add = true;
         for (size_t ui = 0; ui < updates.size () && add; ui++) {
-            const Point16& upos = updates[ui];
+            const Point& upos = updates[ui];
             add &= (upos.x == pos.x && upos.y == pos.y);
         }
         if (add) {
@@ -33,13 +33,13 @@ void Player::process_fields (const FPoint& epos, const Point16& pos, const Field
 
 void Player::render_head () {
     for (size_t ui = 0; ui < updates.size (); ui++) {
-        const Point16& pos = updates[ui];
+        const Point& pos = updates[ui];
         render_update_face (pos.x, pos.y);
     }
     updates.clear ();
 }
 
-void Player::initialize (int ID, const GameInfo& info) {
+void Player::initialize (plid_tu ID, const GameInfo& info) {
     this->id = ID;
     this->info = &info.pl_infos[ID];
     score = 0;
@@ -67,7 +67,7 @@ void Player::erase () {
     length = 0;
 }
 
-void Player::timer_func (int speed) {
+void Player::timer_func (timer_ti speed) {
     if (timer < 0) {
         timer += speed;
         if (timer >= 0) {
@@ -82,7 +82,7 @@ void Player::clear_bottom () {
 
     FPoint& pos = body[bottom];
     new_bottom = (bottom + 1) % size;
-    world_calc_fields (body[new_bottom], fields);
+    World::calc_fields (body[new_bottom], fields);
 
     if ((int)body[new_bottom].x > (int)body[bottom].x) {
         for (int y = 0; y < 3; y++) {
@@ -166,7 +166,7 @@ void Player::add_part (const FPoint& part) {
 }
 
 void Player::live () {
-    Point16 pos;
+    Point pos;
     int survive;
 
     check_length ();
@@ -187,14 +187,14 @@ void Player::live () {
 
     pos.x = exact.x - 1;
     pos.y = exact.y - 1;
-    world_calc_fields (exact, fields);
+    World::calc_fields (exact, fields);
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
-        survive = world_test_fields (pos, fields, id, head, size);
+        survive = World::test_fields (pos, fields, id, head, size);
         if (!survive) state = PS_Death;
         process_fields (exact, pos, fields);
     } else {
-        survive = world_simple_test_fields (pos, fields);
+        survive = World::simple_test_fields (pos, fields);
         if (!survive) state = PS_Death;
     }
 }
@@ -236,14 +236,14 @@ int Player::step (const Uint8 *keys) {
     return state == PS_Live;
 }
 
-void Player::give_start (int start) {
+void Player::give_start (startid_tu start) {
     const Start *st;
-    Point16 pos;
+    Point pos;
 
     if (start >= 0) {
-        st = world_get_start (start);
+        st = World::get_start (start);
         if (st != NULL) {
-            cout << "give pl start " << id << ' ' << st->angle << '\n';
+            cout << "give pl start " << (int)id << ' ' << (int)st->angle << '\n';
 
             exact = st->pos;
             angle = st->angle;
@@ -253,7 +253,7 @@ void Player::give_start (int start) {
             jumptime = 0;
             length = 0;
 
-            world_calc_fields (exact, fields);
+            World::calc_fields (exact, fields);
             pos.x = exact.x - 1;
             pos.y = exact.y - 1;
             process_fields (exact, pos, fields);
@@ -263,15 +263,15 @@ void Player::give_start (int start) {
     }
 }
 
-void Player::inc_score (int delta) {
+void Player::inc_score (score_ti delta) {
     score += delta;
 }
 
-void Player::dec_score (int delta) {
+void Player::dec_score (score_ti delta) {
     score -= delta;
 }
 
-void Player::set_score (int value) {
+void Player::set_score (score_ti value) {
     score = value;
 }
 
@@ -284,29 +284,29 @@ void Player::fast_clear () {
                 clear_bottom ();
             }
             state = PS_Erased;
-            world_check_starts ();
+            World::check_starts ();
             break;
         default:
             break;
     }
 }
 
-void Player::cut_at_length (int nlength) {
+void Player::cut_at_length (plsize_tu nlength) {
     if (nlength < 1) nlength = 1;
     while (length > 0) {
         clear_bottom ();
     }
-    world_check_starts ();
+    World::check_starts ();
 }
 
-void Player::dec_max_length (size_t delta) {
+void Player::dec_max_length (plsize_tu delta) {
     int maxlen = max_length - delta;
     if (maxlen < 0) maxlen = 0;
 
     max_length = maxlen;
 }
 
-void Player::inc_max_length (size_t delta) {
+void Player::inc_max_length (plsize_tu delta) {
     size_t maxlen = max_length + delta;
     size_t inc = 0;
 
@@ -319,7 +319,7 @@ void Player::inc_max_length (size_t delta) {
     max_length = maxlen;
 }
 
-void Player::set_max_length (size_t nlength) {
+void Player::set_max_length (plsize_tu nlength) {
     if (nlength > 0) {
         if (nlength > max_length) {
             inc_max_length (nlength - max_length);
@@ -331,7 +331,7 @@ void Player::set_max_length (size_t nlength) {
     }
 }
 
-void Player::set_timer (int time) {
+void Player::set_timer (timer_ti time) {
     timer = time;
 }
 

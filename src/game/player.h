@@ -1,6 +1,8 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
+#include <stdint.h>
+
 struct Player;
 
 
@@ -40,20 +42,20 @@ typedef enum KeySt {
 
 struct Player {
 private:
-    int id;
+    plid_tu id;
     const PlInfo* info;
     PlState state;
 
     FPoint exact;
-    int angle;
-    int jumptime;
+    uint_fast16_t angle;
+    uint_fast8_t jumptime;
     KeySt keyst;
     Fields fields;
     Fields help_fields;
 
-    int score;
-    int order;
-    int timer;
+    score_ti score;
+    plid_tu order;
+    timer_ti timer;
 
     /*
      * Player body
@@ -62,34 +64,34 @@ private:
     /*
      * size of body
      */
-    uint16_t size;
+    plsize_tu size;
     /*
      * length of player <= size
      */
-    uint16_t length;
+    plsize_tu length;
     /*
      * max_length > 0 -> length <= max_length
      * mex_length <= 0 -> unlimited length
      */
-    uint16_t max_length;
+    plsize_tu max_length;
     /*
      * index of first part
      */
-    uint16_t head;
+    plsize_tu head;
     /*
      * index of last part
      */
-    uint16_t bottom;
+    plsize_tu bottom;
     bool ironized;
 
-    vector<Point16> updates;
+    vector<Point> updates;
 
     void clear_bottom ();
     void check_length ();
     void live ();
-    void process_fields (const FPoint& epos, const Point16& pos, const Fields & fields);
+    void process_fields (const FPoint& epos, const Point& pos, const Fields & fields);
 public:
-    void initialize (int ID, const GameInfo & plinfo);
+    void initialize (plid_tu ID, const GameInfo & plinfo);
     void uninitialize ();
     /*
      * Set state to PS_Erased
@@ -102,7 +104,7 @@ public:
     /*
      * Update player's timer and posiblly call on_pl_timer event
      */
-    void timer_func (int speed);
+    void timer_func (timer_ti speed);
     /*
      * make one player step, depending on state
      * do only something in PS_Live or PS_Clear states
@@ -115,19 +117,19 @@ public:
     /*
      * player claims start, draw one dot and set state to PS_Start
      */
-    void give_start (int start);
+    void give_start (startid_tu start);
     /*
      * incrase player's score
      */
-    void inc_score (int delta);
+    void inc_score (score_ti delta);
     /*
      * decrase player's score
      */
-    void dec_score (int delta);
+    void dec_score (score_ti delta);
     /*
      * set player's score
      */
-    void set_score (int value);
+    void set_score (score_ti value);
     /*
      * clear whole player in one step
      */
@@ -135,15 +137,15 @@ public:
     /*
      * make player shorter in one step
      */
-    void cut_at_length (int length);
+    void cut_at_length (plsize_tu length);
     /*
      * decrase player's max length
      * if max is lower than current length, corpose decays at double speed
      */
-    void dec_max_length (size_t delta);
-    void inc_max_length (size_t delta);
-    void set_max_length (size_t length);
-    void set_timer (int time);
+    void dec_max_length (plsize_tu delta);
+    void inc_max_length (plsize_tu delta);
+    void set_max_length (plsize_tu length);
+    void set_timer (timer_ti time);
     /*
      * Change state from PS_Start to PS_Live
      */
@@ -163,7 +165,7 @@ public:
 
     void render_head ();
 
-    int get_score () const {
+    score_ti get_score () const {
         return score;
     }
 
@@ -175,15 +177,15 @@ public:
         return info->type == PT_Human;
     }
 
-    size_t get_max_length () const {
+    plsize_tu get_max_length () const {
         return max_length;
     }
 
-    size_t get_length () const {
+    plsize_tu get_length () const {
         return length;
     }
 
-    int get_id () const {
+    plid_tu get_id () const {
         return id;
     }
 
@@ -199,7 +201,7 @@ public:
         return ironized;
     }
 
-    int get_order () const {
+    plid_tu get_order () const {
         return order;
     }
 };

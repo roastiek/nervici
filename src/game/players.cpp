@@ -29,13 +29,13 @@ void Players::uninitialize () {
     Players::players.clear ();
 }
 
-int Players::step () {
+plid_tu Players::step () {
     uint8_t *keys;
-    int result = 0;
+    plid_tu result = 0;
 
     keys = SDL_GetKeyState (NULL);
 
-    for (size_t pi = 0; pi < players.size (); pi++) {
+    for (plid_tu pi = 0; pi < players.size (); pi++) {
         result += players[pi].step (keys);
         //result += (players[pi].state == psLive);
     }
