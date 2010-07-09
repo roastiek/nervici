@@ -1,6 +1,7 @@
 #include "game/players.h"
 #include "game/world.h"
 #include "game/game.h"
+#include "engine/audio.h"
 
 #include "nervici.h"
 
@@ -25,7 +26,8 @@ void next_round () {
 }
 
 void play_music (int type) {
-    Game::play_music (type);
+    Audio::music_play ((MusicType) (type % 2));
+//    Game::play_music (type);
 }
 
 round_tu get_round () {
@@ -33,7 +35,7 @@ round_tu get_round () {
 }
 
 void set_semafor (int state) {
-    Game::set_semafor (state);
+    Render::draw_semafor (state);
 }
 
 void set_speed (timer_ti speed) {
@@ -45,7 +47,7 @@ void set_timer (timer_ti time) {
 }
 
 void stop_music () {
-    Game::stop_music ();
+    Audio::music_stop ();
 }
 
 void game_wait (timer_ti time) {

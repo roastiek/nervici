@@ -20,7 +20,7 @@ bool Game::end;
 bool Game::abort;
 timer_ti Game::speed;
 timer_ti Game::timer;
-struct timespec Game::time;
+//struct timespec Game::time;
 Uint32 Game::sdl_time;
 
 void Game::initialize (const GameInfo& info) {
@@ -40,7 +40,7 @@ void Game::initialize (const GameInfo& info) {
     round = 1;
     timer = 0;
 
-    set_semafor (SEMAFOR_OF);
+    Render::draw_semafor (SEMAFOR_OF);
     Render::draw_round (round);
 
     clear_playerground ();
@@ -169,8 +169,8 @@ void Game::wait (timer_ti time) {
                     break;
             }
         }
-        rest -= 5;
-        sleep (5);
+        rest -= 10;
+        sleep (10);
     }
 }
 
@@ -200,25 +200,13 @@ void Game::wait_for_space () {
                     break;
             }
         }
-        sleep (5);
+        sleep (10);
     }
-}
-
-void Game::set_semafor (int state) {
-    Render::draw_semafor (state);
 }
 
 void Game::next_round () {
     round++;
     Render::draw_round (round);
-}
-
-void Game::play_music (int type) {
-    Audio::music_play ((MusicType) (type % 2));
-}
-
-void Game::stop_music () {
-    Audio::music_stop ();
 }
 
 void Game::clear_playerground () {

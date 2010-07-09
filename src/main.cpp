@@ -26,6 +26,8 @@ float isin[angles];
 static GameInfo gameinfo;
 static GameSetting gameset;
 
+//proc neni cisarsky rez jako zakusek
+
 static int initialize() {
     int a;
 

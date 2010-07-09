@@ -2,7 +2,7 @@
 #define __GAME_H__
 
 #include <vector>
-#include <time.h>
+//#include <time.h>
 
 using namespace std;
 
@@ -26,11 +26,12 @@ private:
 
     static timer_ti timer;
 
-    static struct timespec time;
+    //static struct timespec time;
 
     static Uint32 sdl_time;
 
     static void sleep (timer_ti pause);
+    
 public:
     static void initialize (const GameInfo & info);
 
@@ -52,21 +53,15 @@ public:
 
     static void next_round ();
 
-    static void play_music (int type);
-
     static round_tu get_round () {
         return round;
     }
-
-    static void set_semafor (int state);
 
     static void set_speed (timer_ti value);
 
     static void set_timer (timer_ti value) {
         timer = value;
     }
-
-    static void stop_music ();
 
     static void wait (timer_ti time);
 
