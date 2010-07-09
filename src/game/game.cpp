@@ -45,7 +45,7 @@ void Game::initialize (const GameInfo& info) {
 
     clear_playerground ();
 
-    System::load_mod (0);
+    System::load_mod (0, "");
 }
 
 void Game::uninitialize () {

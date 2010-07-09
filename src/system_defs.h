@@ -10,9 +10,13 @@
 
 #include <string>
 
+#include "mods/mods.h"
+
 using namespace std;
 
 struct ModEvents {
+    LoadScript load_script;
+    UnloadScript unload_script;
     ModOnGameStart on_game_start;
     ModOnGameEnd on_game_end;
     ModOnTimer on_timer;
@@ -32,11 +36,17 @@ struct ModEvents {
     ModOnPlTimer on_pl_timer;
 };
 
-struct ModEntry {
+struct ModRunner {
     string filename;
-    const ModInfo *info;
 };
 
+struct Mod {
+    const ModRunner *runner;
+    string script;
+    string name;
+    string autor;
+    string rules;
+};
 
 #endif	/* SYSTEM_DEFS_H */
 

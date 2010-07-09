@@ -5,15 +5,27 @@
 #include "nervici.h"
 #include "mods.h"
 
+static const char * const exts[] = {
+    "", NULL
+};
+
+static ModRunnerInfo runner_info = {
+    NULL
+};
+
 static ModInfo info = {
     "cervici",
     "bobo",
-    "proste cervici"
+    "proste cervici",
 };
 
 static const GameSetting *set;
 
-const ModInfo *get_mod_info () {
+const ModRunnerInfo *get_mod_runner_info () {
+    return &runner_info;
+}
+
+const ModInfo *get_mod_info (const char* script) {
     return &info;
 }
 
@@ -53,6 +65,12 @@ static void begin_start_procedure () {
         start_pl (pi);
     }
     set_semafor (SEMAFOR_G1);
+}
+
+void load_script (const char* script) {
+}
+
+void unload_script () {
 }
 
 void on_game_start (const GameSetting *nset) {

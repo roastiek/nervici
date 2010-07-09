@@ -7,6 +7,10 @@
 extern "C" {
 #endif
 
+typedef struct _ModRunnerInfo {
+    const char * const *extensions;
+} ModRunnerInfo;
+
 typedef struct _ModInfo {
     const char *name;
     const char *autor;
@@ -24,8 +28,11 @@ typedef struct _GameSetting {
     int maxScore;
 } GameSetting;
 
-typedef const ModInfo *(*ModGetModInfo) ();
-typedef void (*ModOnGameStart) (const GameSetting *set);
+typedef const ModRunnerInfo *(*ModGetModRunnerInfo) ();
+typedef const ModInfo *(*ModGetModInfo) (const char* script);
+typedef void (*LoadScript) (const char* script);
+typedef void (*UnloadScript) ();
+typedef void (*ModOnGameStart) (const GameSetting* set);
 typedef void (*ModOnGameEnd) ();
 typedef void (*ModOnTimer) ();
 typedef void (*ModOnDeath) (plid_tu plid);

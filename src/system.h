@@ -37,7 +37,9 @@ private:
 
     static string music_dir_home;
 
-    static vector<ModEntry> mod_entries;
+    static vector<ModRunner> mod_runners;
+
+    static vector<Mod> mods;
 
     static ModEvents mod_events;
 
@@ -137,21 +139,21 @@ public:
      * Return count of avaible mods
      */
     static size_t get_mods_count () {
-        return mod_entries.size ();
+        return mods.size ();
     }
 
     /*
      * Return info about mod with index mid
      */
-    static const ModInfo * get_mod (size_t mid) {
-        return mod_entries[mid].info;
+    static const Mod& get_mod (size_t mid) {
+        return mods[mid];
     }
 
     /*
      * Select and prepare mod before game start.
      * Technically it loads all event funtictions of mod
      */
-    static void load_mod (size_t mid);
+    static void load_mod (size_t mid, const string& script);
 
     /*
      * Disconnect from event function of mod after game ends.
