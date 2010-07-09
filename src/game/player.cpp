@@ -87,8 +87,10 @@ void Player::resize (plsize_tu new_size) {
         plsize_tu delta = new_size - size;
 
         if (head > bottom) {
+            cout << "normal resize\n";
             memcpy (new_body, body, length * sizeof (FPoint));
         } else {
+            cout << "hard resize\n";
             memcpy (new_body, body, (head + 1) * sizeof (FPoint));
             memcpy (&new_body[bottom + delta], &body[bottom], (size - bottom) * sizeof (FPoint));
             bottom+= delta;

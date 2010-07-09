@@ -149,11 +149,10 @@ bool World::test_fields (const Point& pos, const Fields& fields, plid_tu id,
                     case IT_SOFT_SMILE:
                         continue;
                     case IT_PLAYER:
-
                         result &= (item.player.ID == id) && (
                                 (item.player.order < head)
-                                ? head - item.player.order <= 8
-                                : head + item.player.order - 8 <= size
+                                ? head - item.player.order <= 5
+                                : size - item.player.order + head <= 5
                                 );
                         break;
 
