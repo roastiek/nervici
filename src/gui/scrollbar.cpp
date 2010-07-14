@@ -1,0 +1,169 @@
+#include <SDL/SDL_stdinc.h>
+
+#include "scrollbar.h"
+
+Scrollbar::Scrollbar (Control* par, int x, int y, int w, int h, const string& name) :
+Control (par, x, y, w, h, name) {
+    min = 0;
+    max = 20;
+    value = 0;
+    drag_start_y = -1;
+    small_step = 1;
+    big_step = 5;
+}
+
+void Scrollbar::paint () {
+//    Uint32 border = (is_focused ()) ? C_FOC_FOREGROUND : C_FOREGROUND;
+    Uint32 foreground = C_FOREGROUND;
+    Uint32 background = C_BACKGROUND;
+    Uint32 filler = C_FILL;
+
+    int h = get_height ();
+    int w = get_width ();
+    int space = h - 2 * w;
+    int bar = space - (max - min);
+    if (bar < 16) bar = 16;
+    int rest = space - bar;
+    int y_offset = w;
+    y_offset += (rest != 0) ? (max - min) * value / rest : 0;
+
+    draw_box (1, 1, w - 2, h - 2, background);
+    draw_rectangle (0, y_offset, w, bar, foreground);
+    draw_box (1, y_offset + 1, w - 2, bar - 2, filler);
+    draw_aaline (4, w - 4, w / 2, 4, foreground);
+    draw_aaline (w - 5, w - 4, w / 2, 4, foreground);
+    draw_aaline (4, h - w + 4, w / 2, h - 4, foreground);
+    draw_aaline (w - 5, h - w + 4, w / 2, h - 4, foreground);
+   // draw_frame (border);
+}
+
+void Scrollbar::scroll_inc (int distance) {
+    set_value (value + distance);
+}
+
+void Scrollbar::scroll_dec (int distance) {
+    set_value (value - distance);
+}
+
+bool Scrollbar::process_key_pressed_event (SDL_KeyboardEvent event) {
+    if (event.state == SDL_PRESSED) {
+        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
+        if ((event.keysym.mod & KMOD_META) != 0) return false;
+        if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
+
+        switch (event.keysym.sym) {
+        case SDLK_UP:
+            scroll_dec (get_small_step ());
+            return true;
+        case SDLK_DOWN:
+            scroll_inc (get_small_step ());
+            return true;
+        case SDLK_PAGEUP:
+            scroll_dec (get_big_step ());
+            return true;
+        case SDLK_PAGEDOWN:
+            scroll_inc (get_big_step ());
+            return true;
+        default:
+            break;
+        }
+    }
+
+    return Control::process_key_pressed_event (event);
+}
+
+void Scrollbar::process_mouse_button_event (SDL_MouseButtonEvent event) {
+    if (event.state == SDL_PRESSED) {
+        if (event.button == SDL_BUTTON_LEFT) {
+            int w = get_width ();
+            int h = get_height ();
+
+            if (event.y <= w) {
+                scroll_dec (get_small_step ());
+            }
+            if (event.y >= h - w) {
+                scroll_inc (get_small_step ());
+            }
+
+            int space = h - 2 * w;
+            int bar = space - (max - min);
+            if (bar < 16) bar = 16;
+            int rest = space - bar;
+            int y_offset = w;
+            y_offset += (rest != 0) ? (max - min) * value / rest : 0;
+
+            if (event.y >= y_offset && event.y <= y_offset + bar) {
+                drag_start_y = event.y;
+            } else {
+                drag_start_y = -1;
+            }
+        }
+
+        if (event.button == SDL_BUTTON_WHEELUP) {
+            scroll_dec (get_big_step ());
+        }
+
+        if (event.button == SDL_BUTTON_WHEELDOWN) {
+            scroll_inc (get_big_step ());
+        }
+    }
+
+    Control::process_mouse_button_event (event);
+}
+
+void Scrollbar::process_mouse_move_event (SDL_MouseMotionEvent event) {
+    if ((event.state & SDL_BUTTON_LMASK) != 0) {
+        if (drag_start_y != -1) {
+            int h = get_height ();
+            int w = get_width ();
+            int space = h - 2 * w;
+            int bar = space - (max - min);
+            if (bar < 16) bar = 16;
+            int rest = space - bar;
+            if ((max - min) > 0) {
+                int delta = event.y - drag_start_y;
+                int value_delta = rest * delta / (max - min);
+                set_value (value_delta);
+            }
+
+        }
+    }
+    Control::process_mouse_move_event (event);
+}
+
+void Scrollbar::set_min (int m) {
+    if (min != m) {
+        if (m > max)
+            m = max;
+        if (value < m)
+            set_value (m);
+        min = m;
+        invalidate ();
+    }
+}
+
+void Scrollbar::set_max (int m) {
+    if (max != m) {
+        if (m < min)
+            m = min;
+        if (value > m)
+            set_value (m);
+        max = m;
+        invalidate ();
+    }
+}
+
+void Scrollbar::set_value (int v) {
+    if (v < min) {
+        v = min;
+    }
+    if (v > max) {
+        v = max;
+    }
+    if (v != value) {
+        value = v;
+        on_value_changed (value);
+        invalidate ();
+    }
+}

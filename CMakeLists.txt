@@ -17,10 +17,16 @@ FIND_PACKAGE (SDL REQUIRED)
 FIND_PACKAGE (SDL_image REQUIRED)
 FIND_PACKAGE (SDL_ttf REQUIRED)
 FIND_PACKAGE (OpenAL REQUIRED)
+FIND_PACKAGE (PkgConfig REQUIRED)
+
 INCLUDE (vorbis.cmake)
 #INCLUDE (ogg.cmake)
-INCLUDE_DIRECTORIES (SYSTEM ${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR} ${SDLTTF_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR} ${VORBIS_INCLUDE_DIR} ${OGG_INCLUDE_DIR} "src")
-INCLUDE_DIRECTORIES ("src")
+PKG_CHECK_MODULES (GTKMM gtkmm-2.4)
+PKG_CHECK_MODULES (SDLPango SDL_Pango)
+
+
+INCLUDE_DIRECTORIES (SYSTEM ${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR} ${SDLTTF_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR} ${VORBIS_INCLUDE_DIR} ${OGG_INCLUDE_DIR} ${GTKMM_INCLUDE_DIRS} ${SDLPango_INCLUDE_DIRS} "src" )
+#INCLUDE_DIRECTORIES ("src")
 
 SET (CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
@@ -43,7 +49,8 @@ SET (NERVICI_ENGINE src/engine/render.cpp src/engine/audio.cpp src/engine/loader
 SET (NERVICI_GAME src/game/world.cpp src/game/player.cpp src/game/players.cpp src/game/game.cpp)
 SET (NERVICI_SETTINGS src/settings/setting.cpp src/settings/plinfo.cpp)
 SET (NERVICI_BASE src/main.cpp src/system.cpp src/mods/nervici.cpp)
-SET (NERVICI_SOURCE ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_SETTINGS})
+SET (NERVICI_GUI src/gui/button.cpp src/gui/control.cpp src/gui/screen.cpp src/gui/scrollbar.cpp src/gui/scrollport.cpp src/gui/textbox.cpp src/gui/view.cpp)
+SET (NERVICI_SOURCE ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_SETTINGS} ${NERVICI_GUI})
 ADD_EXECUTABLE (nervici ${NERVICI_SOURCE})
 TARGET_LINK_LIBRARIES (nervici 
     ${SDL_LIBRARY} 
@@ -51,7 +58,9 @@ TARGET_LINK_LIBRARIES (nervici
     ${SDLTTF_LIBRARY} 
     ${OPENAL_LIBRARY} 
     ${VORBIS_LIBRARY} 
-    m dl
+    ${GTKMM_LIBRARIES}
+    ${SDLPango_LIBRARIES}
+    m dl SDL_gfx
 )
 
 ADD_DEPENDENCIES (nervici mod_cervici)
