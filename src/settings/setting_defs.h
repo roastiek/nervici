@@ -8,19 +8,19 @@
 #ifndef SETTING_DEFS_H
 #define	SETTING_DEFS_H
 
-#include <string>
+#include <glibmm/ustring.h>
 
-using namespace std;
+using namespace Glib;
 
 struct SetEntry {
     SetEntry *next;
-    string key;
-    string value;
+    ustring key;
+    ustring value;
 };
 
 struct SetSection {
     SetSection *next;
-    string name;
+    ustring name;
     SetEntry *first_entry;
 };
 

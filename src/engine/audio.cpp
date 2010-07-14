@@ -48,14 +48,14 @@ static ALfloat listener_pos[] = {0.0, 0.0, 0.0};
 static ALfloat listener_vel[] = {0.0, 0.0, 0.0};
 static ALfloat listener_ori[] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0};
 
-static void scan_sounds_dir (const string& path, vector<SoundProfile>& profiles) {
+static void scan_sounds_dir (const ustring& path, vector<SoundProfile>& profiles) {
     int w;
     int valid;
     DIR *dir;
     struct dirent *ent;
     FILE *file;
-    string prof_path;
-    string wav_path;
+    ustring prof_path;
+    ustring wav_path;
     SoundProfile entry;
 
     dir = opendir (path.c_str ());
@@ -88,7 +88,7 @@ static void scan_sounds_dir (const string& path, vector<SoundProfile>& profiles)
     closedir (dir);
 }
 
-static ALuint load_wav (const string& filename) {
+static ALuint load_wav (const ustring& filename) {
     SDL_AudioSpec spec;
     Uint8 *data;
     Uint32 len;
@@ -131,7 +131,7 @@ static ALuint load_wav (const string& filename) {
 
 static void load_buffers (vector<SoundProfile>& profiles) {
     int w;
-    string filename;
+    ustring filename;
 
     for (size_t pi = 0; pi < profiles.size (); pi++) {
         SoundProfile& spi = profiles[pi];
@@ -143,7 +143,7 @@ static void load_buffers (vector<SoundProfile>& profiles) {
     }
 }
 
-static double ogg_get_length (const string& filename) {
+static double ogg_get_length (const ustring& filename) {
     OggVorbis_File file;
     double result;
     size_t len;
@@ -161,11 +161,11 @@ static double ogg_get_length (const string& filename) {
     return result;
 }
 
-static void scan_music_dir (const string& path, vector<MusicFile>& files, MusicType type) {
+static void scan_music_dir (const ustring& path, vector<MusicFile>& files, MusicType type) {
     DIR *dir;
     struct dirent *ent;
     double len;
-    string file_path;
+    ustring file_path;
     MusicFile entry;
 
     dir = opendir (path.c_str ());
@@ -213,7 +213,7 @@ void Audio::free_wavs () {
 
 void Audio::init_music () {
     static const char* const suffixs[MT_Count] = {"/game", "/game", "/menu", "/stat"};
-    string dir_name;
+    ustring dir_name;
     MusicType mt;
 
     cout << __func__ << '\n';
@@ -290,7 +290,7 @@ void Audio::uninitialize () {
     alcCloseDevice (device);
 }
 
-int Audio::find_profil (const string& name) {
+int Audio::find_profil (const ustring& name) {
     for (size_t si = 0; si < sound_profiles.size (); si++) {
         if (strcasecmp (name.c_str (), sound_profiles[si].name.c_str ()) == 0) {
             return si;

@@ -8,9 +8,9 @@
 #ifndef PLINFO_DEFS_H
 #define	PLINFO_DEFS_H
 
-#include <string>
+#include <glibmm/ustring.h>
 
-using namespace std;
+using namespace Glib;
 
 enum PlTypes {
     PT_Human, PT_AI
@@ -29,12 +29,12 @@ struct AIInfo {
 struct PlInfo {
     int color;
     PlTypes type;
-    string name;
+    ustring name;
     union {
         PlKeys keys;
         AIInfo ai;
     };
-    string profil;
+    ustring profil;
     int pitch;
 };
 

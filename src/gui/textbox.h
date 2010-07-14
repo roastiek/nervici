@@ -8,10 +8,6 @@
 #ifndef TEXTBOX_H
 #define	TEXTBOX_H
 
-//#include <string>
-
-//using namespace std;
-
 #include "control.h"
 
 class Textbox : public Control {

@@ -8,11 +8,11 @@
 #ifndef SYSTEM_DEFS_H
 #define	SYSTEM_DEFS_H
 
-#include <string>
+#include <glibmm/ustring.h>
+
+using namespace Glib;
 
 #include "mods/mods.h"
-
-using namespace std;
 
 struct ModEvents {
     LoadScript load_script;
@@ -37,15 +37,15 @@ struct ModEvents {
 };
 
 struct ModRunner {
-    string filename;
+    ustring filename;
 };
 
 struct Mod {
     const ModRunner *runner;
-    string script;
-    string name;
-    string autor;
-    string rules;
+    ustring script;
+    ustring name;
+    ustring autor;
+    ustring rules;
 };
 
 #endif	/* SYSTEM_DEFS_H */

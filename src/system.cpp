@@ -21,36 +21,36 @@ using namespace std;
 #define HOME_SOUNDS_DIR "/sounds"
 #define HOME_MUSIC_DIR "/music"
 
-string System::home_dir;
-string System::profile_dir;
-string System::profile_file;
-string System::mods_dir;
-string System::mods_dir_home;
-string System::images_dir;
-string System::fonts_dir;
-string System::fonts_dir_home;
-string System::sounds_dir;
-string System::sounds_dir_home;
-string System::music_dir;
-string System::music_dir_home;
+ustring System::home_dir;
+ustring System::profile_dir;
+ustring System::profile_file;
+ustring System::mods_dir;
+ustring System::mods_dir_home;
+ustring System::images_dir;
+ustring System::fonts_dir;
+ustring System::fonts_dir_home;
+ustring System::sounds_dir;
+ustring System::sounds_dir_home;
+ustring System::music_dir;
+ustring System::music_dir_home;
 vector<ModRunner> System::mod_runners;
 vector<Mod> System::mods;
 ModEvents System::mod_events;
 void *System::mod_handle;
 
-string System::resolv_home_dir () {
+ustring System::resolv_home_dir () {
     return getenv ("HOME");
 }
 
-string System::resolv_profile_dir () {
+ustring System::resolv_profile_dir () {
     return home_dir + PROFILE_DIR;
 }
 
-string System::resolv_profile_file () {
+ustring System::resolv_profile_file () {
     return profile_dir + PROFILE_FILE;
 }
 
-string System::resolv_dir (const string& dir) {
+ustring System::resolv_dir (const ustring& dir) {
     string result;
 
 #ifdef USE_WORKING_DIR
@@ -68,7 +68,7 @@ string System::resolv_dir (const string& dir) {
     return result;
 }
 
-string System::resolv_dir_home (const string& dir) {
+ustring System::resolv_dir_home (const ustring& dir) {
     return profile_dir + dir;
 }
 
@@ -97,7 +97,7 @@ void System::init_paths () {
 void System::free_paths () {
 }
 
-static void scan_mods_dir (const string& path, vector<string>& files) {
+static void scan_mods_dir (const ustring& path, vector<ustring>& files) {
     DIR *dir;
 
     dir = opendir (path.c_str ());
@@ -109,12 +109,12 @@ static void scan_mods_dir (const string& path, vector<string>& files) {
     }
 }
 
-static void find_mod_runners (const vector<string>& files, vector<ModRunner>& runners) {
+static void find_mod_runners (const vector<ustring>& files, vector<ModRunner>& runners) {
     cout << __func__ << '\n';
 
     for (size_t fi = 0; fi < files.size (); fi++) {
-        const string& file = files[fi];
-        string suffix = file.substr (file.length () - 3, 3);
+        const ustring& file = files[fi];
+        ustring suffix = file.substr (file.length () - 3, 3);
 
         if (strcasecmp (".so", suffix.c_str ()) == 0) {
             ModRunner entry;
@@ -124,7 +124,7 @@ static void find_mod_runners (const vector<string>& files, vector<ModRunner>& ru
     }
 }
 
-static void find_scripts (const vector<string>& files, vector<ModRunner>& runners,
+static void find_scripts (const vector<ustring>& files, vector<ModRunner>& runners,
         vector<Mod>& mods) {
     cout << __func__ << '\n';
 
@@ -188,7 +188,7 @@ static void find_scripts (const vector<string>& files, vector<ModRunner>& runner
 void System::find_mods () {
     cout << __func__ << '\n';
 
-    vector<string> files;
+    vector<ustring> files;
 
     scan_mods_dir (mods_dir, files);
     scan_mods_dir (mods_dir_home, files);
@@ -202,7 +202,7 @@ void System::find_mods () {
 void System::free_mods () {
 }
 
-void System::load_mod (size_t mid, const string& script) {
+void System::load_mod (size_t mid, const ustring& script) {
     long int fake;
 
     cout << __func__ << '\n';

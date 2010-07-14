@@ -1,9 +1,10 @@
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
 
-#include <string>
+#include <glibmm/ustring.h>
 #include <vector>
 
+using namespace Glib;
 using namespace std;
 
 #include "mods/mods.h"
@@ -13,29 +14,29 @@ using namespace std;
 
 struct System {
 private:
-    static string home_dir;
+    static ustring home_dir;
 
-    static string profile_dir;
+    static ustring profile_dir;
 
-    static string profile_file;
+    static ustring profile_file;
 
-    static string mods_dir;
+    static ustring mods_dir;
 
-    static string mods_dir_home;
+    static ustring mods_dir_home;
 
-    static string images_dir;
+    static ustring images_dir;
 
-    static string fonts_dir;
+    static ustring fonts_dir;
 
-    static string fonts_dir_home;
+    static ustring fonts_dir_home;
 
-    static string sounds_dir;
+    static ustring sounds_dir;
 
-    static string sounds_dir_home;
+    static ustring sounds_dir_home;
 
-    static string music_dir;
+    static ustring music_dir;
 
-    static string music_dir_home;
+    static ustring music_dir_home;
 
     static vector<ModRunner> mod_runners;
 
@@ -45,71 +46,71 @@ private:
 
     static void *mod_handle;
 
-    static string resolv_home_dir ();
+    static ustring resolv_home_dir ();
 
-    static string resolv_profile_dir ();
+    static ustring resolv_profile_dir ();
 
-    static string resolv_profile_file ();
+    static ustring resolv_profile_file ();
 
-    static string resolv_dir (const string & dir);
+    static ustring resolv_dir (const ustring & dir);
 
-    static string resolv_dir_home (const string & dir);
+    static ustring resolv_dir_home (const ustring & dir);
 
 public:
 
     /*
      * location of ~/.nervici/nervici.conf
      */
-    static const string & get_profile_file () {
+    static const ustring & get_profile_file () {
         return profile_file;
     }
 
     /*
      * location of share/nervici/images
      */
-    static const string & get_images_dir () {
+    static const ustring & get_images_dir () {
         return images_dir;
     }
 
     /*
      * location of share/nervici/fonts
      */
-    static const string & get_fonts_dir () {
+    static const ustring & get_fonts_dir () {
         return fonts_dir;
     }
 
     /*
      * location of ~/.nervici/fonts
      */
-    static const string & get_fonts_dir_home () {
+    static const ustring & get_fonts_dir_home () {
         return fonts_dir_home;
     }
 
     /*
      * location of share/nervici/sound
      */
-    static const string & get_sounds_dir () {
+    static const ustring & get_sounds_dir () {
         return sounds_dir;
     }
 
     /*
      * location of ~/.nervici/sounds
      */
-    static const string & get_sounds_dir_home () {
+    static const ustring & get_sounds_dir_home () {
         return sounds_dir_home;
     }
 
     /*
      * location of share/nervici/fonts
      */
-    static const string & get_music_dir () {
+    static const ustring & get_music_dir () {
         return music_dir;
     }
 
     /*
      * location of ~/.nervici/sounds
      */
-    static const string & get_music_dir_home () {
+    static const ustring & get_music_dir_home () {
         return music_dir_home;
     }
 
@@ -153,7 +154,7 @@ public:
      * Select and prepare mod before game start.
      * Technically it loads all event funtictions of mod
      */
-    static void load_mod (size_t mid, const string& script);
+    static void load_mod (size_t mid, const ustring& script);
 
     /*
      * Disconnect from event function of mod after game ends.

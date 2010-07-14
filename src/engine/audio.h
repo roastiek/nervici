@@ -61,7 +61,7 @@ private:
 
     static void save_setting ();
 
-    static int find_profil (const string& name);
+    static int find_profil (const ustring& name);
 
 public:
     static void initialize ();

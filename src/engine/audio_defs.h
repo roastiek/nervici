@@ -8,10 +8,10 @@
 #ifndef AUDIO_DEFS_H
 #define	AUDIO_DEFS_H
 
-#include <string>
+#include <glibmm/ustring.h>
 #include <al.h>
 
-using namespace std;
+using namespace Glib;
 
 #define WAVS_COUNT 8
 
@@ -29,8 +29,8 @@ inline MusicType operator++(MusicType &mt, int) {
 }
 
 struct SoundProfile {
-    string name;
-    string directory;
+    ustring name;
+    ustring directory;
     ALuint buffers[WAVS_COUNT];
 };
 
@@ -43,7 +43,7 @@ struct AudioSetting {
 };
 
 struct MusicFile {
-    string filename;
+    ustring filename;
     bool played;
 };
 

@@ -1,10 +1,6 @@
 #ifndef __SETTING_H__
 #define __SETTING_H__
 
-#include <string>
-
-using namespace std;
-
 #include "setting_defs.h"
 
 struct Setting {
@@ -13,15 +9,15 @@ private:
 
     static bool changed;
 
-    static SetSection * select_section (const string & name);
+    static SetSection * select_section (const ustring & name);
 
-    static void add_entry (SetSection *sec, const string& key, const string & value);
+    static void add_entry (SetSection *sec, const ustring& key, const ustring & value);
 
-    static SetSection * parse_line (SetSection *sec, const string & line);
+    static SetSection * parse_line (SetSection *sec, const ustring & line);
 
-    static SetSection *find_section (const string& name);
+    static SetSection *find_section (const ustring& name);
 
-    static SetEntry *find_entry (const SetSection *sec, const string& key);
+    static SetEntry *find_entry (const SetSection *sec, const ustring& key);
     
 public:
     static void load ();
@@ -32,15 +28,15 @@ public:
 
     static void free_directory ();
 
-    static int read_int (const string& section, const string& key, int def);
+    static int read_int (const ustring& section, const ustring& key, int def);
 
-    static void write_int (const string& section, const string& key, int value);
+    static void write_int (const ustring& section, const ustring& key, int value);
 
-    static const string & read_string (const string& section, const string& key, const string & def);
+    static const ustring & read_string (const ustring& section, const ustring& key, const ustring & def);
 
-    static void write_string (const string& section, const string& key, const string & value);
+    static void write_string (const ustring& section, const ustring& key, const ustring & value);
 
-    static void delete_section (const string & section);
+    static void delete_section (const ustring & section);
 };
 
 

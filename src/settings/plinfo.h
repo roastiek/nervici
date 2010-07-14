@@ -1,10 +1,7 @@
 #ifndef __PLINFO_H__
 #define __PLINFO_H__
 
-#include <string>
 #include <sys/types.h>
-
-using namespace std;
 
 #include "plinfo_defs.h"
 
