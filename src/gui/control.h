@@ -15,7 +15,7 @@
 
 using namespace Glib;
 
-#include "utils.h"
+#include "defaults.h"
 #include "event.h"
 
 SDL_Surface *make_surface (int width, int height);
