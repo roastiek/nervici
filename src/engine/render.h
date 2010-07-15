@@ -89,6 +89,10 @@ public:
     static wsize_tu get_playerground_height () {
         return gs_outer.playerground.h;
     }
+
+    static SDL_Surface* get_primary () {
+        return primary;
+    }
 };
 
 #endif

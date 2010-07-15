@@ -32,10 +32,12 @@ protected:
 
 public:
 
-    Screen ();
+    Screen (SDL_Surface *face, const ustring& name = "");
     ~Screen ();
 
     void process_event (SDL_Event& event);
+
+    
 };
 
 #endif	/* SCREEN_H */

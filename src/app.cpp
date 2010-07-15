@@ -1,53 +1,30 @@
-//#include <stdlib.h>
-//#include <stdio.h>
-#include <math.h>
-#include <SDL.h>
-#include <iostream>
-
 #include "main.h"
-#include "game/game.h"
-#include "game/world.h"
-
-#include "engine/render.h"
 #include "system.h"
 #include "settings/setting.h"
 #include "settings/plinfo.h"
+#include "engine/render.h"
 #include "engine/audio.h"
+#include "game/world.h"
+#include "game/game.h"
+
 #include "app.h"
 
-using namespace std;
+Screen* App::screen;
+GameInfo App::gameinfo;
+GameSetting App::gameset;
 
-#ifndef M_PI
-#define M_PI 3.141f
-#endif
-
-float icos[angles];
-float isin[angles];
-
-static GameInfo gameinfo;
-static GameSetting gameset;
-
-//proc neni cisarsky rez jako zakusek
-
-static int initialize() {
-    int a;
-
+void App::initialize () {
     cout << __func__ << '\n';
 
     System::init_paths ();
     Setting::load ();
     System::find_mods ();
     PlInfos::load ();
-    
 
-    if (SDL_Init(0)) return 1;
-    
-    for (a = 0; a < angles; a++) {
-        icos[a] = floor (cos(M_PI * 2  * a / angles) * digits) / digits;
-        isin[a] = floor (sin(M_PI * 2  * a / angles) * digits) / digits;
-    }
 
-    if (Render::initialize ()) return 1;
+    if (SDL_Init(0)) return;
+
+    if (Render::initialize ()) return;
     Audio::initialize ();
 
     gameset.speed = base_speed;
@@ -78,51 +55,27 @@ static int initialize() {
 
 
     srand (SDL_GetTicks ());
-    
-    return 0;
 }
 
-static int uninitialize() {
+void App::uninitialize () {
     cout << __func__ << '\n';
-    
+
     Audio::uninitialize ();
     Render::uninitialize();
-    
+
     SDL_Quit ();
-    
+
     PlInfos::save ();
     System::free_mods ();
     Setting::save ();
     Setting::free_directory ();
     System::free_paths ();
-
-    return 0;
 }
 
-static int run () {
+void App::run () {
     cout << __func__ << '\n';
-    
-    //WorldItem items[renderGetPlayerGroundWidth () * renderGetPlayerGroundHeight ()];
+
     Game::initialize (gameinfo);
     Game::run ();
     Game::uninitialize ();
-
-    return 0;
-}
-
-static void calc_angles () {
-    for (int a = 0; a < angles; a++) {
-        icos[a] = floor (cos(M_PI * 2  * a / angles) * digits) / digits;
-        isin[a] = floor (sin(M_PI * 2  * a / angles) * digits) / digits;
-    }
-}
-
-int main (int argc, char *argv[]) {
-    calc_angles ();
-
-    App::initialize ();
-    App::run ();
-    App::uninitialize ();
-    
-    return 0;
 }

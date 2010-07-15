@@ -1,7 +1,8 @@
 #include "screen.h"
 
-Screen::Screen () : Control (NULL, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "screen") {
-    primary = SDL_SetVideoMode (get_width (), get_height (), 32, SDL_HWSURFACE);
+Screen::Screen (SDL_Surface* face, const ustring& name) : Control (NULL, 0, 0, face->w, face->h, name) {
+//    primary = SDL_SetVideoMode (get_width (), get_height (), 32, SDL_HWSURFACE);
+    primary = face;
     be_cliked = NULL;
     mouse_target = NULL;
     popup = NULL;
@@ -9,21 +10,9 @@ Screen::Screen () : Control (NULL, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, "screen") 
 }
 
 Screen::~Screen () {
-    SDL_FreeSurface (primary);
     remove_popup (false);
+    SDL_FreeSurface (primary);
 }
-
-/*void Screen::on_update_child (int x, int y, int w, int h) {
-    SDL_Rect dest;
-
-    dest.x = x;
-    dest.y = y;
-    dest.w = w;
-    dest.h = h;
-
-    SDL_BlitSurface (surface, &dest, primary, &dest);
-    SDL_UpdateRects (primary, 1, &dest);
-}*/
 
 void Screen::on_update (int x, int y, int w, int h) {
     SDL_Rect dest;
@@ -35,9 +24,6 @@ void Screen::on_update (int x, int y, int w, int h) {
 
     SDL_BlitSurface (surface, &dest, primary, &dest);
     SDL_UpdateRects (primary, 1, &dest);
-
-    /*SDL_BlitSurface (surface, NULL, primary, NULL);
-    SDL_UpdateRect (primary, 0, 0, 1024, 768);*/
 }
 
 void Screen::process_event (SDL_Event& event) {
