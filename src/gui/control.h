@@ -8,9 +8,9 @@
 #ifndef CONTROL_H
 #define	CONTROL_H
 
-#include <SDL.h>
+/*#include <SDL.h>
 #include <SDL_Pango.h>
-#include <SDL_gfxPrimitives.h>
+#include <SDL_gfxPrimitives.h>*/
 #include <glibmm/ustring.h>
 
 using namespace Glib;
@@ -18,20 +18,151 @@ using namespace Glib;
 #include "defaults.h"
 #include "event.h"
 
-SDL_Surface *make_surface (int width, int height);
+struct ControlParameters {
+    const float x;
+    const float y;
+    const float w;
+    const float h;
+    const float font_size;
+    ustring name;
+    ControlParameters (float nx, float ny, float nw, float nh, float nf, const ustring& nn = "");
+};
 
-class Control {
+struct Implementor;
+
+template <class T, class S>
+class Pointer {
 private:
-    Control* parent;
-    Control* children;
-    Control* focused_child;
-    Control* next;
+    T* item;
+public:
+
+    Pointer () : item (NULL) {
+    }
+
+    Pointer (T* ctl) : item (ctl) {
+    }
+
+    void free () {
+        if (item != NULL) delete item;
+    }
+
+    T * operator-> () {
+        return item;
+    }
+
+    const T * operator-> () const {
+        return item;
+    }
+
+    T operator* () {
+        return *item;
+    }
+
+    void operator= (T* ctl) {
+        item = ctl;
+    }
+
+    bool operator!= (Pointer<T,S> ctl) {
+        return item != ctl.item;
+    }
+
+    bool operator== (Pointer<T,S> ctl) {
+        return item == ctl.item;
+    }
+
+    bool operator!= (T* ctl) {
+        return item != ctl;
+    }
+
+    bool operator== (T* ctl) {
+        return item == ctl;
+    }
+
+    operator T* () {
+        return item;
+    }
+
+    T* get () {
+        return item;
+    }
+
+    operator S () {
+        return item;
+    }
+};
+
+class _Control {
+public:
+
+    struct ControlPointer : public Pointer<_Control, ControlPointer> {
+    public:
+
+        ControlPointer () : Pointer<_Control, ControlPointer > (NULL) {
+        }
+
+        ControlPointer (_Control * ctl) : Pointer<_Control, ControlPointer > (ctl) {
+        }
+
+        ControlPointer (ControlPointer par, const ControlParameters * parms) :
+        Pointer<_Control, ControlPointer > (new _Control ()) {
+            get ()->init_control (par, parms);
+        }
+
+    };
+
+    typedef ControlPointer Control;
+
+    typedef Event0<Control> OnClicked;
+    typedef Event1<Control, SDL_MouseButtonEvent> OnMouseButton;
+    typedef Event1<Control, SDL_MouseMotionEvent> OnMouseMove;
+    typedef Event0<Control> OnFocusGained;
+    typedef Event0<Control> OnFocusLost;
+    typedef Event0<Control> OnMouseEnter;
+    typedef Event0<Control> OnMouseLeave;
+    typedef Event1<Control, int> OnXChanged;
+    typedef Event1<Control, int> OnYChanged;
+    typedef Event1<Control, int> OnWidthChanged;
+    typedef Event1<Control, int> OnHeightChanged;
+
+    struct OnKeyPressed {
+    private:
+        Listener* listener;
+        bool (Listener::*callback)(Control, SDL_KeyboardEvent);
+    public:
+
+        OnKeyPressed () :
+        listener (NULL),
+        callback (NULL) {
+        }
+
+        template <class T >
+        OnKeyPressed (T* list, void (T::*call) (Control, SDL_KeyboardEvent)) {
+            listener = reinterpret_cast<Listener*> (list);
+            callback = reinterpret_cast<void (Listener::*) (Control)> (call);
+        }
+
+        bool operator() (Control ctl, SDL_KeyboardEvent p1) {
+            if (listener != NULL && callback != NULL) {
+                return (listener->*callback) (ctl, p1);
+            }
+            return false;
+        }
+    };
+
+private:
+    Control parent;
+    Control children;
+    Control focused_child;
+    Control next;
+
+    Implementor* impl;
 
     int x;
     int y;
     int width;
     int height;
     ustring name;
+    ustring font;
 
     struct {
         Uint32 background;
@@ -44,9 +175,11 @@ private:
     bool focused;
     bool visible;
 
-    SDL_Surface* surface;
+    const ControlParameters* parms;
+
+    /*    SDL_Surface* surface;
     SDLPango_Context* pango_context;
-    SDLPango_Matrix font_color;
+    SDLPango_Matrix font_color;*/
 
     struct {
         OnClicked clicked;
@@ -65,161 +198,105 @@ private:
 
     void destroy_children ();
 
-    void blit (SDL_Surface *dest);
+    void blit (Implementor *dest);
 
-    void update_child (Control* child);
+    //void update_child (Control* child);
 
-    void update_children (Control* item, int x, int y, int w, int h);
+    void update_children (Control item, int x, int y, int w, int h);
 
-    bool switch_focus (Control* item);
+    bool switch_focus (Control item);
 
     void steal_focus ();
 
-    void propagate_focus (Control* child);
+    void propagate_focus (Control child);
 
-    bool child_grab_focus (Control* child);
+    bool child_grab_focus (Control child);
 
 protected:
-    void add_child (Control* child);
+    _Control ();
 
-    void remove_child (Control* child);
+    virtual void init_control (Control par, const ControlParameters* parms);
 
-    void show_popup (Control* popup, Control* owner) {
-        SDL_Event event;
-        event.user.type = E_SHOW_POPUP;
-        event.user.data1 = popup;
-        event.user.data2 = owner;
-        SDL_PushEvent (&event);
-    }
+    virtual int get_screen_width () const;
 
-    void hide_popup () {
-        SDL_Event event;
-        event.user.type = E_HIDE_POPUP;
-        SDL_PushEvent (&event);
-    }
+    virtual int get_screen_height () const;
 
-    Control* control_at_pos (int x, int);
+    virtual void add_child (Control child);
 
-    void draw_frame (Uint32 color) {
-        draw_rectangle (0, 0, get_width (), get_height (), color);
-    }
+    virtual void remove_child (Control child);
 
-    void fill_backgound (Uint32 color) {
-        draw_box (0, 0, get_width (), get_height (), color);
-        //SDL_FillRect (surface, NULL, color);
-    }
+    virtual void show_popup (Control popup, Control owner);
 
-    void draw_point (int x, int y, Uint32 color) {
-        pixelColor (surface, x, y, color);
-    }
+    virtual void hide_popup ();
 
-    void draw_hline (int x, int y, int w, Uint32 color) {
-        hlineColor (surface, x, x + w - 1, y - 1, color);
-    }
+    virtual Control control_at_pos (int x, int);
 
-    void draw_vline (int x, int y, int h, Uint32 color) {
-        vlineColor (surface, x, y - 1, y + h - 1, color);
-    }
+    virtual void draw_frame (Uint32 color);
 
-    void draw_rectangle (int x, int y, int w, int h, Uint32 color) {
-        rectangleColor (surface, x, y, x + w - 1, y + h - 1, color);
-    }
+    virtual void fill_backgound (Uint32 color);
 
-    void draw_box (int x, int y, int w, int h, Uint32 color) {
-        boxColor (surface, x, y, x + w - 1, y + h - 1, color);
-    }
+    virtual void draw_point (int x, int y, Uint32 color);
 
-    void draw_line (int x1, int y1, int x2, int y2, Uint32 color) {
-        lineColor (surface, x1, y1, x2, y2, color);
-    }
+    virtual void draw_hline (int x, int y, int w, Uint32 color);
 
-    void draw_aaline (int x1, int y1, int x2, int y2, Uint32 color) {
-        aalineColor (surface, x1, y1, x2, y2, color);
-    }
+    virtual void draw_vline (int x, int y, int h, Uint32 color);
 
-    void draw_circle (int x, int y, int r, Uint32 color) {
-        circleColor (surface, x, y, r, color);
-    }
+    virtual void draw_rectangle (int x, int y, int w, int h, Uint32 color);
 
-    void draw_arc (int x, int y, int r, int start, int end, Uint32 color) {
-        arcColor (surface, x, y, r, start, end, color);
-    }
+    virtual void draw_box (int x, int y, int w, int h, Uint32 color);
 
-    void draw_filled_circle (int x, int y, int r, Uint32 color) {
-        filledCircleColor (surface, x, y, r, color);
-    }
+    virtual void draw_line (int x1, int y1, int x2, int y2, Uint32 color);
 
-    void draw_aacircle (int x, int y, int r, Uint32 color) {
-        circleColor (surface, x, y, r, color);
-    }
+    virtual void draw_aaline (int x1, int y1, int x2, int y2, Uint32 color);
 
-    void draw_trigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-        trigonColor (surface, x1, y1, x2, y2, x3, y3, color);
-    }
+    virtual void draw_circle (int x, int y, int r, Uint32 color);
 
-    void draw_filled_trigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-        filledTrigonColor (surface, x1, y1, x2, y2, x3, y3, color);
-    }
+    virtual void draw_arc (int x, int y, int r, int start, int end, Uint32 color);
 
-    void draw_aatrigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-        aatrigonColor (surface, x1, y1, x2, y2, x3, y3, color);
-    }
+    virtual void draw_filled_circle (int x, int y, int r, Uint32 color);
 
-    void draw_text (int x, int y, int w, int h, HorizontalAling ha, VerticalAling va,
-            const ustring& text);
+    virtual void draw_aacircle (int x, int y, int r, Uint32 color);
 
-    void draw_text (int x, int y, int w, int h, int x_shift, VerticalAling va,
-            const ustring& text);
+    virtual void draw_trigon (int x1, int y1, int x2, int y2,
+            int x3, int y3, Uint32 color);
 
-    int get_text_width (const ustring& text);
+    virtual void draw_filled_trigon (int x1, int y1, int x2, int y2,
+            int x3, int y3, Uint32 color);
 
-    virtual void on_clicked () {
-        call.clicked (this);
-    }
+    virtual void draw_aatrigon (int x1, int y1, int x2, int y2,
+            int x3, int y3, Uint32 color);
 
-    virtual void on_mouse_button (SDL_MouseButtonEvent event) {
-        call.mouse_button (this, event);
-    }
+    virtual void draw_text (int x, int y, int w, int h, HorizontalAling ha,
+            VerticalAling va, const ustring& text);
 
-    virtual void on_mouse_move (SDL_MouseMotionEvent event) {
-        call.mouse_move (this, event);
-    }
+    virtual void draw_text (int x, int y, int w, int h, int x_shift,
+            VerticalAling va, const ustring& text);
 
-    virtual void on_mouse_enter () {
-        call.mouse_enter (this);
-    }
+    virtual int get_text_width (const ustring& text);
 
-    virtual void on_mouse_leave () {
-        call.mouse_leave (this);
-    }
+    virtual void on_clicked ();
 
-    virtual bool on_key_pressed (SDL_KeyboardEvent event) {
-        return call.key_pressed (this, event);
-    }
+    virtual void on_mouse_button (SDL_MouseButtonEvent event);
 
-    virtual void on_focus_gained () {
-        call.focus_gained (this);
-    }
+    virtual void on_mouse_move (SDL_MouseMotionEvent event);
 
-    virtual void on_focus_lost () {
-        call.focus_lost (this);
-    }
+    virtual void on_mouse_enter ();
 
-    virtual void on_x_changed (int value) {
-        call.x_changed (this, value);
-    }
+    virtual void on_mouse_leave ();
 
-    virtual void on_y_changed (int value) {
-        call.y_changed (this, value);
-    }
+    virtual bool on_key_pressed (SDL_KeyboardEvent event);
 
-    virtual void on_width_changed (int value) {
-        call.width_changed (this, value);
-    }
+    virtual void on_focus_gained ();
 
-    virtual void on_height_changed (int value) {
-        call.height_changed (this, value);
-    }
+    virtual void on_focus_lost ();
+
+    virtual void on_x_changed (int value);
+
+    virtual void on_y_changed (int value);
+
+    virtual void on_width_changed (int value);
+
+    virtual void on_height_changed (int value);
 
     virtual bool process_key_pressed_event (SDL_KeyboardEvent event);
 
@@ -227,259 +304,131 @@ protected:
 
     virtual void process_mouse_move_event (SDL_MouseMotionEvent event);
 
-    virtual void paint () {
-        fill_backgound (get_background ());
-    }
+    virtual void paint ();
 
-    virtual void on_update (int x, int y, int w, int h) {
-    }
+    virtual void on_update (int x, int y, int w, int h);
 
-    virtual void on_update_child (Control* child) {
-    }
+    //virtual void on_update_child (Control* child);
+
+    virtual const ControlParameters* get_parms ();
 
 public:
-    Control (Control* par = NULL, int x = 0, int y = 0, int w = 0, int h = 0, const ustring& name = "");
+    //static Control create (Control par, const ControlParameters& parms);
 
-    virtual ~Control ();
+    virtual ~_Control ();
 
-    void update ();
+    virtual void reinitialize ();
 
-    void update (int x, int y, int w, int h);
+    virtual void update ();
 
-    void invalidate ();
+    virtual void update (int x, int y, int w, int h);
 
-    bool grab_focus ();
+    virtual void invalidate ();
 
-    Control* get_child_at_pos (int x, int y);
+    virtual bool grab_focus ();
 
-    void show_all ();
+    virtual Control get_child_at_pos (int x, int y);
 
-    void register_on_clicked (const OnClicked& handler) {
-        call.clicked = handler;
-    }
+    virtual void show_all ();
 
-    void register_on_mouse_button (const OnMouseButton& handler) {
-        call.mouse_button = handler;
-    }
+    virtual void register_on_clicked (const OnClicked& handler);
 
-    void register_on_mouse_move (const OnMouseMove& handler) {
-        call.mouse_move = handler;
-    }
+    virtual void register_on_mouse_button (const OnMouseButton& handler);
 
-    void register_on_mouse_enter (const OnMouseEnter& handler) {
-        call.mouse_enter = handler;
-    }
+    virtual void register_on_mouse_move (const OnMouseMove& handler);
 
-    void register_on_mouse_leave (const OnMouseLeave& handler) {
-        call.mouse_leave = handler;
-    }
+    virtual void register_on_mouse_enter (const OnMouseEnter& handler);
 
-    void register_on_key_pressed (const OnKeyPressed& handler) {
-        call.key_pressed = handler;
-    }
+    virtual void register_on_mouse_leave (const OnMouseLeave& handler);
 
-    void register_on_focus_gained (const OnFocusGained& handler) {
-        call.focus_gained = handler;
-    }
+    virtual void register_on_key_pressed (const OnKeyPressed& handler);
 
-    void register_on_focus_lost (const OnFocusLost& handler) {
-        call.focus_lost = handler;
-    }
+    virtual void register_on_focus_gained (const OnFocusGained& handler);
 
-    void register_on_x_changed (const OnXChanged& handler) {
-        call.x_changed = handler;
-    }
+    virtual void register_on_focus_lost (const OnFocusLost& handler);
 
-    void register_on_y_changed (const OnXChanged& handler) {
-        call.y_changed = handler;
-    }
+    virtual void register_on_x_changed (const OnXChanged& handler);
 
-    void register_on_width_changed (const OnXChanged& handler) {
-        call.width_changed = handler;
-    }
+    virtual void register_on_y_changed (const OnXChanged& handler);
 
-    void register_on_height_changed (const OnXChanged& handler) {
-        call.height_changed = handler;
-    }
+    virtual void register_on_width_changed (const OnXChanged& handler);
 
-    void set_parent (Control *value) {
-        if (parent != value) {
-            if (parent != NULL) {
-                parent->remove_child (this);
-            }
-            parent = value;
-            if (parent != NULL) {
-                parent->add_child (this);
-            }
-        }
-    }
+    virtual void register_on_height_changed (const OnXChanged& handler);
 
-    void set_visible (bool value) {
-        value &= surface != NULL;
-        if (visible != value) {
-            visible = value;
-            invalidate ();
-        }
-    }
+    virtual void set_parent (Control value);
 
-    void set_foreground (Uint32 value) {
-        if (colors.foreground != value) {
-            colors.foreground = value;
-            invalidate ();
-        }
-    }
+    virtual void set_visible (bool value);
 
-    void set_background (Uint32 value) {
-        if (colors.background != value) {
-            colors.background = value;
-            invalidate ();
-        }
-    }
+    virtual void set_foreground (Uint32 value);
 
-    void set_frame (Uint32 value) {
-        if (colors.frame != value) {
-            colors.frame = value;
-            invalidate ();
-        }
-    }
+    virtual void set_background (Uint32 value);
 
-    void set_width (int value) {
-        if (value != width) {
-            if (surface != NULL) {
-                SDL_FreeSurface (surface);
-                surface = NULL;
-            }
-            width = value;
-            if (width > 0 && get_height () > 0) {
-                surface = make_surface (width, get_height ());
-                invalidate ();
-            }
-            on_width_changed (width);
-        }
-    }
+    virtual void set_frame (Uint32 value);
 
-    void set_height (int value) {
-        if (value != height) {
-            if (surface != NULL) {
-                SDL_FreeSurface (surface);
-                surface = NULL;
-            }
-            height = value;
-            if (get_width () > 0 && height > 0) {
-                surface = make_surface (get_width (), height);
-                invalidate ();
-            }
-            on_height_changed (height);
-        }
-    }
+    virtual void set_width (int value);
 
-    void set_x (int value) {
-        if (x != value) {
-            x = value;
-            on_x_changed (x);
-        }
-    }
+    virtual void set_height (int value);
 
-    void set_y (int value) {
-        if (y != value) {
-            y = value;
-            on_y_changed (y);
-        }
-    }
+    virtual void set_x (int value);
 
-    void set_enabled (bool value) {
-        if (enabled != value) {
-            enabled = value;
-            invalidate ();
-        }
-    }
+    virtual void set_y (int value);
 
-    void set_focused (bool value) {
-        if (focused != value) {
-            focused = value;
+    virtual void set_enabled (bool value);
 
-            if (focused) {
-                on_focus_gained ();
-            } else {
-                on_focus_lost ();
-            }
-            invalidate ();
-        }
-    }
+    virtual void set_focused (bool value);
 
-    void set_font (const ustring& font) {
-        SDLPango_FreeContext (pango_context);
-        pango_context = SDLPango_CreateContext_GivenFontDesc (font.c_str ());
-        SDLPango_SetDefaultColor (pango_context, &font_color);
-    }
+    virtual void set_font (const ustring& font);
 
-    void set_font_color (Uint32 value) {
-        font_color.m[0][1] = 0xff & (value >> 24);
-        font_color.m[1][1] = 0xff & (value >> 16);
-        font_color.m[2][1] = 0xff & (value >> 8);
-        font_color.m[3][1] = 0xff & value;
-        SDLPango_SetDefaultColor (pango_context, &font_color);
-    }
+    virtual void set_font_color (Uint32 value);
 
-    void set_name (const ustring& value) {
-        name = value;
-    }
+    virtual void set_font_size (int value);
 
-    int get_width () const {
-        return width;
-    }
+    virtual void set_name (const ustring& value);
 
-    int get_height () const {
-        return height;
-    }
+    virtual int get_width () const;
 
-    int get_x () const {
-        return x;
-    }
+    virtual int get_height () const;
 
-    int get_y () const {
-        return y;
-    }
+    virtual int get_x () const;
 
-    virtual bool is_focusable () const {
-        return true;
-    }
+    virtual int get_y () const;
 
-    virtual bool is_visible () const {
-        return visible;
-    }
+    virtual bool is_focusable () const;
 
-    virtual bool is_enabled () const {
-        return enabled;
-    }
+    virtual bool is_visible () const;
 
-    Control* get_parent () const {
-        return parent;
-    }
+    virtual bool is_enabled () const;
 
-    bool is_focused () const {
-        return focused;
-    }
+    virtual Control get_parent () const;
 
-    Uint32 get_foreground () const {
-        return colors.foreground;
-    }
+    virtual bool is_focused () const;
 
-    Uint32 get_background () const {
-        return colors.background;
-    }
+    virtual Uint32 get_foreground () const;
 
-    Uint32 get_frame () const {
-        return colors.frame;
-    }
+    virtual Uint32 get_background () const;
 
-    const ustring& get_name () const {
-        return name;
-    }
+    virtual Uint32 get_frame () const;
 
-    friend class Screen;
+    virtual const ustring& get_name () const;
+
+    friend class _Screen;
+
 };
 
+
+typedef _Control::Control Control;
+/*typedef _Control::OnClicked OnClicked;
+typedef _Control::OnMouseButton OnMouseButton;
+typedef _Control::OnMouseMove OnMouseMove;
+typedef _Control::OnFocusGained OnFocusGained;
+typedef _Control::OnFocusLost OnFocusLost;
+typedef _Control::OnMouseEnter OnMouseEnter;
+typedef _Control::OnMouseLeave OnMouseLeave;
+typedef _Control::OnXChanged OnXChanged;
+typedef _Control::OnYChanged OnYChanged;
+typedef _Control::OnWidthChanged OnWidthChanged;
+typedef _Control::OnHeightChanged OnHeightChanged;
+typedef _Control::OnKeyPressed OnKeyPressed;*/
 
 #endif	/* CONTROL_H */
 

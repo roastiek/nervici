@@ -1,20 +1,32 @@
+#include "implementor.h"
+
 #include "screen.h"
 
-Screen::Screen (SDL_Surface* face, const ustring& name) : Control (NULL, 0, 0, face->w, face->h, name) {
-//    primary = SDL_SetVideoMode (get_width (), get_height (), 32, SDL_HWSURFACE);
-    primary = face;
-    be_cliked = NULL;
-    mouse_target = NULL;
-    popup = NULL;
-    popup_owner = NULL;
+_Screen::_Screen () :
+primary (NULL) {
 }
 
-Screen::~Screen () {
+_Screen::~_Screen () {
     remove_popup (false);
-    SDL_FreeSurface (primary);
 }
 
-void Screen::on_update (int x, int y, int w, int h) {
+/*Screen* Screen::create (SDL_Surface* face, const ustring& name) {
+    Screen* result = new Screen ();
+    result->init_screen (face, name);
+    return result;
+}*/
+
+void _Screen::init_screen (SDL_Surface* face, const ustring& nn) {
+    set_name (nn);
+    set_background (C_BACKGROUND);
+    set_foreground (C_FOREGROUND);
+    set_font_color (C_FOREGROUND);
+    set_frame (C_FOREGROUND);
+    primary = face;
+    reinitialize ();
+}
+
+void _Screen::on_update (int x, int y, int w, int h) {
     SDL_Rect dest;
 
     dest.x = x;
@@ -22,13 +34,13 @@ void Screen::on_update (int x, int y, int w, int h) {
     dest.w = w;
     dest.h = h;
 
-    SDL_BlitSurface (surface, &dest, primary, &dest);
+    SDL_BlitSurface (impl->surface, &dest, primary, &dest);
     SDL_UpdateRects (primary, 1, &dest);
 }
 
-void Screen::process_event (SDL_Event& event) {
-    Control* under_cursor;
-    Control* par;
+void _Screen::process_event (SDL_Event& event) {
+    _Control* under_cursor;
+    ControlPointer par;
 
     switch (event.type) {
     case SDL_KEYDOWN:
@@ -40,9 +52,9 @@ void Screen::process_event (SDL_Event& event) {
         process_mouse_button_event (event.button);
 
         if (event.button.button == SDL_BUTTON_LEFT) {
-            be_cliked = under_cursor;
-            if (be_cliked->is_focusable ())
-                be_cliked->grab_focus ();
+            be_clicked = under_cursor;
+            if (be_clicked->is_focusable ())
+                be_clicked->grab_focus ();
         }
 
         break;
@@ -58,10 +70,10 @@ void Screen::process_event (SDL_Event& event) {
             }
             if (par == NULL)
                 remove_popup (false);
-            if (under_cursor == be_cliked) {
-                be_cliked->on_clicked ();
+            if (under_cursor == be_clicked) {
+                be_clicked->on_clicked ();
             }
-            be_cliked = NULL;
+            be_clicked = NULL;
         }
         break;
 
@@ -99,7 +111,7 @@ void Screen::process_event (SDL_Event& event) {
 
     case E_SHOW_POPUP:
         remove_popup (false);
-        add_popup (static_cast<Control*> (event.user.data1), static_cast<Control*> (event.user.data2));
+        add_popup (static_cast<_Control*> (event.user.data1), static_cast<_Control*> (event.user.data2));
         break;
 
     case E_HIDE_POPUP:
@@ -108,7 +120,7 @@ void Screen::process_event (SDL_Event& event) {
     }
 }
 
-void Screen::set_mouse_target (Control* value) {
+void _Screen::set_mouse_target (Control value) {
     if (value != mouse_target) {
         if (mouse_target != NULL) {
             mouse_target->on_mouse_leave ();
@@ -120,7 +132,7 @@ void Screen::set_mouse_target (Control* value) {
     }
 }
 
-void Screen::add_popup (Control* pop, Control* own) {
+void _Screen::add_popup (Control pop, Control own) {
     popup = pop;
     popup_owner = own;
 
@@ -136,7 +148,7 @@ void Screen::add_popup (Control* pop, Control* own) {
     popup->grab_focus ();
 }
 
-void Screen::remove_popup (bool restore_focus) {
+void _Screen::remove_popup (bool restore_focus) {
     if (popup != NULL) {
         popup->set_visible (false);
         popup->set_parent (NULL);
@@ -148,7 +160,22 @@ void Screen::remove_popup (bool restore_focus) {
     }
 }
 
-void Screen::poput_lost_focus (Control* ctl) {
+void _Screen::poput_lost_focus (Control ctl) {
     remove_popup (true);
     ctl->register_on_focus_lost (OnFocusLost ());
+}
+
+int _Screen::get_screen_width () const {
+    return primary->w;
+}
+
+int _Screen::get_screen_height () const {
+    return primary->h;
+}
+
+void _Screen::reinitialize () {
+    set_x (0);
+    set_y (0);
+    set_width (primary->w);
+    set_height (primary->h);
 }

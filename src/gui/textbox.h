@@ -10,7 +10,27 @@
 
 #include "control.h"
 
-class Textbox : public Control {
+class _Textbox : public _Control {
+public:
+
+    struct TextboxPointer : public Pointer<_Textbox, Control> {
+    public:
+
+        TextboxPointer () : Pointer<_Textbox, Control > (NULL) {
+        }
+
+        TextboxPointer (_Textbox * ctl) : Pointer<_Textbox, Control > (ctl) {
+        }
+
+        TextboxPointer (ControlPointer par, const ustring& text, const ControlParameters * parms) :
+        Pointer<_Textbox, Control > (new _Textbox ()) {
+            get ()->init_control (par, parms);
+            get ()->init_textbox (text);
+        }
+    };
+
+    typedef TextboxPointer Textbox;
+
 private:
     ustring text;
     int cursor;
@@ -25,15 +45,12 @@ private:
 
     void insert_at_cursor (const char* part);
 
-    void update_text (const ustring& value) {
-        text = value;
-        if (cursor > int(value.length ())) {
-            set_cursor (value.length ());
-        }
-        invalidate ();
-    }
+    void update_text (const ustring& value);
 
 protected:
+    _Textbox ();
+
+    virtual void init_textbox (const ustring& txt);
 
     void draw_inner_frame (Uint32 color);
 
@@ -41,36 +58,23 @@ protected:
 
     void paint ();
 
-    void on_focus_gained () {
-        set_frame (C_FOC_FOREGROUND);
-        Control::on_focus_gained ();
-    }
+    void on_focus_gained ();
 
-    void on_focus_lost () {
-        set_frame (C_FOREGROUND);
-        Control::on_focus_lost ();
-    }
+    void on_focus_lost ();
 
 public:
-    Textbox (Control* par = NULL, int x = 0, int y = 0, int w = 0, int h = 0,
-            const ustring& text = "", const ustring& name = "");
+    //static _Textbox* create (_Control* par, const ControlParameters* parms);
 
-    void set_text (const ustring& value) {
-        text = value;
-        set_cursor (0);
-        invalidate ();
-    }
+    void set_text (const ustring& value);
 
     void set_cursor (int value);
 
-    const ustring& get_text () {
-        return text;
-    }
+    const ustring& get_text () const;
 
-    int get_cursor () const {
-        return cursor;
-    }
+    int get_cursor () const;
 };
+
+typedef _Textbox::Textbox Textbox;
 
 #endif	/* TEXTBOX_H */
 

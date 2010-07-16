@@ -1,19 +1,31 @@
-#include <SDL/SDL_stdinc.h>
-
 #include "scrollbar.h"
 
-Scrollbar::Scrollbar (Control* par, int x, int y, int w, int h, const string& name) :
-Control (par, x, y, w, h, name) {
-    min = 0;
-    max = 20;
-    value = 0;
-    drag_start_y = -1;
-    small_step = 1;
-    big_step = 5;
+ScrollbarParameters::ScrollbarParameters (float nx, float ny, float nw, float nh, float nf, int nss, int nbs, const ustring& nn) :
+ControlParameters (nx, ny, nw, nh, nf, nn), small_step (nss), big_step (nbs) {
 }
 
-void Scrollbar::paint () {
-//    Uint32 border = (is_focused ()) ? C_FOC_FOREGROUND : C_FOREGROUND;
+_Scrollbar::_Scrollbar () :
+min (0),
+max (0),
+value (0),
+drag_start_y (-1),
+small_step (1),
+big_step (5) {
+}
+
+void _Scrollbar::init_scrollbar (const ScrollbarParameters* parms) {
+    set_small_step (parms->small_step);
+    set_big_step (parms->big_step);
+}
+
+/*_Scrollbar* _Scrollbar::create (_Control* par, const ScrollbarParameters* parms) {
+    _Scrollbar* result = new _Scrollbar ();
+    result->init_scrollbar (par, parms);
+    return result;
+}*/
+
+void _Scrollbar::paint () {
+    //    Uint32 border = (is_focused ()) ? C_FOC_FOREGROUND : C_FOREGROUND;
     Uint32 foreground = C_FOREGROUND;
     Uint32 background = C_BACKGROUND;
     Uint32 filler = C_FILL;
@@ -34,18 +46,18 @@ void Scrollbar::paint () {
     draw_aaline (w - 5, w - 4, w / 2, 4, foreground);
     draw_aaline (4, h - w + 4, w / 2, h - 4, foreground);
     draw_aaline (w - 5, h - w + 4, w / 2, h - 4, foreground);
-   // draw_frame (border);
+    // draw_frame (border);
 }
 
-void Scrollbar::scroll_inc (int distance) {
+void _Scrollbar::scroll_inc (int distance) {
     set_value (value + distance);
 }
 
-void Scrollbar::scroll_dec (int distance) {
+void _Scrollbar::scroll_dec (int distance) {
     set_value (value - distance);
 }
 
-bool Scrollbar::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool _Scrollbar::process_key_pressed_event (SDL_KeyboardEvent event) {
     if (event.state == SDL_PRESSED) {
         if ((event.keysym.mod & KMOD_ALT) != 0) return false;
         if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
@@ -70,10 +82,10 @@ bool Scrollbar::process_key_pressed_event (SDL_KeyboardEvent event) {
         }
     }
 
-    return Control::process_key_pressed_event (event);
+    return _Control::process_key_pressed_event (event);
 }
 
-void Scrollbar::process_mouse_button_event (SDL_MouseButtonEvent event) {
+void _Scrollbar::process_mouse_button_event (SDL_MouseButtonEvent event) {
     if (event.state == SDL_PRESSED) {
         if (event.button == SDL_BUTTON_LEFT) {
             int w = get_width ();
@@ -109,10 +121,10 @@ void Scrollbar::process_mouse_button_event (SDL_MouseButtonEvent event) {
         }
     }
 
-    Control::process_mouse_button_event (event);
+    _Control::process_mouse_button_event (event);
 }
 
-void Scrollbar::process_mouse_move_event (SDL_MouseMotionEvent event) {
+void _Scrollbar::process_mouse_move_event (SDL_MouseMotionEvent event) {
     if ((event.state & SDL_BUTTON_LMASK) != 0) {
         if (drag_start_y != -1) {
             int h = get_height ();
@@ -129,10 +141,10 @@ void Scrollbar::process_mouse_move_event (SDL_MouseMotionEvent event) {
 
         }
     }
-    Control::process_mouse_move_event (event);
+    _Control::process_mouse_move_event (event);
 }
 
-void Scrollbar::set_min (int m) {
+void _Scrollbar::set_min (int m) {
     if (min != m) {
         if (m > max)
             m = max;
@@ -143,7 +155,7 @@ void Scrollbar::set_min (int m) {
     }
 }
 
-void Scrollbar::set_max (int m) {
+void _Scrollbar::set_max (int m) {
     if (max != m) {
         if (m < min)
             m = min;
@@ -154,7 +166,7 @@ void Scrollbar::set_max (int m) {
     }
 }
 
-void Scrollbar::set_value (int v) {
+void _Scrollbar::set_value (int v) {
     if (v < min) {
         v = min;
     }
@@ -166,4 +178,54 @@ void Scrollbar::set_value (int v) {
         on_value_changed (value);
         invalidate ();
     }
+}
+
+void _Scrollbar::on_value_changed (int value) {
+    call_value_changed (this, value);
+}
+
+void _Scrollbar::on_focus_gained () {
+    set_frame (C_FOC_FOREGROUND);
+    _Control::on_focus_gained ();
+}
+
+void _Scrollbar::on_focus_lost () {
+    set_frame (C_FOREGROUND);
+    _Control::on_focus_lost ();
+}
+
+void _Scrollbar::register_on_value_changed (const OnValueChanged& handler) {
+    call_value_changed = handler;
+}
+
+void _Scrollbar::set_small_step (int v) {
+    small_step = v;
+}
+
+void _Scrollbar::set_big_step (int v) {
+    big_step = v;
+}
+
+int _Scrollbar::get_min () const {
+    return min;
+}
+
+int _Scrollbar::get_max () const {
+    return max;
+}
+
+int _Scrollbar::get_value () const {
+    return value;
+}
+
+int _Scrollbar::get_small_step () const {
+    return small_step;
+}
+
+int _Scrollbar::get_big_step () const {
+    return big_step;
+}
+
+const ScrollbarParameters* _Scrollbar::get_parms () {
+    return static_cast<const ScrollbarParameters*> (_Control::get_parms ());
 }

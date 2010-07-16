@@ -9,9 +9,11 @@
 
 #include "app.h"
 
-Screen* App::screen;
+Screen App::screen;
 GameInfo App::gameinfo;
 GameSetting App::gameset;
+bool App::abort;
+
 
 void App::initialize () {
     cout << __func__ << '\n';
@@ -22,7 +24,7 @@ void App::initialize () {
     PlInfos::load ();
 
 
-    if (SDL_Init(0)) return;
+    if (SDL_Init (0)) return;
 
     if (Render::initialize ()) return;
     Audio::initialize ();
@@ -53,15 +55,22 @@ void App::initialize () {
     gameinfo.pl_infos[1].profil = "broug";
     gameinfo.pl_infos[1].pitch = 15;
 
-
     srand (SDL_GetTicks ());
+
+    init_gui ();
+}
+
+void App::init_gui () {
+    screen = Screen (Render::get_primary (), "nervici");
 }
 
 void App::uninitialize () {
     cout << __func__ << '\n';
 
+    delete screen;
+
     Audio::uninitialize ();
-    Render::uninitialize();
+    Render::uninitialize ();
 
     SDL_Quit ();
 
@@ -74,8 +83,23 @@ void App::uninitialize () {
 
 void App::run () {
     cout << __func__ << '\n';
+    SDL_Event event;
 
-    Game::initialize (gameinfo);
+    while (!abort) {
+        if (SDL_WaitEvent (&event)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                abort = true;
+                break;
+            default:
+                screen->process_event (event);
+                break;
+            }
+        } else {
+            abort = true;
+        }
+    }
+    /*Game::initialize (gameinfo);
     Game::run ();
-    Game::uninitialize ();
+    Game::uninitialize ();*/
 }

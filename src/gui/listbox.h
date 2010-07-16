@@ -16,171 +16,96 @@ using namespace std;
 #include "button.h"
 #include "scrollport.h"
 
-template<class T>
-struct ListItem {
-public:
-    ustring text;
-    const T* data;
+struct ListboxParameters : public ControlParameters {
+    const float min_height;
+    const float item_height;
 
-    ListItem (const ustring& txt = "", const T* dt = NULL) :
-    text (txt), data (dt) {
+    ListboxParameters (float nx, float ny, float nw, float nh, float nf,
+            float nmh, float nih, const ustring & nn) : ControlParameters (nx, ny, nw, nh, nf, nn), min_height (nmh), item_height (nih) {
     }
 };
 
-template<class T>
-class Listbox : public Control {
+struct ListItem {
+public:
+    ustring text;
+    Uint32 color;
+
+    ListItem (const ustring& txt = "", Uint32 cl = C_FOREGROUND);
+};
+
+class _Listbox : public _Control {
+public:
+
+    struct ListboxPointer : public Pointer<_Listbox, Control> {
+    public:
+
+        ListboxPointer () : Pointer<_Listbox, Control > (NULL) {
+        }
+
+        ListboxPointer (_Listbox * ctl) : Pointer<_Listbox, Control > (ctl) {
+        }
+
+        ListboxPointer (Control par, const ListboxParameters * parms) :
+        Pointer<_Listbox, Control > (new _Listbox ()) {
+            get ()->init_control (par, parms);
+            get ()->init_listbox ();
+        }
+
+    };
+
+    typedef ListboxPointer Listbox;
+
+
 private:
-    vector<ListItem<T> > items;
+    vector<ListItem> items;
     int selected;
     int min_height;
     int item_height;
 
 protected:
 
-    void select_up () {
-        int s = get_selected ();
-        s--;
-        if (s >= 0)
-            set_selected (s);
-    }
+    _Listbox ();
 
-    void select_down () {
-        int s = get_selected ();
-        s++;
-        if (s < items.size ())
-            set_selected (s);
-    }
+    virtual void init_listbox ();
 
-    void paint () {
-        Uint32 border = (is_focused ()) ? C_FOC_FOREGROUND : C_FOREGROUND;
+    void reinitialize ();
 
-        draw_box (0, 0, get_width (), get_height (), C_BACKGROUND);
+    const ListboxParameters* get_parms ();
 
-        int ih = get_item_height ();
-        int y_offset = 0;
-        int iw = get_width ();
+    virtual void select_up ();
 
-        for (size_t i = 0; i < items.size (); i++, y_offset += ih) {
-            if (i == get_selected ()) {
-                draw_box (0, y_offset, iw, ih, C_SEL_BACKGROUND);
-            }
-            set_font_color (get_item_color (i));
+    virtual void select_down ();
 
-            draw_text (0, y_offset, iw, ih, HA_center, VA_center, items[i].text);
-        }
-    }
+    virtual void paint ();
 
-    virtual int get_item_color (int index) {
-        return C_FOREGROUND;
-    }
+    void process_mouse_move_event (SDL_MouseMotionEvent event);
 
-    void process_mouse_move_event (SDL_MouseMotionEvent event) {
-        int ih = get_item_height ();
-        int iw = get_width () - 2;
-        int index;
-
-        if (event.x >= 0 && event.x <= iw) {
-            if (event.y >= 0) {
-                index = event.y / ih;
-                if (index < items.size ()) {
-                    set_selected (index);
-                }
-            }
-        }
-
-        Control::process_mouse_move_event (event);
-    }
-
-    bool process_key_pressed_event (SDL_KeyboardEvent event) {
-        if (event.state == SDL_PRESSED) {
-            if ((event.keysym.mod & KMOD_ALT) != 0) return false;
-            if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
-            if ((event.keysym.mod & KMOD_META) != 0) return false;
-            if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
-
-            switch (event. keysym.sym) {
-            case SDLK_UP:
-                select_up ();
-                return true;
-            case SDLK_DOWN:
-                select_down ();
-                return true;
-            }
-        }
-
-        return Control::process_key_pressed_event (event);
-    }
+    bool process_key_pressed_event (SDL_KeyboardEvent event);
 
 public:
 
-    Listbox (Control* par = NULL, int x = 0, int y = 0, int w = 0, int h = 0,
-            const ustring& name = "") : Control (par, x, y, w, h, name) {
-        min_height = h;
-        item_height = 20;
-        selected = -1;
-        set_frame (0);
-    }
+    virtual void clear ();
 
-    void clear () {
-        set_selected (-1);
-        items.clear ();
-        invalidate ();
-    }
+    virtual void add_item (const ustring& text, Uint32 color = C_FOREGROUND);
 
-    void add_item (const ustring& text, const T* data) {
-        items.push_back (ListItem<T > (text, data));
+    virtual const ListItem& get_item (int index);
 
-        int h = items.size () * get_item_height ();
+    virtual int get_items_count () const;
 
-        set_height ((h > min_height) ? h : min_height);
+    virtual void set_selected (int value);
 
-        invalidate ();
-    }
+    virtual int get_selected () const;
 
-    const ListItem<T>& get_item (int index) {
-        return items[index];
-    }
+    virtual void set_item_height (int value);
 
-    int get_items_count () const {
-        return items.size ();
-    }
+    virtual int get_item_height () const;
 
-    void set_selected (int value) {
-        if (value != selected) {
-            selected = value;
+    virtual int get_min_height () const;
 
-            int ph = get_parent ()->get_height ();
-            int ih = get_item_height ();
-            int my = -get_y ();
-            int sy = value * ih;
-
-            if (sy + ih <= my) {
-                set_y (-sy);
-            }
-
-            if (sy >= my + ph) {
-                set_y (-(sy - ph + ih));
-            }
-
-            invalidate ();
-        }
-    }
-
-    int get_selected () const {
-        return selected;
-    }
-
-    int get_item_height () const {
-        return item_height;
-    }
-
-    /*Scrollport* get_scrollport () const {
-        return dynamic_cast<Scrollport*> (get_parent ());
-    }*/
-
-    friend class ListboxItem;
-
+    virtual void set_min_height (int value);
 };
+
+typedef _Listbox::Listbox Listbox;
 
 #endif	/* LISTBOX_H */
 

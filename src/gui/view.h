@@ -10,9 +10,34 @@
 
 #include "control.h"
 
-class View: public Control {
+class _View : public _Control {
+public:
+
+    struct ViewPointer : public Pointer<_View, Control> {
+    public:
+
+        ViewPointer () : Pointer<_View, Control > (NULL) {
+        }
+
+        ViewPointer (_View * ctl) : Pointer<_View, Control > (ctl) {
+        }
+
+        ViewPointer (ControlPointer par, ControlPointer content, const ControlParameters * parms) :
+        Pointer<_View, Control > (new _View ()) {
+            get ()->init_control (par, parms);
+            get ()->init_view (content);
+        }
+
+    };
+
+    typedef ViewPointer View;
+
+    typedef Event1<View, int> OnXOffsetChanged;
+
+    typedef Event1<View, int> OnYOffsetChanged;
+
 private:
-    Control* content;
+    Control content;
     int x_offset;
     int y_offset;
 
@@ -21,66 +46,43 @@ private:
         OnYOffsetChanged y_offset_changed;
     } call;
 
-    void content_x_changed (Control* ctl, int value) {
-        set_x_offset (-value);
-    }
+    void content_x_changed (Control ctl, int value);
 
-    void content_y_changed (Control* ctl, int value) {
-        set_y_offset (-value);
-    }
+    void content_y_changed (Control ctl, int value);
 
 protected:
-    virtual void on_x_offset_changed (int value) {
-        call.x_offset_changed(this, value);
-    }
+    _View ();
 
-    virtual void on_y_offset_changed (int value) {
-        call.y_offset_changed(this, value);
-    }
+    virtual void init_view (Control content);
+
+    virtual void on_x_offset_changed (int value);
+
+    virtual void on_y_offset_changed (int value);
 
 public:
-    View (Control* par = NULL, int x = 0, int y = 0, int w = 0, int h = 0, Control* content = NULL,
-            const ustring& name = "");
+    //static View* create (Control& par, Control& content, const ControlParameters* parms);
 
-    void register_on_x_offset_changed (const OnXOffsetChanged& handler) {
-        call.x_offset_changed = handler;
-    }
+    virtual void register_on_x_offset_changed (const OnXOffsetChanged& handler);
 
-    void register_on_y_offset_changed (const OnXOffsetChanged& handler) {
-        call.y_offset_changed = handler;
-    }
+    virtual void register_on_y_offset_changed (const OnXOffsetChanged& handler);
 
-    void set_x_offset (int value) {
-        if (value != x_offset) {
-            x_offset = value;
-            content->set_x (-x_offset);
-            on_x_changed (x_offset);
-            invalidate ();
-        }
-    }
+    virtual void set_x_offset (int value);
 
-    void set_y_offset (int value) {
-        if (value != y_offset) {
-            y_offset = value;
-            content->set_y (-y_offset);
-            on_y_changed (y_offset);
-            invalidate ();
-        }
-    }
+    virtual void set_y_offset (int value);
 
-    int get_x_offset () const {
-        return x_offset;
-    }
+    virtual int get_x_offset () const;
 
-    int get_y_offset () const {
-        return y_offset;
-    }
+    virtual int get_y_offset () const;
 
-    bool is_focusable () const {
-        return false;
-    }
+    bool is_focusable () const;
+
+    virtual void set_content (Control value);
+
+    virtual Control get_content () const;
 };
 
+
+typedef _View::View View;
 
 #endif	/* VIEW_H */
 

@@ -13,36 +13,62 @@
 #include "scrollbar.h"
 #include "view.h"
 
-class Scrollport;
+class _Scrollport : public _Control {
+public:
 
-class Scrollport: public Control {
+    struct ScrollportPointer : public Pointer<_Scrollport, Control> {
+    public:
+
+        ScrollportPointer () : Pointer<_Scrollport, Control > (NULL) {
+        }
+
+        ScrollportPointer (_Scrollport * ctl) : Pointer<_Scrollport, Control > (ctl) {
+        }
+
+        ScrollportPointer (Control par, Control content, const ControlParameters * parms) :
+        Pointer<_Scrollport, Control > (new _Scrollport ()) {
+            get ()->init_control (par, parms);
+            get ()->init_scrollport (content);
+        }
+
+    };
+
+    typedef ScrollportPointer Scrollport;
+
 private:
-    View* view;
-    Control* content;
-    Scrollbar *bar;
+    View view;
+    Control content;
+    Scrollbar bar;
 
-    void bar_value_changed (Control *ctl, int value);
-    
-    void content_height_changed (Control *ctl, int value);
+    static ScrollbarParameters bar_parms;
+    static ControlParameters view_parms;
 
-    void child_focus_gained (Control* ctl) {
-        set_frame (C_FOC_FOREGROUND);
-    }
+    void bar_value_changed (Control ctl, int value);
 
-    void child_focus_lost (Control* ctl) {
-        set_frame (C_FOREGROUND);
-    }
+    void content_height_changed (Control ctl, int value);
+
+    void child_focus_gained (Control ctl);
+
+    void child_focus_lost (Control ctl);
 
 protected:
-    void paint ();
+    _Scrollport ();
+
+    void init_control (Control par, const ControlParameters* parms);
+
+    void init_scrollport (Control content);
+
+    void reinitialize ();
 
 public:
-    Scrollport (Control* par = NULL, int x = 0, int y = 0, int w = 0, int h = 0, Control* content = NULL, const ustring& name = "");
+    bool is_focusable () const;
 
-    bool is_focusable () const {
-        return false;
-    }
+    void set_content (Control value);
+
+    Control get_content () const;
 };
+
+typedef _Scrollport::Scrollport Scrollport;
 
 #endif	/* SCROLLPORT_H */
 

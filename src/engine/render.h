@@ -93,6 +93,14 @@ public:
     static SDL_Surface* get_primary () {
         return primary;
     }
+
+    static int get_width () {
+        return primary->w;
+    }
+
+    static int get_height () {
+        return primary->h;
+    }
 };
 
 #endif

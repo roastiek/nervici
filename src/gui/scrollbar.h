@@ -10,7 +10,37 @@
 
 #include "control.h"
 
-class Scrollbar : public Control {
+struct ScrollbarParameters : public ControlParameters {
+    const int small_step;
+    const int big_step;
+    ScrollbarParameters (float nx, float ny, float nw, float nh, float nf,
+            int nss, int nbs, const ustring & nn);
+};
+
+class _Scrollbar : public _Control {
+public:
+
+    struct ScrollbarPointer : public Pointer<_Scrollbar, Control> {
+    public:
+
+        ScrollbarPointer () : Pointer<_Scrollbar, Control > (NULL) {
+        }
+
+        ScrollbarPointer (_Scrollbar * ctl) : Pointer<_Scrollbar, Control > (ctl) {
+        }
+
+        ScrollbarPointer (ControlPointer par, const ScrollbarParameters * parms) :
+        Pointer<_Scrollbar, Control > (new _Scrollbar ()) {
+            get ()->init_control (par, parms);
+            get ()->init_scrollbar (parms);
+        }
+
+    };
+
+    typedef ScrollbarPointer Scrollbar;
+
+    typedef Event1<Control, int> OnValueChanged;
+
 private:
     int min;
     int max;
@@ -26,6 +56,12 @@ private:
     void scroll_dec (int distance = 1);
 
 protected:
+    _Scrollbar ();
+
+    void init_scrollbar (const ScrollbarParameters* parms);
+
+    const ScrollbarParameters* get_parms ();
+
     void paint ();
 
     void process_mouse_button_event (SDL_MouseButtonEvent event);
@@ -34,26 +70,16 @@ protected:
 
     bool process_key_pressed_event (SDL_KeyboardEvent event);
 
-    virtual void on_value_changed (int value) {
-        call_value_changed (this, value);
-    }
+    virtual void on_value_changed (int value);
 
-    void on_focus_gained () {
-        set_frame (C_FOC_FOREGROUND);
-        Control::on_focus_gained ();
-    }
+    void on_focus_gained ();
 
-    void on_focus_lost () {
-        set_frame (C_FOREGROUND);
-        Control::on_focus_lost ();
-    }
+    void on_focus_lost ();
 
 public:
-    Scrollbar (Control* par = NULL, int x = 0, int y = 0, int w = 0, int h = 0, const string& name = "");
+    //static _Scrollbar* create (_Control* par, const ScrollbarParameters* parms);
 
-    void register_on_value_changed (const OnValueChanged& handler) {
-        call_value_changed = handler;
-    }
+    void register_on_value_changed (const OnValueChanged& handler);
 
     void set_min (int m);
 
@@ -61,34 +87,22 @@ public:
 
     void set_value (int v);
 
-    void set_small_step (int v) {
-        small_step = v;
-    }
+    void set_small_step (int v);
 
-    void set_big_step (int v) {
-        big_step = v;
-    }
+    void set_big_step (int v);
 
-    int get_min () const {
-        return min;
-    }
+    int get_min () const;
 
-    int get_max () const {
-        return max;
-    }
+    int get_max () const;
 
-    int get_value () const {
-        return value;
-    }
+    int get_value () const;
 
-    int get_small_step () const {
-        return small_step;
-    }
+    int get_small_step () const;
 
-    int get_big_step () const {
-        return big_step;
-    }
+    int get_big_step () const;
 };
+
+typedef _Scrollbar::Scrollbar Scrollbar;
 
 #endif	/* SCROLLBAR_H */
 

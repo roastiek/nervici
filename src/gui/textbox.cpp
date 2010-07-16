@@ -1,19 +1,27 @@
 
 #include "textbox.h"
 
-Textbox::Textbox (Control* par, int x, int y, int w, int h, const ustring& text, const ustring& name) :
-Control (par, x, y, w, h, name) {
-
-    x_offset = 0;
-    cursor_x = 1;
-    set_text (text);
+_Textbox::_Textbox () :
+cursor (0),
+cursor_x (1),
+x_offset (0) {
 }
 
-void Textbox::paint () {
+/*_Textbox* _Textbox::create (_Control* par, const ControlParameters* parms) {
+    _Textbox* result = new _Textbox ();
+    result->init_control (par, parms);
+    result->set_text ("");
+    return result;
+}
+*/
+
+void _Textbox::init_textbox (const ustring& txt) {
+    set_text (txt);
+}
+
+void _Textbox::paint () {
     fill_backgound (get_background ());
     draw_frame (get_foreground ());
-
-//    int w = get_text_width (get_text ());
 
     draw_text (2, 2, get_width () - 4, get_height () - 4, x_offset, VA_center, get_text ());
 
@@ -25,19 +33,19 @@ void Textbox::paint () {
 
 }
 
-void Textbox::draw_inner_frame (Uint32 color) {
+void _Textbox::draw_inner_frame (Uint32 color) {
     draw_rectangle (1, 1, get_width () - 2, get_height () - 2, color);
 }
 
-void Textbox::move_cursor_left (int distance) {
+void _Textbox::move_cursor_left (int distance) {
     set_cursor (get_cursor () - distance);
 }
 
-void Textbox::move_cursor_right (int distance) {
+void _Textbox::move_cursor_right (int distance) {
     set_cursor (get_cursor () + distance);
 }
 
-void Textbox::delete_at_cursor () {
+void _Textbox::delete_at_cursor () {
     const ustring& old = get_text ();
 
     if (cursor < int(old.length ())) {
@@ -45,13 +53,13 @@ void Textbox::delete_at_cursor () {
     }
 }
 
-void Textbox::insert_at_cursor (const char* part) {
+void _Textbox::insert_at_cursor (const char* part) {
     const ustring& old = get_text ();
 
     update_text (old.substr (0, cursor) + part + old.substr (cursor, -1));
 }
 
-void Textbox::set_cursor (int value) {
+void _Textbox::set_cursor (int value) {
     const ustring& tx = get_text ();
     cursor = value;
     if (cursor <= 0) cursor = 0;
@@ -72,7 +80,7 @@ void Textbox::set_cursor (int value) {
     invalidate ();
 }
 
-bool Textbox::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool _Textbox::process_key_pressed_event (SDL_KeyboardEvent event) {
     if (event.state == SDL_PRESSED) {
         if ((event.keysym.mod & KMOD_ALT) != 0) return false;
         if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
@@ -125,5 +133,36 @@ bool Textbox::process_key_pressed_event (SDL_KeyboardEvent event) {
         }
     }
 
-    return Control::process_key_pressed_event (event);
+    return _Control::process_key_pressed_event (event);
 }
+
+void _Textbox::set_text (const ustring& value) {
+    text = value;
+    set_cursor (0);
+    invalidate ();
+}
+
+const ustring& _Textbox::get_text () const {
+    return text;
+}
+
+int _Textbox::get_cursor () const {
+    return cursor;
+}
+
+void _Textbox::on_focus_gained () {
+    set_frame (C_FOC_FOREGROUND);
+    _Control::on_focus_gained ();
+}
+
+void _Textbox::on_focus_lost () {
+    set_frame (C_FOREGROUND);
+    _Control::on_focus_lost ();
+}
+    void _Textbox::update_text (const ustring& value) {
+        text = value;
+        if (cursor > int(value.length ())) {
+            set_cursor (value.length ());
+        }
+        invalidate ();
+    }

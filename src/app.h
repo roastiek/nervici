@@ -14,9 +14,12 @@
 
 class App  {
 private:
-    static Screen *screen;
+    static Screen screen;
     static GameInfo gameinfo;
     static GameSetting gameset;
+    static bool abort;
+
+    static void init_gui ();
 
 public:
     static void initialize ();
