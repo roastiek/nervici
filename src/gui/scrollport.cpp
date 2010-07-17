@@ -1,31 +1,40 @@
 #include "scrollport.h"
 #include "view.h"
 
-ScrollbarParameters _Scrollport::bar_parms = {
-    0.0, 0.0, 0.001, 0.001, 0.1, 1, 5, "scrolbar"
+ScrollbarParameters Scrollport::bar_parms = {
+    0.0, 0.0, 15.0, 60.0, 0.1, 1, 5
 };
 
-ControlParameters _Scrollport::view_parms = {
-    0.0, 0.0, 0.0, 0.0, 0.1, "view"
+ControlParameters Scrollport::view_parms = {
+    0.0, 0.0, 0.0, 0.0, 0.1
 };
 
-_Scrollport::_Scrollport () {
+Scrollport::Scrollport (const ControlParameters* parms) :
+Control (parms),
+view (NULL),
+content (NULL),
+bar (NULL) {
 }
 
-void _Scrollport::init_control (Control par, const ControlParameters* parms) {
-    view = View (this, NULL, &view_parms);
-    bar = Scrollbar (this, &bar_parms);
-    _Control::init_control (par, parms);
+void Scrollport::init_control (Control* par) {
+    view = View::create_view (this, NULL, &view_parms);
+    bar = Scrollbar::create_scrollbar (this, &bar_parms);
+    Control::init_control (par);
+    bar->register_on_value_changed (Scrollbar::OnValueChanged (this, &Scrollport::bar_value_changed));
+    bar->register_on_focus_gained (OnFocusGained (this, &Scrollport::child_focus_gained));
+    bar->register_on_focus_lost (OnFocusLost (this, &Scrollport::child_focus_lost));
 }
 
-void _Scrollport::init_scrollport (Control content) {
-    set_content (content);
-    bar->register_on_value_changed (_Scrollbar::OnValueChanged (this, &_Scrollport::bar_value_changed));
-    bar->register_on_focus_gained (OnFocusGained (this, &_Scrollport::child_focus_gained));
-    bar->register_on_focus_lost (OnFocusLost (this, &_Scrollport::child_focus_lost));
+Scrollport* Scrollport::create_scrollport (Control* par, Control* content,
+        const ControlParameters* parms, const ustring& name) {
+    Scrollport* result = new Scrollport (parms);
+    result->set_name (name);
+    result->init_control (par);
+    result->set_content (content);
+    return result;
 }
 
-void _Scrollport::reinitialize () {
+void Scrollport::reinitialize () {
     view->set_x (1);
     view->set_y (1);
     view->set_width (get_width () - bar->get_width () - 1);
@@ -34,12 +43,12 @@ void _Scrollport::reinitialize () {
     bar->set_height (get_height ());
 }
 
-void _Scrollport::bar_value_changed (Control ctl, int value) {
+void Scrollport::bar_value_changed (Scrollbar* ctl, int value) {
     content->set_y (1 - value);
     invalidate ();
 }
 
-void _Scrollport::content_height_changed (Control ctl, int value) {
+void Scrollport::content_height_changed (Control* ctl, int value) {
     bar->set_max (value - get_height ());
 }
 
@@ -48,7 +57,7 @@ void _Scrollport::content_height_changed (Control ctl, int value) {
     // draw_frame (C_FOREGROUND);
 }*/
 
-void _Scrollport::set_content (Control value) {
+void Scrollport::set_content (Control* value) {
     if (content != value) {
         if (content != NULL) {
             content->register_on_height_changed (OnHeightChanged ());
@@ -70,25 +79,25 @@ void _Scrollport::set_content (Control value) {
 
             view->set_content (content);
 
-            content->register_on_height_changed (OnHeightChanged (this, &_Scrollport::content_height_changed));
-            content->register_on_focus_gained (OnFocusGained (this, &_Scrollport::child_focus_gained));
-            content->register_on_focus_lost (OnFocusLost (this, &_Scrollport::child_focus_lost));
+            content->register_on_height_changed (OnHeightChanged (this, &Scrollport::content_height_changed));
+            content->register_on_focus_gained (OnFocusGained (this, &Scrollport::child_focus_gained));
+            content->register_on_focus_lost (OnFocusLost (this, &Scrollport::child_focus_lost));
         }
     }
 }
 
-Control _Scrollport::get_content () const {
+Control* Scrollport::get_content () const {
     return content;
 }
 
-void _Scrollport::child_focus_gained (Control ctl) {
+void Scrollport::child_focus_gained (Control* ctl) {
     set_frame (C_FOC_FOREGROUND);
 }
 
-void _Scrollport::child_focus_lost (Control ctl) {
+void Scrollport::child_focus_lost (Control* ctl) {
     set_frame (C_FOREGROUND);
 }
 
-bool _Scrollport::is_focusable () const {
+bool Scrollport::is_focusable () const {
     return false;
 }

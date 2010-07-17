@@ -21,8 +21,7 @@ struct ListboxParameters : public ControlParameters {
     const float item_height;
 
     ListboxParameters (float nx, float ny, float nw, float nh, float nf,
-            float nmh, float nih, const ustring & nn) : ControlParameters (nx, ny, nw, nh, nf, nn), min_height (nmh), item_height (nih) {
-    }
+            float nmh, float nih);
 };
 
 struct ListItem {
@@ -33,29 +32,7 @@ public:
     ListItem (const ustring& txt = "", Uint32 cl = C_FOREGROUND);
 };
 
-class _Listbox : public _Control {
-public:
-
-    struct ListboxPointer : public Pointer<_Listbox, Control> {
-    public:
-
-        ListboxPointer () : Pointer<_Listbox, Control > (NULL) {
-        }
-
-        ListboxPointer (_Listbox * ctl) : Pointer<_Listbox, Control > (ctl) {
-        }
-
-        ListboxPointer (Control par, const ListboxParameters * parms) :
-        Pointer<_Listbox, Control > (new _Listbox ()) {
-            get ()->init_control (par, parms);
-            get ()->init_listbox ();
-        }
-
-    };
-
-    typedef ListboxPointer Listbox;
-
-
+class Listbox : public Control {
 private:
     vector<ListItem> items;
     int selected;
@@ -63,10 +40,9 @@ private:
     int item_height;
 
 protected:
+    Listbox (const ListboxParameters* parms);
 
-    _Listbox ();
-
-    virtual void init_listbox ();
+    void init_control (Control* par);
 
     void reinitialize ();
 
@@ -83,6 +59,8 @@ protected:
     bool process_key_pressed_event (SDL_KeyboardEvent event);
 
 public:
+    static Listbox* create_listbox (Control* par, 
+            const ListboxParameters* parms, const ustring& name = "listbox");
 
     virtual void clear ();
 
@@ -105,7 +83,6 @@ public:
     virtual void set_min_height (int value);
 };
 
-typedef _Listbox::Listbox Listbox;
 
 #endif	/* LISTBOX_H */
 

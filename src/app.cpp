@@ -8,8 +8,9 @@
 #include "game/game.h"
 
 #include "app.h"
+#include "frames/start_frame.h"
 
-Screen App::screen;
+Screen* App::screen;
 GameInfo App::gameinfo;
 GameSetting App::gameset;
 bool App::abort;
@@ -60,8 +61,13 @@ void App::initialize () {
     init_gui ();
 }
 
+
 void App::init_gui () {
-    screen = Screen (Render::get_primary (), "nervici");
+    cout << __func__ << "\n";
+    screen = Screen::create_screen (Render::get_primary (), "nervici");
+    StartFrame::create_frame (screen);
+    //StartFrame (screen.get());
+    screen->show_all ();
 }
 
 void App::uninitialize () {

@@ -1,47 +1,64 @@
 #include "listbox.h"
 
+ListboxParameters::ListboxParameters (float nx, float ny, float nw, float nh, float nf,
+        float nmh, float nih) :
+ControlParameters (nx, ny, nw, nh, nf), min_height (nmh), item_height (nih) {
+}
+
 ListItem::ListItem (const ustring& txt, Uint32 cl) :
 text (txt),
 color (cl) {
 }
 
-_Listbox::_Listbox () :
+Listbox::Listbox (const ListboxParameters* parms) :
+Control (parms),
 selected (-1),
 min_height (0),
-item_height (20) {
+item_height (0) {
 }
 
-void _Listbox::init_listbox () {
+Listbox* Listbox::create_listbox (Control* par, const ListboxParameters* parms, 
+        const ustring& name) {
+    Listbox* result = new Listbox(parms);
+    result->set_name (name);
+    result->init_control (par);
+    return result;
+}
+
+void Listbox::init_control (Control* par) {
+    Control::init_control (par);
     set_frame (0);
 }
 
-void _Listbox::reinitialize () {
-    _Control::reinitialize ();
+void Listbox::reinitialize () {
+    Control::reinitialize ();
     int sw = get_screen_width ();
-    set_min_height (get_parms ()->min_height * sw);
-    set_item_height (get_parms ()->item_height * sw);
+    const ListboxParameters* p = get_parms ();
+    if (p!= NULL) {
+        set_min_height (p->min_height * sw / STANDARD_WIDTH);
+        set_item_height (p->item_height * sw / STANDARD_WIDTH);
+    }
 }
 
-const ListboxParameters* _Listbox::get_parms () {
-    return static_cast<const ListboxParameters*> (_Control::get_parms ());
+const ListboxParameters* Listbox::get_parms () {
+    return static_cast<const ListboxParameters*> (Control::get_parms ());
 }
 
-void _Listbox::select_up () {
+void Listbox::select_up () {
     int s = get_selected ();
     s--;
     if (s >= 0)
         set_selected (s);
 }
 
-void _Listbox::select_down () {
+void Listbox::select_down () {
     int s = get_selected ();
     s++;
     if (s < int(items.size ()))
         set_selected (s);
 }
 
-void _Listbox::paint () {
-    //    Uint32 border = (is_focused ()) ? C_FOC_FOREGROUND : C_FOREGROUND;
+void Listbox::paint () {
 
     draw_box (0, 0, get_width (), get_height (), C_BACKGROUND);
 
@@ -59,7 +76,7 @@ void _Listbox::paint () {
     }
 }
 
-void _Listbox::process_mouse_move_event (SDL_MouseMotionEvent event) {
+void Listbox::process_mouse_move_event (SDL_MouseMotionEvent event) {
     int ih = get_item_height ();
     int iw = get_width () - 2;
     int index;
@@ -73,10 +90,10 @@ void _Listbox::process_mouse_move_event (SDL_MouseMotionEvent event) {
         }
     }
 
-    _Control::process_mouse_move_event (event);
+    Control::process_mouse_move_event (event);
 }
 
-bool _Listbox::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool Listbox::process_key_pressed_event (SDL_KeyboardEvent event) {
     if (event.state == SDL_PRESSED) {
         if ((event.keysym.mod & KMOD_ALT) != 0) return false;
         if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
@@ -100,16 +117,16 @@ bool _Listbox::process_key_pressed_event (SDL_KeyboardEvent event) {
         }
     }
 
-    return _Control::process_key_pressed_event (event);
+    return Control::process_key_pressed_event (event);
 }
 
-void _Listbox::clear () {
+void Listbox::clear () {
     set_selected (-1);
     items.clear ();
     invalidate ();
 }
 
-void _Listbox::add_item (const ustring& text, Uint32 color) {
+void Listbox::add_item (const ustring& text, Uint32 color) {
     items.push_back (ListItem (text, color));
 
     int h = items.size () * get_item_height ();
@@ -119,15 +136,15 @@ void _Listbox::add_item (const ustring& text, Uint32 color) {
     invalidate ();
 }
 
-const ListItem& _Listbox::get_item (int index) {
+const ListItem& Listbox::get_item (int index) {
     return items[index];
 }
 
-int _Listbox::get_items_count () const {
+int Listbox::get_items_count () const {
     return items.size ();
 }
 
-void _Listbox::set_selected (int value) {
+void Listbox::set_selected (int value) {
     if (value != selected) {
         selected = value;
 
@@ -148,26 +165,26 @@ void _Listbox::set_selected (int value) {
     }
 }
 
-int _Listbox::get_selected () const {
+int Listbox::get_selected () const {
     return selected;
 }
 
-void _Listbox::set_item_height (int value) {
+void Listbox::set_item_height (int value) {
     if (value != item_height) {
         item_height = value;
         invalidate ();
     }
 }
 
-int _Listbox::get_item_height () const {
+int Listbox::get_item_height () const {
     return item_height;
 }
 
-int _Listbox::get_min_height () const {
+int Listbox::get_min_height () const {
     return min_height;
 }
 
-void _Listbox::set_min_height (int value) {
+void Listbox::set_min_height (int value) {
     if (value != min_height) {
         min_height = value;
         if (get_height () < min_height) {

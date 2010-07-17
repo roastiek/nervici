@@ -2,31 +2,44 @@
 
 #include "screen.h"
 
-_Screen::_Screen () :
+Screen::Screen () :
+Control (NULL),
+be_clicked (NULL),
+mouse_target (NULL),
+popup (NULL),
+popup_owner (NULL),
 primary (NULL) {
 }
 
-_Screen::~_Screen () {
+Screen::~Screen () {
     remove_popup (false);
+    delete parms;
 }
 
-/*Screen* Screen::create (SDL_Surface* face, const ustring& name) {
+Screen* Screen::create_screen (SDL_Surface* face, const ustring& name) {
     Screen* result = new Screen ();
-    result->init_screen (face, name);
+    result->set_name (name);
+    result->primary = face;
+    result->init_control (NULL);
     return result;
-}*/
+}
 
-void _Screen::init_screen (SDL_Surface* face, const ustring& nn) {
-    set_name (nn);
+void Screen::init_control (Control* par) {
     set_background (C_BACKGROUND);
     set_foreground (C_FOREGROUND);
     set_font_color (C_FOREGROUND);
-    set_frame (C_FOREGROUND);
-    primary = face;
+    set_frame (0);
     reinitialize ();
 }
 
-void _Screen::on_update (int x, int y, int w, int h) {
+void Screen::reinitialize () {
+    set_x (0);
+    set_y (0);
+    set_width (primary->w);
+    set_height (primary->h);
+}
+
+void Screen::on_update (int x, int y, int w, int h) {
     SDL_Rect dest;
 
     dest.x = x;
@@ -38,9 +51,9 @@ void _Screen::on_update (int x, int y, int w, int h) {
     SDL_UpdateRects (primary, 1, &dest);
 }
 
-void _Screen::process_event (SDL_Event& event) {
-    _Control* under_cursor;
-    ControlPointer par;
+void Screen::process_event (SDL_Event& event) {
+    Control* under_cursor;
+    Control* par;
 
     switch (event.type) {
     case SDL_KEYDOWN:
@@ -111,7 +124,7 @@ void _Screen::process_event (SDL_Event& event) {
 
     case E_SHOW_POPUP:
         remove_popup (false);
-        add_popup (static_cast<_Control*> (event.user.data1), static_cast<_Control*> (event.user.data2));
+        add_popup (static_cast<Control*> (event.user.data1), static_cast<Control*> (event.user.data2));
         break;
 
     case E_HIDE_POPUP:
@@ -120,7 +133,7 @@ void _Screen::process_event (SDL_Event& event) {
     }
 }
 
-void _Screen::set_mouse_target (Control value) {
+void Screen::set_mouse_target (Control* value) {
     if (value != mouse_target) {
         if (mouse_target != NULL) {
             mouse_target->on_mouse_leave ();
@@ -132,7 +145,7 @@ void _Screen::set_mouse_target (Control value) {
     }
 }
 
-void _Screen::add_popup (Control pop, Control own) {
+void Screen::add_popup (Control* pop, Control* own) {
     popup = pop;
     popup_owner = own;
 
@@ -148,7 +161,7 @@ void _Screen::add_popup (Control pop, Control own) {
     popup->grab_focus ();
 }
 
-void _Screen::remove_popup (bool restore_focus) {
+void Screen::remove_popup (bool restore_focus) {
     if (popup != NULL) {
         popup->set_visible (false);
         popup->set_parent (NULL);
@@ -160,22 +173,19 @@ void _Screen::remove_popup (bool restore_focus) {
     }
 }
 
-void _Screen::poput_lost_focus (Control ctl) {
+void Screen::poput_lost_focus (Control* ctl) {
     remove_popup (true);
     ctl->register_on_focus_lost (OnFocusLost ());
 }
 
-int _Screen::get_screen_width () const {
+int Screen::get_screen_width () const {
     return primary->w;
 }
 
-int _Screen::get_screen_height () const {
+int Screen::get_screen_height () const {
     return primary->h;
 }
 
-void _Screen::reinitialize () {
-    set_x (0);
-    set_y (0);
-    set_width (primary->w);
-    set_height (primary->h);
+bool Screen::is_focusable () {
+    return false;
 }

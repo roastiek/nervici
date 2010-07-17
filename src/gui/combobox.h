@@ -11,38 +11,18 @@
 #include "control.h"
 #include "listbox.h"
 
-class _Combobox : public _Control {
-public:
-
-    struct ComboboxPointer : public Pointer<_Combobox, Control> {
-    public:
-
-        ComboboxPointer () : Pointer<_Combobox , Control> (NULL) {
-        }
-
-        ComboboxPointer (_Combobox * ctl) : Pointer<_Combobox, Control > (ctl) {
-        }
-
-        ComboboxPointer (Control par, const ControlParameters * parms) :
-        Pointer<_Combobox, Control > (new _Combobox ()) {
-            get ()->init_control (par, parms);
-        }
-
-    };
-
-    typedef ComboboxPointer Combobox;
-
+class Combobox : public Control {
 private:
-    Listbox list;
+    Listbox* list;
 
-    Scrollport port;
+    Scrollport* port;
 
     int selected;
 
     ListboxParameters list_parms;
     ControlParameters port_parms;
 
-    void list_clicked (Control ctl);
+    void list_clicked (Control* ctl);
 
     void select_up ();
 
@@ -50,12 +30,11 @@ private:
 
 protected:
 
-    _Combobox ();
+    Combobox (const ControlParameters* parms);
 
-    void init_control (Control par, const ControlParameters* parms);
+    void init_control (Control* par);
 
     void reinitialize ();
-
 
     void paint ();
 
@@ -68,7 +47,10 @@ protected:
     void on_focus_lost ();
 
 public:
-    ~_Combobox ();
+    static Combobox* create_combobox (Control* par, 
+            const ControlParameters* parms, const ustring& name = "combobox");
+
+    ~Combobox ();
 
     void clear ();
 

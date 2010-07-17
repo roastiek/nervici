@@ -10,26 +10,7 @@
 
 #include "control.h"
 
-class _Textbox : public _Control {
-public:
-
-    struct TextboxPointer : public Pointer<_Textbox, Control> {
-    public:
-
-        TextboxPointer () : Pointer<_Textbox, Control > (NULL) {
-        }
-
-        TextboxPointer (_Textbox * ctl) : Pointer<_Textbox, Control > (ctl) {
-        }
-
-        TextboxPointer (ControlPointer par, const ustring& text, const ControlParameters * parms) :
-        Pointer<_Textbox, Control > (new _Textbox ()) {
-            get ()->init_control (par, parms);
-            get ()->init_textbox (text);
-        }
-    };
-
-    typedef TextboxPointer Textbox;
+class Textbox : public Control {
 
 private:
     ustring text;
@@ -48,9 +29,7 @@ private:
     void update_text (const ustring& value);
 
 protected:
-    _Textbox ();
-
-    virtual void init_textbox (const ustring& txt);
+    Textbox (const ControlParameters* parms);
 
     void draw_inner_frame (Uint32 color);
 
@@ -63,7 +42,8 @@ protected:
     void on_focus_lost ();
 
 public:
-    //static _Textbox* create (_Control* par, const ControlParameters* parms);
+    static Textbox* create_textbox (Control* par, 
+            const ControlParameters* parms, const ustring& name = "textbox");
 
     void set_text (const ustring& value);
 
@@ -74,7 +54,7 @@ public:
     int get_cursor () const;
 };
 
-typedef _Textbox::Textbox Textbox;
+typedef Textbox::Textbox Textbox;
 
 #endif	/* TEXTBOX_H */
 

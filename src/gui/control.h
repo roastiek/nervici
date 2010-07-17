@@ -8,6 +8,9 @@
 #ifndef CONTROL_H
 #define	CONTROL_H
 
+#define STANDARD_WIDTH 1024
+#define STANDARD_HEIGHT 768
+
 /*#include <SDL.h>
 #include <SDL_Pango.h>
 #include <SDL_gfxPrimitives.h>*/
@@ -24,110 +27,30 @@ struct ControlParameters {
     const float w;
     const float h;
     const float font_size;
-    ustring name;
-    ControlParameters (float nx, float ny, float nw, float nh, float nf, const ustring& nn = "");
+    ControlParameters (float nx, float ny, float nw, float nh, float nf);
 };
 
 struct Implementor;
 
-template <class T, class S>
-class Pointer {
-private:
-    T* item;
+class Control {
 public:
 
-    Pointer () : item (NULL) {
-    }
-
-    Pointer (T* ctl) : item (ctl) {
-    }
-
-    void free () {
-        if (item != NULL) delete item;
-    }
-
-    T * operator-> () {
-        return item;
-    }
-
-    const T * operator-> () const {
-        return item;
-    }
-
-    T operator* () {
-        return *item;
-    }
-
-    void operator= (T* ctl) {
-        item = ctl;
-    }
-
-    bool operator!= (Pointer<T,S> ctl) {
-        return item != ctl.item;
-    }
-
-    bool operator== (Pointer<T,S> ctl) {
-        return item == ctl.item;
-    }
-
-    bool operator!= (T* ctl) {
-        return item != ctl;
-    }
-
-    bool operator== (T* ctl) {
-        return item == ctl;
-    }
-
-    operator T* () {
-        return item;
-    }
-
-    T* get () {
-        return item;
-    }
-
-    operator S () {
-        return item;
-    }
-};
-
-class _Control {
-public:
-
-    struct ControlPointer : public Pointer<_Control, ControlPointer> {
-    public:
-
-        ControlPointer () : Pointer<_Control, ControlPointer > (NULL) {
-        }
-
-        ControlPointer (_Control * ctl) : Pointer<_Control, ControlPointer > (ctl) {
-        }
-
-        ControlPointer (ControlPointer par, const ControlParameters * parms) :
-        Pointer<_Control, ControlPointer > (new _Control ()) {
-            get ()->init_control (par, parms);
-        }
-
-    };
-
-    typedef ControlPointer Control;
-
-    typedef Event0<Control> OnClicked;
-    typedef Event1<Control, SDL_MouseButtonEvent> OnMouseButton;
-    typedef Event1<Control, SDL_MouseMotionEvent> OnMouseMove;
-    typedef Event0<Control> OnFocusGained;
-    typedef Event0<Control> OnFocusLost;
-    typedef Event0<Control> OnMouseEnter;
-    typedef Event0<Control> OnMouseLeave;
-    typedef Event1<Control, int> OnXChanged;
-    typedef Event1<Control, int> OnYChanged;
-    typedef Event1<Control, int> OnWidthChanged;
-    typedef Event1<Control, int> OnHeightChanged;
+    typedef Event0<Control*> OnClicked;
+    typedef Event1<Control*, SDL_MouseButtonEvent> OnMouseButton;
+    typedef Event1<Control*, SDL_MouseMotionEvent> OnMouseMove;
+    typedef Event0<Control*> OnFocusGained;
+    typedef Event0<Control*> OnFocusLost;
+    typedef Event0<Control*> OnMouseEnter;
+    typedef Event0<Control*> OnMouseLeave;
+    typedef Event1<Control*, int> OnXChanged;
+    typedef Event1<Control*, int> OnYChanged;
+    typedef Event1<Control*, int> OnWidthChanged;
+    typedef Event1<Control*, int> OnHeightChanged;
 
     struct OnKeyPressed {
     private:
         Listener* listener;
-        bool (Listener::*callback)(Control, SDL_KeyboardEvent);
+        bool (Listener::*callback)(Control*, SDL_KeyboardEvent);
     public:
 
         OnKeyPressed () :
@@ -136,12 +59,12 @@ public:
         }
 
         template <class T >
-        OnKeyPressed (T* list, void (T::*call) (Control, SDL_KeyboardEvent)) {
+        OnKeyPressed (T* list, void (T::*call) (Control*, SDL_KeyboardEvent)) {
             listener = reinterpret_cast<Listener*> (list);
-            callback = reinterpret_cast<void (Listener::*) (Control)> (call);
+            callback = reinterpret_cast<void (Listener::*) (Control*)> (call);
         }
 
-        bool operator() (Control ctl, SDL_KeyboardEvent p1) {
+        bool operator() (Control* ctl, SDL_KeyboardEvent p1) {
             if (listener != NULL && callback != NULL) {
                 return (listener->*callback) (ctl, p1);
             }
@@ -150,10 +73,10 @@ public:
     };
 
 private:
-    Control parent;
-    Control children;
-    Control focused_child;
-    Control next;
+    Control* parent;
+    Control* children;
+    Control* focused_child;
+    Control* next;
 
     Implementor* impl;
 
@@ -162,7 +85,11 @@ private:
     int width;
     int height;
     ustring name;
-    ustring font;
+    struct {
+        ustring name;
+        int size;
+        Uint32 color;
+    } font;
 
     struct {
         Uint32 background;
@@ -175,11 +102,7 @@ private:
     bool focused;
     bool visible;
 
-    const ControlParameters* parms;
-
-    /*    SDL_Surface* surface;
-    SDLPango_Context* pango_context;
-    SDLPango_Matrix font_color;*/
+    const ControlParameters * const parms;
 
     struct {
         OnClicked clicked;
@@ -200,36 +123,34 @@ private:
 
     void blit (Implementor *dest);
 
-    //void update_child (Control* child);
+    void update_children (Control* item, int x, int y, int w, int h);
 
-    void update_children (Control item, int x, int y, int w, int h);
-
-    bool switch_focus (Control item);
+    bool switch_focus (Control* item);
 
     void steal_focus ();
 
-    void propagate_focus (Control child);
+    void propagate_focus (Control* child);
 
-    bool child_grab_focus (Control child);
+    bool child_grab_focus (Control* child);
 
 protected:
-    _Control ();
+    Control (const ControlParameters* parms);
 
-    virtual void init_control (Control par, const ControlParameters* parms);
+    virtual void init_control (Control* par);
 
     virtual int get_screen_width () const;
 
     virtual int get_screen_height () const;
 
-    virtual void add_child (Control child);
+    virtual void add_child (Control* child);
 
-    virtual void remove_child (Control child);
+    virtual void remove_child (Control* child);
 
-    virtual void show_popup (Control popup, Control owner);
+    virtual void show_popup (Control* popup, Control* owner);
 
     virtual void hide_popup ();
 
-    virtual Control control_at_pos (int x, int);
+    virtual Control* control_at_pos (int x, int);
 
     virtual void draw_frame (Uint32 color);
 
@@ -308,14 +229,12 @@ protected:
 
     virtual void on_update (int x, int y, int w, int h);
 
-    //virtual void on_update_child (Control* child);
-
     virtual const ControlParameters* get_parms ();
 
 public:
-    //static Control create (Control par, const ControlParameters& parms);
+    static Control* create_control (Control* par, const ControlParameters* parms, const ustring& = "control");
 
-    virtual ~_Control ();
+    virtual ~Control ();
 
     virtual void reinitialize ();
 
@@ -327,7 +246,7 @@ public:
 
     virtual bool grab_focus ();
 
-    virtual Control get_child_at_pos (int x, int y);
+    virtual Control* get_child_at_pos (int x, int y);
 
     virtual void show_all ();
 
@@ -355,7 +274,7 @@ public:
 
     virtual void register_on_height_changed (const OnXChanged& handler);
 
-    virtual void set_parent (Control value);
+    virtual void set_parent (Control* value);
 
     virtual void set_visible (bool value);
 
@@ -399,7 +318,7 @@ public:
 
     virtual bool is_enabled () const;
 
-    virtual Control get_parent () const;
+    virtual Control* get_parent () const;
 
     virtual bool is_focused () const;
 
@@ -411,12 +330,16 @@ public:
 
     virtual const ustring& get_name () const;
 
-    friend class _Screen;
+    virtual int get_font_size () const;
+
+    virtual const ustring& get_font () const;
+
+    virtual Uint32 get_font_color () const;
+
+    friend class Screen;
 
 };
 
-
-typedef _Control::Control Control;
 /*typedef _Control::OnClicked OnClicked;
 typedef _Control::OnMouseButton OnMouseButton;
 typedef _Control::OnMouseMove OnMouseMove;

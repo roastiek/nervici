@@ -37,8 +37,8 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 SET (CMAKE_C_FLAGS "-O2")
 SET (CMAKE_CXX_FLAGS "-O2")
-SET (CMAKE_C_FLAGS_DEBUG "-Wall -pedantic -DUSE_WORKING_DIR -g3 -gdwarf-2 -std=c99")
-SET (CMAKE_CXX_FLAGS_DEBUG "-Wall -pedantic -DUSE_WORKING_DIR -g3 -gdwarf-2 -std=c++0x")
+SET (CMAKE_C_FLAGS_DEBUG "-Wall -O0 -pedantic -DUSE_WORKING_DIR -g3 -gdwarf-2 -std=c99")
+SET (CMAKE_CXX_FLAGS_DEBUG "-Wall -O0 -pedantic -DUSE_WORKING_DIR -g3 -gdwarf-2 -std=c++0x")
 SET (CMAKE_C_FLAGS_RELEASE "-Wall -DUSE_WORKING_DIR")
 
 CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
@@ -50,7 +50,7 @@ SET (NERVICI_GAME src/game/world.cpp src/game/player.cpp src/game/players.cpp sr
 SET (NERVICI_SETTINGS src/settings/setting.cpp src/settings/plinfo.cpp)
 SET (NERVICI_BASE src/main.cpp src/system.cpp src/mods/nervici.cpp src/app.cpp)
 SET (NERVICI_GUI src/gui/button.cpp src/gui/control.cpp src/gui/screen.cpp src/gui/scrollbar.cpp src/gui/scrollport.cpp src/gui/textbox.cpp src/gui/view.cpp src/gui/listbox.cpp src/gui/combobox.cpp)
-SET (NERVICI_FRAMES src/frames/start.cpp src/frames/frame.cpp)
+SET (NERVICI_FRAMES src/frames/start_frame.cpp src/frames/game_frame.cpp)
 
 SET (NERVICI_SOURCE ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_SETTINGS} ${NERVICI_GUI} ${NERVICI_FRAMES})
 ADD_EXECUTABLE (nervici ${NERVICI_SOURCE})

@@ -10,36 +10,13 @@
 
 #include "control.h"
 
-struct ButtonParameters : public ControlParameters {
-    const ustring text;
-    ButtonParameters (float nx, float ny, float nw, float nh, float nf,
-            const ustring& nt, const ustring& nn = "");
-};
-
-class _Button : public _Control {
-public:
-    struct ButtonPointer: public Pointer<_Button, _Control> {
-    public:
-        ButtonPointer (): Pointer<_Button, _Control>() {
-        }
-
-        ButtonPointer (_Button* it): Pointer<_Button, _Control>(it) {
-        }
-
-        ButtonPointer (ControlPointer& par, const ButtonParameters* parms):
-        Pointer<_Button, _Control>(new _Button()){
-            get()->init_control (par, parms);
-            get()->init_button (parms);
-        }
-    };
-
-    typedef ButtonPointer Button;
+class Button : public Control {
 
 private:
     ustring text;
 
 protected:
-    virtual void init_button (const ButtonParameters* parms);
+    Button (const ControlParameters* parms);
 
     void paint ();
 
@@ -48,14 +25,13 @@ protected:
     void on_focus_lost ();
 
 public:
-    //static Button* create (Control* par, const ButtonParameters* parms);
+    static Button* create_button (Control* par, const ustring& text, 
+            const ControlParameters* parms, const ustring& name = "button");
 
     void set_text (const ustring& value);
 
     const ustring& get_text () const;
 };
-
-typedef _Button::Button Button;
 
 #endif	/* BUTTON_H */
 

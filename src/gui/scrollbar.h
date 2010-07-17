@@ -11,35 +11,16 @@
 #include "control.h"
 
 struct ScrollbarParameters : public ControlParameters {
-    const int small_step;
-    const int big_step;
+    const float small_step;
+    const float big_step;
     ScrollbarParameters (float nx, float ny, float nw, float nh, float nf,
-            int nss, int nbs, const ustring & nn);
+            float nss, float nbs);
 };
 
-class _Scrollbar : public _Control {
+class Scrollbar : public Control {
 public:
 
-    struct ScrollbarPointer : public Pointer<_Scrollbar, Control> {
-    public:
-
-        ScrollbarPointer () : Pointer<_Scrollbar, Control > (NULL) {
-        }
-
-        ScrollbarPointer (_Scrollbar * ctl) : Pointer<_Scrollbar, Control > (ctl) {
-        }
-
-        ScrollbarPointer (ControlPointer par, const ScrollbarParameters * parms) :
-        Pointer<_Scrollbar, Control > (new _Scrollbar ()) {
-            get ()->init_control (par, parms);
-            get ()->init_scrollbar (parms);
-        }
-
-    };
-
-    typedef ScrollbarPointer Scrollbar;
-
-    typedef Event1<Control, int> OnValueChanged;
+    typedef Event1<Scrollbar*, int> OnValueChanged;
 
 private:
     int min;
@@ -56,9 +37,9 @@ private:
     void scroll_dec (int distance = 1);
 
 protected:
-    _Scrollbar ();
+    Scrollbar (const ScrollbarParameters* parms);
 
-    void init_scrollbar (const ScrollbarParameters* parms);
+    void reinitialize ();
 
     const ScrollbarParameters* get_parms ();
 
@@ -77,7 +58,8 @@ protected:
     void on_focus_lost ();
 
 public:
-    //static _Scrollbar* create (_Control* par, const ScrollbarParameters* parms);
+    static Scrollbar* create_scrollbar (Control* par, 
+            const ScrollbarParameters* parms, const ustring& name = "scrollbar");
 
     void register_on_value_changed (const OnValueChanged& handler);
 
@@ -101,8 +83,6 @@ public:
 
     int get_big_step () const;
 };
-
-typedef _Scrollbar::Scrollbar Scrollbar;
 
 #endif	/* SCROLLBAR_H */
 
