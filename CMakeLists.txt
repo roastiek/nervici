@@ -49,7 +49,7 @@ SET (NERVICI_ENGINE src/engine/render.cpp src/engine/audio.cpp src/engine/loader
 SET (NERVICI_GAME src/game/world.cpp src/game/player.cpp src/game/players.cpp src/game/game.cpp)
 SET (NERVICI_SETTINGS src/settings/setting.cpp src/settings/plinfo.cpp)
 SET (NERVICI_BASE src/main.cpp src/system.cpp src/mods/nervici.cpp src/app.cpp)
-SET (NERVICI_GUI src/gui/button.cpp src/gui/control.cpp src/gui/screen.cpp src/gui/scrollbar.cpp src/gui/scrollport.cpp src/gui/textbox.cpp src/gui/view.cpp src/gui/listbox.cpp src/gui/combobox.cpp)
+SET (NERVICI_GUI src/gui/button.cpp src/gui/control.cpp src/gui/screen.cpp src/gui/scrollbar.cpp src/gui/scrollport.cpp src/gui/textbox.cpp src/gui/view.cpp src/gui/listbox.cpp src/gui/combobox.cpp src/gui/multiline_label.cpp src/gui/team_button.cpp)
 SET (NERVICI_FRAMES src/frames/start_frame.cpp src/frames/game_frame.cpp)
 
 SET (NERVICI_SOURCE ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_SETTINGS} ${NERVICI_GUI} ${NERVICI_FRAMES})

@@ -232,8 +232,6 @@ protected:
     virtual const ControlParameters* get_parms ();
 
 public:
-    static Control* create_control (Control* par, const ControlParameters* parms, const ustring& = "control");
-
     virtual ~Control ();
 
     virtual void reinitialize ();
@@ -337,7 +335,14 @@ public:
     virtual Uint32 get_font_color () const;
 
     friend class Screen;
+    
+    friend class ControlFactory;
 
+};
+
+class ControlFactory {
+public:
+    static Control* create (Control* par, const ControlParameters* parms, const ustring& = "control");
 };
 
 /*typedef _Control::OnClicked OnClicked;

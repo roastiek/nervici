@@ -30,7 +30,7 @@ private:
 
 protected:
 
-    Combobox (const ControlParameters* parms);
+    Combobox (const ListboxParameters* parms);
 
     void init_control (Control* par);
 
@@ -47,8 +47,6 @@ protected:
     void on_focus_lost ();
 
 public:
-    static Combobox* create_combobox (Control* par, 
-            const ControlParameters* parms, const ustring& name = "combobox");
 
     ~Combobox ();
 
@@ -63,6 +61,14 @@ public:
     void set_selected (int value);
 
     int get_selected () const;
+
+    friend class ComboboxFactory;
+};
+
+class ComboboxFactory {
+public:
+    static Combobox* create (Control* par,
+            const ListboxParameters* parms, const ustring& name = "combobox");
 };
 
 #endif	/* COMBOBOX_H */

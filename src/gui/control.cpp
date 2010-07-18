@@ -68,7 +68,7 @@ void Control::reinitialize () {
     }
 }
 
-Control* Control::create_control (Control* par, const ControlParameters* parms, const ustring& name) {
+Control* ControlFactory::create (Control* par, const ControlParameters* parms, const ustring& name) {
     Control* result = new Control (parms);
     result->set_name (name);
     result->init_control (par);

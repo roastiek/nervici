@@ -39,8 +39,6 @@ protected:
     virtual void on_y_offset_changed (int value);
 
 public:
-    static View* create_view (Control* par, Control* content, 
-            const ControlParameters* parms, const ustring& name = "view");
 
     virtual void register_on_x_offset_changed (const OnXOffsetChanged& handler);
 
@@ -59,8 +57,15 @@ public:
     virtual void set_content (Control* value);
 
     virtual Control* get_content () const;
+
+    friend class ViewFactory;
 };
 
+class ViewFactory {
+public:
+    static View* create (Control* par, Control* content,
+            const ControlParameters* parms, const ustring& name = "view");
+};
 
 #endif	/* VIEW_H */
 

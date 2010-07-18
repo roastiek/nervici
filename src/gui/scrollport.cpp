@@ -2,7 +2,7 @@
 #include "view.h"
 
 ScrollbarParameters Scrollport::bar_parms = {
-    0.0, 0.0, 15.0, 60.0, 0.1, 1, 5
+    0.0, 0.0, 15.0, 60.0, 10, 1, 5
 };
 
 ControlParameters Scrollport::view_parms = {
@@ -17,15 +17,17 @@ bar (NULL) {
 }
 
 void Scrollport::init_control (Control* par) {
-    view = View::create_view (this, NULL, &view_parms);
-    bar = Scrollbar::create_scrollbar (this, &bar_parms);
+    view = ViewFactory::create (this, NULL, &view_parms);
+    bar = ScrollbarFactory::create (this, &bar_parms);
     Control::init_control (par);
     bar->register_on_value_changed (Scrollbar::OnValueChanged (this, &Scrollport::bar_value_changed));
     bar->register_on_focus_gained (OnFocusGained (this, &Scrollport::child_focus_gained));
     bar->register_on_focus_lost (OnFocusLost (this, &Scrollport::child_focus_lost));
+   /* view->show_all ();
+    bar->show_all ();*/
 }
 
-Scrollport* Scrollport::create_scrollport (Control* par, Control* content,
+Scrollport* ScrollportFactory::create (Control* par, Control* content,
         const ControlParameters* parms, const ustring& name) {
     Scrollport* result = new Scrollport (parms);
     result->set_name (name);
@@ -35,6 +37,7 @@ Scrollport* Scrollport::create_scrollport (Control* par, Control* content,
 }
 
 void Scrollport::reinitialize () {
+    Control::reinitialize ();
     view->set_x (1);
     view->set_y (1);
     view->set_width (get_width () - bar->get_width () - 1);

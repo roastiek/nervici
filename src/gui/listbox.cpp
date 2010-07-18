@@ -17,7 +17,7 @@ min_height (0),
 item_height (0) {
 }
 
-Listbox* Listbox::create_listbox (Control* par, const ListboxParameters* parms, 
+Listbox* ListboxFactory::create (Control* par, const ListboxParameters* parms,
         const ustring& name) {
     Listbox* result = new Listbox(parms);
     result->set_name (name);

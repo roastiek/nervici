@@ -42,8 +42,6 @@ protected:
     void on_focus_lost ();
 
 public:
-    static Textbox* create_textbox (Control* par, 
-            const ControlParameters* parms, const ustring& name = "textbox");
 
     void set_text (const ustring& value);
 
@@ -52,9 +50,14 @@ public:
     const ustring& get_text () const;
 
     int get_cursor () const;
+
+    friend class TextboxFactory;
 };
 
-typedef Textbox::Textbox Textbox;
-
+class TextboxFactory {
+public:
+    static Textbox* create (Control* par, const ControlParameters* parms,
+            const ustring& name = "textbox");
+};
 #endif	/* TEXTBOX_H */
 

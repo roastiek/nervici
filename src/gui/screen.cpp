@@ -16,7 +16,7 @@ Screen::~Screen () {
     delete parms;
 }
 
-Screen* Screen::create_screen (SDL_Surface* face, const ustring& name) {
+Screen* ScreenFactory::create (SDL_Surface* face, const ustring& name) {
     Screen* result = new Screen ();
     result->set_name (name);
     result->primary = face;

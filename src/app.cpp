@@ -10,11 +10,13 @@
 #include "app.h"
 #include "frames/start_frame.h"
 
+Control* App::active_frame = NULL;
 Screen* App::screen;
+StartFrame* App::start_frame;
+GameFrame* App::game_frame;
 GameInfo App::gameinfo;
 GameSetting App::gameset;
 bool App::abort;
-
 
 void App::initialize () {
     cout << __func__ << '\n';
@@ -23,7 +25,6 @@ void App::initialize () {
     Setting::load ();
     System::find_mods ();
     PlInfos::load ();
-
 
     if (SDL_Init (0)) return;
 
@@ -61,13 +62,18 @@ void App::initialize () {
     init_gui ();
 }
 
-
 void App::init_gui () {
     cout << __func__ << "\n";
-    screen = Screen::create_screen (Render::get_primary (), "nervici");
-    StartFrame::create_frame (screen);
-    //StartFrame (screen.get());
+    screen = ScreenFactory::create (Render::get_primary (), "nervici");
     screen->show_all ();
+
+    start_frame = StartFrame::create_frame (screen);
+    game_frame = GameFrame::create_frame (screen);
+
+    start_frame->set_visible (false);
+    game_frame->set_visible (false);
+
+    switch_to_start_frame ();
 }
 
 void App::uninitialize () {
@@ -108,4 +114,19 @@ void App::run () {
     /*Game::initialize (gameinfo);
     Game::run ();
     Game::uninitialize ();*/
+}
+
+void App::hide_previous () {
+    if (active_frame != NULL)
+        active_frame->set_visible (false);
+}
+
+StartFrame* App::switch_to_start_frame () {
+    start_frame->set_visible (true);
+    return start_frame;
+}
+
+GameFrame* App::switch_game_frame () {
+    game_frame->set_visible (true);
+    return game_frame;
 }

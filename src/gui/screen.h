@@ -46,13 +46,18 @@ protected:
     void reinitialize ();
 
 public:
-    static Screen* create_screen (SDL_Surface* face, const ustring& name = "");
-
     ~Screen ();
 
     void process_event (SDL_Event& event);
 
     bool is_focusable ();
+
+    friend class ScreenFactory;
+};
+
+class ScreenFactory {
+public:
+    static Screen* create (SDL_Surface* face, const ustring& name = "");
 };
 
 

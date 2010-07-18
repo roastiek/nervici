@@ -9,7 +9,7 @@
 #define	SCROLLPORT_H
 
 #include "control.h"
-#include "button.h"
+//#include "button.h"
 #include "scrollbar.h"
 #include "view.h"
 
@@ -39,14 +39,20 @@ protected:
     void reinitialize ();
 
 public:
-    static Scrollport* create_scrollport (Control* par, Control* content,
-            const ControlParameters* parms, const ustring& name = "scrollport");
 
     bool is_focusable () const;
 
     void set_content (Control* value);
 
     Control* get_content () const;
+
+    friend class ScrollportFactory;
+};
+
+class ScrollportFactory {
+public:
+    static Scrollport* create (Control* par, Control* content,
+            const ControlParameters* parms, const ustring& name = "scrollport");
 };
 
 #endif	/* SCROLLPORT_H */

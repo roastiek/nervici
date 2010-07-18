@@ -7,7 +7,7 @@ x_offset (0),
 y_offset (0) {
 }
 
-View* View::create_view (Control* par, Control* content,
+View* ViewFactory::create (Control* par, Control* content,
         const ControlParameters* parms, const ustring& name) {
     View* result = new View (parms);
     result->set_name (name);

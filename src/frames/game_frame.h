@@ -9,15 +9,27 @@
 #define	GAME_FRAME_H
 
 #include "gui/control.h"
+#include "gui/multiline_label.h"
+#include "gui/combobox.h"
 
-class _GameFrame : public Control {
+class GameFrame : public Control {
 private:
     static ControlParameters parms;
+    static ControlParameters rules_parms;
+    static ListboxParameters mod_parms;
+
+    MultilineLabel* la_rules;
+    Combobox* cb_mod;
+
 
 protected:
-    virtual void init_frame ();
+    GameFrame();
+
+    void init_control (Control* par);
 
 public:
+    static GameFrame* create_frame (Control* par);
+
     bool is_focusable () const;
 
 };

@@ -4,7 +4,7 @@ Button::Button (const ControlParameters* parms):
 Control (parms) {
 }
 
-Button* Button::create_button (Control* par, const ustring& text,
+Button* ButtonFactory::create (Control* par, const ustring& text,
         const ControlParameters* parms, const ustring& name) {
     Button* result = new Button(parms);
     result->set_name (name);

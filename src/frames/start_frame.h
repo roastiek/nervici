@@ -17,6 +17,8 @@ private:
     static ControlParameters btn_new_game_parms;
     static ControlParameters btn_quit_parms;
 
+    void btn_new_game_clicked (Control* ctl);
+
 protected:
     StartFrame();
 

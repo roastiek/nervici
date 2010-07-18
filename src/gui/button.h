@@ -25,12 +25,18 @@ protected:
     void on_focus_lost ();
 
 public:
-    static Button* create_button (Control* par, const ustring& text, 
-            const ControlParameters* parms, const ustring& name = "button");
 
     void set_text (const ustring& value);
 
     const ustring& get_text () const;
+
+    friend class ButtonFactory;
+};
+
+class ButtonFactory {
+public:
+    static Button* create (Control* par, const ustring& text,
+            const ControlParameters* parms, const ustring& name = "button");
 };
 
 #endif	/* BUTTON_H */

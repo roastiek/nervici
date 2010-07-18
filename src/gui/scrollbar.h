@@ -58,8 +58,6 @@ protected:
     void on_focus_lost ();
 
 public:
-    static Scrollbar* create_scrollbar (Control* par, 
-            const ScrollbarParameters* parms, const ustring& name = "scrollbar");
 
     void register_on_value_changed (const OnValueChanged& handler);
 
@@ -82,6 +80,14 @@ public:
     int get_small_step () const;
 
     int get_big_step () const;
+
+    friend class ScrollbarFactory;
+};
+
+class ScrollbarFactory {
+public:
+    static Scrollbar* create (Control* par, const ScrollbarParameters* parms,
+            const ustring& name = "scrollbar");
 };
 
 #endif	/* SCROLLBAR_H */

@@ -14,6 +14,7 @@
 #include "settings/plinfo.h"
 #include "engine/audio.h"
 #include "app.h"
+#include "float.h"
 
 using namespace std;
 

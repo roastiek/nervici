@@ -25,7 +25,7 @@ void Scrollbar::reinitialize () {
     }
 }
 
-Scrollbar* Scrollbar::create_scrollbar (Control* par, 
+Scrollbar* ScrollbarFactory::create (Control* par,
         const ScrollbarParameters* parms, const ustring& name) {
     Scrollbar* result = new Scrollbar (parms);
     result->set_name (name);

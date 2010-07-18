@@ -13,7 +13,6 @@
 using namespace std;
 
 #include "control.h"
-#include "button.h"
 #include "scrollport.h"
 
 struct ListboxParameters : public ControlParameters {
@@ -59,9 +58,6 @@ protected:
     bool process_key_pressed_event (SDL_KeyboardEvent event);
 
 public:
-    static Listbox* create_listbox (Control* par, 
-            const ListboxParameters* parms, const ustring& name = "listbox");
-
     virtual void clear ();
 
     virtual void add_item (const ustring& text, Uint32 color = C_FOREGROUND);
@@ -81,6 +77,14 @@ public:
     virtual int get_min_height () const;
 
     virtual void set_min_height (int value);
+
+    friend class ListboxFactory;
+};
+
+class ListboxFactory {
+public:
+    static Listbox* create (Control* par,
+            const ListboxParameters* parms, const ustring& name = "listbox");
 };
 
 

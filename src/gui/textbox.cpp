@@ -8,7 +8,7 @@ cursor_x (1),
 x_offset (0) {
 }
 
-Textbox* Textbox::create_textbox (Control* par, const ControlParameters* parms,
+Textbox* TextboxFactory::create (Control* par, const ControlParameters* parms,
         const ustring& name) {
     Textbox* result = new Textbox (parms);
     result->set_name (name);

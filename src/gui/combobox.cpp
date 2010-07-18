@@ -5,19 +5,20 @@ void Combobox::list_clicked (Control* ctl) {
     hide_popup ();
 }
 
-Combobox::Combobox (const ControlParameters* parms) :
+Combobox::Combobox (const ListboxParameters* parms) :
 Control (parms),
 selected (-1),
-list_parms (ListboxParameters (0.0, 0.0, 0.0, 0.0, 10.0, 20.0, 20.0)),
-port_parms (ControlParameters (0.0, 0.0, 0.0, 0.2, 0.1)) {
+list_parms (ListboxParameters(0, 0, 0, parms->min_height, parms->font_size, parms->min_height, parms->item_height)),
+port_parms (ControlParameters (0.0, 0.0, parms->w, 100, 10)) {
 }
 
 Combobox::~Combobox () {
-    delete port;
+    if (port != NULL)
+        delete port;
 }
 
-Combobox* Combobox::create_combobox (Control* par,
-        const ControlParameters* parms, const ustring& name) {
+Combobox* ComboboxFactory::create (Control* par,
+        const ListboxParameters* parms, const ustring& name) {
     Combobox* result = new Combobox(parms);
     result->set_name (name);
     result->init_control (par);
@@ -25,8 +26,8 @@ Combobox* Combobox::create_combobox (Control* par,
 }
 
 void Combobox::init_control (Control* par) {
-    list = Listbox::create_listbox (NULL, &list_parms);
-    port = Scrollport::create_scrollport (this, list, &port_parms);
+    list = ListboxFactory::create (NULL, &list_parms);
+    port = ScrollportFactory::create (NULL, list, &port_parms);
     Control::init_control (par);
 }
 
