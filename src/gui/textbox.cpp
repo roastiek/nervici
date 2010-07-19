@@ -1,14 +1,14 @@
 
 #include "textbox.h"
 
-Textbox::Textbox (const ControlParameters* parms) :
-Control (parms),
+Textbox::Textbox (const ControlParameters& parms) :
+InputControl (parms),
 cursor (0),
 cursor_x (1),
 x_offset (0) {
 }
 
-Textbox* TextboxFactory::create (Control* par, const ControlParameters* parms,
+Textbox* TextboxFactory::create (Control* par, const ControlParameters& parms,
         const ustring& name) {
     Textbox* result = new Textbox (parms);
     result->set_name (name);
@@ -18,12 +18,12 @@ Textbox* TextboxFactory::create (Control* par, const ControlParameters* parms,
 }
 
 void Textbox::paint () {
-    fill_backgound (get_background ());
-    draw_frame (get_foreground ());
+    fill_backgound (get_input_background ());
+    draw_frame (get_input_foreground ());
 
     draw_text (2, 2, get_width () - 4, get_height () - 4, x_offset, VA_center, get_text ());
 
-    draw_inner_frame (0x000000ff);
+    draw_inner_frame (get_input_background ());
 
     if (is_focused ()) {
         draw_vline (cursor_x + 2, 2, get_height () - 4, C_TEXT_CURSOR);

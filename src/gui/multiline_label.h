@@ -16,7 +16,9 @@ private:
     ustring text;
 
 protected:
-    MultilineLabel (const ControlParameters* parms);
+    MultilineLabel (const ControlParameters& parms);
+
+    void init_control (Control* par);
 
     void paint ();
 
@@ -26,13 +28,15 @@ public:
 
     virtual const ustring& get_text () const;
 
+    bool is_focusable () const;
+
     friend class MultilineLabelFactory;
 };
 
 class MultilineLabelFactory {
 public:
     static MultilineLabel* create (Control* par, const ustring& text,
-            const ControlParameters* parms, const ustring& name = "multiline label");
+            const ControlParameters& parms, const ustring& name = "multiline label");
 };
 
 

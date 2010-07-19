@@ -5,11 +5,12 @@ void Combobox::list_clicked (Control* ctl) {
     hide_popup ();
 }
 
-Combobox::Combobox (const ListboxParameters* parms) :
-Control (parms),
+Combobox::Combobox (const ListboxParameters& parms) :
+InputControl (parms),
 selected (-1),
-list_parms (ListboxParameters(0, 0, 0, parms->min_height, parms->font_size, parms->min_height, parms->item_height)),
-port_parms (ControlParameters (0.0, 0.0, parms->w, 100, 10)) {
+list_parms (ListboxParameters(0, 0, parms.w, parms.min_height, parms.font_size, parms.min_height, parms.item_height)),
+port_parms (ScrollbarParameters (0.0, 0.0, parms.w, 100, parms.font_size, 1, 5))
+{
 }
 
 Combobox::~Combobox () {
@@ -18,7 +19,7 @@ Combobox::~Combobox () {
 }
 
 Combobox* ComboboxFactory::create (Control* par,
-        const ListboxParameters* parms, const ustring& name) {
+        const ListboxParameters& parms, const ustring& name) {
     Combobox* result = new Combobox(parms);
     result->set_name (name);
     result->init_control (par);
@@ -26,14 +27,14 @@ Combobox* ComboboxFactory::create (Control* par,
 }
 
 void Combobox::init_control (Control* par) {
-    list = ListboxFactory::create (NULL, &list_parms);
-    port = ScrollportFactory::create (NULL, list, &port_parms);
-    Control::init_control (par);
+    list = ListboxFactory::create (NULL, list_parms);
+    port = ScrollportFactory::create (NULL, list, port_parms);
+    InputControl::init_control (par);
 }
 
 void Combobox::reinitialize () {
-    Control::reinitialize ();
-    port->set_width (get_width ());
+    InputControl::reinitialize ();
+    //port->set_width (get_width ());
 }
 
 void Combobox::select_up () {
@@ -51,11 +52,13 @@ void Combobox::select_down () {
 }
 
 void Combobox::paint () {
-    fill_backgound (C_BACKGROUND);
-    draw_frame (C_FOREGROUND);
+    fill_backgound (get_input_background ());
+    set_font_color (get_input_text ());
+    //draw_frame (C_FOREGROUND);
 
     if (get_selected () >= 0) {
-        draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center, VA_center, get_item (get_selected ()).text);
+        draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center,
+                VA_center, get_item (get_selected ()).text);
     }
 }
 
@@ -131,3 +134,4 @@ void Combobox::set_selected (int value) {
 int Combobox::get_selected () const {
     return selected;
 }
+

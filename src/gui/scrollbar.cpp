@@ -1,32 +1,31 @@
 #include "scrollbar.h"
 
-ScrollbarParameters::ScrollbarParameters (float nx, float ny, float nw, float nh, 
+ScrollbarParameters::ScrollbarParameters (float nx, float ny, float nw, float nh,
         float nf, float nss, float nbs) :
 ControlParameters (nx, ny, nw, nh, nf), small_step (nss), big_step (nbs) {
 }
 
-Scrollbar::Scrollbar (const ScrollbarParameters* parms) :
+Scrollbar::Scrollbar (const ScrollbarParameters& parms) :
 Control (parms),
 min (0),
 max (0),
 value (0),
 drag_start_y (-1),
 small_step (1),
-big_step (5) {
+big_step (5),
+sc_parms (parms){
 }
 
 void Scrollbar::reinitialize () {
     Control::reinitialize ();
     int sw = get_screen_width ();
-    const ScrollbarParameters *p = get_parms ();
-    if (p != NULL) {
-        set_small_step (p->small_step * sw / STANDARD_WIDTH);
-        set_big_step (p->big_step * sw / STANDARD_WIDTH);
-    }
+    const ScrollbarParameters& p = get_parms ();
+    set_small_step (p.small_step * sw / STANDARD_WIDTH);
+    set_big_step (p.big_step * sw / STANDARD_WIDTH);
 }
 
 Scrollbar* ScrollbarFactory::create (Control* par,
-        const ScrollbarParameters* parms, const ustring& name) {
+        const ScrollbarParameters& parms, const ustring& name) {
     Scrollbar* result = new Scrollbar (parms);
     result->set_name (name);
     result->init_control (par);
@@ -234,6 +233,6 @@ int Scrollbar::get_big_step () const {
     return big_step;
 }
 
-const ScrollbarParameters* Scrollbar::get_parms () {
-    return static_cast<const ScrollbarParameters*> (Control::get_parms ());
+const ScrollbarParameters& Scrollbar::get_parms () {
+    return sc_parms;
 }

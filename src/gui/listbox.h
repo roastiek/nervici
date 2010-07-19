@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#include "control.h"
+#include "input_control.h"
 #include "scrollport.h"
 
 struct ListboxParameters : public ControlParameters {
@@ -28,24 +28,25 @@ public:
     ustring text;
     Uint32 color;
 
-    ListItem (const ustring& txt = "", Uint32 cl = C_FOREGROUND);
+    ListItem (const ustring& txt = "", Uint32 cl = C_INPUT_TEXT);
 };
 
-class Listbox : public Control {
+class Listbox : public InputControl {
 private:
     vector<ListItem> items;
     int selected;
     int min_height;
     int item_height;
+    const ListboxParameters lb_parms;
 
 protected:
-    Listbox (const ListboxParameters* parms);
+    Listbox (const ListboxParameters& parms);
 
     void init_control (Control* par);
 
     void reinitialize ();
 
-    const ListboxParameters* get_parms ();
+    const ListboxParameters& get_parms ();
 
     virtual void select_up ();
 
@@ -60,7 +61,7 @@ protected:
 public:
     virtual void clear ();
 
-    virtual void add_item (const ustring& text, Uint32 color = C_FOREGROUND);
+    virtual void add_item (const ustring& text, Uint32 color = C_INPUT_TEXT);
 
     virtual const ListItem& get_item (int index);
 
@@ -79,12 +80,13 @@ public:
     virtual void set_min_height (int value);
 
     friend class ListboxFactory;
+
 };
 
 class ListboxFactory {
 public:
     static Listbox* create (Control* par,
-            const ListboxParameters* parms, const ustring& name = "listbox");
+            const ListboxParameters& parms, const ustring& name = "listbox");
 };
 
 

@@ -1,16 +1,36 @@
 #include "button.h"
 
-Button::Button (const ControlParameters* parms):
+Button::Button (const ControlParameters& parms):
 Control (parms) {
 }
 
 Button* ButtonFactory::create (Control* par, const ustring& text,
-        const ControlParameters* parms, const ustring& name) {
+        const ControlParameters& parms, const ustring& name) {
     Button* result = new Button(parms);
     result->set_name (name);
     result->init_control (par);
     result->set_text (text);
     return result;
+}
+
+bool Button::process_key_pressed_event (SDL_KeyboardEvent event) {
+    if (event.state == SDL_PRESSED) {
+        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
+        if ((event.keysym.mod & KMOD_META) != 0) return false;
+        if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
+
+        switch (event.keysym.sym) {
+        case SDLK_SPACE:
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:
+            this->on_clicked ();
+            return true;
+        default:
+            break;
+        }
+    }
+    return Control::process_key_pressed_event (event);
 }
 
 void Button::paint () {

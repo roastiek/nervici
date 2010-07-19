@@ -1,6 +1,6 @@
 #include "view.h"
 
-View::View (const ControlParameters* parms) :
+View::View (const ControlParameters& parms) :
 Control (parms),
 content (NULL),
 x_offset (0),
@@ -8,7 +8,7 @@ y_offset (0) {
 }
 
 View* ViewFactory::create (Control* par, Control* content,
-        const ControlParameters* parms, const ustring& name) {
+        const ControlParameters& parms, const ustring& name) {
     View* result = new View (parms);
     result->set_name (name);
     result->init_control (par);

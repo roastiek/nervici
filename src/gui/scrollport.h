@@ -9,7 +9,6 @@
 #define	SCROLLPORT_H
 
 #include "control.h"
-//#include "button.h"
 #include "scrollbar.h"
 #include "view.h"
 
@@ -20,7 +19,7 @@ private:
     Control* content;
     Scrollbar* bar;
 
-    static ScrollbarParameters bar_parms;
+    const ScrollbarParameters bar_parms;
     static ControlParameters view_parms;
 
     void bar_value_changed (Scrollbar* ctl, int value);
@@ -32,7 +31,7 @@ private:
     void child_focus_lost (Control* ctl);
 
 protected:
-    Scrollport (const ControlParameters* parms);
+    Scrollport (const ScrollbarParameters& parms);
 
     void init_control (Control* par);
 
@@ -52,7 +51,7 @@ public:
 class ScrollportFactory {
 public:
     static Scrollport* create (Control* par, Control* content,
-            const ControlParameters* parms, const ustring& name = "scrollport");
+            const ScrollbarParameters& parms, const ustring& name = "scrollport");
 };
 
 #endif	/* SCROLLPORT_H */

@@ -18,6 +18,8 @@ struct SDL_Surface;
 
 class Screen : public Control {
 private:
+    static ControlParameters parms;
+
     Control* be_clicked;
     Control* mouse_target;
     Control* popup;

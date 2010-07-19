@@ -1,5 +1,4 @@
 #include "start_frame.h"
-#include "gui/button.h"
 #include "app.h"
 
 #define START_WIDTH 300
@@ -14,14 +13,14 @@ ControlParameters StartFrame::btn_quit_parms = ControlParameters (
         8, 8 + 40 + 8, START_WIDTH - 16, 40, 20
         );
 
-StartFrame::StartFrame ():Control(&parms) {
+StartFrame::StartFrame ():Control(parms) {
 }
 
 void StartFrame::init_control (Control* par) {
     Control::init_control (par);
 
-    Button* btn_new_game = ButtonFactory::create (this, "chcu si zahrat", &btn_new_game_parms);
-    ButtonFactory::create (this, "uz me to nebavi", &btn_quit_parms);
+    Button* btn_new_game = ButtonFactory::create (this, "chcu si zahrat", btn_new_game_parms);
+    ButtonFactory::create (this, "uz me to nebavi", btn_quit_parms);
 
     btn_new_game->register_on_clicked (OnClicked (this, &StartFrame::btn_new_game_clicked));
 }

@@ -30,6 +30,7 @@ private:
     int small_step;
     int big_step;
 
+    const ScrollbarParameters sc_parms;
     OnValueChanged call_value_changed;
 
     void scroll_inc (int distance = 1);
@@ -37,11 +38,11 @@ private:
     void scroll_dec (int distance = 1);
 
 protected:
-    Scrollbar (const ScrollbarParameters* parms);
+    Scrollbar (const ScrollbarParameters& parms);
 
     void reinitialize ();
 
-    const ScrollbarParameters* get_parms ();
+    const ScrollbarParameters& get_parms ();
 
     void paint ();
 
@@ -86,7 +87,7 @@ public:
 
 class ScrollbarFactory {
 public:
-    static Scrollbar* create (Control* par, const ScrollbarParameters* parms,
+    static Scrollbar* create (Control* par, const ScrollbarParameters& parms,
             const ustring& name = "scrollbar");
 };
 

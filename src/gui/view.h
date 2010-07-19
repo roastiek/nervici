@@ -32,7 +32,7 @@ private:
     void content_y_changed (Control* ctl, int value);
 
 protected:
-    View (const ControlParameters* parms);
+    View (const ControlParameters& parms);
 
     virtual void on_x_offset_changed (int value);
 
@@ -64,7 +64,7 @@ public:
 class ViewFactory {
 public:
     static View* create (Control* par, Control* content,
-            const ControlParameters* parms, const ustring& name = "view");
+            const ControlParameters& parms, const ustring& name = "view");
 };
 
 #endif	/* VIEW_H */

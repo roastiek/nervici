@@ -16,13 +16,15 @@ private:
     ustring text;
 
 protected:
-    Button (const ControlParameters* parms);
+    Button (const ControlParameters& parms);
 
     void paint ();
 
     void on_focus_gained ();
 
     void on_focus_lost ();
+
+    bool process_key_pressed_event (SDL_KeyboardEvent event);
 
 public:
 
@@ -36,7 +38,7 @@ public:
 class ButtonFactory {
 public:
     static Button* create (Control* par, const ustring& text,
-            const ControlParameters* parms, const ustring& name = "button");
+            const ControlParameters& parms, const ustring& name = "button");
 };
 
 #endif	/* BUTTON_H */

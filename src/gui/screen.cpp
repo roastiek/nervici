@@ -2,8 +2,12 @@
 
 #include "screen.h"
 
+ControlParameters Screen::parms = ControlParameters (
+        0, 0, 0, 0, 10
+        );
+
 Screen::Screen () :
-Control (NULL),
+Control (parms),
 be_clicked (NULL),
 mouse_target (NULL),
 popup (NULL),
@@ -13,7 +17,6 @@ primary (NULL) {
 
 Screen::~Screen () {
     remove_popup (false);
-    delete parms;
 }
 
 Screen* ScreenFactory::create (SDL_Surface* face, const ustring& name) {
@@ -25,7 +28,7 @@ Screen* ScreenFactory::create (SDL_Surface* face, const ustring& name) {
 }
 
 void Screen::init_control (Control* par) {
-    set_background (C_BACKGROUND);
+    set_background (C_SCREEN_BACKGROUND);
     set_foreground (C_FOREGROUND);
     set_font_color (C_FOREGROUND);
     set_frame (0);

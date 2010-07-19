@@ -8,9 +8,9 @@
 #ifndef TEXTBOX_H
 #define	TEXTBOX_H
 
-#include "control.h"
+#include "input_control.h"
 
-class Textbox : public Control {
+class Textbox : public InputControl {
 
 private:
     ustring text;
@@ -29,7 +29,7 @@ private:
     void update_text (const ustring& value);
 
 protected:
-    Textbox (const ControlParameters* parms);
+    Textbox (const ControlParameters& parms);
 
     void draw_inner_frame (Uint32 color);
 
@@ -52,11 +52,12 @@ public:
     int get_cursor () const;
 
     friend class TextboxFactory;
+
 };
 
 class TextboxFactory {
 public:
-    static Textbox* create (Control* par, const ControlParameters* parms,
+    static Textbox* create (Control* par, const ControlParameters& parms,
             const ustring& name = "textbox");
 };
 #endif	/* TEXTBOX_H */

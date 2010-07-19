@@ -8,10 +8,10 @@
 #ifndef COMBOBOX_H
 #define	COMBOBOX_H
 
-#include "control.h"
+#include "input_control.h"
 #include "listbox.h"
 
-class Combobox : public Control {
+class Combobox : public InputControl {
 private:
     Listbox* list;
 
@@ -20,7 +20,7 @@ private:
     int selected;
 
     ListboxParameters list_parms;
-    ControlParameters port_parms;
+    ScrollbarParameters port_parms;
 
     void list_clicked (Control* ctl);
 
@@ -30,7 +30,7 @@ private:
 
 protected:
 
-    Combobox (const ListboxParameters* parms);
+    Combobox (const ListboxParameters& parms);
 
     void init_control (Control* par);
 
@@ -68,7 +68,7 @@ public:
 class ComboboxFactory {
 public:
     static Combobox* create (Control* par,
-            const ListboxParameters* parms, const ustring& name = "combobox");
+            const ListboxParameters& parms, const ustring& name = "combobox");
 };
 
 #endif	/* COMBOBOX_H */

@@ -10,14 +10,15 @@ text (txt),
 color (cl) {
 }
 
-Listbox::Listbox (const ListboxParameters* parms) :
-Control (parms),
+Listbox::Listbox (const ListboxParameters& parms) :
+InputControl (parms),
 selected (-1),
 min_height (0),
-item_height (0) {
+item_height (0),
+lb_parms (parms) {
 }
 
-Listbox* ListboxFactory::create (Control* par, const ListboxParameters* parms,
+Listbox* ListboxFactory::create (Control* par, const ListboxParameters& parms,
         const ustring& name) {
     Listbox* result = new Listbox(parms);
     result->set_name (name);
@@ -26,22 +27,20 @@ Listbox* ListboxFactory::create (Control* par, const ListboxParameters* parms,
 }
 
 void Listbox::init_control (Control* par) {
-    Control::init_control (par);
+    InputControl::init_control (par);
     set_frame (0);
 }
 
 void Listbox::reinitialize () {
-    Control::reinitialize ();
+    InputControl::reinitialize ();
     int sw = get_screen_width ();
-    const ListboxParameters* p = get_parms ();
-    if (p!= NULL) {
-        set_min_height (p->min_height * sw / STANDARD_WIDTH);
-        set_item_height (p->item_height * sw / STANDARD_WIDTH);
-    }
+    const ListboxParameters& p = get_parms ();
+        set_min_height (p.min_height * sw / STANDARD_WIDTH);
+        set_item_height (p.item_height * sw / STANDARD_WIDTH);
 }
 
-const ListboxParameters* Listbox::get_parms () {
-    return static_cast<const ListboxParameters*> (Control::get_parms ());
+const ListboxParameters& Listbox::get_parms () {
+    return lb_parms;
 }
 
 void Listbox::select_up () {
@@ -60,7 +59,7 @@ void Listbox::select_down () {
 
 void Listbox::paint () {
 
-    draw_box (0, 0, get_width (), get_height (), C_BACKGROUND);
+    draw_box (0, 0, get_width (), get_height (), get_input_background ());
 
     int ih = get_item_height ();
     int y_offset = 0;

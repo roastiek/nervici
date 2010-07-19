@@ -22,11 +22,11 @@ using namespace Glib;
 #include "event.h"
 
 struct ControlParameters {
-    const float x;
-    const float y;
-    const float w;
-    const float h;
-    const float font_size;
+    float x;
+    float y;
+    float w;
+    float h;
+    float font_size;
     ControlParameters (float nx, float ny, float nw, float nh, float nf);
 };
 
@@ -85,6 +85,7 @@ private:
     int width;
     int height;
     ustring name;
+
     struct {
         ustring name;
         int size;
@@ -102,7 +103,7 @@ private:
     bool focused;
     bool visible;
 
-    const ControlParameters * const parms;
+    const ControlParameters parms;
 
     struct {
         OnClicked clicked;
@@ -134,7 +135,7 @@ private:
     bool child_grab_focus (Control* child);
 
 protected:
-    Control (const ControlParameters* parms);
+    Control (const ControlParameters& parms);
 
     virtual void init_control (Control* par);
 
@@ -193,6 +194,8 @@ protected:
     virtual void draw_text (int x, int y, int w, int h, int x_shift,
             VerticalAling va, const ustring& text);
 
+    virtual void draw_wrapped_text (int x, int y, int w, int h, const ustring& text);
+
     virtual int get_text_width (const ustring& text);
 
     virtual void on_clicked ();
@@ -229,7 +232,7 @@ protected:
 
     virtual void on_update (int x, int y, int w, int h);
 
-    virtual const ControlParameters* get_parms ();
+    virtual const ControlParameters& get_parms ();
 
 public:
     virtual ~Control ();
@@ -335,14 +338,14 @@ public:
     virtual Uint32 get_font_color () const;
 
     friend class Screen;
-    
+
     friend class ControlFactory;
 
 };
 
 class ControlFactory {
 public:
-    static Control* create (Control* par, const ControlParameters* parms, const ustring& = "control");
+    static Control* create (Control* par, const ControlParameters& parms, const ustring& = "control");
 };
 
 /*typedef _Control::OnClicked OnClicked;

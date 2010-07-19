@@ -16,7 +16,7 @@ ustring make_font (const ustring& name, int size) {
     return name + " " + to_string<int>(size);
 }
 
-Control::Control (const ControlParameters* pp) :
+Control::Control (const ControlParameters& pp) :
 parent (NULL),
 children (NULL),
 focused_child (NULL),
@@ -26,12 +26,12 @@ x (0),
 y (0),
 width (-1),
 height (-1),
+colors ({0, 0, 0}),
 valid (true),
 enabled (true),
 focused (false),
 visible (false),
 parms (pp) {
-    memset (&colors, 0, sizeof (colors));
 }
 
 Control::~Control () {
@@ -58,17 +58,15 @@ void Control::init_control (Control* par) {
 
 void Control::reinitialize () {
     int sw = get_screen_width ();
-    const ControlParameters* p = get_parms ();
-    if (p != NULL) {
-        set_width (p->w * sw / STANDARD_WIDTH);
-        set_height (p->h * sw / STANDARD_WIDTH);
-        set_x (p->x * sw / STANDARD_WIDTH);
-        set_y (p->y * sw / STANDARD_WIDTH);
-        set_font_size (p->font_size * sw / STANDARD_WIDTH);
-    }
+    const ControlParameters& p = get_parms ();
+    set_width (p.w * sw / STANDARD_WIDTH);
+    set_height (p.h * sw / STANDARD_WIDTH);
+    set_x (p.x * sw / STANDARD_WIDTH);
+    set_y (p.y * sw / STANDARD_WIDTH);
+    set_font_size (p.font_size * sw / STANDARD_WIDTH);
 }
 
-Control* ControlFactory::create (Control* par, const ControlParameters* parms, const ustring& name) {
+Control* ControlFactory::create (Control* par, const ControlParameters& parms, const ustring& name) {
     Control* result = new Control (parms);
     result->set_name (name);
     result->init_control (par);
@@ -391,6 +389,30 @@ void Control::draw_text (int x, int y, int w, int h, int x_shift, VerticalAling 
         dest.y = y + h - src.h;
         break;
     }
+
+    SDL_BlitSurface (face, &src, impl->surface, &dest);
+
+    SDL_FreeSurface (face);
+}
+
+void Control::draw_wrapped_text (int x, int y, int w, int h, const ustring& text) {
+    SDL_Rect src;
+    SDL_Rect dest;
+
+    if (text == "") return;
+
+    SDLPango_SetMarkup (impl->pango_context, text.c_str (), -1);
+    SDLPango_SetMinimumSize (impl->pango_context, w, h);
+    SDL_Surface* face = SDLPango_CreateSurfaceDraw (impl->pango_context);
+
+    src.w = (face->w < w) ? face->w : w;
+    src.h = (face->h < h) ? face->h : h;
+
+    src.x = 0;
+    dest.x = x;
+
+    src.y = 0;
+    dest.y = y;
 
     SDL_BlitSurface (face, &src, impl->surface, &dest);
 
@@ -791,7 +813,7 @@ const ustring& Control::get_name () const {
     return name;
 }
 
-const ControlParameters* Control::get_parms () {
+const ControlParameters& Control::get_parms () {
     return parms;
 }
 

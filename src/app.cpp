@@ -62,8 +62,15 @@ void App::initialize () {
     init_gui ();
 }
 
+static int paint_filter (const SDL_Event* event) {
+    return event->type != E_PAINT;
+}
+
 void App::init_gui () {
     cout << __func__ << "\n";
+
+    SDL_SetEventFilter (paint_filter);
+
     screen = ScreenFactory::create (Render::get_primary (), "nervici");
     screen->show_all ();
 
@@ -72,6 +79,8 @@ void App::init_gui () {
 
     start_frame->set_visible (false);
     game_frame->set_visible (false);
+
+    SDL_SetEventFilter (NULL);
 
     switch_to_start_frame ();
 }
@@ -123,10 +132,12 @@ void App::hide_previous () {
 
 StartFrame* App::switch_to_start_frame () {
     start_frame->set_visible (true);
+    start_frame->grab_focus ();
     return start_frame;
 }
 
 GameFrame* App::switch_game_frame () {
     game_frame->set_visible (true);
+    game_frame->grab_focus ();
     return game_frame;
 }

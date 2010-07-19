@@ -1,6 +1,6 @@
 #include "team_button.h"
 
-TeamButton::TeamButton (const ControlParameters* parms):
+TeamButton::TeamButton (const ControlParameters& parms):
 Control (parms) {
 }
 
@@ -31,7 +31,7 @@ int TeamButton::get_selected () const {
 }
 
 TeamButton* TeamButtonFactory::create (Control* parent, const TeamColors* colors,
-        const ControlParameters* parms, const ustring& name) {
+        const ControlParameters& parms, const ustring& name) {
     TeamButton* result = new TeamButton (parms);
     result->set_name (name);
     result->init_control (parent);

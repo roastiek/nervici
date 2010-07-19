@@ -25,13 +25,18 @@ using namespace std;
 //extern bool labort;
 
 //#define FRAME_WIDHT 2
-#define C_BACKGROUND        0x000000ff
+#define C_SCREEN_BACKGROUND 0x000000ff
+#define C_BACKGROUND        0x201008ff
 #define C_FOREGROUND        0xff8040ff
+#define C_TEXT              0xff8040ff
 #define C_SEL_BACKGROUND    0xff8040ff
-#define C_SEL_FOREGROUND    0xffffffff
+#define C_SEL_FOREGROUND    0x000000ff
 #define C_FOC_FOREGROUND    0xffff40ff
 #define C_FILL              0xc06020ff
 #define C_TEXT_CURSOR       0xff0000ff
+#define C_INPUT_BACKGROUND  0x000000ff
+#define C_INPUT_FOREGROUND  0x80ff40ff
+#define C_INPUT_TEXT        0x80ff40ff
 
 #define E_PAINT         SDL_USEREVENT
 #define E_SHOW_POPUP    SDL_USEREVENT + 1
