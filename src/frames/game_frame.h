@@ -16,6 +16,7 @@
 #include "gui/vline.h"
 #include "gui/label.h"
 #include "gui/numberbox.h"
+#include "gui/smile_control.h"
 
 class GameFrame : public Control {
 private:
@@ -49,6 +50,7 @@ private:
     Numberbox* time;
     Numberbox* step;
     Numberbox* bonus;
+    SmileControl* smiles[6][4];
 
     void speed_value_changed (Scale* ctl, int value);
 

@@ -182,6 +182,27 @@ void GameFrame::init_control (Control* par) {
 
     LabelFactory::create (this, "bonus:", la_bonus_parms, "la_bonus");
     bonus = NumberboxFactory::create (this, bonus_parms, "bonus");
+
+
+    ControlParameters smiles_parms (la_speed_parms.x + ONE_COLUMN_W + 17,
+            8,
+            22, 136, 10);
+
+    for (int si = 0; si < 6; si++) {
+        for (int li = 0; li < 4; li++) {
+            smiles[si][li] = SmileControlFactory::create (this, NULL, smiles_parms, "smiles");
+            smiles[si][li]->set_value (si * li);
+            smiles_parms.x+=2 + smiles_parms.w;
+            //if (li == 2) smiles_parms.x+= 2;
+        }
+        smiles_parms.x+= 8;
+    SmileControlFactory::create (this, NULL, smiles_parms, "smiles");
+        if (si % 2 == 1) {
+            smiles_parms.y+= 8 + smiles_parms.h;
+            smiles_parms.x = la_speed_parms.x + ONE_COLUMN_W + 17;
+        }
+    }
+    smiles_parms.x+= 8;
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
