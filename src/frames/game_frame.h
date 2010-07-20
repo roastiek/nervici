@@ -51,6 +51,7 @@ private:
     Numberbox* step;
     Numberbox* bonus;
     SmileControl* smiles[6][4];
+    SmileControl* big_smile;
 
     void speed_value_changed (Scale* ctl, int value);
 

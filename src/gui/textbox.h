@@ -41,6 +41,8 @@ protected:
 
     void on_focus_lost ();
 
+    virtual bool filter (const ustring::value_type& c);
+
 public:
 
     void set_text (const ustring& value);

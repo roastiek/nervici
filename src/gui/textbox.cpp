@@ -25,10 +25,11 @@ void Textbox::paint () {
 
     draw_inner_frame (get_input_background ());
 
+    //text.at
+
     if (is_focused ()) {
         draw_vline (cursor_x + 2, 2, get_height () - 4, C_TEXT_CURSOR);
     }
-
 }
 
 void Textbox::draw_inner_frame (Uint32 color) {
@@ -52,9 +53,11 @@ void Textbox::delete_at_cursor () {
 }
 
 void Textbox::insert_at_cursor (const char* part) {
-    const ustring& old = get_text ();
-
-    update_text (old.substr (0, cursor) + part + old.substr (cursor, -1));
+    ustring part_str = part;
+    if (filter (part_str[0])) {
+        const ustring& old = get_text ();
+        update_text (old.substr (0, cursor) + part_str[0] + old.substr (cursor, -1));
+    }
 }
 
 void Textbox::set_cursor (int value) {
@@ -70,6 +73,7 @@ void Textbox::set_cursor (int value) {
         x_offset = w - (get_width () - 5);
     }
     if (x_offset > w) {
+
         x_offset = w;
     }
 
@@ -127,6 +131,7 @@ bool Textbox::process_key_pressed_event (SDL_KeyboardEvent event) {
             }
             insert_at_cursor (part);
             move_cursor_right ();
+
             return true;
         }
     }
@@ -134,33 +139,47 @@ bool Textbox::process_key_pressed_event (SDL_KeyboardEvent event) {
     return Control::process_key_pressed_event (event);
 }
 
+bool Textbox::filter (const ustring::value_type& c) {
+
+    return true;
+}
+
 void Textbox::set_text (const ustring& value) {
-    text = value;
+    text = "";
+    for (size_t ci = 0; ci < value.length (); ci++) {
+        if (filter (value[ci]))
+            text+= value[ci];
+    }
     set_cursor (0);
     invalidate ();
 }
 
 const ustring& Textbox::get_text () const {
+
     return text;
 }
 
 int Textbox::get_cursor () const {
+
     return cursor;
 }
 
 void Textbox::on_focus_gained () {
+
     set_frame (C_FOC_FOREGROUND);
     Control::on_focus_gained ();
 }
 
 void Textbox::on_focus_lost () {
+
     set_frame (C_FOREGROUND);
     Control::on_focus_lost ();
 }
-    void Textbox::update_text (const ustring& value) {
-        text = value;
-        if (cursor > int(value.length ())) {
-            set_cursor (value.length ());
-        }
-        invalidate ();
+
+void Textbox::update_text (const ustring& value) {
+    text = value;
+    if (cursor > int(value.length ())) {
+        set_cursor (value.length ());
     }
+    invalidate ();
+}

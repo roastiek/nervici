@@ -12,13 +12,13 @@ ControlParameters GameFrame::parms = ControlParameters (
 ControlParameters GameFrame::rules_parms = ControlParameters (
         8, 
         8,
-        ONE_COLUMN_W,
+        ONE_COLUMN_W - 7,
         ONE_COLUMN_H,
         10
         );
 
 ListboxParameters GameFrame::mod_parms = ListboxParameters (
-        rules_parms.x + ONE_COLUMN_W + 17, 
+        rules_parms.x + rules_parms.w + 17,
         8,
         ONE_COLUMN_W,
         24,
@@ -139,7 +139,7 @@ void GameFrame::init_control (Control* par) {
 
     //set_background (0x202020ff);
 
-    ControlParameters line (ONE_COLUMN_W + 8, 8, 17, ONE_COLUMN_H, 10);
+    ControlParameters line (ONE_COLUMN_W + 1, 8, 17, ONE_COLUMN_H, 10);
 
     for (int li = 0; li < 3; li++) {
         lines[li] = VLineFactory::create (this, line, "lines");
@@ -186,23 +186,31 @@ void GameFrame::init_control (Control* par) {
 
     ControlParameters smiles_parms (la_speed_parms.x + ONE_COLUMN_W + 17,
             8,
-            22, 136, 10);
+            22, 146, 8);
 
     for (int si = 0; si < 6; si++) {
         for (int li = 0; li < 4; li++) {
             smiles[si][li] = SmileControlFactory::create (this, NULL, smiles_parms, "smiles");
+            smiles[si][li]->set_step ((li < 3) ? 1 : 3);
+            smiles[si][li]->set_count (16 *smiles[si][li]->get_step ());
             smiles[si][li]->set_value (si * li);
+
             smiles_parms.x+=2 + smiles_parms.w;
             //if (li == 2) smiles_parms.x+= 2;
         }
         smiles_parms.x+= 8;
-    SmileControlFactory::create (this, NULL, smiles_parms, "smiles");
         if (si % 2 == 1) {
             smiles_parms.y+= 8 + smiles_parms.h;
             smiles_parms.x = la_speed_parms.x + ONE_COLUMN_W + 17;
         }
     }
-    smiles_parms.x+= 8;
+    smiles_parms.x = la_speed_parms.x + ONE_COLUMN_W + 17 + 8 * (2 + smiles_parms.w) + 16;
+    smiles_parms.y = 8;
+    smiles_parms.h*= 3;
+    smiles_parms.h+= 16;
+    big_smile = SmileControlFactory::create (this, NULL, smiles_parms, "smiles");
+    big_smile->set_count (16 * 15);
+    big_smile->set_step (3);
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {

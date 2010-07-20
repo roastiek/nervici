@@ -2,6 +2,9 @@
 #include <SDL_Pango.h>
 #include <SDL_gfxPrimitives.h>
 
+
+#include "screen.h"
+
 #include "implementor.h"
 #include "control.h"
 

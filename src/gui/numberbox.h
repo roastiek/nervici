@@ -16,7 +16,12 @@ protected:
 
     Numberbox (const ControlParameters& parms);
 
+    bool filter (const ustring::value_type& c);
+
     friend class NumberboxFactory;
+
+public:
+    virtual int get_value () const;
 };
 
 class NumberboxFactory {
