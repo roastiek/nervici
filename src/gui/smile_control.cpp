@@ -1,6 +1,8 @@
+#include "utils.h"
+
 #include "smile_control.h"
 
-SmileControl::SmileControl (const ControlParameters& parms, SDL_Surface* face) :
+SmileControl::SmileControl (const ControlParameters& parms, Canvas* face) :
 Control (parms),
 smile (face),
 enabled (true),
@@ -36,7 +38,7 @@ void SmileControl::paint () {
     area.w = 20;
     area.h = 20;
 
-    draw_image (left, h + left, area, smile);
+    draw_image (left, h + left, smile, area.x, area.y, area.w, area.h);
     //draw_box (left, h + left, 20, 20, 0x20ffff);
 
     int color = (is_focused ()) ? C_FOC_FOREGROUND : get_foreground ();
@@ -179,7 +181,7 @@ int SmileControl::get_step () const {
     return step;
 }
 
-SmileControl* SmileControlFactory::create (Control* parent, SDL_Surface* face,
+SmileControl* SmileControlFactory::create (Control* parent, Canvas* face,
         const ControlParameters& parms, const ustring& name) {
     SmileControl* result = new SmileControl (parms, face);
     result->set_name (name);

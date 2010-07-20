@@ -1,11 +1,5 @@
-#include <SDL.h>
-#include <SDL_Pango.h>
-#include <SDL_gfxPrimitives.h>
+#include "utils.h"
 
-
-#include "screen.h"
-
-#include "implementor.h"
 #include "control.h"
 
 ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
@@ -24,11 +18,9 @@ parent (NULL),
 children (NULL),
 focused_child (NULL),
 next (NULL),
-impl (new Implementor ()),
 x (0),
 y (0),
-width (-1),
-height (-1),
+canvas (new Canvas ()),
 colors ({0, 0, 0}),
 valid (true),
 enabled (true),
@@ -39,14 +31,8 @@ parms (pp) {
 
 Control::~Control () {
     destroy_children ();
-    if (impl->surface != NULL) {
-        SDL_FreeSurface (impl->surface);
-    }
-    if (impl->pango_context != NULL) {
-        SDLPango_FreeContext (impl->pango_context);
-    }
-    delete impl;
-    impl = NULL;
+    delete canvas;
+    canvas = NULL;
 }
 
 void Control::init_control (Control* par) {
@@ -109,13 +95,8 @@ void Control::destroy_children () {
     }
 }
 
-void Control::blit (Implementor *dest) {
-    if (impl->surface != NULL) {
-        SDL_Rect dest_area;
-        dest_area.x = x;
-        dest_area.y = y;
-        SDL_BlitSurface (impl->surface, NULL, dest->surface, &dest_area);
-    }
+void Control::blit (Canvas *dest) {
+    dest->draw_image (x, y, canvas);
 }
 
 void Control::update_children (Control* child, int x, int y, int w, int h) {
@@ -129,7 +110,7 @@ void Control::update_children (Control* child, int x, int y, int w, int h) {
 
     if (child->is_visible ()) {
         child->update (x, y, w, h);
-        child->blit (impl);
+        child->blit (canvas);
     }
 }
 
@@ -313,119 +294,20 @@ void Control::process_mouse_move_event (SDL_MouseMotionEvent event) {
 
 void Control::draw_text (int x, int y, int w, int h, HorizontalAling ha, VerticalAling va,
         const ustring& text) {
-    SDL_Rect src;
-    SDL_Rect dest;
-
-    if (text == "") return;
-
-    SDLPango_SetMarkup (impl->pango_context, text.c_str (), -1);
-    SDL_Surface* face = SDLPango_CreateSurfaceDraw (impl->pango_context);
-
-    src.w = (face->w < w) ? face->w : w;
-    src.h = (face->h < h) ? face->h : h;
-
-    switch (ha) {
-    case HA_left:
-        src.x = 0;
-        dest.x = x;
-        break;
-    case HA_center:
-        src.x = (face->w - src.w) / 2;
-        dest.x = x + (w - src.w) / 2;
-        break;
-    case HA_right:
-        src.x = face->w - src.w;
-        dest.x = x + w - src.w;
-        break;
-    }
-
-    switch (va) {
-    case VA_top:
-        src.y = 0;
-        dest.y = y;
-        break;
-    case VA_center:
-        src.y = (face->h - src.h) / 2;
-        dest.y = y + (h - src.h) / 2;
-        break;
-    case VA_bottom:
-        src.y = face->h - src.h;
-        dest.y = y + h - src.h;
-        break;
-    }
-
-    SDL_BlitSurface (face, &src, impl->surface, &dest);
-
-    SDL_FreeSurface (face);
+    canvas->draw_text (x, y, w, h, ha, va, text);
 }
 
-void Control::draw_text (int x, int y, int w, int h, int x_shift, VerticalAling va, const ustring& text) {
-    SDL_Rect src;
-    SDL_Rect dest;
-
-    if (text == "") return;
-
-    SDLPango_SetMarkup (impl->pango_context, text.c_str (), -1);
-    SDL_Surface* face = SDLPango_CreateSurfaceDraw (impl->pango_context);
-
-    src.w = (face->w - x_shift < w) ? face->w - x_shift : w;
-    src.h = (face->h < h) ? face->h : h;
-
-    if (x_shift >= 0) {
-        src.x = x_shift;
-        dest.x = x;
-    } else {
-        src.x = 0;
-        dest.x = -x_shift;
-    }
-
-    switch (va) {
-    case VA_top:
-        src.y = 0;
-        dest.y = y;
-        break;
-    case VA_center:
-        src.y = (face->h - src.h) / 2;
-        dest.y = y + (h - src.h) / 2;
-        break;
-    case VA_bottom:
-        src.y = face->h - src.h;
-        dest.y = y + h - src.h;
-        break;
-    }
-
-    SDL_BlitSurface (face, &src, impl->surface, &dest);
-
-    SDL_FreeSurface (face);
+void Control::draw_text (int x, int y, int w, int h, int x_shift, 
+        VerticalAling va, const ustring& text) {
+    canvas->draw_text (x, y, w, h, x_shift, va, text);
 }
 
 void Control::draw_wrapped_text (int x, int y, int w, int h, const ustring& text) {
-    SDL_Rect src;
-    SDL_Rect dest;
-
-    if (text == "") return;
-
-    SDLPango_SetMarkup (impl->pango_context, text.c_str (), -1);
-    SDLPango_SetMinimumSize (impl->pango_context, w, h);
-    SDL_Surface* face = SDLPango_CreateSurfaceDraw (impl->pango_context);
-
-    src.w = (face->w < w) ? face->w : w;
-    src.h = (face->h < h) ? face->h : h;
-
-    src.x = 0;
-    dest.x = x;
-
-    src.y = 0;
-    dest.y = y;
-
-    SDL_BlitSurface (face, &src, impl->surface, &dest);
-
-    SDL_FreeSurface (face);
+    canvas->draw_wrapped_text (x, y, w, h, text);
 }
 
 int Control::get_text_width (const ustring& text) {
-    SDLPango_SetMarkup (impl->pango_context, text.c_str (), -1);
-    return SDLPango_GetLayoutWidth (impl->pango_context);
+    return canvas->get_text_width (text);
 }
 
 void Control::show_all () {
@@ -433,10 +315,6 @@ void Control::show_all () {
     for (Control* child = children; child != NULL; child = child->next) {
         child->show_all ();
     }
-}
-
-SDL_Surface *make_surface (int width, int height) {
-    return SDL_CreateRGBSurface (SDL_SWSURFACE, width, height, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
 }
 
 int Control::get_screen_width () const {
@@ -472,67 +350,67 @@ void Control::fill_backgound (Uint32 color) {
 }
 
 void Control::draw_point (int x, int y, Uint32 color) {
-    pixelColor (impl->surface, x, y, color);
+    canvas->draw_point (x, y, color);
 }
 
 void Control::draw_hline (int x, int y, int w, Uint32 color) {
-    hlineColor (impl->surface, x, x + w - 1, y - 1, color);
+    canvas->draw_hline (x, y, w, color);
 }
 
 void Control::draw_vline (int x, int y, int h, Uint32 color) {
-    vlineColor (impl->surface, x, y - 1, y + h - 1, color);
+    canvas->draw_vline (x, y, h, color);
 }
 
 void Control::draw_rectangle (int x, int y, int w, int h, Uint32 color) {
-    rectangleColor (impl->surface, x, y, x + w - 1, y + h - 1, color);
+    canvas->draw_rectangle (x, y, w, h, color);
 }
 
 void Control::draw_box (int x, int y, int w, int h, Uint32 color) {
-    boxColor (impl->surface, x, y, x + w - 1, y + h - 1, color);
+    canvas->draw_box (x, y, w, h, color);
 }
 
 void Control::draw_line (int x1, int y1, int x2, int y2, Uint32 color) {
-    lineColor (impl->surface, x1, y1, x2, y2, color);
+    canvas->draw_line (x1, y1, x2, y2, color);
 }
 
 void Control::draw_aaline (int x1, int y1, int x2, int y2, Uint32 color) {
-    aalineColor (impl->surface, x1, y1, x2, y2, color);
+    canvas->draw_aaline (x1, y1, x2, y2, color);
 }
 
 void Control::draw_circle (int x, int y, int r, Uint32 color) {
-    circleColor (impl->surface, x, y, r, color);
+    canvas->draw_circle (x, y, r, color);
 }
 
 void Control::draw_arc (int x, int y, int r, int start, int end, Uint32 color) {
-    arcColor (impl->surface, x, y, r, start, end, color);
+    canvas->draw_arc (x, y, r, start, end, color);
 }
 
 void Control::draw_filled_circle (int x, int y, int r, Uint32 color) {
-    filledCircleColor (impl->surface, x, y, r, color);
+    canvas->draw_filled_circle (x, y, r, color);
 }
 
 void Control::draw_aacircle (int x, int y, int r, Uint32 color) {
-    circleColor (impl->surface, x, y, r, color);
+    canvas->draw_aacircle (x, y, r, color);
 }
 
 void Control::draw_trigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-    trigonColor (impl->surface, x1, y1, x2, y2, x3, y3, color);
+    canvas->draw_trigon (x1, y1, x2, y2, x3, y3, color);
 }
 
 void Control::draw_filled_trigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-    filledTrigonColor (impl->surface, x1, y1, x2, y2, x3, y3, color);
+    canvas->draw_filled_trigon (x1, y1, x2, y2, x3, y3, color);
 }
 
 void Control::draw_aatrigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-    aatrigonColor (impl->surface, x1, y1, x2, y2, x3, y3, color);
+    canvas->draw_aatrigon (x1, y1, x2, y2, x3, y3, color);
 }
 
-void Control::draw_image (int x, int y, SDL_Rect& area, SDL_Surface* image) {
-    SDL_Rect dest_area;
-    dest_area.x = x;
-    dest_area.y = y;
+void Control::draw_image (int x, int y, Canvas* image) {
+    canvas->draw_image (x, y, image);
+}
 
-    SDL_BlitSurface (image, &area, impl->surface, &dest_area);
+void Control::draw_image (int x, int y, Canvas* image, int src_x, int src_y, int src_w, int src_h) {
+    canvas->draw_image (x, y, image, src_x, src_y, src_w, src_h);
 }
 
 void Control::on_clicked () {
@@ -654,7 +532,6 @@ void Control::set_parent (Control* value) {
 }
 
 void Control::set_visible (bool value) {
-    value &= impl->surface != NULL;
     if (visible != value) {
         visible = value;
         invalidate ();
@@ -683,32 +560,18 @@ void Control::set_frame (Uint32 value) {
 }
 
 void Control::set_width (int value) {
-    if (value != width) {
-        if (impl->surface != NULL) {
-            SDL_FreeSurface (impl->surface);
-            impl->surface = NULL;
-        }
-        width = value;
-        if (width > 0 && get_height () > 0) {
-            impl->surface = make_surface (width, get_height ());
-            invalidate ();
-        }
-        on_width_changed (width);
+    if (value != canvas->get_width ()) {
+        canvas->set_width (value);
+        on_width_changed (value);
+        invalidate ();
     }
 }
 
 void Control::set_height (int value) {
-    if (value != height) {
-        if (impl->surface != NULL) {
-            SDL_FreeSurface (impl->surface);
-            impl->surface = NULL;
-        }
-        height = value;
-        if (get_width () > 0 && height > 0) {
-            impl->surface = make_surface (get_width (), height);
-            invalidate ();
-        }
-        on_height_changed (height);
+    if (value != canvas->get_height()) {
+        canvas->set_height (value);
+        on_height_changed (value);
+        invalidate ();
     }
 }
 
@@ -747,26 +610,15 @@ void Control::set_focused (bool value) {
 }
 
 void Control::set_font (const ustring& value) {
-    SDLPango_FreeContext (impl->pango_context);
-    font.name = value;
-    impl->pango_context = SDLPango_CreateContext_GivenFontDesc (make_font (value, get_font_size ()).c_str ());
-    SDLPango_SetDefaultColor (impl->pango_context, &impl->font_color);
+    canvas->set_font (value);
 }
 
 void Control::set_font_color (Uint32 value) {
-    font.color = value;
-    impl->font_color.m[0][1] = 0xff & (value >> 24);
-    impl->font_color.m[1][1] = 0xff & (value >> 16);
-    impl->font_color.m[2][1] = 0xff & (value >> 8);
-    impl->font_color.m[3][1] = 0xff & value;
-    SDLPango_SetDefaultColor (impl->pango_context, &impl->font_color);
+    canvas->set_font_color (value);
 }
 
 void Control::set_font_size (int value) {
-    SDLPango_FreeContext (impl->pango_context);
-    font.size = value;
-    impl->pango_context = SDLPango_CreateContext_GivenFontDesc (make_font (get_font (), value).c_str ());
-    SDLPango_SetDefaultColor (impl->pango_context, &impl->font_color);
+    canvas->set_font_size (value);
 }
 
 void Control::set_name (const ustring& value) {
@@ -774,11 +626,11 @@ void Control::set_name (const ustring& value) {
 }
 
 int Control::get_width () const {
-    return width;
+    return canvas->get_width ();
 }
 
 int Control::get_height () const {
-    return height;
+    return canvas->get_height ();
 }
 
 int Control::get_x () const {
@@ -829,14 +681,3 @@ const ControlParameters& Control::get_parms () {
     return parms;
 }
 
-const ustring& Control::get_font () const {
-    return font.name;
-}
-
-int Control::get_font_size () const {
-    return font.size;
-}
-
-Uint32 Control::get_font_color () const {
-    return font.color;
-}

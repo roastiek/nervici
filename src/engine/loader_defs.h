@@ -8,6 +8,8 @@
 #ifndef LOADER_DEFS_H
 #define	LOADER_DEFS_H
 
+#include "gui/canvas.h"
+
 enum ImageType {
     IMT_Numbers, IMT_Timer, IMT_Semafor, IMT_Heart, IMT_Count
 };
@@ -21,7 +23,7 @@ enum FontType {
     FNT_Mono20, FNT_Mono100, FNT_Count
 };
 
-typedef SDL_Surface* SmileSettingImages[21];
+typedef Canvas* SmileSettingImages[21];
 
 #endif	/* LOADER_DEFS_H */
 

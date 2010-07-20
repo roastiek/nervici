@@ -14,7 +14,6 @@
 extern "C" {
 #endif
 
-
 typedef uint8_t plid_tu;
 typedef uint16_t plsize_tu;
 typedef int32_t score_ti;

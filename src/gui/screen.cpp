@@ -50,7 +50,7 @@ void Screen::on_update (int x, int y, int w, int h) {
     dest.w = w;
     dest.h = h;
 
-    SDL_BlitSurface (impl->surface, &dest, primary, &dest);
+    SDL_BlitSurface (canvas->impl->surface, &dest, primary, &dest);
     SDL_UpdateRects (primary, 1, &dest);
 }
 

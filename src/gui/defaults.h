@@ -5,22 +5,19 @@
  * Created on 10. červenec 2010, 13:34
  */
 
-#ifndef UTILS_H
-#define	UTILS_H
+#ifndef _DEFAULTS_H
+#define	_DEFAULTS_H
 
-#include <iostream>
-#include <sstream>
-#include <SDL.h>
-#include <SDL_Pango.h>
+/*#include <SDL.h>
+#include <SDL_Pango.h>*/
 
-using namespace std;
+//using namespace std;
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
-
-#define _MAKE_FNT_NAME(family, size)   family " " #size
-#define FORM_FONT _MAKE_FNT_NAME ("Sans", 12 * 1024 / SCREEN_WIDTH)
+/*#define _MAKE_FNT_NAME(family, size)   family " " #size
+#define FORM_FONT _MAKE_FNT_NAME ("Sans", 12 * 1024 / SCREEN_WIDTH)*/
 
 //extern bool labort;
 
@@ -52,16 +49,6 @@ enum HorizontalAling {
 enum VerticalAling {
     VA_top, VA_center, VA_bottom
 };
-
-#define trf(color) ((color & 0xff) << 24 | (color & 0xff00) << 8 | (color & 0xff0000) >> 8 | (color & 0xff000000) >> 24)
-
-
-template <class T>
-inline string to_string (const T& value) {
-    stringstream ss;
-    ss << value;
-    return ss.str ();
-}
 
 #endif	/* UTILS_H */
 

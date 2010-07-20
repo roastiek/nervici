@@ -12,11 +12,11 @@ using namespace std;
 
 #include "render.h"
 
-#define C_BACKGROUND    0x00442204
-#define C_MEDROUND      0x00663306
-#define C_HIGHGROUND    0x00884408
-#define C_TEXT          0x00ffd5d5
-#define C_ACTIVETEXT    0x00d5d5ff
+#define SC_BACKGROUND    0x00442204
+#define SC_MEDROUND      0x00663306
+#define SC_HIGHGROUND    0x00884408
+#define SC_TEXT          0x00ffd5d5
+#define SC_ACTIVETEXT    0x00d5d5ff
 
 
 
@@ -293,13 +293,13 @@ void Render::update_player (wsize_tu x, wsize_tu y) {
 }
 
 void Render::draw_game_screen () {
-    SDL_FillRect (background, NULL, C_BACKGROUND);
-    SDL_FillRect (background, &gs_outer.score, C_HIGHGROUND);
-    SDL_FillRect (background, &gs_outer.team, C_HIGHGROUND);
-    SDL_FillRect (background, &gs_outer.status, C_HIGHGROUND);
-    SDL_FillRect (background, &gs_outer.semafor, C_HIGHGROUND);
-    SDL_FillRect (background, &gs_outer.round, C_HIGHGROUND);
-    SDL_FillRect (background, &gs_outer.playerground, C_HIGHGROUND);
+    SDL_FillRect (background, NULL, SC_BACKGROUND);
+    SDL_FillRect (background, &gs_outer.score, SC_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.team, SC_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.status, SC_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.semafor, SC_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.round, SC_HIGHGROUND);
+    SDL_FillRect (background, &gs_outer.playerground, SC_HIGHGROUND);
 
     SDL_FillRect (background, &gs_inner.score, 0);
     SDL_FillRect (background, &gs_inner.team, 0);

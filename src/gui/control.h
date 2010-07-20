@@ -11,16 +11,13 @@
 #define STANDARD_WIDTH 1024
 #define STANDARD_HEIGHT 768
 
-#include <SDL.h>
-/*#include <SDL_Pango.h>
-#include <SDL_gfxPrimitives.h>*/
 #include <glibmm/ustring.h>
 
 using namespace Glib;
 
 #include "defaults.h"
 #include "event.h"
-//#include "screen.h"
+#include "canvas.h"
 
 struct ControlParameters {
     float x;
@@ -30,8 +27,6 @@ struct ControlParameters {
     float font_size;
     ControlParameters (float nx, float ny, float nw, float nh, float nf);
 };
-
-struct Implementor;
 
 class Control {
 public:
@@ -79,19 +74,10 @@ private:
     Control* focused_child;
     Control* next;
 
-    Implementor* impl;
-
     int x;
     int y;
-    int width;
-    int height;
+    Canvas* canvas;
     ustring name;
-
-    struct {
-        ustring name;
-        int size;
-        Uint32 color;
-    } font;
 
     struct {
         Uint32 background;
@@ -123,7 +109,7 @@ private:
 
     void destroy_children ();
 
-    void blit (Implementor *dest);
+    void blit (Canvas *dest);
 
     void update_children (Control* item, int x, int y, int w, int h);
 
@@ -199,7 +185,10 @@ protected:
 
     virtual int get_text_width (const ustring& text);
 
-    virtual void draw_image (int x, int y, SDL_Rect& area, SDL_Surface* image);
+    virtual void draw_image (int x, int y, Canvas* image);
+
+    virtual void draw_image (int x, int y, Canvas* image,
+            int src_x, int src_y, int src_w, int src_h);
 
     virtual void on_clicked ();
 
@@ -334,12 +323,6 @@ public:
 
     virtual const ustring& get_name () const;
 
-    virtual int get_font_size () const;
-
-    virtual const ustring& get_font () const;
-
-    virtual Uint32 get_font_color () const;
-
     friend class Screen;
 
     friend class ControlFactory;
@@ -350,19 +333,6 @@ class ControlFactory {
 public:
     static Control* create (Control* par, const ControlParameters& parms, const ustring& = "control");
 };
-
-/*typedef _Control::OnClicked OnClicked;
-typedef _Control::OnMouseButton OnMouseButton;
-typedef _Control::OnMouseMove OnMouseMove;
-typedef _Control::OnFocusGained OnFocusGained;
-typedef _Control::OnFocusLost OnFocusLost;
-typedef _Control::OnMouseEnter OnMouseEnter;
-typedef _Control::OnMouseLeave OnMouseLeave;
-typedef _Control::OnXChanged OnXChanged;
-typedef _Control::OnYChanged OnYChanged;
-typedef _Control::OnWidthChanged OnWidthChanged;
-typedef _Control::OnHeightChanged OnHeightChanged;
-typedef _Control::OnKeyPressed OnKeyPressed;*/
 
 #endif	/* CONTROL_H */
 

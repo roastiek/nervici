@@ -1,3 +1,7 @@
+#include <iostream>
+
+using namespace std;
+
 #include "main.h"
 #include "system.h"
 #include "settings/setting.h"

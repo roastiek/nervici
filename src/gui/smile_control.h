@@ -16,7 +16,7 @@
 
 class SmileControl : public Control {
 private:
-    SDL_Surface* smile;
+    Canvas* smile;
     int value;
     bool enabled;
     int count;
@@ -30,7 +30,7 @@ private:
 
 protected:
 
-    SmileControl (const ControlParameters& parms, SDL_Surface* face);
+    SmileControl (const ControlParameters& parms, Canvas* face);
 
     void paint ();
 
@@ -65,7 +65,7 @@ public:
 
 class SmileControlFactory {
 public:
-    static SmileControl* create (Control* parent, SDL_Surface* face,
+    static SmileControl* create (Control* parent, Canvas* face,
             const ControlParameters& parms, const ustring& name = "smile_control");
 };
 

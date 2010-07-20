@@ -5,9 +5,10 @@
 #include <SDL/SDL_ttf.h>
 
 #include "system.h"
+//#include "gui/screen.h"
+#include "gui/implementor.h"
 
 #include "loader.h"
-#include "gui/screen.h"
 
 static const char* const gameImages[] = {
     "/semafor.png",
@@ -85,8 +86,11 @@ void Loader::load_smile_setting_images (SmileSettingImages& images) {
     dest_area.y = 0;
 
     for (int si = 0; si < 21; si++) {
-        images[si] = SDL_CreateRGBSurface (SDL_SWSURFACE, 20, 40, 32, 0xff, 0xff00, 0xff0000, 0x00);
-        SDL_BlitSurface (smiles, &src_area, images[si], &dest_area);
+        images[si] = new Canvas();
+        images[si]->set_width (20);
+        images[si]->set_height (40);
+//        images[si]->impl->surface = SDL_CreateRGBSurface (SDL_SWSURFACE, 20, 40, 32, 0xff, 0xff00, 0xff0000, 0x00);
+        SDL_BlitSurface (smiles, &src_area, images[si]->impl->surface, &dest_area);
         src_area.x+= src_area.w;
     }
 
@@ -95,7 +99,8 @@ void Loader::load_smile_setting_images (SmileSettingImages& images) {
 
 void Loader::free_smile_setting_images (SmileSettingImages& images) {
     for (int si = 0; si < 21; si++) {
-        SDL_FreeSurface (images[si]);
+        //SDL_FreeSurface (images[si]);
+        delete images[si];
         images[si] = NULL;
     }
 }

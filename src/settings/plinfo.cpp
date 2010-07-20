@@ -1,7 +1,7 @@
 #include <SDL/SDL_keysym.h>
 
 #include "plinfo.h"
-#include "gui/defaults.h"
+#include "utils.h"
 
 #include "setting.h"
 

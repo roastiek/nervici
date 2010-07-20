@@ -1,9 +1,11 @@
-#include "game_frame.h"
 #include "main.h"
 #include "gui/label.h"
 #include "engine/loader.h"
 #include "gui/button.h"
 #include "settings/plinfo.h"
+#include "utils.h"
+
+#include "game_frame.h"
 
 #define ONE_COLUMN_W ((1024 - 16 - 3 * 17) / 4)
 #define ONE_COLUMN_H (24 + 14 + 26 * 16)
@@ -86,9 +88,25 @@ ControlParameters GameFrame::max_score_parms = ControlParameters (
         10
         );
 
-ControlParameters GameFrame::la_time_parms = ControlParameters (
+ControlParameters GameFrame::la_max_length_parms = ControlParameters (
         max_score_parms.x,
         max_score_parms.y + max_score_parms.h + 8,
+        ONE_COLUMN_W,
+        20,
+        10
+        );
+
+ControlParameters GameFrame::max_length_parms = ControlParameters (
+        la_max_length_parms.x,
+        la_max_length_parms.y + la_max_length_parms.h,
+        ONE_COLUMN_W,
+        24,
+        10
+        );
+
+ControlParameters GameFrame::la_time_parms = ControlParameters (
+        max_length_parms.x,
+        max_length_parms.y + max_length_parms.h + 8,
         ONE_COLUMN_W,
         20,
         10
@@ -202,6 +220,9 @@ void GameFrame::init_control (Control* par) {
 
     LabelFactory::create (this, "konecne skore:", la_max_score_parms, "la_max_score");
     max_score = NumberboxFactory::create (this, max_score_parms, "max_score");
+
+    LabelFactory::create (this, "maximalni natahnuti:", la_max_length_parms, "la_max_length");
+    max_length = NumberboxFactory::create (this, max_length_parms, "max_length");
 
     LabelFactory::create (this, "cas na kolo:", la_time_parms, "la_time");
     time = NumberboxFactory::create (this, time_parms, "time");

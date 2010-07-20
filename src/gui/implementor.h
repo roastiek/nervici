@@ -16,8 +16,8 @@ struct Implementor {
     SDLPango_Context* pango_context;
     SDLPango_Matrix font_color;
 
-    Implementor () : surface (NULL), pango_context (SDLPango_CreateContext ()), font_color (*MATRIX_TRANSPARENT_BACK_WHITE_LETTER) {
-    }
+    Implementor ();
+    ~Implementor ();
 };
 
 #endif	/* IMPLEMENTOR_H */

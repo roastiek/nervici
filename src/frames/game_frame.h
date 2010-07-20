@@ -32,6 +32,8 @@ private:
     static ControlParameters rounds_parms;
     static ControlParameters la_max_score_parms;
     static ControlParameters max_score_parms;
+    static ControlParameters la_max_length_parms;
+    static ControlParameters max_length_parms;
     static ControlParameters la_time_parms;
     static ControlParameters time_parms;
     static ControlParameters la_step_parms;
@@ -51,6 +53,7 @@ private:
     VLine* lines[3];
     Numberbox* rounds;
     Numberbox* max_score;
+    Numberbox* max_length;
     Numberbox* time;
     Numberbox* step;
     Numberbox* bonus;
