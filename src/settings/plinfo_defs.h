@@ -12,6 +12,8 @@
 
 using namespace Glib;
 
+#define AIS_COUNT 16
+
 enum PlTypes {
     PT_Human, PT_AI
 };
@@ -27,7 +29,7 @@ struct AIInfo {
 };
 
 struct PlInfo {
-    int color;
+    uint32_t color;
     PlTypes type;
     ustring name;
     union {
@@ -36,6 +38,10 @@ struct PlInfo {
     };
     ustring profil;
     int pitch;
+
+    PlInfo();
+
+    PlInfo (uint32_t nc, const ustring& nn, int nai, const ustring& np, int npi);
 };
 
 #endif	/* PLINFO_DEFS_H */

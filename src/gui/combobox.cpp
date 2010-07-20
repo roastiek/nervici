@@ -9,7 +9,7 @@ Combobox::Combobox (const ListboxParameters& parms) :
 InputControl (parms),
 selected (-1),
 list_parms (ListboxParameters(0, 0, parms.w, parms.min_height, parms.font_size, parms.min_height, parms.item_height)),
-port_parms (ScrollbarParameters (0.0, 0.0, parms.w, 100, parms.font_size, 1, 5))
+port_parms (ScrollbarParameters (0.0, 0.0, parms.w, 100, parms.font_size, 1, 10))
 {
 }
 
@@ -30,6 +30,8 @@ void Combobox::init_control (Control* par) {
     list = ListboxFactory::create (NULL, list_parms);
     port = ScrollportFactory::create (NULL, list, port_parms);
     InputControl::init_control (par);
+    list->set_frame (0);
+    list->register_on_clicked (OnClicked(this, &Combobox::list_clicked));
 }
 
 void Combobox::reinitialize () {
@@ -57,7 +59,8 @@ void Combobox::paint () {
     //draw_frame (C_FOREGROUND);
 
     if (get_selected () >= 0) {
-        draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center,
+        set_font_color (get_item (get_selected ()).color);
+        draw_text (2, 2, get_width () - 4, get_height () - 4, HA_left,
                 VA_center, get_item (get_selected ()).text);
     }
 }

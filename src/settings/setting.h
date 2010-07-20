@@ -28,9 +28,9 @@ public:
 
     static void free_directory ();
 
-    static int read_int (const ustring& section, const ustring& key, int def);
+    static long int read_int (const ustring& section, const ustring& key, int def);
 
-    static void write_int (const ustring& section, const ustring& key, int value);
+    static void write_int (const ustring& section, const ustring& key, long int value);
 
     static const ustring & read_string (const ustring& section, const ustring& key, const ustring & def);
 

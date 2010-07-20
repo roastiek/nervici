@@ -44,11 +44,12 @@ void Scrollbar::paint () {
     if (bar < 16) bar = 16;
     int rest = space - bar;
     int y_offset = w;
-    y_offset += (rest != 0) ? (max - min) * value / rest : 0;
+    y_offset += (max != min) ? rest * value / (max - min) : 0;
 
     draw_box (1, 1, w - 2, h - 2, background);
     draw_rectangle (0, y_offset, w, bar, foreground);
     draw_box (1, y_offset + 1, w - 2, bar - 2, filler);
+    
     draw_aaline (4, w - 4, w / 2, 4, foreground);
     draw_aaline (w - 5, w - 4, w / 2, 4, foreground);
     draw_aaline (4, h - w + 4, w / 2, h - 4, foreground);
@@ -110,7 +111,7 @@ void Scrollbar::process_mouse_button_event (SDL_MouseButtonEvent event) {
             if (bar < 16) bar = 16;
             int rest = space - bar;
             int y_offset = w;
-            y_offset += (rest != 0) ? (max - min) * value / rest : 0;
+            y_offset += (max != min) ? rest * value / (max - min) : 0;
 
             if (event.y >= y_offset && event.y <= y_offset + bar) {
                 drag_start_y = event.y;
@@ -140,9 +141,9 @@ void Scrollbar::process_mouse_move_event (SDL_MouseMotionEvent event) {
             int bar = space - (max - min);
             if (bar < 16) bar = 16;
             int rest = space - bar;
-            if ((max - min) > 0) {
+            if (rest > 0) {
                 int delta = event.y - drag_start_y;
-                int value_delta = rest * delta / (max - min);
+                int value_delta = (max - min) * delta / rest;
                 set_value (value_delta);
             }
 

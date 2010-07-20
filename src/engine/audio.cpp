@@ -305,7 +305,7 @@ void Audio::load_players (const GameInfo& info) {
     for (size_t si = 0; si < info.pl_infos.size (); si++) {
         PlAudio entry;
         alGenSources (1, &entry.source);
-        alSourcef (entry.source, AL_PITCH, (info.pl_infos[si].pitch + 5) / 10.0);
+        alSourcef (entry.source, AL_PITCH, (info.pl_infos[si].pitch + 5.0) / 10.0);
         alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
         alSourcefv (entry.source, AL_VELOCITY, source_vel);
         alSourcefv (entry.source, AL_POSITION, source_pos);

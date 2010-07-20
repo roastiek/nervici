@@ -18,6 +18,7 @@
 #include "gui/numberbox.h"
 #include "gui/smile_control.h"
 #include "engine/loader_defs.h"
+#include "gui/button.h"
 
 class GameFrame : public Control {
 private:
@@ -37,6 +38,8 @@ private:
     static ControlParameters step_parms;
     static ControlParameters la_bonus_parms;
     static ControlParameters bonus_parms;
+    static ControlParameters start_parms;
+    static ControlParameters cancel_parms;
 
     MultilineLabel* la_rules;
     Combobox* cb_mod;
@@ -54,6 +57,8 @@ private:
     SmileControl* smiles[5][4];
     SmileControl* big_smile;
     SmileSettingImages smile_images;
+    Button* btn_start;
+    Button* btn_cancel;
 
     void speed_value_changed (Scale* ctl, int value);
 
@@ -69,6 +74,7 @@ public:
 
     bool is_focusable () const;
 
+    void preapare ();
 };
 
 #endif	/* GAME_FRAME_H */

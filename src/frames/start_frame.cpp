@@ -38,5 +38,5 @@ bool StartFrame::is_focusable () const {
 }
 
 void StartFrame::btn_new_game_clicked (Control* ctl) {
-    App::switch_game_frame ();
+    App::switch_game_frame ()->preapare ();
 }

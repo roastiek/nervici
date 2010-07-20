@@ -2,13 +2,17 @@
 #include "main.h"
 #include "gui/label.h"
 #include "engine/loader.h"
-
-ControlParameters GameFrame::parms = ControlParameters (
-        8, 8, 1024 - 16, 768 - 16, 10
-        );
+#include "gui/button.h"
+#include "settings/plinfo.h"
 
 #define ONE_COLUMN_W ((1024 - 16 - 3 * 17) / 4)
-#define ONE_COLUMN_H (768 - 32 - 24)
+#define ONE_COLUMN_H (24 + 14 + 26 * 16)
+
+ControlParameters GameFrame::parms = ControlParameters (
+        8, 8, 1024 - 16, ONE_COLUMN_H + 16 + 24 + 8, 10
+        );
+
+//#define ONE_COLUMN_H (768 - 32 - 24)
 
 ControlParameters GameFrame::rules_parms = ControlParameters (
         8, 
@@ -128,8 +132,21 @@ ControlParameters GameFrame::bonus_parms = ControlParameters (
         24,
         10
         );
+ControlParameters GameFrame::start_parms = ControlParameters (
+        1024 - 16 - 200 - 16,
+        ONE_COLUMN_H + 16,
+        100,
+        24,
+        10
+        );
 
-
+ControlParameters GameFrame::cancel_parms = ControlParameters (
+        start_parms.x + start_parms.w + 8,
+        start_parms.y,
+        start_parms.w,
+        start_parms.h,
+        10
+        );
 
 GameFrame::GameFrame () :
 Control (parms) {
@@ -225,6 +242,9 @@ void GameFrame::init_control (Control* par) {
     big_smile = SmileControlFactory::create (this, smile_images[smi], smiles_parms, "smiles");
     big_smile->set_count (16 * 15);
     big_smile->set_step (3);
+
+    btn_start = ButtonFactory::create (this, "start", start_parms, "btn_start");
+    btn_cancel = ButtonFactory::create (this, "ale nic", cancel_parms, "btn_cancel");
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
@@ -241,4 +261,20 @@ GameFrame* GameFrame::create_frame (Control* par) {
 
 bool GameFrame::is_focusable () const {
     return false;
+}
+
+#define trans(color) ((color & 0xff) << 24 | (color & 0xff00) << 8 | (color & 0xff0000) >> 8 | 0xff)
+
+void GameFrame::preapare () {
+    for (int ci = 0; ci < 16; ci++) {
+        cb_players[ci]->clear ();
+
+        cb_players[ci]->add_item ("(zadny)", 0x808080ff);
+        cb_players[ci]->set_selected (0);
+
+        for (size_t pi = 0; pi < PlInfos::get_count (); pi++) {
+            const PlInfo& info = PlInfos::get (pi);
+            cb_players[ci]->add_item (info.name, trans(info.color));
+        }
+    }
 }

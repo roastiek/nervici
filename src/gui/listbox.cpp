@@ -67,11 +67,11 @@ void Listbox::paint () {
 
     for (size_t i = 0; i < items.size (); i++, y_offset += ih) {
         if (int(i) == get_selected ()) {
-            draw_box (0, y_offset, iw, ih, C_SEL_BACKGROUND);
+            draw_rectangle (0, y_offset, iw, ih, get_foreground ());
         }
         set_font_color (items[i].color);
 
-        draw_text (0, y_offset, iw, ih, HA_center, VA_center, items[i].text);
+        draw_text (1, y_offset, iw - 2, ih, HA_left, VA_center, items[i].text);
     }
 }
 

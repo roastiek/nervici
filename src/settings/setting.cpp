@@ -7,6 +7,7 @@
 #include <fstream>
 
 #include "system.h"
+#include "gui/defaults.h"
 
 #include "setting.h"
 
@@ -210,7 +211,7 @@ SetEntry *Setting::find_entry (const SetSection *sec, const ustring& key) {
     return NULL;
 }
 
-int Setting::read_int (const ustring& section, const ustring& key, int def) {
+long int Setting::read_int (const ustring& section, const ustring& key, int def) {
     SetSection *sec;
     SetEntry *ent;
     int value = def;
@@ -221,20 +222,16 @@ int Setting::read_int (const ustring& section, const ustring& key, int def) {
     ent = find_entry (sec, key);
     if (ent == NULL) return def;
 
-    value = atoi (ent->value.c_str ());
+    value = atol (ent->value.c_str ());
 
     return value;
 }
 
-void Setting::write_int (const ustring& section, const ustring& key, int value) {
-#define BUFF_LEN 16
-    char buff[BUFF_LEN];
+void Setting::write_int (const ustring& section, const ustring& key, long int value) {
     SetSection *sec;
 
-    snprintf (buff, BUFF_LEN, "%d", value);
-
     sec = select_section (section);
-    add_entry (sec, key, buff);
+    add_entry (sec, key, to_string<long int>(value));
 }
 
 const ustring& Setting::read_string (const ustring& section, const ustring& key, const ustring& def) {
