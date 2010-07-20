@@ -25,7 +25,15 @@ protected:
 
     TeamButton (const ControlParameters& parms);
 
+    void init_control (Control* par);
+
     void paint ();
+
+    void on_focus_gained ();
+
+    void on_focus_lost ();
+
+    void on_clicked ();
 
 public:
 

@@ -1,4 +1,4 @@
-SET (BASIC_IMAGES heart.png semafor.png)
+SET (BASIC_IMAGES heart.png semafor.png smile_setting.png)
 
 SET (DEPS "")
 

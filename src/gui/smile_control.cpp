@@ -3,6 +3,7 @@
 SmileControl::SmileControl (const ControlParameters& parms, SDL_Surface* face) :
 Control (parms),
 smile (face),
+enabled (true),
 count (1),
 step (1) {
 }
@@ -19,17 +20,24 @@ void SmileControl::paint () {
     int c = get_count ();
     int s = get_step ();
 
-    draw_box (0, h, get_width (), -h * get_value () / c + 1, C_FILL);
+    draw_box (0, h, get_width (), -h * get_value () / c + 1, (is_smile_enabled ()) ? C_FILL : C_DIS_FILL);
 
     //int
 
     for (int i = 0; i < c / s; i++) {
-        draw_hline (0, h * (i + 1) * s / c + 1, get_width (), get_font_color ());
+        draw_hline (0, h * (i + 1) * s / c + 1, get_width (), (is_smile_enabled ()) ? get_foreground () : C_DIS_FOREGROUND);
     }
 
     int left = (get_width () - 20) / 2;
 
-    draw_box (left, h + left, 20, 20, 0x20ffff);
+    SDL_Rect area;
+    area.x = 0;
+    area.y = (is_smile_enabled ()) ? 0 : 20;
+    area.w = 20;
+    area.h = 20;
+
+    draw_image (left, h + left, area, smile);
+    //draw_box (left, h + left, 20, 20, 0x20ffff);
 
     int color = (is_focused ()) ? C_FOC_FOREGROUND : get_foreground ();
 
@@ -41,7 +49,6 @@ void SmileControl::paint () {
 void SmileControl::update_value (int y) {
     int h = get_height () - get_width () - 12;
     int c = get_count ();
-    int s = get_step ();
 
     if (y <= h) {
         int v = (h - y) * c / h + 1;
@@ -66,6 +73,8 @@ void SmileControl::process_mouse_button_event (SDL_MouseButtonEvent event) {
 
             if (event.y <= h) {
                 update_value (event.y);
+            } else {
+                set_smile_enabled (!is_smile_enabled ());
             }
 
             break;

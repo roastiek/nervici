@@ -1,6 +1,7 @@
 #include "game_frame.h"
 #include "main.h"
 #include "gui/label.h"
+#include "engine/loader.h"
 
 ControlParameters GameFrame::parms = ControlParameters (
         8, 8, 1024 - 16, 768 - 16, 10
@@ -134,8 +135,19 @@ GameFrame::GameFrame () :
 Control (parms) {
 }
 
+GameFrame::~GameFrame () {
+    Loader::free_smile_setting_images (smile_images);
+}
+
 void GameFrame::init_control (Control* par) {
     Control::init_control (par);
+
+    Loader::load_smile_setting_images (smile_images);
+
+    team_colors[0] = 0xff8080ff;
+    team_colors[1] = 0xff80ffff;
+    team_colors[2] = 0x80ff80ff;
+    team_colors[3] = 0x8080ffff;
 
     //set_background (0x202020ff);
 
@@ -188,15 +200,17 @@ void GameFrame::init_control (Control* par) {
             8,
             22, 146, 8);
 
-    for (int si = 0; si < 6; si++) {
+    int smi = 0;
+
+    for (int si = 0; si < 5; si++) {
         for (int li = 0; li < 4; li++) {
-            smiles[si][li] = SmileControlFactory::create (this, NULL, smiles_parms, "smiles");
+            smiles[si][li] = SmileControlFactory::create (this, smile_images[smi], smiles_parms, "smiles");
             smiles[si][li]->set_step ((li < 3) ? 1 : 3);
             smiles[si][li]->set_count (16 *smiles[si][li]->get_step ());
             smiles[si][li]->set_value (si * li);
 
             smiles_parms.x+=2 + smiles_parms.w;
-            //if (li == 2) smiles_parms.x+= 2;
+            smi++;
         }
         smiles_parms.x+= 8;
         if (si % 2 == 1) {
@@ -208,7 +222,7 @@ void GameFrame::init_control (Control* par) {
     smiles_parms.y = 8;
     smiles_parms.h*= 3;
     smiles_parms.h+= 16;
-    big_smile = SmileControlFactory::create (this, NULL, smiles_parms, "smiles");
+    big_smile = SmileControlFactory::create (this, smile_images[smi], smiles_parms, "smiles");
     big_smile->set_count (16 * 15);
     big_smile->set_step (3);
 }

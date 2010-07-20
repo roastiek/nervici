@@ -7,6 +7,7 @@
 #include "system.h"
 
 #include "loader.h"
+#include "gui/screen.h"
 
 static const char* const gameImages[] = {
     "/semafor.png",
@@ -16,6 +17,8 @@ static const char* const gameImages[] = {
 static const char* const baseFonts[] = {
     "/mono.ttf"
 };
+
+static const char* const smile_setting = "/smile_setting.png";
 
 void Loader::load_game_images (vector<SDL_Surface*>& images, TTF_Font *font) {
     const SDL_Color color = {255, 255, 255};
@@ -65,4 +68,34 @@ void Loader::free_fonts (vector<TTF_Font*>& fonts) {
         TTF_CloseFont(fonts[fi]);
     }
     fonts.clear ();
+}
+
+void Loader::load_smile_setting_images (SmileSettingImages& images) {
+    string filename = System::get_images_dir () + smile_setting;
+    
+    SDL_Surface* smiles = IMG_Load (filename.c_str());
+    SDL_Rect src_area;
+    SDL_Rect dest_area;
+
+    src_area.x = 0;
+    src_area.y = 0;
+    src_area.w = 20;
+    src_area.h = 40;
+    dest_area.x = 0;
+    dest_area.y = 0;
+
+    for (int si = 0; si < 21; si++) {
+        images[si] = SDL_CreateRGBSurface (SDL_SWSURFACE, 20, 40, 32, 0xff, 0xff00, 0xff0000, 0x00);
+        SDL_BlitSurface (smiles, &src_area, images[si], &dest_area);
+        src_area.x+= src_area.w;
+    }
+
+    SDL_FreeSurface (smiles);
+}
+
+void Loader::free_smile_setting_images (SmileSettingImages& images) {
+    for (int si = 0; si < 21; si++) {
+        SDL_FreeSurface (images[si]);
+        images[si] = NULL;
+    }
 }

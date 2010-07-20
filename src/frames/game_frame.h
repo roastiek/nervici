@@ -17,6 +17,7 @@
 #include "gui/label.h"
 #include "gui/numberbox.h"
 #include "gui/smile_control.h"
+#include "engine/loader_defs.h"
 
 class GameFrame : public Control {
 private:
@@ -50,8 +51,9 @@ private:
     Numberbox* time;
     Numberbox* step;
     Numberbox* bonus;
-    SmileControl* smiles[6][4];
+    SmileControl* smiles[5][4];
     SmileControl* big_smile;
+    SmileSettingImages smile_images;
 
     void speed_value_changed (Scale* ctl, int value);
 
@@ -61,6 +63,8 @@ protected:
     void init_control (Control* par);
 
 public:
+    ~GameFrame ();
+
     static GameFrame* create_frame (Control* par);
 
     bool is_focusable () const;

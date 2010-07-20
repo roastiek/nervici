@@ -11,8 +11,8 @@
 #define STANDARD_WIDTH 1024
 #define STANDARD_HEIGHT 768
 
-/*#include <SDL.h>
-#include <SDL_Pango.h>
+#include <SDL.h>
+/*#include <SDL_Pango.h>
 #include <SDL_gfxPrimitives.h>*/
 #include <glibmm/ustring.h>
 
@@ -20,6 +20,7 @@ using namespace Glib;
 
 #include "defaults.h"
 #include "event.h"
+//#include "screen.h"
 
 struct ControlParameters {
     float x;
@@ -197,6 +198,8 @@ protected:
     virtual void draw_wrapped_text (int x, int y, int w, int h, const ustring& text);
 
     virtual int get_text_width (const ustring& text);
+
+    virtual void draw_image (int x, int y, SDL_Rect& area, SDL_Surface* image);
 
     virtual void on_clicked ();
 

@@ -21,6 +21,7 @@ enum FontType {
     FNT_Mono20, FNT_Mono100, FNT_Count
 };
 
+typedef SDL_Surface* SmileSettingImages[21];
 
 #endif	/* LOADER_DEFS_H */
 

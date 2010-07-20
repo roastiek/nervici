@@ -12,9 +12,9 @@
 
 #include "control.h"
 
-#ifndef SDL_Surface
+/*#ifndef SDL_Surface
 struct SDL_Surface;
-#endif
+#endif*/
 
 class Screen : public Control {
 private:

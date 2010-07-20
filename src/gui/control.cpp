@@ -144,7 +144,8 @@ void Control::update (int x, int y, int w, int h) {
     }
 
     update_children (children, x - get_x (), y - get_y (), w, h);
-    draw_frame (get_frame ());
+    if (get_frame () != 0)
+        draw_frame (get_frame ());
     on_update (x, y, w, h);
 }
 
@@ -524,6 +525,14 @@ void Control::draw_filled_trigon (int x1, int y1, int x2, int y2, int x3, int y3
 
 void Control::draw_aatrigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
     aatrigonColor (impl->surface, x1, y1, x2, y2, x3, y3, color);
+}
+
+void Control::draw_image (int x, int y, SDL_Rect& area, SDL_Surface* image) {
+    SDL_Rect dest_area;
+    dest_area.x = x;
+    dest_area.y = y;
+
+    SDL_BlitSurface (image, &area, impl->surface, &dest_area);
 }
 
 void Control::on_clicked () {

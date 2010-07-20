@@ -38,6 +38,9 @@ using namespace std;
 #define C_INPUT_FOREGROUND  0x80ff40ff
 #define C_INPUT_TEXT        0x80ff40ff
 
+#define C_DIS_FILL          0xa0a0a0ff
+#define C_DIS_FOREGROUND    0xe0e0e0ff
+
 #define E_PAINT         SDL_USEREVENT
 #define E_SHOW_POPUP    SDL_USEREVENT + 1
 #define E_HIDE_POPUP    SDL_USEREVENT + 2

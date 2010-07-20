@@ -2,6 +2,7 @@
 #define __LOADER_H__
 
 #include <vector>
+#include <SDL_ttf.h>
 
 using namespace std;
 
@@ -18,6 +19,10 @@ public:
     static void load_fonts (vector<TTF_Font*>& fonts);
 
     static void free_fonts (vector<TTF_Font*>& fonts);
+
+    static void load_smile_setting_images (SmileSettingImages& images);
+
+    static void free_smile_setting_images (SmileSettingImages& images);
 };
 
 #endif // __LOADER_H__
