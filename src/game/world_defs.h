@@ -12,10 +12,10 @@
 
 #define IT_FREE         0
 #define IT_PLAYER       1
-#define IT_STONE        2
-#define IT_WALL         3
-#define IT_SOFT_SMILE   4
-#define IT_HARD_SMILE   5
+#define IT_STONE        3
+#define IT_WALL         4
+#define IT_SOFT_SMILE   5
+#define IT_HARD_SMILE   6
 
 typedef plpart_tu Fields[3][3];
 

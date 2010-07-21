@@ -40,8 +40,8 @@ void App::initialize () {
     gameset.maxLength = 500;
     gameset.startsCount = World::get_starts_count ();
 
-    gameinfo.setting = &gameset;
-    gameinfo.pl_infos.resize (2);
+    gameinfo.setting = gameset;
+/*    gameinfo.pl_infos.resize (2);
     gameset.playersCount = gameinfo.pl_infos.size ();
     gameinfo.pl_infos[0].color = 0xff8040;
     gameinfo.pl_infos[0].name = "bobo";
@@ -59,7 +59,7 @@ void App::initialize () {
     gameinfo.pl_infos[1].keys.jump = SDLK_KP2;
     gameinfo.pl_infos[1].type = PT_Human;
     gameinfo.pl_infos[1].profil = "broug";
-    gameinfo.pl_infos[1].pitch = 15;
+    gameinfo.pl_infos[1].pitch = 15;*/
 
     srand (SDL_GetTicks ());
     SDL_EnableUNICODE (1);

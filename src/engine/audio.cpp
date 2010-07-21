@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "system.h"
+#include "settings/plinfo.h"
 #include "settings/setting.h"
 
 #include "audio.h"
@@ -98,30 +99,30 @@ static ALuint load_wav (const ustring& filename) {
 
     if (SDL_LoadWAV (filename.c_str (), &spec, &data, &len) == NULL) return result;
     switch (spec.channels) {
-        case 1:
-            switch (spec.format) {
-                case AUDIO_S8:
-                    alBufferData (result, AL_FORMAT_MONO8, data, len, spec.freq);
-                    break;
-                case AUDIO_S16LSB:
-                case AUDIO_S16MSB:
-                    alBufferData (result, AL_FORMAT_MONO16, data, len, spec.freq);
-                    break;
-            }
+    case 1:
+        switch (spec.format) {
+        case AUDIO_S8:
+            alBufferData (result, AL_FORMAT_MONO8, data, len, spec.freq);
             break;
-        case 2:
-            switch (spec.format) {
-                case AUDIO_S8:
-                    alBufferData (result, AL_FORMAT_STEREO8, data, len, spec.freq);
-                    break;
-                case AUDIO_S16LSB:
-                case AUDIO_S16MSB:
-                    alBufferData (result, AL_FORMAT_STEREO16, data, len, spec.freq);
-                    break;
-            }
+        case AUDIO_S16LSB:
+        case AUDIO_S16MSB:
+            alBufferData (result, AL_FORMAT_MONO16, data, len, spec.freq);
             break;
-        default:
+        }
+        break;
+    case 2:
+        switch (spec.format) {
+        case AUDIO_S8:
+            alBufferData (result, AL_FORMAT_STEREO8, data, len, spec.freq);
             break;
+        case AUDIO_S16LSB:
+        case AUDIO_S16MSB:
+            alBufferData (result, AL_FORMAT_STEREO16, data, len, spec.freq);
+            break;
+        }
+        break;
+    default:
+        break;
     }
 
     SDL_FreeWAV (data);
@@ -193,7 +194,6 @@ static void scan_music_dir (const ustring& path, vector<MusicFile>& files, Music
 
     closedir (dir);
 }
-
 
 void Audio::init_wavs () {
     cout << __func__ << '\n';
@@ -302,15 +302,17 @@ int Audio::find_profil (const ustring& name) {
 void Audio::load_players (const GameInfo& info) {
     sounds.clear ();
 
-    for (size_t si = 0; si < info.pl_infos.size (); si++) {
-        PlAudio entry;
-        alGenSources (1, &entry.source);
-        alSourcef (entry.source, AL_PITCH, (info.pl_infos[si].pitch + 5.0) / 10.0);
-        alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
-        alSourcefv (entry.source, AL_VELOCITY, source_vel);
-        alSourcefv (entry.source, AL_POSITION, source_pos);
-        entry.prof = find_profil (info.pl_infos[si].profil);
-        sounds.push_back (entry);
+    for (size_t si = 0; si < 16; si++) {
+        if (info.pl_ids[si] >= 0) {
+            PlAudio entry;
+            alGenSources (1, &entry.source);
+            alSourcef (entry.source, AL_PITCH, (PlInfos::get (info.pl_ids[si]).pitch + 5.0) / 10.0);
+            alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
+            alSourcefv (entry.source, AL_VELOCITY, source_vel);
+            alSourcefv (entry.source, AL_POSITION, source_pos);
+            entry.prof = find_profil (PlInfos::get (info.pl_ids[si]).profil);
+            sounds.push_back (entry);
+        }
     }
 }
 
@@ -334,26 +336,26 @@ void Audio::play_effect (plid_tu plid, EffectType effect) {
 
         if (play != AL_PLAYING) {
             switch (effect) {
-                case ET_Hop:
-                    alSourcei (source, AL_BUFFER, spi.buffers[0]);
-                    break;
-                case ET_Jau:
-                    alSourcei (source, AL_BUFFER, spi.buffers[1 + (sounds[plid].r % 2)]);
-                    sounds[plid].r++;
-                    break;
-                case ET_Self:
-                    alSourcei (source, AL_BUFFER, spi.buffers[3]);
-                    break;
-                case ET_SmilePlus:
-                    alSourcei (source, AL_BUFFER, spi.buffers[4]);
-                    break;
-                case ET_SmileMinus:
-                    alSourcei (source, AL_BUFFER, spi.buffers[5]);
-                    break;
-                case ET_Wall:
-                    alSourcei (source, AL_BUFFER, spi.buffers[6 + (sounds[plid].r % 2)]);
-                    sounds[plid].r++;
-                    break;
+            case ET_Hop:
+                alSourcei (source, AL_BUFFER, spi.buffers[0]);
+                break;
+            case ET_Jau:
+                alSourcei (source, AL_BUFFER, spi.buffers[1 + (sounds[plid].r % 2)]);
+                sounds[plid].r++;
+                break;
+            case ET_Self:
+                alSourcei (source, AL_BUFFER, spi.buffers[3]);
+                break;
+            case ET_SmilePlus:
+                alSourcei (source, AL_BUFFER, spi.buffers[4]);
+                break;
+            case ET_SmileMinus:
+                alSourcei (source, AL_BUFFER, spi.buffers[5]);
+                break;
+            case ET_Wall:
+                alSourcei (source, AL_BUFFER, spi.buffers[6 + (sounds[plid].r % 2)]);
+                sounds[plid].r++;
+                break;
             }
 
             alSourcePlay (source);

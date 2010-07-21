@@ -1,3 +1,5 @@
+#include "utils.h"
+
 #include "numberbox.h"
 
 Numberbox::Numberbox (const ControlParameters& parms):
@@ -6,6 +8,10 @@ Textbox (parms) {
 
 bool Numberbox::filter (const ustring::value_type& c) {
     return (c >= '0' && c <= '9') || c == '-';
+}
+
+void Numberbox::set_value (int value) {
+    set_text (to_string<int>(value));
 }
 
 int Numberbox::get_value () const {

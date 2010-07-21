@@ -26,8 +26,8 @@ Uint32 Game::sdl_time;
 void Game::initialize (const GameInfo& info) {
     cout << __func__ << '\n';
 
-    set = *info.setting;
-    set_speed (info.setting->speed);
+    set = info.setting;
+    set_speed (info.setting.speed);
 
     Render::draw_game_screen ();
     World::initialize ();

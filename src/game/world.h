@@ -79,7 +79,7 @@ public:
 
     static bool simple_test_fields (const Point& pos, const Fields & fields);
 
-    static bool test_fields (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head, plsize_tu size);
+    static bool test_fields (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
 
     static void write_player_head (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
 

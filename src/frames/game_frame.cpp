@@ -1,6 +1,9 @@
 #include "main.h"
 #include "gui/label.h"
 #include "engine/loader.h"
+
+
+#include "game/game.h"
 #include "gui/button.h"
 #include "settings/plinfo.h"
 #include "utils.h"
@@ -168,6 +171,18 @@ ControlParameters GameFrame::cancel_parms = ControlParameters (
 
 GameFrame::GameFrame () :
 Control (parms) {
+    game_info.setting.bonus = 1000;
+    game_info.setting.gameTime = 0;
+    game_info.setting.maxLength = 0;
+    game_info.setting.maxScore = 0;
+    game_info.setting.playersCount = 0;
+    game_info.setting.rounds = 10;
+    game_info.setting.speed = base_speed;
+    game_info.setting.startsCount = 40;
+    game_info.setting.step = 1;
+    for (int pi = 0; pi < 16; pi++) {
+        game_info.pl_ids[pi] = -1;
+    }
 }
 
 GameFrame::~GameFrame () {
@@ -213,25 +228,31 @@ void GameFrame::init_control (Control* par) {
     sc_speed->set_min (base_speed / 2);
     sc_speed->set_max (base_speed * 2);
     sc_speed->register_on_value_changed (Scale::OnValueChanged(this, &GameFrame::speed_value_changed));
-    sc_speed->set_value (base_speed);
+    sc_speed->set_value (game_info.setting.speed);
 
     LabelFactory::create (this, "pocet kol o vozu:", la_rounds_parms, "la_rounds");
     rounds = NumberboxFactory::create (this, rounds_parms, "rounds");
+    rounds->set_value (game_info.setting.rounds);
 
     LabelFactory::create (this, "konecne skore:", la_max_score_parms, "la_max_score");
     max_score = NumberboxFactory::create (this, max_score_parms, "max_score");
+    max_score->set_value (game_info.setting.maxScore);
 
     LabelFactory::create (this, "maximalni natahnuti:", la_max_length_parms, "la_max_length");
     max_length = NumberboxFactory::create (this, max_length_parms, "max_length");
+    max_length->set_value (game_info.setting.maxLength);
 
     LabelFactory::create (this, "cas na kolo:", la_time_parms, "la_time");
     time = NumberboxFactory::create (this, time_parms, "time");
+    time->set_value (game_info.setting.gameTime);
 
     LabelFactory::create (this, "bod na krok:", la_step_parms, "la_step");
     step = NumberboxFactory::create (this, step_parms, "step");
+    step->set_value (game_info.setting.step);
 
     LabelFactory::create (this, "bonus:", la_bonus_parms, "la_bonus");
     bonus = NumberboxFactory::create (this, bonus_parms, "bonus");
+    bonus->set_value (game_info.setting.bonus);
 
 
     ControlParameters smiles_parms (la_speed_parms.x + ONE_COLUMN_W + 17,
@@ -265,6 +286,8 @@ void GameFrame::init_control (Control* par) {
     big_smile->set_step (3);
 
     btn_start = ButtonFactory::create (this, "start", start_parms, "btn_start");
+    btn_start->register_on_clicked (OnClicked (this, &GameFrame::btn_start_clicked));
+
     btn_cancel = ButtonFactory::create (this, "ale nic", cancel_parms, "btn_cancel");
 }
 
@@ -291,11 +314,33 @@ void GameFrame::preapare () {
         cb_players[ci]->clear ();
 
         cb_players[ci]->add_item ("(zadny)", 0x808080ff);
-        cb_players[ci]->set_selected (0);
 
         for (size_t pi = 0; pi < PlInfos::get_count (); pi++) {
             const PlInfo& info = PlInfos::get (pi);
             cb_players[ci]->add_item (info.name, trans(info.color));
         }
+
+        cb_players[ci]->set_selected (game_info.pl_ids[ci] + 1);
     }
+}
+
+void GameFrame::btn_start_clicked (Control* ctl) {
+    game_info.setting.bonus = bonus->get_value ();
+    game_info.setting.gameTime = time->get_value ();
+    game_info.setting.maxLength = max_length->get_value ();
+    game_info.setting.maxScore = max_score->get_value ();
+    game_info.setting.rounds = rounds->get_value ();
+    game_info.setting.speed = sc_speed->get_value ();
+    game_info.setting.step = step->get_value ();
+
+    game_info.setting.playersCount = 0;
+    for (int pi = 0; pi < 16; pi++) {
+        game_info.pl_ids[pi] = cb_players[pi]->get_selected () - 1;
+        if (game_info.pl_ids[pi] >= 0)
+            game_info.setting.playersCount++;
+    }
+
+    Game::initialize (game_info);
+    Game::run ();
+    Game::uninitialize ();
 }

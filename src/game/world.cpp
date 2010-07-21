@@ -135,8 +135,8 @@ bool World::simple_test_fields (const Point& pos, const Fields& fields) {
     return result;
 }
 
-bool World::test_fields (const Point& pos, const Fields& fields, plid_tu id,
-        plsize_tu head, plsize_tu size) {
+bool World::test_fields (const Point& pos, const Fields& fields,
+        plid_tu id, plsize_tu head) {
 
     bool result = true;
 
@@ -145,20 +145,20 @@ bool World::test_fields (const Point& pos, const Fields& fields, plid_tu id,
             if (fields[x][y] != 0) {
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
-                    case IT_FREE:
-                    case IT_SOFT_SMILE:
-                        continue;
-                    case IT_PLAYER:
-                        result &= (item.player.ID == id) && (
-                                (item.player.order < head)
-                                ? head - item.player.order <= 5
-                                : size - item.player.order + head <= 5
-                                );
-                        break;
+                case IT_FREE:
+                case IT_SOFT_SMILE:
+                    continue;
+                case IT_PLAYER:
+                    result &= (item.player.ID == id) && (
+                            (item.player.order < head)
+                            ? head - item.player.order <= 5
+                            : 0xffff - item.player.order + head <= 5
+                            );
+                    break;
 
-                    default:
-                        result = 0;
-                        break;
+                default:
+                    result = 0;
+                    break;
                 }
             }
         }
@@ -166,7 +166,7 @@ bool World::test_fields (const Point& pos, const Fields& fields, plid_tu id,
     return result;
 }
 
-void World::write_player_head (const Point& pos, const Fields& fields, 
+void World::write_player_head (const Point& pos, const Fields& fields,
         plid_tu id, plsize_tu head) {
 
     for (wsize_tu x = 0; x < 3; x++) {
@@ -174,20 +174,20 @@ void World::write_player_head (const Point& pos, const Fields& fields,
             if (fields[x][y] != 0) {
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
-                    case IT_FREE:
-                        item.type = IT_PLAYER;
-                        item.player.ID = id;
+                case IT_FREE:
+                    item.type = IT_PLAYER;
+                    item.player.ID = id;
+                    item.player.body = fields[x][y];
+                    item.player.order = head;
+                    break;
+                case IT_PLAYER:
+                    if (item.player.ID == id && item.player.body < fields[x][y]) {
                         item.player.body = fields[x][y];
                         item.player.order = head;
-                        break;
-                    case IT_PLAYER:
-                        if (item.player.ID == id && item.player.body < fields[x][y]) {
-                            item.player.body = fields[x][y];
-                            item.player.order = head;
-                        }
-                        break;
-                    case IT_SOFT_SMILE:
-                        break;
+                    }
+                    break;
+                case IT_SOFT_SMILE:
+                    break;
                 }
                 queue_item (pos.x + x, pos.y + y);
             }
@@ -196,17 +196,17 @@ void World::write_player_head (const Point& pos, const Fields& fields,
 }
 
 void World::rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
-    
+
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
             switch (item.type) {
-                case IT_PLAYER:
-                    if (item.player.ID == id && item.player.order == bottom) {
-                        item.type = IT_FREE;
-                        queue_item (pos.x + x, pos.y + y);
-                    }
-                    break;
+            case IT_PLAYER:
+                if (item.player.ID == id && item.player.order == bottom) {
+                    item.type = IT_FREE;
+                    queue_item (pos.x + x, pos.y + y);
+                }
+                break;
             }
         }
     }

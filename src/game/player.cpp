@@ -9,11 +9,12 @@
 #include "system.h"
 
 #include "player.h"
+#include "settings/plinfo.h"
 
-void Player::process_fields (const FPoint& epos, const Point& pos, const Fields& fields) {
+void Player::process_fields (const Point& pos, const Fields& fields) {
     if (state == PS_Live || state == PS_Start) {
         World::write_player_head (pos, fields, id, head);
-        add_part (epos);
+        add_part (pos);
         updates.push_back (pos);
     }
 }
@@ -25,22 +26,24 @@ void Player::update_body () {
     updates.clear ();
 }
 
-void Player::initialize (plid_tu ID, const GameInfo& info) {
+void Player::initialize (plid_tu ID, const PlInfo* info, int max_len) {
     this->id = ID;
-    this->info = &info.pl_infos[ID];
+    this->info = info;
     score = 0;
     order = ID;
-    max_length = info.setting->maxLength;
-    size = 0xff;
+    max_length = max_len;
+    size = 0xf;
     while (size <= max_length) {
         size *= 2;
         size++;
     }
-    body = new FPoint[size];
+    body = new Point[size];
     length = 0;
     head = 0;
-    timer = 0;
+    head_index = 0;
     bottom = 0;
+    bottom_index = 0;
+    timer = 0;
     state = PS_Erased;
     ironized = false;
 }
@@ -53,7 +56,9 @@ void Player::erase () {
     state = PS_Erased;
     length = 0;
     bottom = 0;
+    bottom_index = 0;
     head = 0;
+    head_index = 0;
 }
 
 void Player::timer_func (timer_ti speed) {
@@ -67,36 +72,42 @@ void Player::timer_func (timer_ti speed) {
 }
 
 void Player::clear_bottom () {
-    Point pos;
+    World::rewrite_player_bottom (body[bottom_index], id, bottom);
 
-    pos.x = body[bottom].x - 1;
-    pos.y = body[bottom].y - 1;
-
-    World::rewrite_player_bottom (pos, id, bottom);
-
-    updates.push_back (pos);
+    updates.push_back (body[bottom_index]);
 
     bottom++;
-    bottom %= size;
+    bottom %= 0xffff;
+    bottom_index++;
+    bottom_index %= size;
     length--;
 }
 
 void Player::resize (plsize_tu new_size) {
     if (new_size > size) {
-        FPoint *new_body = new FPoint[new_size];
+        Point* new_body = new Point[new_size];
         plsize_tu delta = new_size - size;
 
-        if (head > bottom) {
-            cout << "normal resize\n";
-            memcpy (new_body, body, length * sizeof (FPoint));
+        if (head_index > bottom_index) {
+            memcpy (new_body, body, size * sizeof (Point));
         } else {
-            cout << "hard resize\n";
-            memcpy (new_body, body, (head + 1) * sizeof (FPoint));
-            memcpy (&new_body[bottom + delta], &body[bottom], (size - bottom) * sizeof (FPoint));
-            bottom+= delta;
-        }
+            memcpy (new_body, body, (head_index + 1) * sizeof(Point));
+            memcpy (&new_body[delta + bottom_index], &body[bottom_index], (size - bottom_index) * sizeof (Point));
+            for (int i = 0; i <= head_index; i++)  {
+                if (body[i].x != new_body[i].x || body[i].y != new_body[i].y) {
+                    cout << "chyba pri kopirovani\n";
+                }
+            }
+            for (int i = bottom_index; i < size; i++)  {
+                if (body[i].x != new_body[i + delta].x || body[i].y != new_body[i + delta].y) {
+                    cout << "chyba pri kopirovani\n";
+                }
+            }
 
+            bottom_index+= delta;
+        }
         delete [] body;
+
         size = new_size;
         body = new_body;
     }
@@ -112,22 +123,29 @@ void Player::check_length () {
             clear_bottom ();
         if (length >= max_length)
             clear_bottom ();
+        if (length == size) {
+            resize (size * 2 + 1);
+        }
     }
 }
 
-void Player::add_part (const FPoint& part) {
+void Player::add_part (const Point& part) {
     if (max_length == 0) {
         if (length < size) {
-            body[head] = part;
+            body[head_index] = part;
+            head_index++;
+            head_index %= size;
             head++;
-            head %= size;
+            head&= 0xffff;
             length++;
         } else cerr << "error: not enough bodysize\n";
     } else {
         if (length < max_length) {
-            body[head] = part;
+            body[head_index] = part;
+            head_index++;
+            head_index %= size;
             head++;
-            head %= size;
+            head&= 0xffff;
             length++;
         } else cerr << "error: not enough maxlength\n";
     }
@@ -158,9 +176,9 @@ void Player::live () {
     World::calc_fields (exact, fields);
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
-        survive = World::test_fields (pos, fields, id, head, size);
+        survive = World::test_fields (pos, fields, id, head);
         if (!survive) state = PS_Death;
-        process_fields (exact, pos, fields);
+        process_fields (pos, fields);
     } else {
         survive = World::simple_test_fields (pos, fields);
         if (!survive) state = PS_Death;
@@ -217,14 +235,16 @@ void Player::give_start (startid_tu start) {
             angle = st->angle;
             state = PS_Start;
             bottom = 0;
+            bottom_index = 0;
             head = 0;
+            head_index = 0;
             jumptime = 0;
             length = 0;
 
             World::calc_fields (exact, fields);
             pos.x = exact.x - 1;
             pos.y = exact.y - 1;
-            process_fields (exact, pos, fields);
+            process_fields (pos, fields);
         }
     }
 }
@@ -277,8 +297,8 @@ void Player::inc_max_length (plsize_tu delta) {
     plsize_tu new_size = size;
 
     while (new_size < maxlen) {
-         new_size*= 2;
-         new_size++;
+        new_size *= 2;
+        new_size++;
     }
 
     resize (new_size);

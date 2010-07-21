@@ -26,6 +26,7 @@ typedef struct _GameSetting {
     int speed;
     int maxLength;
     int maxScore;
+    int step;
 } GameSetting;
 
 typedef const ModRunnerInfo *(*ModGetModRunnerInfo) ();

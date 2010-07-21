@@ -16,8 +16,8 @@ using namespace std;
 #include "settings/plinfo_defs.h"
 
 struct GameInfo {
-    GameSetting *setting;
-    vector<PlInfo> pl_infos;
+    GameSetting setting;
+    int pl_ids[16];
 };
 
 #endif	/* GAME_DEFS_H */

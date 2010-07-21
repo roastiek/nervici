@@ -31,7 +31,7 @@ private:
     /*
      * Player body
      */
-    FPoint *body;
+    Point* body;
     /*
      * size of body
      */
@@ -49,10 +49,12 @@ private:
      * index of first part
      */
     plsize_tu head;
+    plsize_tu head_index;
     /*
      * index of last part
      */
     plsize_tu bottom;
+    plsize_tu bottom_index;
 
     bool ironized;
 
@@ -64,12 +66,12 @@ private:
 
     void live ();
     
-    void process_fields (const FPoint& epos, const Point& pos, const Fields & fields);
+    void process_fields (const Point& pos, const Fields & fields);
 
     void resize (plsize_tu new_size);
 
 public:
-    void initialize (plid_tu ID, const GameInfo & plinfo);
+    void initialize (plid_tu ID, const PlInfo* plinfo, int max_len);
     void uninitialize ();
     /*
      * Set state to PS_Erased
@@ -91,7 +93,7 @@ public:
     /*
      * add part to players body
      */
-    void add_part (const FPoint & part);
+    void add_part (const Point & part);
     /*
      * player claims start, draw one dot and set state to PS_Start
      */

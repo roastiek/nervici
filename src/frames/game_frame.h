@@ -19,6 +19,7 @@
 #include "gui/smile_control.h"
 #include "engine/loader_defs.h"
 #include "gui/button.h"
+#include "game/game_defs.h"
 
 class GameFrame : public Control {
 private:
@@ -43,6 +44,8 @@ private:
     static ControlParameters start_parms;
     static ControlParameters cancel_parms;
 
+    GameInfo game_info;
+
     MultilineLabel* la_rules;
     Combobox* cb_mod;
     TeamButton* btn_teams[16];
@@ -64,6 +67,8 @@ private:
     Button* btn_cancel;
 
     void speed_value_changed (Scale* ctl, int value);
+
+    void btn_start_clicked (Control* ctl);
 
 protected:
     GameFrame();

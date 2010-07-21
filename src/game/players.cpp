@@ -4,14 +4,19 @@
 #include "engine/audio.h"
 
 #include "players.h"
+#include "settings/plinfo.h"
 
 vector<Player> Players::players;
 
 void Players::initialize (const GameInfo& info) {
-    players.resize (info.pl_infos.size ());
+    players.resize (info.setting.playersCount);
 
-    for (size_t pi = 0; pi < info.pl_infos.size (); pi++) {
-        players[pi].initialize (pi, info);
+    int p = 0;
+    for (size_t pi = 0; pi < 16; pi++) {
+        if (info.pl_ids[pi] >= 0) {
+            players[p].initialize (p, &PlInfos::get (info.pl_ids[pi]), info.setting.maxLength);
+            p++;
+        }
     }
 
     Render::load_players (info);

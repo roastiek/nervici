@@ -21,6 +21,8 @@ protected:
     friend class NumberboxFactory;
 
 public:
+    virtual void set_value (int value);
+
     virtual int get_value () const;
 };
 

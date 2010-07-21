@@ -11,6 +11,7 @@ using namespace std;
 #include "game/world.h"
 
 #include "render.h"
+#include "settings/plinfo.h"
 
 #define SC_BACKGROUND    0x00442204
 #define SC_MEDROUND      0x00663306
@@ -239,11 +240,15 @@ SDL_Surface* Render::create_numbers (Uint32 color, Uint32 team) {
 }
 
 void Render::load_players (const GameInfo& info) {
-    pl_images.resize (info.pl_infos.size ());
+    pl_images.resize (info.setting.playersCount);
 
-    for (size_t p = 0; p < info.pl_infos.size (); p++) {
-        pl_images[p].face = create_player_face (info.pl_infos[p].color);
-        pl_images[p].numbers = create_numbers (info.pl_infos[p].color, 0x00);
+    int p = 0;
+    for (size_t pi = 0; pi < 16; pi++) {
+        if (info.pl_ids[pi] >= 0) {
+            pl_images[p].face = create_player_face (PlInfos::get (info.pl_ids[pi]).color);
+            pl_images[p].numbers = create_numbers (PlInfos::get (info.pl_ids[pi]).color, 0x00);
+            p++;
+        }
     }
 
 }
