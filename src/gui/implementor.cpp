@@ -1,9 +1,9 @@
-#include "implementor.h"
+#include "gui/implementor.h"
 
 Implementor::Implementor () :
 surface (NULL),
 pango_context (SDLPango_CreateContext ()),
-font_color (*MATRIX_TRANSPARENT_BACK_WHITE_LETTER) {
+font_color (*MATRIX_TRANSPARENT_BACK_BLACK_LETTER) {
 }
 
 Implementor::~Implementor () {

@@ -1,4 +1,4 @@
-#include "scrollbar.h"
+#include "gui/scrollbar.h"
 
 ScrollbarParameters::ScrollbarParameters (float nx, float ny, float nw, float nh,
         float nf, float nss, float nbs) :

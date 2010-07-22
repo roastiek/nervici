@@ -1,4 +1,4 @@
-#include "multiline_label.h"
+#include "gui/multiline_label.h"
 
 MultilineLabel::MultilineLabel (const ControlParameters& parms):
 Control(parms) {

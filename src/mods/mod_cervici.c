@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "nervici.h"
-#include "mods.h"
+#include "mods/nervici.h"
+#include "mods/mods.h"
 
 static const char * const exts[] = {
     "", NULL

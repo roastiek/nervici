@@ -1,6 +1,6 @@
-#include "implementor.h"
+#include "gui/implementor.h"
 
-#include "screen.h"
+#include "gui/screen.h"
 
 ControlParameters Screen::parms = ControlParameters (
         0, 0, 0, 0, 10
@@ -19,13 +19,13 @@ Screen::~Screen () {
     remove_popup (false);
 }
 
-Screen* ScreenFactory::create (SDL_Surface* face, const ustring& name) {
+/*Screen* ScreenFactory::create (SDL_Surface* face, const ustring& name) {
     Screen* result = new Screen ();
     result->set_name (name);
     result->primary = face;
     result->init_control (NULL);
     return result;
-}
+}*/
 
 void Screen::init_control (Control* par) {
     set_background (C_SCREEN_BACKGROUND);

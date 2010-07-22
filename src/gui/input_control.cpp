@@ -1,4 +1,4 @@
-#include "input_control.h"
+#include "gui/input_control.h"
 
 InputControl::InputControl (const ControlParameters& parms) :
 Control (parms), colors ({0, 0, 0}) {

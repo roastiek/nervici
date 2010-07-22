@@ -1,4 +1,4 @@
-#include "scale.h"
+#include "gui/scale.h"
 
 Scale::Scale (const ControlParameters& parms) :
 Control (parms),

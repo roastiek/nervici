@@ -1,28 +1,50 @@
 #include <iostream>
+#include <SDL.h>
 
-using namespace std;
-
-#include "main.h"
 #include "system.h"
 #include "settings/setting.h"
-#include "settings/plinfo.h"
+#include "settings/pl_infos.h"
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "game/world.h"
 #include "game/game.h"
 
 #include "app.h"
-#include "frames/start_frame.h"
 
-Control* App::active_frame = NULL;
-Screen* App::screen;
-StartFrame* App::start_frame;
-GameFrame* App::game_frame;
-GameInfo App::gameinfo;
-GameSetting App::gameset;
-bool App::abort;
+namespace App {
 
-void App::initialize () {
+static Control* active_frame = NULL;
+static Screen* screen;
+static StartFrame* start_frame;
+static GameFrame* game_frame;
+static GameInfo gameinfo;
+static GameSetting gameset;
+static bool abort;
+
+static int paint_filter (const SDL_Event* event) {
+    return event->type != E_PAINT;
+}
+
+static void init_gui () {
+    cout << __func__ << "\n";
+
+    SDL_SetEventFilter (paint_filter);
+
+    screen = Render::create_screen ("nervici");
+    screen->show_all ();
+
+    start_frame = StartFrame::create_frame (screen);
+    game_frame = GameFrame::create_frame (screen);
+
+    start_frame->set_visible (false);
+    game_frame->set_visible (false);
+
+    SDL_SetEventFilter (NULL);
+
+    switch_to_start_frame ();
+}
+
+void initialize () {
     cout << __func__ << '\n';
 
     System::init_paths ();
@@ -68,30 +90,7 @@ void App::initialize () {
     init_gui ();
 }
 
-static int paint_filter (const SDL_Event* event) {
-    return event->type != E_PAINT;
-}
-
-void App::init_gui () {
-    cout << __func__ << "\n";
-
-    SDL_SetEventFilter (paint_filter);
-
-    screen = ScreenFactory::create (Render::get_primary (), "nervici");
-    screen->show_all ();
-
-    start_frame = StartFrame::create_frame (screen);
-    game_frame = GameFrame::create_frame (screen);
-
-    start_frame->set_visible (false);
-    game_frame->set_visible (false);
-
-    SDL_SetEventFilter (NULL);
-
-    switch_to_start_frame ();
-}
-
-void App::uninitialize () {
+void uninitialize () {
     cout << __func__ << '\n';
 
     delete screen;
@@ -108,7 +107,7 @@ void App::uninitialize () {
     System::free_paths ();
 }
 
-void App::run () {
+void run () {
     cout << __func__ << '\n';
     SDL_Event event;
 
@@ -131,19 +130,22 @@ void App::run () {
     Game::uninitialize ();*/
 }
 
-void App::hide_previous () {
+static void hide_previous () {
     if (active_frame != NULL)
         active_frame->set_visible (false);
 }
 
-StartFrame* App::switch_to_start_frame () {
+StartFrame* switch_to_start_frame () {
+    hide_previous ();
     start_frame->set_visible (true);
     start_frame->grab_focus ();
     return start_frame;
 }
 
-GameFrame* App::switch_game_frame () {
+GameFrame* switch_game_frame () {
+    hide_previous ();
     game_frame->set_visible (true);
     game_frame->grab_focus ();
     return game_frame;
+}
 }

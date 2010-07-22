@@ -1,4 +1,4 @@
-#include "vline.h"
+#include "gui/vline.h"
 
 VLine::VLine (const ControlParameters& parms):
 Control(parms) {

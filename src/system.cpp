@@ -8,11 +8,36 @@
 #include <sys/stat.h>
 #include <vector>
 #include <iostream>
+using namespace std;
 
 #include "config.h"
+#include "mods/mods.h"
+
 #include "system.h"
 
-using namespace std;
+namespace System {
+
+struct ModEvents {
+    LoadScript load_script;
+    UnloadScript unload_script;
+    ModOnGameStart on_game_start;
+    ModOnGameEnd on_game_end;
+    ModOnTimer on_timer;
+    ModOnDeath on_death;
+    ModBeforeStep before_step;
+    ModAfterStep after_step;
+    ModOnPoziSmile on_pozi_smile;
+    ModOnNegaSmile on_nega_smile;
+    ModOnFlegSmile on_fleg_smile;
+    ModOnIronSmile on_iron_smile;
+    ModOnHamSmile on_ham_smile;
+    ModOnKilled on_killed;
+    ModOnKill on_kill;
+    ModOnWall on_wall;
+    ModOnSelfDeath on_self_death;
+    ModOnCleared on_cleared;
+    ModOnPlTimer on_pl_timer;
+};
 
 #define PROFILE_DIR "/.nervici"
 #define PROFILE_FILE "/nervici.conf"
@@ -21,36 +46,36 @@ using namespace std;
 #define HOME_SOUNDS_DIR "/sounds"
 #define HOME_MUSIC_DIR "/music"
 
-ustring System::home_dir;
-ustring System::profile_dir;
-ustring System::profile_file;
-ustring System::mods_dir;
-ustring System::mods_dir_home;
-ustring System::images_dir;
-ustring System::fonts_dir;
-ustring System::fonts_dir_home;
-ustring System::sounds_dir;
-ustring System::sounds_dir_home;
-ustring System::music_dir;
-ustring System::music_dir_home;
-vector<ModRunner> System::mod_runners;
-vector<Mod> System::mods;
-ModEvents System::mod_events;
-void *System::mod_handle;
+static ustring home_dir;
+static ustring profile_dir;
+static ustring profile_file;
+static ustring mods_dir;
+static ustring mods_dir_home;
+static ustring images_dir;
+static ustring fonts_dir;
+static ustring fonts_dir_home;
+static ustring sounds_dir;
+static ustring sounds_dir_home;
+static ustring music_dir;
+static ustring music_dir_home;
+static vector<ModRunner> mod_runners;
+static vector<Mod> mods;
+static ModEvents mod_events;
+static void* mod_handle;
 
-ustring System::resolv_home_dir () {
+static ustring resolv_home_dir () {
     return getenv ("HOME");
 }
 
-ustring System::resolv_profile_dir () {
+static ustring resolv_profile_dir () {
     return home_dir + PROFILE_DIR;
 }
 
-ustring System::resolv_profile_file () {
+static ustring resolv_profile_file () {
     return profile_dir + PROFILE_FILE;
 }
 
-ustring System::resolv_dir (const ustring& dir) {
+static ustring resolv_dir (const ustring& dir) {
     string result;
 
 #ifdef USE_WORKING_DIR
@@ -68,11 +93,11 @@ ustring System::resolv_dir (const ustring& dir) {
     return result;
 }
 
-ustring System::resolv_dir_home (const ustring& dir) {
+static ustring resolv_dir_home (const ustring& dir) {
     return profile_dir + dir;
 }
 
-void System::init_paths () {
+void init_paths () {
     home_dir = resolv_home_dir ();
     profile_dir = resolv_profile_dir ();
     profile_file = resolv_profile_file ();
@@ -94,7 +119,7 @@ void System::init_paths () {
     mkdir (music_dir_home.c_str (), 0755);
 }
 
-void System::free_paths () {
+void free_paths () {
 }
 
 static void scan_mods_dir (const ustring& path, vector<ustring>& files) {
@@ -185,7 +210,7 @@ static void find_scripts (const vector<ustring>& files, vector<ModRunner>& runne
     }
 }
 
-void System::find_mods () {
+void find_mods () {
     cout << __func__ << '\n';
 
     vector<ustring> files;
@@ -199,10 +224,10 @@ void System::find_mods () {
         scan_mods_path (mods_dir_home, mod_runners);*/
 }
 
-void System::free_mods () {
+void free_mods () {
 }
 
-void System::load_mod (size_t mid, const ustring& script) {
+void load_mod (size_t mid, const ustring& script) {
     long int fake;
 
     cout << __func__ << '\n';
@@ -271,8 +296,133 @@ void System::load_mod (size_t mid, const ustring& script) {
     mod_events.load_script (script.c_str ());
 }
 
-void System::unload_mod () {
+void unload_mod () {
     mod_events.unload_script ();
     dlclose (mod_handle);
 }
 
+const ustring & get_profile_file () {
+    return profile_file;
+}
+
+const ustring & get_images_dir () {
+    return images_dir;
+}
+
+const ustring & get_fonts_dir () {
+    return fonts_dir;
+}
+
+const ustring & get_fonts_dir_home () {
+    return fonts_dir_home;
+}
+
+const ustring & get_sounds_dir () {
+    return sounds_dir;
+}
+
+const ustring & get_sounds_dir_home () {
+    return sounds_dir_home;
+}
+
+const ustring & get_music_dir () {
+    return music_dir;
+}
+
+const ustring & get_music_dir_home () {
+    return music_dir_home;
+}
+
+size_t get_mods_count () {
+    return mods.size ();
+}
+
+const Mod & get_mod (size_t mid) {
+    return mods[mid];
+}
+
+void mod_on_game_start (const GameSetting * set) {
+    if (mod_events.on_game_start != NULL)
+        mod_events.on_game_start (set);
+}
+
+void mod_on_game_end () {
+    if (mod_events.on_game_end != NULL)
+        mod_events.on_game_end ();
+}
+
+void mod_on_timer () {
+    if (mod_events.on_timer != NULL)
+        mod_events.on_timer ();
+}
+
+void mod_on_death (plid_tu plid) {
+    if (mod_events.on_death != NULL)
+        mod_events.on_death (plid);
+}
+
+void mod_before_step () {
+    if (mod_events.before_step != NULL)
+        mod_events.before_step ();
+}
+
+void mod_after_step () {
+    if (mod_events.after_step != NULL)
+        mod_events.after_step ();
+}
+
+void mod_on_pozi_smile (int smid, int lvl) {
+    if (mod_events.on_pozi_smile != NULL)
+        mod_events.on_pozi_smile (smid, lvl);
+}
+
+void mod_on_nega_smile (int smid, int lvl) {
+    if (mod_events.on_nega_smile != NULL)
+        mod_events.on_nega_smile (smid, lvl);
+}
+
+void mod_on_fleg_smile (int smid, int lvl) {
+    if (mod_events.on_fleg_smile != NULL)
+        mod_events.on_fleg_smile (smid, lvl);
+}
+
+void mod_on_iron_smile (int smid, int lvl) {
+    if (mod_events.on_iron_smile != NULL)
+        mod_events.on_iron_smile (smid, lvl);
+}
+
+void mod_on_ham_smile (int smid, int lvl) {
+    if (mod_events.on_ham_smile != NULL)
+        mod_events.on_ham_smile (smid, lvl);
+}
+
+void mod_on_killed (plid_tu plid, plid_tu murder) {
+    if (mod_events.on_killed != NULL)
+        mod_events.on_killed (plid, murder);
+}
+
+void mod_on_kill (plid_tu plid, plid_tu victim) {
+    if (mod_events.on_kill != NULL)
+        mod_events.on_kill (plid, victim);
+}
+
+void mod_on_wall (plid_tu plid) {
+    if (mod_events.on_wall != NULL)
+        mod_events.on_wall (plid);
+}
+
+void mod_on_self_death (plid_tu plid) {
+    if (mod_events.on_self_death != NULL)
+        mod_events.on_self_death (plid);
+}
+
+void mod_on_cleared (plid_tu plid) {
+    if (mod_events.on_cleared != NULL)
+        mod_events.on_cleared (plid);
+}
+
+void mod_on_pl_timer (plid_tu plid) {
+    if (mod_events.on_pl_timer != NULL)
+        mod_events.on_pl_timer (plid);
+}
+}

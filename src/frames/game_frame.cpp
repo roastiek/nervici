@@ -1,14 +1,12 @@
-#include "main.h"
 #include "gui/label.h"
 #include "engine/loader.h"
-
-
 #include "game/game.h"
-#include "gui/button.h"
-#include "settings/plinfo.h"
+#include "settings/pl_infos.h"
 #include "utils.h"
 
-#include "game_frame.h"
+#include "frames/game_frame.h"
+#include "settings/team_info.h"
+#include "settings/team_infos.h"
 
 #define ONE_COLUMN_W ((1024 - 16 - 3 * 17) / 4)
 #define ONE_COLUMN_H (24 + 14 + 26 * 16)
@@ -182,6 +180,7 @@ Control (parms) {
     game_info.setting.step = 1;
     for (int pi = 0; pi < 16; pi++) {
         game_info.pl_ids[pi] = -1;
+        game_info.pls_team[pi] = 0;
     }
 }
 
@@ -189,15 +188,17 @@ GameFrame::~GameFrame () {
     Loader::free_smile_setting_images (smile_images);
 }
 
+#define trans(color) ((color & 0xff) << 24 | (color & 0xff00) << 8 | (color & 0xff0000) >> 8 | 0xff)
+
 void GameFrame::init_control (Control* par) {
     Control::init_control (par);
 
     Loader::load_smile_setting_images (smile_images);
 
-    team_colors[0] = 0xff8080ff;
-    team_colors[1] = 0xff80ffff;
-    team_colors[2] = 0x80ff80ff;
-    team_colors[3] = 0x8080ffff;
+    team_colors[1] = trans (TeamInfos::get (1).color);
+    team_colors[2] = trans (TeamInfos::get (2).color);
+    team_colors[3] = trans (TeamInfos::get (3).color);
+    team_colors[4] = trans (TeamInfos::get (4).color);
 
     //set_background (0x202020ff);
 
@@ -307,8 +308,6 @@ bool GameFrame::is_focusable () const {
     return false;
 }
 
-#define trans(color) ((color & 0xff) << 24 | (color & 0xff00) << 8 | (color & 0xff0000) >> 8 | 0xff)
-
 void GameFrame::preapare () {
     for (int ci = 0; ci < 16; ci++) {
         cb_players[ci]->clear ();
@@ -321,6 +320,8 @@ void GameFrame::preapare () {
         }
 
         cb_players[ci]->set_selected (game_info.pl_ids[ci] + 1);
+
+        btn_teams[ci]->set_selected (game_info.pls_team[ci]);
     }
 }
 
@@ -333,11 +334,25 @@ void GameFrame::btn_start_clicked (Control* ctl) {
     game_info.setting.speed = sc_speed->get_value ();
     game_info.setting.step = step->get_value ();
 
+    game_info.setting.teams_count = 0;
+    for (int ti = 0; ti < TEAMS_COUNT; ti++)
+        game_info.team_active[ti] = false;
+
     game_info.setting.playersCount = 0;
     for (int pi = 0; pi < 16; pi++) {
         game_info.pl_ids[pi] = cb_players[pi]->get_selected () - 1;
-        if (game_info.pl_ids[pi] >= 0)
+        if (game_info.pl_ids[pi] >= 0) {
             game_info.setting.playersCount++;
+            game_info.pls_team[pi] = btn_teams[pi]->get_selected ();
+            if (game_info.pls_team[pi] > 0) {
+                if (!game_info.team_active[game_info.pls_team[pi]]) {
+                    game_info.team_active[game_info.pls_team[pi]] = true;
+                    game_info.setting.teams_count++;
+                }
+            }
+        } else {
+            game_info.pls_team[pi] = -1;
+        }
     }
 
     Game::initialize (game_info);

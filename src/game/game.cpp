@@ -1,29 +1,29 @@
 #include <SDL.h>
 #include <math.h>
-//#include <stdio.h>
 #include <iostream>
 
 using namespace std;
 
-#include "game/players.h"
-#include "game/world.h"
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "system.h"
-#include "int_type.h"
+#include "game/world.h"
+#include "game/players.h"
+#include "game/teams.h"
 
-#include "game.h"
+#include "game/game.h"
 
-GameSetting Game::set;
-round_tu Game::round;
-bool Game::end;
-bool Game::abort;
-timer_ti Game::speed;
-timer_ti Game::timer;
-//struct timespec Game::time;
-Uint32 Game::sdl_time;
+namespace Game {
 
-void Game::initialize (const GameInfo& info) {
+static GameSetting set;
+static round_tu round;
+static bool end;
+static bool abort;
+static timer_ti speed;
+static timer_ti timer;
+static Uint32 sdl_time;
+
+void initialize (const GameInfo& info) {
     cout << __func__ << '\n';
 
     set = info.setting;
@@ -31,6 +31,7 @@ void Game::initialize (const GameInfo& info) {
 
     Render::draw_game_screen ();
     World::initialize ();
+    Teams::initialize (info);
     Players::initialize (info);
 
     set.startsCount = World::get_starts_count ();
@@ -48,30 +49,31 @@ void Game::initialize (const GameInfo& info) {
     System::load_mod (0, "");
 }
 
-void Game::uninitialize () {
+void uninitialize () {
     cout << __func__ << '\n';
 
     System::unload_mod ();
 
     Players::uninitialize ();
+    Teams::uninitialize ();
     World::uninitialize ();
 }
 
-void Game::sleep (timer_ti pause) {
+void sleep (timer_ti pause) {
     /*time.tv_nsec += 1000 * 1000 * pause;
     if (time.tv_nsec >= 1000 * 1000 * 1000) {
         time.tv_sec++;
         time.tv_nsec -= 1000 * 1000 * 1000;
     }
     clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &time, NULL);*/
-    sdl_time+= pause;
+    sdl_time += pause;
     timer_ti delta = sdl_time - SDL_GetTicks ();
     if (delta > 0) {
         SDL_Delay (delta);
     }
 }
 
-void Game::run () {
+void run () {
     SDL_Event event;
     size_t steps = 0;
 
@@ -85,18 +87,18 @@ void Game::run () {
     while (!end && !abort) {
         while (SDL_PollEvent (&event)) {
             switch (event.type) {
-                case SDL_QUIT:
+            case SDL_QUIT:
+                abort = true;
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_ESCAPE:
                     abort = true;
                     break;
-                case SDL_KEYDOWN:
-                    switch (event.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                            abort = true;
-                            break;
-                        default:
-                            break;
-                    }
+                default:
                     break;
+                }
+                break;
             }
         }
 
@@ -113,6 +115,7 @@ void Game::run () {
         World::render_queue ();
         Players::update_bodies ();
         Players::update_score ();
+        Teams::update_score ();
         //Render::update_screen ();
 
         Audio::music_update ();
@@ -140,33 +143,34 @@ void Game::run () {
     System::mod_on_game_end ();
 }
 
-void Game::set_speed (timer_ti value) {
+void set_speed (timer_ti value) {
     speed = value;
     if (speed < base_speed / 2) speed = base_speed / 2;
     if (speed > base_speed * 2) speed = base_speed * 2;
     Audio::music_set_rate ((base_speed * 1.0) / speed);
 }
 
-void Game::wait (timer_ti time) {
+void wait (timer_ti time) {
     SDL_Event event;
     int rest = time;
 
     World::render_queue ();
     Players::update_bodies ();
     Players::update_score ();
+    Teams::update_score ();
 
     while (!end && !abort && rest > 0) {
 
         while (SDL_PollEvent (&event)) {
             switch (event.type) {
-                case SDL_QUIT:
+            case SDL_QUIT:
+                abort = true;
+                break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
                     abort = true;
-                    break;
-                case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        abort = true;
-                    }
-                    break;
+                }
+                break;
             }
         }
         rest -= 10;
@@ -174,43 +178,61 @@ void Game::wait (timer_ti time) {
     }
 }
 
-void Game::wait_for_space () {
+void wait_for_space () {
     SDL_Event event;
 
     World::render_queue ();
     Players::update_bodies ();
     Players::update_score ();
+    Teams::update_score ();
 
     while (!abort) {
         while (SDL_PollEvent (&event)) {
             switch (event.type) {
-                case SDL_QUIT:
+            case SDL_QUIT:
+                abort = 1;
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_ESCAPE:
                     abort = 1;
                     break;
-                case SDL_KEYDOWN:
-                    switch (event.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                            abort = 1;
-                            break;
-                        case SDLK_SPACE:
-                            return;
-                        default:
-                            break;
-                    }
+                case SDLK_SPACE:
+                    return;
+                default:
                     break;
+                }
+                break;
             }
         }
         sleep (10);
     }
 }
 
-void Game::next_round () {
+void next_round () {
     round++;
     Render::draw_round (round);
 }
 
-void Game::clear_playerground () {
+void clear_playerground () {
     World::clear ();
     Render::clear_playerground ();
     Players::erase ();
+}
+
+void end_game () {
+    end = true;
+}
+
+timer_ti get_speed () {
+    return speed;
+}
+
+round_tu get_round () {
+    return round;
+}
+
+void set_timer (timer_ti value) {
+    timer = value;
+}
 }

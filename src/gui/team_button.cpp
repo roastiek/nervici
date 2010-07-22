@@ -1,6 +1,6 @@
 #include "utils.h"
 
-#include "team_button.h"
+#include "gui/team_button.h"
 
 TeamButton::TeamButton (const ControlParameters& parms):
 Control (parms),
@@ -13,10 +13,10 @@ void TeamButton::init_control (Control* par) {
 }
 
 void TeamButton::paint () {
-    Uint32 color = (get_selected () >= 0) ? (*colors)[get_selected ()] : get_background ();
+    Uint32 color = (get_selected () > 0) ? (*colors)[get_selected ()] : get_background ();
     fill_backgound (color);
-    if (get_selected () >= 0) {
-        draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center, VA_center, to_string<int> (get_selected () + 1));
+    if (get_selected () > 0) {
+        draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center, VA_center, to_string<int> (get_selected ()));
     }
 }
 
@@ -26,8 +26,8 @@ void TeamButton::set_colors (const TeamColors* value) {
 }
 
 void TeamButton::set_selected (int value) {
-    if (value < -1) value = -1;
-    if (value >= TEAMS_COUNT) value = -1;
+    if (value < 0) value = 0;
+    if (value >= TEAMS_COUNT) value = 0;
     if (value != selected) {
         selected = value;
         invalidate ();

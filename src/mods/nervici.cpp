@@ -2,8 +2,9 @@
 #include "game/world.h"
 #include "game/game.h"
 #include "engine/audio.h"
+#include "engine/render.h"
 
-#include "nervici.h"
+#include "mods/nervici.h"
 
 
 void clear_playerground () {

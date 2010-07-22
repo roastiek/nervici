@@ -1,20 +1,30 @@
-//#include <stdio.h>
-//#include <stdlib.h>
 #include <string.h>
-//#include <strings.h>
-//#include <ctype.h>
 #include <iostream>
 #include <fstream>
 
 #include "system.h"
 #include "utils.h"
 
-#include "setting.h"
+#include "settings/setting.h"
 
-SetSection* Setting::directory;
-bool Setting::changed;
+namespace Setting {
 
-SetSection* Setting::select_section (const ustring& name) {
+struct SetEntry {
+    SetEntry *next;
+    ustring key;
+    ustring value;
+};
+
+struct SetSection {
+    SetSection *next;
+    ustring name;
+    SetEntry *first_entry;
+};
+
+static SetSection* directory;
+static bool changed;
+
+SetSection* select_section (const ustring& name) {
     SetSection *curr = directory;
     SetSection *last = NULL;
     int s;
@@ -41,7 +51,7 @@ SetSection* Setting::select_section (const ustring& name) {
     return sec;
 }
 
-void Setting::add_entry (SetSection *sec, const ustring& key, const ustring& value) {
+void add_entry (SetSection *sec, const ustring& key, const ustring& value) {
     SetEntry *curr = sec->first_entry;
     SetEntry *last = NULL;
     int s;
@@ -77,7 +87,7 @@ void Setting::add_entry (SetSection *sec, const ustring& key, const ustring& val
     changed = true;
 }
 
-SetSection *Setting::parse_line (SetSection *sec, const ustring& line) {
+SetSection* parse_line (SetSection *sec, const ustring& line) {
     size_t pos, len;
     ustring key;
     ustring value;
@@ -108,7 +118,7 @@ SetSection *Setting::parse_line (SetSection *sec, const ustring& line) {
     return sec;
 }
 
-void Setting::load () {
+void load () {
     struct SetSection *sec;
     string line;
     ifstream stream;
@@ -131,7 +141,7 @@ void Setting::load () {
     changed = false;
 }
 
-void Setting::free_directory () {
+void free_directory () {
     struct SetSection *s, *sec = directory;
     struct SetEntry *ent, *e;
 
@@ -151,7 +161,7 @@ void Setting::free_directory () {
     directory = NULL;
 }
 
-void Setting::save () {
+void save () {
     SetSection *sec;
     SetEntry *ent;
     ofstream stream;
@@ -179,7 +189,7 @@ void Setting::save () {
     }
 }
 
-SetSection *Setting::find_section (const ustring& name) {
+SetSection* find_section (const ustring& name) {
     SetSection *curr = directory;
     int s;
 
@@ -195,7 +205,7 @@ SetSection *Setting::find_section (const ustring& name) {
     return NULL;
 }
 
-SetEntry *Setting::find_entry (const SetSection *sec, const ustring& key) {
+SetEntry* find_entry (const SetSection *sec, const ustring& key) {
     SetEntry *curr = sec->first_entry;
     int s;
 
@@ -211,7 +221,7 @@ SetEntry *Setting::find_entry (const SetSection *sec, const ustring& key) {
     return NULL;
 }
 
-long int Setting::read_int (const ustring& section, const ustring& key, int def) {
+long int read_int (const ustring& section, const ustring& key, int def) {
     SetSection *sec;
     SetEntry *ent;
     int value = def;
@@ -227,14 +237,14 @@ long int Setting::read_int (const ustring& section, const ustring& key, int def)
     return value;
 }
 
-void Setting::write_int (const ustring& section, const ustring& key, long int value) {
+void write_int (const ustring& section, const ustring& key, long int value) {
     SetSection *sec;
 
     sec = select_section (section);
     add_entry (sec, key, to_string<long int>(value));
 }
 
-const ustring& Setting::read_string (const ustring& section, const ustring& key, const ustring& def) {
+const ustring& read_string (const ustring& section, const ustring& key, const ustring& def) {
     SetSection *sec;
     SetEntry *ent;
 
@@ -251,34 +261,14 @@ const ustring& Setting::read_string (const ustring& section, const ustring& key,
     return ent->value;
 }
 
-void Setting::write_string (const ustring& section, const ustring& key, const ustring& value) {
+void write_string (const ustring& section, const ustring& key, const ustring& value) {
     SetSection *sec;
 
     sec = select_section (section);
     add_entry (sec, key, value);
 }
 
-/*int findSections (String prefix, String **sections) {
-    struct SetSection *curr = directory;
-    int count = 0;
-    int s;
-    int n = strlen (prefix);
-    
-    while (curr != NULL) {
-        s = strncasecmp (curr->name, prefix, n);
-        if (s == 0) {
-            count++;
-            (*sections) = realloc ((*sections), sizeof (char*) * count);
-            (*sections)[count - 1] = curr->name;
-        } else if (s > 0) {
-            break;  
-        }
-        curr = curr->next;
-    }
-    return count;
-}*/
-
-void Setting::delete_section (const ustring& section) {
+void delete_section (const ustring& section) {
     SetSection *curr = directory->next;
     SetSection *last = directory;
     SetEntry *ent, *e;
@@ -307,7 +297,7 @@ void Setting::delete_section (const ustring& section) {
     }
 }
 
-void Setting::print_directory () {
+void print_directory () {
     SetSection *sec = directory;
     SetEntry *ent;
 
@@ -322,4 +312,6 @@ void Setting::print_directory () {
 
         sec = sec->next;
     }
+}
+
 }

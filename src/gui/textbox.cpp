@@ -1,5 +1,5 @@
 
-#include "textbox.h"
+#include "gui/textbox.h"
 
 Textbox::Textbox (const ControlParameters& parms) :
 InputControl (parms),

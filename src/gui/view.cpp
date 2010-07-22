@@ -1,4 +1,4 @@
-#include "view.h"
+#include "gui/view.h"
 
 View::View (const ControlParameters& parms) :
 Control (parms),

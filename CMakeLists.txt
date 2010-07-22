@@ -25,7 +25,7 @@ PKG_CHECK_MODULES (GTKMM gtkmm-2.4)
 PKG_CHECK_MODULES (SDLPango SDL_Pango)
 
 
-INCLUDE_DIRECTORIES (SYSTEM ${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR} ${SDLTTF_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR} ${VORBIS_INCLUDE_DIR} ${OGG_INCLUDE_DIR} ${GTKMM_INCLUDE_DIRS} ${SDLPango_INCLUDE_DIRS} "src" )
+INCLUDE_DIRECTORIES (SYSTEM ${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR} ${SDLTTF_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR} ${VORBIS_INCLUDE_DIR} ${OGG_INCLUDE_DIR} ${GTKMM_INCLUDE_DIRS} ${SDLPango_INCLUDE_DIRS} "src" "include" )
 #INCLUDE_DIRECTORIES ("src")
 
 SET (CMAKE_INCLUDE_CURRENT_DIR TRUE)
@@ -45,14 +45,14 @@ CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINAR
 
 ADD_LIBRARY (mod_cervici SHARED src/mods/mod_cervici.c)
 
-SET (NERVICI_ENGINE src/engine/render.cpp src/engine/audio.cpp src/engine/loader.cpp)
-SET (NERVICI_GAME src/game/world.cpp src/game/player.cpp src/game/players.cpp src/game/game.cpp)
-SET (NERVICI_SETTINGS src/settings/setting.cpp src/settings/plinfo.cpp)
+SET (NERVICI_ENGINE src/engine/loader.cpp src/engine/render.cpp src/engine/audio.cpp)
+SET (NERVICI_GAME src/game/game.cpp src/game/player.cpp src/game/world.cpp src/game/players.cpp src/game/team.cpp src/game/teams.cpp)
+SET (NERVICI_SETTINGS src/settings/setting.cpp src/settings/pl_info.cpp src/settings/pl_infos.cpp src/settings/team_infos.cpp)
 SET (NERVICI_BASE src/utils.cpp src/main.cpp src/system.cpp src/mods/nervici.cpp src/app.cpp)
 SET (NERVICI_GUI src/gui/implementor.cpp src/gui/canvas.cpp src/gui/control.cpp src/gui/input_control.cpp src/gui/button.cpp  src/gui/screen.cpp src/gui/scrollbar.cpp src/gui/scrollport.cpp src/gui/textbox.cpp src/gui/view.cpp src/gui/listbox.cpp src/gui/combobox.cpp src/gui/multiline_label.cpp src/gui/team_button.cpp src/gui/scale.cpp src/gui/numberbox.cpp src/gui/vline.cpp src/gui/label.cpp src/gui/smile_control.cpp)
 SET (NERVICI_FRAMES src/frames/start_frame.cpp src/frames/game_frame.cpp)
 
-SET (NERVICI_SOURCE ${NERVICI_GUI} ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_SETTINGS} ${NERVICI_FRAMES})
+SET (NERVICI_SOURCE ${NERVICI_SETTINGS}  ${NERVICI_GUI} ${NERVICI_BASE} ${NERVICI_ENGINE} ${NERVICI_GAME} ${NERVICI_FRAMES})
 ADD_EXECUTABLE (nervici ${NERVICI_SOURCE})
 TARGET_LINK_LIBRARIES (nervici 
     ${SDL_LIBRARY} 

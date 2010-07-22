@@ -1,15 +1,16 @@
-#include <SDL.h>
-#include <math.h>
-#include <vector>
 #include <iostream>
 
-#include "world.h"
-#include "engine/render.h"
-#include "engine/audio.h"
+#include "main.h"
 #include "system.h"
+#include "engine/audio.h"
+#include "engine/render.h"
+#include "game/world.h"
 
-#include "player.h"
-#include "settings/plinfo.h"
+#include "game/player.h"
+#include "game/teams.h"
+
+#define JUMP_LENGTH 24
+#define JUMP_REPEAT 80
 
 void Player::process_fields (const Point& pos, const Fields& fields) {
     if (state == PS_Live || state == PS_Start) {
@@ -26,9 +27,10 @@ void Player::update_body () {
     updates.clear ();
 }
 
-void Player::initialize (plid_tu ID, const PlInfo* info, int max_len) {
+void Player::initialize (plid_tu ID, plid_tu team_id, const PlInfo* info, int max_len) {
     this->id = ID;
     this->info = info;
+    this->team_id = team_id;
     score = 0;
     order = ID;
     max_length = max_len;
@@ -45,6 +47,7 @@ void Player::initialize (plid_tu ID, const PlInfo* info, int max_len) {
     bottom_index = 0;
     timer = 0;
     state = PS_Erased;
+    Teams::inc_state (team_id, state);
     ironized = false;
 }
 
@@ -53,7 +56,7 @@ void Player::uninitialize () {
 }
 
 void Player::erase () {
-    state = PS_Erased;
+    set_state (PS_Erased);
     length = 0;
     bottom = 0;
     bottom_index = 0;
@@ -91,20 +94,20 @@ void Player::resize (plsize_tu new_size) {
         if (head_index > bottom_index) {
             memcpy (new_body, body, size * sizeof (Point));
         } else {
-            memcpy (new_body, body, (head_index + 1) * sizeof(Point));
+            memcpy (new_body, body, (head_index + 1) * sizeof (Point));
             memcpy (&new_body[delta + bottom_index], &body[bottom_index], (size - bottom_index) * sizeof (Point));
-            for (int i = 0; i <= head_index; i++)  {
+            for (int i = 0; i <= head_index; i++) {
                 if (body[i].x != new_body[i].x || body[i].y != new_body[i].y) {
                     cout << "chyba pri kopirovani\n";
                 }
             }
-            for (int i = bottom_index; i < size; i++)  {
+            for (int i = bottom_index; i < size; i++) {
                 if (body[i].x != new_body[i + delta].x || body[i].y != new_body[i + delta].y) {
                     cout << "chyba pri kopirovani\n";
                 }
             }
 
-            bottom_index+= delta;
+            bottom_index += delta;
         }
         delete [] body;
 
@@ -136,7 +139,7 @@ void Player::add_part (const Point& part) {
             head_index++;
             head_index %= size;
             head++;
-            head&= 0xffff;
+            head &= 0xffff;
             length++;
         } else cerr << "error: not enough bodysize\n";
     } else {
@@ -145,7 +148,7 @@ void Player::add_part (const Point& part) {
             head_index++;
             head_index %= size;
             head++;
-            head&= 0xffff;
+            head &= 0xffff;
             length++;
         } else cerr << "error: not enough maxlength\n";
     }
@@ -177,17 +180,17 @@ void Player::live () {
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
         survive = World::test_fields (pos, fields, id, head);
-        if (!survive) state = PS_Death;
+        if (!survive) set_state (PS_Death);
         process_fields (pos, fields);
     } else {
         survive = World::simple_test_fields (pos, fields);
-        if (!survive) state = PS_Death;
+        if (!survive) set_state (PS_Death);
     }
 }
 
 void Player::clear_step () {
     if (length == 0) {
-        state = PS_Erased;
+        set_state (PS_Erased);
         System::mod_on_cleared (id);
     } else {
         clear_bottom ();
@@ -233,7 +236,7 @@ void Player::give_start (startid_tu start) {
 
             exact = st->pos;
             angle = st->angle;
-            state = PS_Start;
+            set_state (PS_Start);
             bottom = 0;
             bottom_index = 0;
             head = 0;
@@ -251,14 +254,20 @@ void Player::give_start (startid_tu start) {
 
 void Player::inc_score (score_ti delta) {
     score += delta;
+    Teams::inc_score (team_id, delta);
 }
 
 void Player::dec_score (score_ti delta) {
     score -= delta;
+    Teams::dec_score (team_id, delta);
 }
 
 void Player::set_score (score_ti value) {
-    score = value;
+    if (score != value) {
+        Teams::dec_score (team_id, score);
+        score = value;
+        Teams::inc_score (team_id, score);
+    }
 }
 
 void Player::fast_clear () {
@@ -269,7 +278,7 @@ void Player::fast_clear () {
         while (length > 0) {
             clear_bottom ();
         }
-        state = PS_Erased;
+        set_state (PS_Erased);
         World::check_starts ();
         break;
     default:
@@ -324,14 +333,14 @@ void Player::set_timer (timer_ti time) {
 
 void Player::start () {
     if (state == PS_Start)
-        state = PS_Live;
+        set_state (PS_Live);
 }
 
 void Player::kill () {
     switch (state) {
     case PS_Start:
     case PS_Live:
-        state = PS_Death;
+        set_state (PS_Death);
         break;
     default:
         break;
@@ -343,14 +352,61 @@ void Player::clear () {
     case PS_Start:
     case PS_Death:
     case PS_Clear:
-        state = PS_Clear;
+        set_state (PS_Clear);
         break;
     default:
         break;
     }
 }
 
-/*void Player::update_score () {
-    Render::draw_player_score (id, order, score, state, ironized);
-}*/
+bool Player::is_human () const {
+    return info->type == PT_Human;
+}
 
+void Player::update_score () {
+    Render::draw_player_score (id, order, score, state, ironized);
+}
+
+score_ti Player::get_score () const {
+    return score;
+}
+
+bool Player::is_jumping () const {
+    return jumptime > JUMP_REPEAT - JUMP_LENGTH;
+}
+
+plsize_tu Player::get_max_length () const {
+    return max_length;
+}
+
+plsize_tu Player::get_length () const {
+    return length;
+}
+
+plid_tu Player::get_id () const {
+    return id;
+}
+
+PlState Player::get_state () const {
+    return state;
+}
+
+bool Player::is_live () const {
+    return state == PS_Live || state == PS_Start;
+}
+
+bool Player::is_ironized () const {
+    return ironized;
+}
+
+plid_tu Player::get_order () const {
+    return order;
+}
+
+void Player::set_state (PlState value) {
+    if (value != state) {
+        Teams::dec_state (team_id, state);
+        state = value;
+        Teams::inc_state (team_id, state);
+    }
+}

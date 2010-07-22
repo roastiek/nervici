@@ -1,5 +1,5 @@
-#include "scrollport.h"
-#include "view.h"
+#include "gui/scrollport.h"
+#include "gui/view.h"
 
 ControlParameters Scrollport::view_parms = {
     0.0, 0.0, 0.0, 0.0, 0.1

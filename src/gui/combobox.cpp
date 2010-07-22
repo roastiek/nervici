@@ -1,4 +1,4 @@
-#include "combobox.h"
+#include "gui/combobox.h"
 
 void Combobox::list_clicked (Control* ctl) {
     set_selected (list->get_selected ());

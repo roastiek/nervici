@@ -1,4 +1,4 @@
-#include "label.h"
+#include "gui/label.h"
 
 Label::Label (const ControlParameters& parms):
 Control(parms) {

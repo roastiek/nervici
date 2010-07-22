@@ -3,12 +3,12 @@
 #include <SDL_gfxPrimitives.h>
 
 #include "utils.h"
-#include "implementor.h"
+#include "gui/implementor.h"
 
-#include "canvas.h"
+#include "gui/canvas.h"
 
 SDL_Surface *make_surface (int width, int height) {
-    return SDL_CreateRGBSurface (SDL_SWSURFACE, width, height, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
+    return SDL_CreateRGBSurface (SDL_SWSURFACE, width, height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
 }
 
 Canvas::Canvas () :
@@ -64,7 +64,11 @@ void Canvas::set_font_color (Uint32 value) {
     impl->font_color.m[0][1] = 0xff & (value >> 24);
     impl->font_color.m[1][1] = 0xff & (value >> 16);
     impl->font_color.m[2][1] = 0xff & (value >> 8);
-    impl->font_color.m[3][1] = 0xff & value;
+    impl->font_color.m[3][1] = 0xff;
+    impl->font_color.m[0][0] = 0xff & (value >> 24);
+    impl->font_color.m[1][0] = 0xff & (value >> 16);
+    impl->font_color.m[2][0] = 0xff & (value >> 8);
+    impl->font_color.m[3][0] = 0x00;
     SDLPango_SetDefaultColor (impl->pango_context, &impl->font_color);
 }
 

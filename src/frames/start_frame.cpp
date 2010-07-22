@@ -1,5 +1,6 @@
-#include "start_frame.h"
 #include "app.h"
+
+#include "frames/start_frame.h"
 
 #define START_WIDTH 300
 

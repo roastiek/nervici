@@ -1,20 +1,9 @@
-//#include <stdlib.h>
-//#include <stdio.h>
 #include <math.h>
-#include <SDL.h>
-#include <iostream>
+//#include <iostream>
+
+#include "app.h"
 
 #include "main.h"
-#include "game/game.h"
-#include "game/world.h"
-
-#include "engine/render.h"
-#include "system.h"
-#include "settings/setting.h"
-#include "settings/plinfo.h"
-#include "engine/audio.h"
-#include "app.h"
-#include "float.h"
 
 using namespace std;
 
@@ -37,8 +26,29 @@ static void calc_angles () {
     }
 }
 
+/*static void print_sdl_matrix (const SDLPango_Matrix& mat) {
+    for (int c = 0; c < 4; c++) {
+        for (int i = 0; i < 4; i++) {
+            cout << int (mat.m[i][c]) << " ";
+        }
+        cout << '\n';
+    }
+}*/
+
 int main (int argc, char *argv[]) {
     calc_angles ();
+
+/*    cout << "black back\n";
+    print_sdl_matrix (*MATRIX_BLACK_BACK);
+    cout << "white back\n";
+    print_sdl_matrix (*MATRIX_WHITE_BACK);
+    cout << "trans black letter\n";
+    print_sdl_matrix (*MATRIX_TRANSPARENT_BACK_BLACK_LETTER);
+    cout << "trans white letter\n";
+    print_sdl_matrix (*MATRIX_TRANSPARENT_BACK_WHITE_LETTER);
+    cout << "trans tran letter\n";
+    print_sdl_matrix (*MATRIX_TRANSPARENT_BACK_TRANSPARENT_LETTER);*/
+
 
     App::initialize ();
     App::run ();

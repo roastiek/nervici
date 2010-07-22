@@ -1,6 +1,6 @@
 #include "utils.h"
 
-#include "smile_control.h"
+#include "gui/smile_control.h"
 
 SmileControl::SmileControl (const ControlParameters& parms, Canvas* face) :
 Control (parms),

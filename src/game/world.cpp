@@ -1,23 +1,23 @@
-#include <SDL.h>
-#include <math.h>
 #include <iostream>
-
-using namespace std;
+#include <math.h>
 
 #include "engine/render.h"
+#include "main.h"
 
-#include "world.h"
+#include "game/world.h"
 
-wsize_tu World::width;
-wsize_tu World::height;
-WorldItem** World::items;
-WorldItem* World::__items;
-vector<Start> World::starts;
-vector<Point> World::items_queue;
+namespace World {
+
+static wsize_tu width;
+static wsize_tu height;
+static WorldItem** items;
+static WorldItem* __items;
+static vector<Start> starts;
+static vector<Point> items_queue;
 
 //#define pos_(X,Y) (width * Y + X)
 
-void World::initialize () {
+void initialize () {
     int x;
 
     width = Render::get_playerground_width ();
@@ -47,13 +47,13 @@ void World::initialize () {
 
 }
 
-void World::uninitialize () {
+void uninitialize () {
     delete [] items;
     delete [] __items;
     starts.clear ();
 }
 
-void World::clear () {
+void clear () {
     for (wsize_tu y = 1; y < height - 1; y++) {
         items[0][y].type = IT_STONE;
         for (wsize_tu x = 1; x < width - 1; x++) {
@@ -67,7 +67,7 @@ void World::clear () {
     }
 }
 
-void World::check_starts () {
+void check_starts () {
     int state;
     wsize_tu fx, fy;
 
@@ -84,7 +84,7 @@ void World::check_starts () {
     }
 }
 
-const Start* World::get_start (startid_tu stid) {
+const Start* get_start (startid_tu stid) {
     Start* result = &starts[stid];
     if (result->ready) {
         result->ready = false;
@@ -92,7 +92,7 @@ const Start* World::get_start (startid_tu stid) {
     } else return NULL;
 }
 
-startid_tu World::find_free_start () {
+startid_tu find_free_start () {
     startid_tu result;
     startid_tu avai = 0;
 
@@ -109,7 +109,7 @@ startid_tu World::find_free_start () {
     return starts.size ();
 }
 
-void World::calc_fields (const FPoint& pos, Fields& fields) {
+void calc_fields (const FPoint& pos, Fields& fields) {
     fields[1][1] = 255;
     fields[2][1] = 255 * (pos.x - floor (pos.x));
     fields[0][1] = 255 - fields[2][1];
@@ -121,7 +121,7 @@ void World::calc_fields (const FPoint& pos, Fields& fields) {
     fields[2][2] = fields[1][2] * fields[2][1] / 255;
 }
 
-bool World::simple_test_fields (const Point& pos, const Fields& fields) {
+bool simple_test_fields (const Point& pos, const Fields& fields) {
     bool result = true;
 
     for (wsize_tu x = 0; x < 3 && result; x++) {
@@ -135,7 +135,7 @@ bool World::simple_test_fields (const Point& pos, const Fields& fields) {
     return result;
 }
 
-bool World::test_fields (const Point& pos, const Fields& fields,
+bool test_fields (const Point& pos, const Fields& fields,
         plid_tu id, plsize_tu head) {
 
     bool result = true;
@@ -166,7 +166,7 @@ bool World::test_fields (const Point& pos, const Fields& fields,
     return result;
 }
 
-void World::write_player_head (const Point& pos, const Fields& fields,
+void write_player_head (const Point& pos, const Fields& fields,
         plid_tu id, plsize_tu head) {
 
     for (wsize_tu x = 0; x < 3; x++) {
@@ -195,7 +195,7 @@ void World::write_player_head (const Point& pos, const Fields& fields,
     }
 }
 
-void World::rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
+void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
 
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -212,7 +212,7 @@ void World::rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu botto
     }
 }
 
-void World::queue_item (wsize_tu x, wsize_tu y) {
+void queue_item (wsize_tu x, wsize_tu y) {
     Point pos = {x, y};
     /*pos.x = x;
     pos.y = y;*/
@@ -221,3 +221,28 @@ void World::queue_item (wsize_tu x, wsize_tu y) {
     World::get_item (x, y).changed = true;
 }
 
+wsize_tu get_width () {
+    return width;
+}
+
+wsize_tu get_height () {
+    return height;
+}
+
+WorldItem & get_item (wsize_tu x, wsize_tu y) {
+    return items[x][y];
+}
+
+WorldItem & get_item (const Point & pos) {
+    return items[pos.x][pos.y];
+}
+
+startid_tu get_starts_count () {
+    return starts.size ();
+}
+
+void render_queue () {
+    Render::draw_world_items_queue (items_queue);
+}
+
+}

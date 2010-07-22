@@ -1,4 +1,4 @@
-#include "listbox.h"
+#include "gui/listbox.h"
 
 ListboxParameters::ListboxParameters (float nx, float ny, float nw, float nh, float nf,
         float nmh, float nih) :
@@ -67,6 +67,7 @@ void Listbox::paint () {
 
     for (size_t i = 0; i < items.size (); i++, y_offset += ih) {
         if (int(i) == get_selected ()) {
+            draw_box (0, y_offset, iw, ih, C_FILL);
             draw_rectangle (0, y_offset, iw, ih, get_foreground ());
         }
         set_font_color (items[i].color);

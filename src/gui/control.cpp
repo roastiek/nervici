@@ -1,6 +1,6 @@
 #include "utils.h"
 
-#include "control.h"
+#include "gui/control.h"
 
 ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
         float nf) :

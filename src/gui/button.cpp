@@ -1,4 +1,4 @@
-#include "button.h"
+#include "gui/button.h"
 
 Button::Button (const ControlParameters& parms):
 Control (parms) {

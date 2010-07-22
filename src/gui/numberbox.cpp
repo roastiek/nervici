@@ -1,6 +1,6 @@
 #include "utils.h"
 
-#include "numberbox.h"
+#include "gui/numberbox.h"
 
 Numberbox::Numberbox (const ControlParameters& parms):
 Textbox (parms) {
