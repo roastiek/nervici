@@ -410,3 +410,15 @@ void Player::set_state (PlState value) {
         Teams::inc_state (team_id, state);
     }
 }
+
+bool Player::operator > (const Player& other) const {
+    return score < other.score || (score == other.score && order > other.order);
+}
+
+bool Player::operator < (const Player& other) const {
+    return score > other.score || (score == other.score && order < other.order);
+}
+
+void Player::set_order (plid_tu value) {
+    order = value;
+}

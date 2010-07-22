@@ -11,9 +11,11 @@ using namespace std;
 namespace Players {
 
 static vector<Player> players;
+static vector<plid_tu> orders;
 
 void initialize (const GameInfo& info) {
     players.resize (info.setting.playersCount);
+    orders.resize (info.setting.playersCount);
 
     int p = 0;
     for (size_t pi = 0; pi < 16; pi++) {
@@ -53,7 +55,21 @@ plid_tu step () {
 }
 
 void update_score () {
+    for (plid_tu pi = 0; pi < orders.size (); pi++) {
+        orders[pi] = 0;
+    }
+
+
+    for (plid_tu oi = 0; oi < players.size (); oi++) {
+        for (plid_tu pi = 0; pi < players.size (); pi++) {
+            if (players[oi] > players[pi]) {
+                orders[oi]++;
+            }
+        }
+    }
+
     for (plid_tu pi = 0; pi < players.size (); pi++) {
+        players[pi].set_order (orders[pi]);
         players[pi].update_score ();
     }
 }

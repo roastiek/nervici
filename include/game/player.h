@@ -171,7 +171,11 @@ public:
 
     plid_tu get_order () const;
 
+    bool operator >(const Player& other) const;
 
+    bool operator <(const Player& other) const;
+
+    void set_order (plid_tu value);
 };
 
 

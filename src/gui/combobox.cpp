@@ -9,7 +9,7 @@ Combobox::Combobox (const ListboxParameters& parms) :
 InputControl (parms),
 selected (-1),
 list_parms (ListboxParameters(0, 0, parms.w, parms.min_height, parms.font_size, parms.min_height, parms.item_height)),
-port_parms (ScrollbarParameters (0.0, 0.0, parms.w, 100, parms.font_size, 1, 10))
+port_parms (ScrollbarParameters (0.0, 0.0, parms.w, 200, parms.font_size, 1, 10))
 {
 }
 

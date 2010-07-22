@@ -39,6 +39,12 @@ public:
     void dec_state (PlState state);
 
     void update_score ();
+
+    bool operator > (const Team& other);
+
+    bool operator < (const Team& other);
+
+    void set_order (plid_tu value);
 };
 
 #endif	/* TEAM_H */

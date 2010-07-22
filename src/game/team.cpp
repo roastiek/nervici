@@ -52,3 +52,15 @@ void Team::update_score () {
 
     Render::draw_team_score (id, order, score, state);
 }
+
+bool Team::operator > (const Team& other) {
+    return score < other.score || (score == other.score && order > other.order);
+}
+
+bool Team::operator < (const Team& other) {
+    return score > other.score || (score == other.score && order < other.order);
+}
+
+void Team::set_order (plid_tu value) {
+    order = value;
+}

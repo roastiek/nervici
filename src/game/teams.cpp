@@ -11,6 +11,7 @@ namespace Teams {
 
 static Team teams[TEAMS_COUNT];
 static vector<Team*> active;
+static vector<plid_tu> orders;
 
 void initialize (const GameInfo& info) {
     active.resize (0);
@@ -21,6 +22,7 @@ void initialize (const GameInfo& info) {
             active.push_back (&teams[ti]);
         }
     }
+    orders.resize (active.size ());
 
     Render::load_teams (info);
 }
@@ -34,7 +36,20 @@ void uninitialize () {
 }
 
 void update_score () {
+    for (size_t ti = 0; ti < orders.size (); ti++) {
+        orders[ti] = 0;
+    }
+
+    for (size_t oi = 0; oi < active.size (); oi++) {
+        for (size_t ti = 0; ti < active.size (); ti++) {
+            if ((*active[oi]) > (*active[ti])) {
+                orders[oi]++;
+            }
+        }
+    }
+
     for (size_t ti = 0; ti < active.size (); ti++) {
+        active[ti]->set_order (orders[ti]);
         active[ti]->update_score ();
     }
 }
