@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include "engine/render.h"
+#include "game/smiles.h"
 #include "main.h"
 
 #include "game/world.h"
@@ -166,6 +167,13 @@ bool test_fields (const Point& pos, const Fields& fields,
     return result;
 }
 
+static void queue_item (wsize_tu x, wsize_tu y) {
+    Point pos = {x, y};
+
+    items_queue.push_back (pos);
+    World::get_item (x, y).changed = true;
+}
+
 void write_player_head (const Point& pos, const Fields& fields,
         plid_tu id, plsize_tu head) {
 
@@ -174,6 +182,8 @@ void write_player_head (const Point& pos, const Fields& fields,
             if (fields[x][y] != 0) {
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
+                case IT_SOFT_SMILE:
+                    Smiles::drop (item.smile.ID);
                 case IT_FREE:
                     item.type = IT_PLAYER;
                     item.player.ID = id;
@@ -186,7 +196,8 @@ void write_player_head (const Point& pos, const Fields& fields,
                         item.player.order = head;
                     }
                     break;
-                case IT_SOFT_SMILE:
+                case IT_HARD_SMILE:
+                    Smiles::drop (item.smile.ID);
                     break;
                 }
                 queue_item (pos.x + x, pos.y + y);
@@ -210,15 +221,6 @@ void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
             }
         }
     }
-}
-
-void queue_item (wsize_tu x, wsize_tu y) {
-    Point pos = {x, y};
-    /*pos.x = x;
-    pos.y = y;*/
-
-    items_queue.push_back (pos);
-    World::get_item (x, y).changed = true;
 }
 
 wsize_tu get_width () {
@@ -245,4 +247,48 @@ void render_queue () {
     Render::draw_world_items_queue (items_queue);
 }
 
+void write_soft_smile (smileid_tu sid, const Point& pos) {
+    for (int x = 0; x < 20; x++) {
+        for (int y = 0; y < 20; y++) {
+            WorldItem& item = get_item (pos.x + x, pos.y + y);
+            item.type = IT_SOFT_SMILE;
+            item.smile.ID = sid;
+        }
+    }
 }
+
+void write_hard_smile (smileid_tu sid, const Point& pos) {
+    for (int x = 0; x < 20; x++) {
+        for (int y = 0; y < 20; y++) {
+            WorldItem& item = get_item (pos.x + x, pos.y + y);
+            item.type = IT_HARD_SMILE;
+            item.smile.ID = sid;
+        }
+    }
+}
+
+void erase_smile (const Point& pos) {
+    for (int x = 0; x < 20; x++) {
+        for (int y = 0; y < 20; y++) {
+            WorldItem& item = get_item (pos.x + x, pos.y + y);
+            item.type = IT_FREE;
+        }
+    }
+}
+
+bool test_smile (smileid_tu sid, const Point& pos) {
+    bool result = true;
+    for (int x = 0; x < 20 && result; x++) {
+        for (int y = 0; y < 20 && result; y++) {
+            WorldItem& item = get_item (pos.x + x, pos.y + y);
+            result&= (item.type == IT_FREE) ||
+                    ((item.type == IT_SOFT_SMILE || item.type == IT_HARD_SMILE) && item.smile.ID == sid);
+        }
+    }
+    return result;
+}
+
+
+
+}
+

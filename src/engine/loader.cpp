@@ -10,9 +10,9 @@
 #include "gui/implementor.h"
 #include "engine/image_type.h"
 #include "engine/font_type.h"
+#include "utils.h"
 
 #include "engine/loader.h"
-#include "utils.h"
 
 namespace Loader {
 
@@ -128,7 +128,7 @@ static const char* const mouth_masks[] = {
     "pozimouth", "negamouth", "flegmouth", "ironmouth"
 };
 
-void load_smile_faces (SmileFaces& faces) {
+void load_smile_faces (SmileImages& faces) {
     DIR* dir;
 
     ustring smiles_dir = System::get_images_dir () + "/smiles";
@@ -189,7 +189,7 @@ void load_smile_faces (SmileFaces& faces) {
     }
 }
 
-void free_smile_faces (SmileFaces& faces) {
+void free_smile_faces (SmileImages& faces) {
     for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
         for (size_t i = 0; i < faces.eyes[sti].size (); i++) {
             SDL_FreeSurface (faces.eyes[sti][i]);

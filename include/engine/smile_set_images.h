@@ -5,8 +5,8 @@
  * Created on 22. červenec 2010, 15:57
  */
 
-#ifndef SMILE_IMAGES_H
-#define	SMILE_IMAGES_H
+#ifndef SMILE_SET_IMAGES_H
+#define	SMILE_SET_IMAGES_H
 
 
 #include "gui/canvas.h"

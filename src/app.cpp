@@ -84,6 +84,7 @@ void initialize () {
     gameinfo.pl_infos[1].pitch = 15;*/
 
     srand (SDL_GetTicks ());
+    srandom (SDL_GetTicks ());
     SDL_EnableUNICODE (1);
     SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 

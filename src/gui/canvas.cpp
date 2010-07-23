@@ -8,7 +8,7 @@
 #include "gui/canvas.h"
 
 SDL_Surface *make_surface (int width, int height) {
-    return SDL_CreateRGBSurface (SDL_SWSURFACE, width, height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
+    return SDL_CreateRGBSurface (SDL_SWSURFACE, width, height, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
 }
 
 Canvas::Canvas () :

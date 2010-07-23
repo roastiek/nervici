@@ -22,6 +22,8 @@ typedef uint8_t startid_tu;
 typedef uint16_t wsize_tu;
 typedef uint8_t plpart_tu;
 typedef uint8_t round_tu;
+typedef uint16_t smileid_tu;
+typedef uint8_t smilelvl_tu;
 
 #ifdef __cplusplus
 }

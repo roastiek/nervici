@@ -38,7 +38,7 @@ protected:
 
     Screen ();
 
-    void init_control (Control* par);
+    virtual void init_control (Control* par);
 
     void on_update (int x, int y, int w, int h);
 

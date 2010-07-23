@@ -10,8 +10,10 @@ using namespace std;
 #include "game/world.h"
 #include "game/players.h"
 #include "game/teams.h"
+#include "game/smiles.h"
 
 #include "game/game.h"
+#include "game/smile.h"
 
 namespace Game {
 
@@ -33,6 +35,7 @@ void initialize (const GameInfo& info) {
     World::initialize ();
     Teams::initialize (info);
     Players::initialize (info);
+    Smiles::initialize (info);
 
     set.startsCount = World::get_starts_count ();
 
@@ -54,6 +57,7 @@ void uninitialize () {
 
     System::unload_mod ();
 
+    Smiles::uninitialize ();
     Players::uninitialize ();
     Teams::uninitialize ();
     World::uninitialize ();
@@ -109,14 +113,16 @@ void run () {
 
         System::mod_before_step ();
         Players::step ();
+        Smiles::step ();
         World::check_starts ();
         System::mod_after_step ();
 
         World::render_queue ();
         Players::update_bodies ();
+        Smiles::update ();
         Players::update_score ();
         Teams::update_score ();
-        //Render::update_screen ();
+        Render::update_screen ();
 
         Audio::music_update ();
 
@@ -218,6 +224,7 @@ void clear_playerground () {
     World::clear ();
     Render::clear_playerground ();
     Players::erase ();
+    Smiles::erase ();
 }
 
 void end_game () {

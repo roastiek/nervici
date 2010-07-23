@@ -50,7 +50,15 @@ namespace World {
 
     void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom);
 
-    void queue_item (wsize_tu x, wsize_tu y);
+    void write_soft_smile (smileid_tu sid, const Point& pos);
+
+    void write_hard_smile (smileid_tu sid, const Point& pos);
+
+    bool test_smile (smileid_tu sid, const Point& pos);
+
+    void erase_smile (const Point& pos);
+
+    //void queue_item (wsize_tu x, wsize_tu y);
 
     void render_queue ();
 };

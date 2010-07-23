@@ -5,6 +5,7 @@ using namespace std;
 
 #include "engine/loader.h"
 #include "engine/image_type.h"
+#include "gui/scale.h"
 #include "engine/font_type.h"
 #include "game/world.h"
 #include "settings/pl_infos.h"
@@ -55,7 +56,8 @@ static vector<TTF_Font*> fonts;
 static vector<SDL_Surface*> teams;
 static GameScreen gs_inner, gs_outer;
 static ScreenSet setting;
-static SmileFaces smile_faces;
+static SmileImages smile_images;
+static vector<SDL_Surface*> smile_faces;
 
 //pojd me do hymen
 
@@ -315,14 +317,14 @@ bool initialize () {
 
     Loader::load_fonts (fonts);
     Loader::load_game_images (images, fonts[FNT_Mono20]);
-    Loader::load_smile_faces (smile_faces);
+    Loader::load_smile_faces (smile_images);
     init_game_screen ();
 
     return false;
 }
 
 void uninitialize () {
-    Loader::free_smile_faces (smile_faces);
+    Loader::free_smile_faces (smile_images);
     Loader::free_game_images (images);
     Loader::free_fonts (fonts);
 
@@ -344,7 +346,7 @@ void load_players (const GameInfo& info) {
         if (info.pl_ids[pi] >= 0) {
             pl_images[p].face = create_player_face (PlInfos::get (info.pl_ids[pi]).color);
             pl_images[p].numbers = create_numbers (PlInfos::get (info.pl_ids[pi]).color,
-            TeamInfos::get(info.pls_team[pi]).color);
+                    TeamInfos::get (info.pls_team[pi]).color);
             p++;
         }
     }
@@ -406,13 +408,15 @@ void draw_world_items_queue (vector<Point>& queue) {
     queue.clear ();
 }
 
-void update_player (wsize_tu x, wsize_tu y) {
+/*void update_player (wsize_tu x, wsize_tu y) {
     SDL_UpdateRect (primary, x + gs_outer.playerground.x,
             y + gs_outer.playerground.y, 3, 3);
-}
+}*/
 
 void update_player (const Point& pos) {
-    update_player (pos.x, pos.y);
+    SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x,
+            pos.y + gs_outer.playerground.y, 3, 3);
+    //    update_player (pos.x, pos.y);
 }
 
 void draw_game_screen () {
@@ -528,15 +532,15 @@ Screen* create_screen (const ustring& name) {
             primary = value;
         }
 
-        void init_control () {
-            Screen::init_control (NULL);
+        void init () {
+            init_control (NULL);
         }
     };
 
     RenderScreen* result = new RenderScreen ();
     result->set_name (name);
     result->set_primary (primary);
-    result->init_control ();
+    result->init ();
     return result;
 }
 
@@ -546,6 +550,115 @@ int get_width () {
 
 int get_height () {
     return primary->h;
+}
+
+static SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl) {
+    SDL_Surface* result;
+    SDL_Rect dest;
+
+    dest.x = 0;
+    dest.y = 0;
+
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 20, 20, 0xff, 0xff00, 0xff0000, 0x000000);
+
+    //SDL_FillRect (result, NULL, 0xffffffff);
+
+    SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
+    int eyes = random () % smile_images.eyes[type].size ();
+    int mouth = random () % smile_images.mouths[type].size ();
+
+    SDL_BlitSurface (smile_images.eyes[type][eyes], NULL, result, &dest);
+    dest.y = 10;
+    SDL_BlitSurface (smile_images.mouths[type][mouth], NULL, result, &dest);
+
+    return result;
+}
+
+static SDL_Surface* create_ham_face (SmileType type) {
+    SDL_Surface* result;
+    SDL_Rect dest;
+    int back;
+
+    switch (type) {
+    case ST_dest:
+        back = 4;
+        break;
+    case ST_term:
+        back = 5;
+        break;
+    default:
+        back = 3;
+        break;
+    }
+
+    dest.x = 0;
+    dest.y = 0;
+
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 20, 40, 0xff, 0xff00, 0xff0000, 0x000000);
+
+    SDL_BlitSurface (smile_images.backs[back], NULL, result, &dest);
+    dest.y = 20;
+    SDL_BlitSurface (smile_images.backs[back], NULL, result, &dest);
+    int eyes = random () % smile_images.eyes[type].size ();
+
+    dest.y = 0;
+    SDL_BlitSurface (smile_images.eyes[type][eyes], NULL, result, &dest);
+
+    return result;
+}
+
+void load_smiles (const GameInfo& info) {
+    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
+        for (int li = 0; li < 3; li++) {
+            for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
+                SDL_Surface* face = create_smile_face (sti, li);
+                smile_faces.push_back (face);
+            }
+        }
+    }
+
+    for (SmileType sti = ST_ham; sti < ST_count; sti++) {
+        for (int li = 0; li < 3; li++) {
+            for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
+                SDL_Surface* face = create_ham_face (sti);
+                smile_faces.push_back (face);
+            }
+        }
+    }
+}
+
+void free_smiles () {
+    for (size_t si = 0; si < smile_faces.size (); si++) {
+        SDL_FreeSurface (smile_faces[si]);
+    }
+    smile_faces.clear ();
+}
+
+void draw_smile (smileid_tu sid, const Point& pos, int phase) {
+    static SDL_Rect src = {0, 0, 20, 20};
+    static SDL_Rect dest = {0, 0, 20, 20};
+
+    src.y = phase * 20;
+    dest.x = pos.x + gs_outer.playerground.x;
+    dest.y = pos.y + gs_outer.playerground.y;
+
+    SDL_BlitSurface (smile_faces[sid], &src, primary, &dest);
+   /* SDL_BlitSurface (smile_images.backs[0], NULL, primary, &dest);
+    SDL_BlitSurface (smile_faces[0], NULL, primary, &dest);*/
+}
+
+void clear_smile (const Point& pos) {
+    static SDL_Rect dest = {0, 0, 20, 20};
+
+    dest.x = pos.x + gs_outer.playerground.x;
+    dest.y = pos.y + gs_outer.playerground.y;
+
+    SDL_BlitSurface (background, &dest, primary, &dest);
+}
+
+void update_smile (const Point& pos) {
+    SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x - 1,
+            pos.y + gs_outer.playerground.y - 1, 22, 22);
 }
 
 }

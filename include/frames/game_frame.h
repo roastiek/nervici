@@ -23,27 +23,6 @@
 
 class GameFrame : public Control {
 private:
-    static ControlParameters parms;
-    static ControlParameters rules_parms;
-    static ListboxParameters mod_parms;
-    static ControlParameters la_speed_parms;
-    static ControlParameters speed_text_parms;
-    static ControlParameters speed_parms;
-    static ControlParameters la_rounds_parms;
-    static ControlParameters rounds_parms;
-    static ControlParameters la_max_score_parms;
-    static ControlParameters max_score_parms;
-    static ControlParameters la_max_length_parms;
-    static ControlParameters max_length_parms;
-    static ControlParameters la_time_parms;
-    static ControlParameters time_parms;
-    static ControlParameters la_step_parms;
-    static ControlParameters step_parms;
-    static ControlParameters la_bonus_parms;
-    static ControlParameters bonus_parms;
-    static ControlParameters start_parms;
-    static ControlParameters cancel_parms;
-
     GameInfo game_info;
 
     MultilineLabel* la_rules;
@@ -60,8 +39,7 @@ private:
     Numberbox* time;
     Numberbox* step;
     Numberbox* bonus;
-    SmileControl* smiles[5][4];
-    SmileControl* big_smile;
+    SmileControl* smiles[5][3];
     SmileSettingImages smile_images;
     Button* btn_start;
     Button* btn_cancel;

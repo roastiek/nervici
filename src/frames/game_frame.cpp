@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "gui/label.h"
 #include "engine/loader.h"
 #include "game/game.h"
@@ -11,164 +13,168 @@
 #define ONE_COLUMN_W ((1024 - 16 - 3 * 17) / 4)
 #define ONE_COLUMN_H (24 + 14 + 26 * 16)
 
-ControlParameters GameFrame::parms = ControlParameters (
-        8, 8, 1024 - 16, ONE_COLUMN_H + 16 + 24 + 8, 10
-        );
+static const ControlParameters frame_parms = {
+    8,
+    8,
+    1024 - 16,
+    ONE_COLUMN_H + 16 + 24 + 8,
+    10
+};
 
-//#define ONE_COLUMN_H (768 - 32 - 24)
+static const ControlParameters rules_parms = {
+    8,
+    8,
+    ONE_COLUMN_W - 7,
+    ONE_COLUMN_H,
+    10
+};
 
-ControlParameters GameFrame::rules_parms = ControlParameters (
-        8, 
-        8,
-        ONE_COLUMN_W - 7,
-        ONE_COLUMN_H,
-        10
-        );
+static const ListboxParameters mod_parms = {
+    rules_parms.x + rules_parms.w + 17,
+    8,
+    ONE_COLUMN_W,
+    24,
+    10, 20, 18
+};
 
-ListboxParameters GameFrame::mod_parms = ListboxParameters (
-        rules_parms.x + rules_parms.w + 17,
-        8,
-        ONE_COLUMN_W,
-        24,
-        10, 20, 18
-        );
+static const ControlParameters la_speed_parms = {
+    mod_parms.x + ONE_COLUMN_W + 17,
+    8,
+    ONE_COLUMN_W,
+    20,
+    10
+};
 
-ControlParameters GameFrame::la_speed_parms = ControlParameters (
-        mod_parms.x + ONE_COLUMN_W + 17, 
-        8,
-        ONE_COLUMN_W,
-        20,
-        10
-        );
+static const ControlParameters speed_parms = {
+    la_speed_parms.x,
+    la_speed_parms.y + la_speed_parms.h,
+    ONE_COLUMN_W - 32,
+    24,
+    10
+};
 
-ControlParameters GameFrame::speed_parms = ControlParameters (
-        la_speed_parms.x, 
-        la_speed_parms.y + la_speed_parms.h,
-        ONE_COLUMN_W - 32,
-        24,
-        10
-        );
+static const ControlParameters speed_text_parms = {
+    la_speed_parms.x + ONE_COLUMN_W - 32,
+    speed_parms.y,
+    32,
+    24,
+    10
+};
 
-ControlParameters GameFrame::speed_text_parms = ControlParameters (
-        la_speed_parms.x + ONE_COLUMN_W - 32,
-        speed_parms.y,
-        32,
-        24,
-        10
-        );
+static const ControlParameters la_rounds_parms = {
+    speed_parms.x,
+    speed_parms.y + speed_parms.h + 8,
+    ONE_COLUMN_W,
+    20,
+    10
+};
 
-ControlParameters GameFrame::la_rounds_parms = ControlParameters (
-        speed_parms.x,
-        speed_parms.y + speed_parms.h + 8,
-        ONE_COLUMN_W,
-        20,
-        10
-        );
+static const ControlParameters rounds_parms = {
+    la_rounds_parms.x,
+    la_rounds_parms.y + la_rounds_parms.h,
+    ONE_COLUMN_W,
+    24,
+    10
+};
 
-ControlParameters GameFrame::rounds_parms = ControlParameters (
-        la_rounds_parms.x,
-        la_rounds_parms.y + la_rounds_parms.h,
-        ONE_COLUMN_W,
-        24,
-        10
-        );
+static const ControlParameters la_max_score_parms = {
+    rounds_parms.x,
+    rounds_parms.y + rounds_parms.h + 8,
+    ONE_COLUMN_W,
+    20,
+    10
+};
 
-ControlParameters GameFrame::la_max_score_parms = ControlParameters (
-        rounds_parms.x,
-        rounds_parms.y + rounds_parms.h + 8,
-        ONE_COLUMN_W,
-        20,
-        10
-        );
+static const ControlParameters max_score_parms = {
+    la_max_score_parms.x,
+    la_max_score_parms.y + la_max_score_parms.h,
+    ONE_COLUMN_W,
+    24,
+    10
+};
 
-ControlParameters GameFrame::max_score_parms = ControlParameters (
-        la_max_score_parms.x,
-        la_max_score_parms.y + la_max_score_parms.h,
-        ONE_COLUMN_W,
-        24,
-        10
-        );
+static const ControlParameters la_max_length_parms = {
+    max_score_parms.x,
+    max_score_parms.y + max_score_parms.h + 8,
+    ONE_COLUMN_W,
+    20,
+    10
+};
 
-ControlParameters GameFrame::la_max_length_parms = ControlParameters (
-        max_score_parms.x,
-        max_score_parms.y + max_score_parms.h + 8,
-        ONE_COLUMN_W,
-        20,
-        10
-        );
+static const ControlParameters max_length_parms = {
+    la_max_length_parms.x,
+    la_max_length_parms.y + la_max_length_parms.h,
+    ONE_COLUMN_W,
+    24,
+    10
+};
 
-ControlParameters GameFrame::max_length_parms = ControlParameters (
-        la_max_length_parms.x,
-        la_max_length_parms.y + la_max_length_parms.h,
-        ONE_COLUMN_W,
-        24,
-        10
-        );
+static const ControlParameters la_time_parms = {
+    max_length_parms.x,
+    max_length_parms.y + max_length_parms.h + 8,
+    ONE_COLUMN_W,
+    20,
+    10
+};
 
-ControlParameters GameFrame::la_time_parms = ControlParameters (
-        max_length_parms.x,
-        max_length_parms.y + max_length_parms.h + 8,
-        ONE_COLUMN_W,
-        20,
-        10
-        );
+static const ControlParameters time_parms = {
+    la_time_parms.x,
+    la_time_parms.y + la_time_parms.h,
+    ONE_COLUMN_W,
+    24,
+    10
+};
 
-ControlParameters GameFrame::time_parms = ControlParameters (
-        la_time_parms.x,
-        la_time_parms.y + la_time_parms.h,
-        ONE_COLUMN_W,
-        24,
-        10
-        );
+static const ControlParameters la_step_parms = {
+    time_parms.x,
+    time_parms.y + time_parms.h + 8,
+    ONE_COLUMN_W,
+    20,
+    10
+};
 
-ControlParameters GameFrame::la_step_parms = ControlParameters (
-        time_parms.x,
-        time_parms.y + time_parms.h + 8,
-        ONE_COLUMN_W,
-        20,
-        10
-        );
+static const ControlParameters step_parms = {
+    la_step_parms.x,
+    la_step_parms.y + la_step_parms.h,
+    ONE_COLUMN_W,
+    24,
+    10
+};
 
-ControlParameters GameFrame::step_parms = ControlParameters (
-        la_step_parms.x,
-        la_step_parms.y + la_step_parms.h,
-        ONE_COLUMN_W,
-        24,
-        10
-        );
-ControlParameters GameFrame::la_bonus_parms = ControlParameters (
-        step_parms.x,
-        step_parms.y + step_parms.h + 8,
-        ONE_COLUMN_W,
-        20,
-        10
-        );
+static const ControlParameters la_bonus_parms = {
+    step_parms.x,
+    step_parms.y + step_parms.h + 8,
+    ONE_COLUMN_W,
+    20,
+    10
+};
 
-ControlParameters GameFrame::bonus_parms = ControlParameters (
-        la_bonus_parms.x,
-        la_bonus_parms.y + la_bonus_parms.h,
-        ONE_COLUMN_W,
-        24,
-        10
-        );
-ControlParameters GameFrame::start_parms = ControlParameters (
-        1024 - 16 - 200 - 16,
-        ONE_COLUMN_H + 16,
-        100,
-        24,
-        10
-        );
+static const ControlParameters bonus_parms = {
+    la_bonus_parms.x,
+    la_bonus_parms.y + la_bonus_parms.h,
+    ONE_COLUMN_W,
+    24,
+    10
+};
 
-ControlParameters GameFrame::cancel_parms = ControlParameters (
-        start_parms.x + start_parms.w + 8,
-        start_parms.y,
-        start_parms.w,
-        start_parms.h,
-        10
-        );
+static const ControlParameters start_parms = {
+    1024 - 16 - 200 - 16,
+    ONE_COLUMN_H + 16,
+    100,
+    24,
+    10
+};
+
+static const ControlParameters cancel_parms = {
+    start_parms.x + start_parms.w + 8,
+    start_parms.y,
+    start_parms.w,
+    start_parms.h,
+    10
+};
 
 GameFrame::GameFrame () :
-Control (parms) {
+Control (frame_parms) {
     game_info.setting.bonus = 1000;
     game_info.setting.gameTime = 0;
     game_info.setting.maxLength = 0;
@@ -181,6 +187,12 @@ Control (parms) {
     for (int pi = 0; pi < 16; pi++) {
         game_info.pl_ids[pi] = -1;
         game_info.pls_team[pi] = 0;
+    }
+
+    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+        for (int li = 0; li < 3; li++) {
+            game_info.smiles.counts[sti][li] = 0;
+        }
     }
 }
 
@@ -228,7 +240,7 @@ void GameFrame::init_control (Control* par) {
     sc_speed = ScaleFactory::create (this, 1, 1, speed_parms, "sc_speed");
     sc_speed->set_min (base_speed / 2);
     sc_speed->set_max (base_speed * 2);
-    sc_speed->register_on_value_changed (Scale::OnValueChanged(this, &GameFrame::speed_value_changed));
+    sc_speed->register_on_value_changed (Scale::OnValueChanged (this, &GameFrame::speed_value_changed));
     sc_speed->set_value (game_info.setting.speed);
 
     LabelFactory::create (this, "pocet kol o vozu:", la_rounds_parms, "la_rounds");
@@ -262,29 +274,30 @@ void GameFrame::init_control (Control* par) {
 
     int smi = 0;
 
-    for (int si = 0; si < 5; si++) {
-        for (int li = 0; li < 4; li++) {
+    for (int si = 0; si < 4; si++) {
+        for (int li = 0; li < 3; li++) {
             smiles[si][li] = SmileControlFactory::create (this, smile_images[smi], smiles_parms, "smiles");
-            smiles[si][li]->set_step ((li < 3) ? 1 : 3);
-            smiles[si][li]->set_count (16 *smiles[si][li]->get_step ());
-            smiles[si][li]->set_value (si * li);
+            smiles[si][li]->set_count (16);
+            smiles[si][li]->set_value (game_info.smiles.counts[si][li]);
 
-            smiles_parms.x+=2 + smiles_parms.w;
+            smiles_parms.x += 2 + smiles_parms.w;
             smi++;
         }
-        smiles_parms.x+= 8;
-        if (si % 2 == 1) {
-            smiles_parms.y+= 8 + smiles_parms.h;
+        smi++;
+        smiles_parms.x += 8;
+        if (si % 3 == 2) {
+            smiles_parms.y += 8 + smiles_parms.h;
             smiles_parms.x = la_speed_parms.x + ONE_COLUMN_W + 17;
         }
     }
-    smiles_parms.x = la_speed_parms.x + ONE_COLUMN_W + 17 + 8 * (2 + smiles_parms.w) + 16;
-    smiles_parms.y = 8;
-    smiles_parms.h*= 3;
-    smiles_parms.h+= 16;
-    big_smile = SmileControlFactory::create (this, smile_images[smi], smiles_parms, "smiles");
-    big_smile->set_count (16 * 15);
-    big_smile->set_step (3);
+    for (int li = 0; li < 3; li++) {
+        smiles[4][li] = SmileControlFactory::create (this, smile_images[smi], smiles_parms, "smiles");
+        smiles[4][li]->set_count (16);
+        smiles[4][li]->set_value (game_info.smiles.counts[SmileType (ST_ham + li)][0]);
+
+        smiles_parms.x += 2 + smiles_parms.w;
+        smi++;
+    }
 
     btn_start = ButtonFactory::create (this, "start", start_parms, "btn_start");
     btn_start->register_on_clicked (OnClicked (this, &GameFrame::btn_start_clicked));
@@ -316,7 +329,7 @@ void GameFrame::preapare () {
 
         for (size_t pi = 0; pi < PlInfos::get_count (); pi++) {
             const PlInfo& info = PlInfos::get (pi);
-            cb_players[ci]->add_item (info.name, trans(info.color));
+            cb_players[ci]->add_item (info.name, trans (info.color));
         }
 
         cb_players[ci]->set_selected (game_info.pl_ids[ci] + 1);
@@ -354,6 +367,26 @@ void GameFrame::btn_start_clicked (Control* ctl) {
             game_info.pls_team[pi] = -1;
         }
     }
+
+    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
+        for (int li = 0; li < 3; li++) {
+            game_info.smiles.counts[sti][li] = (smiles[sti][li]->is_smile_enabled ()) ?
+                    smiles[sti][li]->get_value () : 0;
+        }
+    }
+
+    for (SmileType sti = ST_ham; sti < ST_count; sti++) {
+        game_info.smiles.counts[sti][0] = (smiles[ST_ham][sti - ST_ham]->is_smile_enabled ()) ?
+                smiles[ST_ham][sti - ST_ham]->get_value () : 0;
+    }
+
+    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+        for (int li = 0; li < 3; li++) {
+            cout << int (game_info.smiles.counts[sti][li]) << " ";
+        }
+        cout << '\n';
+    }
+
 
     Game::initialize (game_info);
     Game::run ();

@@ -9,10 +9,12 @@
 #define	GAME_INFO_H
 
 #include "mods/game_setting.h"
+#include "smile_setting.h"
 #include "basic_defs.h"
 
 struct GameInfo {
     GameSetting setting;
+    SmileSetting smiles;
     bool team_active[TEAMS_COUNT];
     int pl_ids[16];
     int pls_team[16];

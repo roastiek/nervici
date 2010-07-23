@@ -46,7 +46,7 @@ CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINAR
 ADD_LIBRARY (mod_cervici SHARED src/mods/mod_cervici.c)
 
 SET (NERVICI_ENGINE src/engine/loader.cpp src/engine/render.cpp src/engine/audio.cpp)
-SET (NERVICI_GAME src/game/game.cpp src/game/player.cpp src/game/world.cpp src/game/players.cpp src/game/team.cpp src/game/teams.cpp)
+SET (NERVICI_GAME src/game/game.cpp src/game/player.cpp src/game/world.cpp src/game/players.cpp src/game/team.cpp src/game/teams.cpp src/game/smile.cpp src/game/smiles.cpp)
 SET (NERVICI_SETTINGS src/settings/setting.cpp src/settings/pl_info.cpp src/settings/pl_infos.cpp src/settings/team_infos.cpp)
 SET (NERVICI_BASE src/utils.cpp src/main.cpp src/system.cpp src/mods/nervici.cpp src/app.cpp)
 SET (NERVICI_GUI src/gui/implementor.cpp src/gui/canvas.cpp src/gui/control.cpp src/gui/input_control.cpp src/gui/button.cpp  src/gui/screen.cpp src/gui/scrollbar.cpp src/gui/scrollport.cpp src/gui/textbox.cpp src/gui/view.cpp src/gui/listbox.cpp src/gui/combobox.cpp src/gui/multiline_label.cpp src/gui/team_button.cpp src/gui/scale.cpp src/gui/numberbox.cpp src/gui/vline.cpp src/gui/label.cpp src/gui/smile_control.cpp)

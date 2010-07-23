@@ -24,7 +24,7 @@ struct WIPlayer {
 };
 
 struct WISmile {
-    uint32_t ID;
+    smileid_tu ID;
 };
 
 struct WorldItem {

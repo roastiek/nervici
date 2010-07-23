@@ -26,9 +26,13 @@ namespace Render {
 
     void free_teams ();
 
+    void load_smiles (const GameInfo& info);
+
+    void free_smiles ();
+
     void clear_playerground ();
 
-    void update_player (wsize_tu x, wsize_tu y);
+    //void update_player (wsize_tu x, wsize_tu y);
 
     void update_player (const Point& pos);
 
@@ -49,6 +53,12 @@ namespace Render {
     void draw_round (round_tu round);
 
     void draw_end ();
+
+    void draw_smile (smileid_tu sid, const Point& pos, int phase = 0);
+
+    void clear_smile (const Point& pos);
+
+    void update_smile (const Point& pos);
 
     wsize_tu get_playerground_width ();
 
