@@ -188,5 +188,8 @@ void cancel_ironize (plid_tu plid) {
     players[plid].cancel_ironize ();
 }
 
+void ironize (plid_tu plid) {
+    players[plid].ironize ();
+}
 
 }

@@ -71,6 +71,8 @@ namespace Players {
     void start_pl (plid_tu plid);
 
     void cancel_ironize (plid_tu plid);
+
+    void ironize (plid_tu plid);
 };
 
 #endif	/* PLAYERS_H */

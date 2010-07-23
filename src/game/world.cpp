@@ -158,7 +158,7 @@ bool test_fields (const Point& pos, const Fields& fields,
                     break;
 
                 default:
-                    result = 0;
+                    result = false;
                     break;
                 }
             }

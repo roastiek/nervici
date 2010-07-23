@@ -178,6 +178,8 @@ public:
     void set_order (plid_tu value);
 
     void cancel_ironize ();
+
+    void ironize ();
 };
 
 

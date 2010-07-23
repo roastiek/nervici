@@ -426,3 +426,8 @@ void Player::set_order (plid_tu value) {
 void Player::cancel_ironize () {
     ironized = false;
 }
+
+
+void Player::ironize () {
+    ironized = true;
+}

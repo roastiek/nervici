@@ -126,6 +126,12 @@ void on_pozi_smile (plid_tu plid, int lvl) {
 }
 
 void on_nega_smile (plid_tu plid, int lvl) {
+    if (!is_pl_ironized (plid)) {
+        dec_pl_score (plid, set->bonus * lvl);
+    } else {
+        inc_pl_score (plid, set->bonus * lvl);
+        pl_cancel_ironize (plid);
+    }
 }
 
 void on_fleg_smile (plid_tu plid, int lvl) {
