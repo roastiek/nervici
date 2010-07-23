@@ -3,6 +3,8 @@
 #include <SDL_image.h>
 #include <SDL/SDL_video.h>
 #include <SDL/SDL_ttf.h>
+#include <dirent.h>
+#include <iostream>
 
 #include "system.h"
 #include "gui/implementor.h"
@@ -10,6 +12,7 @@
 #include "engine/font_type.h"
 
 #include "engine/loader.h"
+#include "utils.h"
 
 namespace Loader {
 
@@ -97,11 +100,11 @@ void load_smile_setting_images (SmileSettingImages& images) {
     };
 
     for (int si = 0; si < 21; si++) {
-        LoaderCanvas* lc = new  LoaderCanvas ();
+        LoaderCanvas* lc = new LoaderCanvas ();
 
         lc->set_width (20);
         lc->set_height (40);
-        SDL_BlitSurface (smiles, &src_area, lc->get_surface(), &dest_area);
+        SDL_BlitSurface (smiles, &src_area, lc->get_surface (), &dest_area);
         images[si] = lc;
         src_area.x += src_area.w;
     }
@@ -116,5 +119,95 @@ void free_smile_setting_images (SmileSettingImages& images) {
         images[si] = NULL;
     }
 }
+
+static const char* const eyes_masks[] = {
+    "pozieyes", "negaeyes", "flegeyes", "ironeyes", "hami", "dest", "temr"
+};
+
+static const char* const mouth_masks[] = {
+    "pozimouth", "negamouth", "flegmouth", "ironmouth"
+};
+
+void load_smile_faces (SmileFaces& faces) {
+    DIR* dir;
+
+    ustring smiles_dir = System::get_images_dir () + "/smiles";
+    vector<ustring> images;
+
+    dir = opendir (smiles_dir.c_str ());
+
+    for (struct dirent* ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
+        if (ent->d_name[0] == '.') continue;
+
+        size_t len = strlen (ent->d_name);
+        if (len < 4) continue;
+        if (strcasecmp (".png", &ent->d_name[len - 4]) != 0) continue;
+
+        images.push_back (ent->d_name);
+    }
+
+    closedir (dir);
+    ustring path;
+
+    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+        size_t prefix_len = strlen (eyes_masks[sti]);
+        ustring prefix;
+
+        for (size_t i = 0; i < images.size (); i++) {
+            prefix = images[i].substr (0, prefix_len).lowercase ();
+
+            if (prefix.compare (eyes_masks[sti]) == 0) {
+                path = smiles_dir + "/" + images[i];
+                SDL_Surface* eyes = IMG_Load (path.c_str ());
+                if (eyes != NULL) {
+                    faces.eyes[sti].push_back (eyes);
+                }
+            }
+        }
+    }
+
+    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
+        size_t prefix_len = strlen (mouth_masks[sti]);
+        ustring prefix;
+
+        for (size_t i = 0; i < images.size (); i++) {
+            prefix = images[i].substr (0, prefix_len).lowercase ();
+
+            if (prefix.compare (mouth_masks[sti]) == 0) {
+                path = smiles_dir + "/" + images[i];
+                SDL_Surface* mouth = IMG_Load (path.c_str ());
+                if (mouth != NULL) {
+                    faces.mouths[sti].push_back (mouth);
+                }
+            }
+        }
+    }
+
+    for (int bi = 0; bi < 6; bi++) {
+        path = smiles_dir + "/smile" + to_string<int> (bi + 1) + ".png";
+        faces.backs[bi] = IMG_Load (path.c_str ());
+    }
+}
+
+void free_smile_faces (SmileFaces& faces) {
+    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+        for (size_t i = 0; i < faces.eyes[sti].size (); i++) {
+            SDL_FreeSurface (faces.eyes[sti][i]);
+        }
+        faces.eyes[sti].clear ();
+    }
+
+    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
+        for (size_t i = 0; i < faces.mouths[sti].size (); i++) {
+            SDL_FreeSurface (faces.mouths[sti][i]);
+        }
+        faces.mouths[sti].clear ();
+    }
+
+    for (int bi = 0; bi < 6; bi++) {
+        SDL_FreeSurface (faces.backs[bi]);
+    }
+}
+
 
 }

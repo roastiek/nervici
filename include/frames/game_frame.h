@@ -8,7 +8,7 @@
 #ifndef GAME_FRAME_H
 #define	GAME_FRAME_H
 
-#include "engine/smile_images.h"
+#include "engine/smile_set_images.h"
 #include "gui/control.h"
 #include "gui/multiline_label.h"
 #include "gui/combobox.h"

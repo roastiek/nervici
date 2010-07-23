@@ -55,6 +55,7 @@ static vector<TTF_Font*> fonts;
 static vector<SDL_Surface*> teams;
 static GameScreen gs_inner, gs_outer;
 static ScreenSet setting;
+static SmileFaces smile_faces;
 
 //pojd me do hymen
 
@@ -314,12 +315,14 @@ bool initialize () {
 
     Loader::load_fonts (fonts);
     Loader::load_game_images (images, fonts[FNT_Mono20]);
+    Loader::load_smile_faces (smile_faces);
     init_game_screen ();
 
     return false;
 }
 
 void uninitialize () {
+    Loader::free_smile_faces (smile_faces);
     Loader::free_game_images (images);
     Loader::free_fonts (fonts);
 
