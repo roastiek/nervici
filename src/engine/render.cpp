@@ -394,10 +394,15 @@ void draw_world_items_queue (vector<Point>& queue) {
         if (item.changed) {
             drawdest.x = pos.x + gs_outer.playerground.x;
             drawdest.y = pos.y + gs_outer.playerground.y;
-            SDL_BlitSurface (background, &drawdest, primary, &drawdest);
 
             switch (item.type) {
+            case IT_FREE:
+            case IT_WALL:
+            case IT_STONE:
+                SDL_BlitSurface (background, &drawdest, primary, &drawdest);
+                break;
             case IT_PLAYER:
+                SDL_BlitSurface (background, &drawdest, primary, &drawdest);
                 drawsrc.x = item.player.body;
                 SDL_BlitSurface (pl_images[item.player.ID].face, &drawsrc, primary, &drawdest);
                 break;
@@ -643,8 +648,8 @@ void draw_smile (smileid_tu sid, const Point& pos, int phase) {
     dest.y = pos.y + gs_outer.playerground.y;
 
     SDL_BlitSurface (smile_faces[sid], &src, primary, &dest);
-   /* SDL_BlitSurface (smile_images.backs[0], NULL, primary, &dest);
-    SDL_BlitSurface (smile_faces[0], NULL, primary, &dest);*/
+    /* SDL_BlitSurface (smile_images.backs[0], NULL, primary, &dest);
+     SDL_BlitSurface (smile_faces[0], NULL, primary, &dest);*/
 }
 
 void clear_smile (const Point& pos) {

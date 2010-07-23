@@ -22,7 +22,7 @@ namespace Smiles {
 
     void update ();
 
-    void drop (smileid_tu sid);
+    void eat (smileid_tu sid, plid_tu pid);
 };
 
 #endif	/* SMILES_H */

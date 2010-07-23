@@ -183,7 +183,7 @@ void write_player_head (const Point& pos, const Fields& fields,
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
                 case IT_SOFT_SMILE:
-                    Smiles::drop (item.smile.ID);
+                    Smiles::eat (item.smile.ID, id);
                 case IT_FREE:
                     item.type = IT_PLAYER;
                     item.player.ID = id;
@@ -196,9 +196,9 @@ void write_player_head (const Point& pos, const Fields& fields,
                         item.player.order = head;
                     }
                     break;
-                case IT_HARD_SMILE:
-                    Smiles::drop (item.smile.ID);
-                    break;
+                /*case IT_HARD_SMILE:
+                    Smiles::eat (item.smile.ID, id);
+                    break;*/
                 }
                 queue_item (pos.x + x, pos.y + y);
             }

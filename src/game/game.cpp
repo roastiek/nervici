@@ -122,7 +122,7 @@ void run () {
         Smiles::update ();
         Players::update_score ();
         Teams::update_score ();
-        Render::update_screen ();
+        //Render::update_screen ();
 
         Audio::music_update ();
 

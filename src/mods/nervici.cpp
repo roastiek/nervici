@@ -5,6 +5,7 @@
 #include "engine/render.h"
 
 #include "mods/nervici.h"
+#include "game/player.h"
 
 
 void clear_playerground () {
@@ -143,3 +144,10 @@ void start_pl (plid_tu plid) {
     Players::start_pl (plid);
 }
 
+int is_pl_ironized (plid_tu plid) {
+    return Players::is_pl_ironized (plid);
+}
+
+void pl_cancel_ironize (plid_tu plid) {
+    Players::cancel_ironize (plid);
+}

@@ -15,7 +15,8 @@
 class Smile {
 protected:
     const smileid_tu id;
-    
+    const smileid_tu order;
+    const smileid_tu count;
     const smilelvl_tu level;
 
     Point pos;
@@ -24,14 +25,14 @@ protected:
 
     bool valid;
 
-    Smile (smileid_tu sid, smilelvl_tu lvl);
+    Smile (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl);
 
 public:
     virtual ~Smile ();
 
     virtual void step ();
 
-    virtual void drop ();
+    virtual void eat (plid_tu pid);
 
     virtual void erase ();
 
@@ -44,7 +45,8 @@ public:
 
 class SmileFactory {
 public:
-    static Smile* create (smileid_tu sid, SmileType stype, smilelvl_tu lvl);
+    static Smile* create (smileid_tu sid, smileid_tu order, smileid_tu count,
+            SmileType stype, smilelvl_tu lvl);
 };
 
 #endif	/* SMILE_H */

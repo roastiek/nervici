@@ -422,3 +422,7 @@ bool Player::operator < (const Player& other) const {
 void Player::set_order (plid_tu value) {
     order = value;
 }
+
+void Player::cancel_ironize () {
+    ironized = false;
+}

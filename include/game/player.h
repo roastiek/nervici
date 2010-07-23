@@ -176,6 +176,8 @@ public:
     bool operator <(const Player& other) const;
 
     void set_order (plid_tu value);
+
+    void cancel_ironize ();
 };
 
 

@@ -180,4 +180,13 @@ void start_pl (plid_tu plid) {
     players[plid].start ();
 }
 
+bool is_pl_ironized (plid_tu plid) {
+    return players[plid].is_ironized ();
+}
+
+void cancel_ironize (plid_tu plid) {
+    players[plid].cancel_ironize ();
+}
+
+
 }

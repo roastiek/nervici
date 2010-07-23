@@ -11,12 +11,17 @@ namespace Smiles {
 static vector<Smile*> smiles;
 
 void initialize (const GameInfo& info) {
+    smileid_tu order = 0;
+
     for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
-                Smile* sm = SmileFactory::create (smiles.size (), sti, li + 1);
+                Smile* sm = SmileFactory::create (smiles.size (),
+                        order, info.smiles.counts[sti][li], sti, li + 1);
                 smiles.push_back (sm);
+                order++;
             }
+            order = 0;
         }
     }
 
@@ -51,8 +56,8 @@ void update () {
     }
 }
 
-void drop (smileid_tu sid) {
-    smiles[sid]->drop ();
+void eat (smileid_tu sid, plid_tu pid) {
+    smiles[sid]->eat (pid);
 }
 
 }

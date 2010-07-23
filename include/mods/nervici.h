@@ -66,6 +66,8 @@ int is_pl_jumping (plid_tu plid);
 
 int is_pl_live (plid_tu plid);
 
+int is_pl_ironized (plid_tu plid);
+
 void kill_pl (plid_tu plid);
 
 void set_pl_max_length (plid_tu plid, plsize_tu length);
@@ -75,6 +77,8 @@ void set_pl_score (plid_tu plid, score_ti score);
 void set_pl_timer (plid_tu plid, timer_ti time);
 
 void start_pl (plid_tu plid);
+
+void pl_cancel_ironize (plid_tu plid);
 
 #ifdef	__cplusplus
 }

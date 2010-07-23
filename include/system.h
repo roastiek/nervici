@@ -120,15 +120,15 @@ namespace System {
 
     void mod_after_step ();
 
-    void mod_on_pozi_smile (int smid, int lvl);
+    void mod_on_pozi_smile (plid_tu plid, int lvl);
 
-    void mod_on_nega_smile (int smid, int lvl);
+    void mod_on_nega_smile (plid_tu plid, int lvl);
 
-    void mod_on_fleg_smile (int smid, int lvl);
+    void mod_on_fleg_smile (plid_tu plid, int lvl);
 
-    void mod_on_iron_smile (int smid, int lvl);
+    void mod_on_iron_smile (plid_tu plid, int lvl);
 
-    void mod_on_ham_smile (int smid, int lvl);
+    void mod_on_ham_smile (plid_tu plid, int lvl);
 
     void mod_on_killed (plid_tu plid, plid_tu murder);
 
