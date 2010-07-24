@@ -54,7 +54,7 @@ void Canvas::set_height (int value) {
 void Canvas::set_font (const ustring& value) {
     SDLPango_FreeContext (impl->pango_context);
     font.name = value;
-    ustring desc = value + " " + to_string<int>(font.size);
+    ustring desc = value + " " + to_string<int>(font.size) + "px";
     impl->pango_context = SDLPango_CreateContext_GivenFontDesc (desc.c_str ());
     SDLPango_SetDefaultColor (impl->pango_context, &impl->font_color);
 }
@@ -75,7 +75,7 @@ void Canvas::set_font_color (Uint32 value) {
 void Canvas::set_font_size (int value) {
     SDLPango_FreeContext (impl->pango_context);
     font.size = value;
-    ustring desc = font.name + " " + to_string<int>(value);
+    ustring desc = font.name + " " + to_string<int>(value) + "px";
     impl->pango_context = SDLPango_CreateContext_GivenFontDesc (desc.c_str ());
     SDLPango_SetDefaultColor (impl->pango_context, &impl->font_color);
 }

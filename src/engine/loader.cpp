@@ -1,8 +1,9 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
-#include <SDL/SDL_video.h>
-#include <SDL/SDL_ttf.h>
+//#include <SDL/SDL_video.h>
+//#include <SDL/SDL_ttf.h>
+#include <SDL_Pango.h>
 #include <dirent.h>
 #include <iostream>
 
@@ -39,6 +40,12 @@ void load_game_images (vector<SDL_Surface*>& images, TTF_Font *font) {
         filename = System::get_images_dir () + gameImages[i - IMT_Semafor];
         images[i] = IMG_Load (filename.c_str ());
     }
+
+    SDLPango_Context* context;
+
+    context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
+
+    SDLPango_FreeContext (context);
 
     images[IMT_Numbers] = TTF_RenderText_Blended (font, "0123456789- ", color);
     images[IMT_Timer] = TTF_RenderText_Shaded (font, "0123456789:.", color, bg);

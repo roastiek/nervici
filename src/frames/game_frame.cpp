@@ -18,7 +18,7 @@ static const ControlParameters frame_parms = {
     8,
     1024 - 16,
     ONE_COLUMN_H + 16 + 24 + 8,
-    10
+    12
 };
 
 static const ControlParameters rules_parms = {
@@ -26,7 +26,7 @@ static const ControlParameters rules_parms = {
     8,
     ONE_COLUMN_W - 7,
     ONE_COLUMN_H,
-    10
+    12
 };
 
 static const ListboxParameters mod_parms = {
@@ -34,7 +34,7 @@ static const ListboxParameters mod_parms = {
     8,
     ONE_COLUMN_W,
     24,
-    10, 20, 18
+    12, 20, 18
 };
 
 static const ControlParameters la_speed_parms = {
@@ -42,7 +42,7 @@ static const ControlParameters la_speed_parms = {
     8,
     ONE_COLUMN_W,
     20,
-    10
+    12
 };
 
 static const ControlParameters speed_parms = {
@@ -50,7 +50,7 @@ static const ControlParameters speed_parms = {
     la_speed_parms.y + la_speed_parms.h,
     ONE_COLUMN_W - 32,
     24,
-    10
+    12
 };
 
 static const ControlParameters speed_text_parms = {
@@ -58,7 +58,7 @@ static const ControlParameters speed_text_parms = {
     speed_parms.y,
     32,
     24,
-    10
+    12
 };
 
 static const ControlParameters la_rounds_parms = {
@@ -66,7 +66,7 @@ static const ControlParameters la_rounds_parms = {
     speed_parms.y + speed_parms.h + 8,
     ONE_COLUMN_W,
     20,
-    10
+    12
 };
 
 static const ControlParameters rounds_parms = {
@@ -74,7 +74,7 @@ static const ControlParameters rounds_parms = {
     la_rounds_parms.y + la_rounds_parms.h,
     ONE_COLUMN_W,
     24,
-    10
+    12
 };
 
 static const ControlParameters la_max_score_parms = {
@@ -82,7 +82,7 @@ static const ControlParameters la_max_score_parms = {
     rounds_parms.y + rounds_parms.h + 8,
     ONE_COLUMN_W,
     20,
-    10
+    12
 };
 
 static const ControlParameters max_score_parms = {
@@ -90,7 +90,7 @@ static const ControlParameters max_score_parms = {
     la_max_score_parms.y + la_max_score_parms.h,
     ONE_COLUMN_W,
     24,
-    10
+    12
 };
 
 static const ControlParameters la_max_length_parms = {
@@ -98,7 +98,7 @@ static const ControlParameters la_max_length_parms = {
     max_score_parms.y + max_score_parms.h + 8,
     ONE_COLUMN_W,
     20,
-    10
+    12
 };
 
 static const ControlParameters max_length_parms = {
@@ -106,7 +106,7 @@ static const ControlParameters max_length_parms = {
     la_max_length_parms.y + la_max_length_parms.h,
     ONE_COLUMN_W,
     24,
-    10
+    12
 };
 
 static const ControlParameters la_time_parms = {
@@ -114,7 +114,7 @@ static const ControlParameters la_time_parms = {
     max_length_parms.y + max_length_parms.h + 8,
     ONE_COLUMN_W,
     20,
-    10
+    12
 };
 
 static const ControlParameters time_parms = {
@@ -122,7 +122,7 @@ static const ControlParameters time_parms = {
     la_time_parms.y + la_time_parms.h,
     ONE_COLUMN_W,
     24,
-    10
+    12
 };
 
 static const ControlParameters la_step_parms = {
@@ -130,7 +130,7 @@ static const ControlParameters la_step_parms = {
     time_parms.y + time_parms.h + 8,
     ONE_COLUMN_W,
     20,
-    10
+    12
 };
 
 static const ControlParameters step_parms = {
@@ -138,7 +138,7 @@ static const ControlParameters step_parms = {
     la_step_parms.y + la_step_parms.h,
     ONE_COLUMN_W,
     24,
-    10
+    12
 };
 
 static const ControlParameters la_bonus_parms = {
@@ -154,7 +154,7 @@ static const ControlParameters bonus_parms = {
     la_bonus_parms.y + la_bonus_parms.h,
     ONE_COLUMN_W,
     24,
-    10
+    12
 };
 
 static const ControlParameters start_parms = {
@@ -162,7 +162,7 @@ static const ControlParameters start_parms = {
     ONE_COLUMN_H + 16,
     100,
     24,
-    10
+    12
 };
 
 static const ControlParameters cancel_parms = {
@@ -170,7 +170,7 @@ static const ControlParameters cancel_parms = {
     start_parms.y,
     start_parms.w,
     start_parms.h,
-    10
+    12
 };
 
 GameFrame::GameFrame () :
@@ -224,8 +224,8 @@ void GameFrame::init_control (Control* par) {
     la_rules = MultilineLabelFactory::create (this, "rules: ", rules_parms, "la_rules");
     cb_mod = ComboboxFactory::create (this, mod_parms, "cb_mod");
 
-    ControlParameters btn_teams_parms (mod_parms.x, 24 + 16, 24, 24, 10);
-    ListboxParameters btn_players_parms (mod_parms.x + 24 + 2, 24 + 16, ONE_COLUMN_W - 24 - 2, 24, 10, 22, 20);
+    ControlParameters btn_teams_parms (mod_parms.x, 24 + 16, 24, 24, 12);
+    ListboxParameters btn_players_parms (mod_parms.x + 24 + 2, 24 + 16, ONE_COLUMN_W - 24 - 2, 24, 12, 22, 20);
 
     for (int pi = 0; pi < 16; pi++) {
         btn_teams[pi] = TeamButtonFactory::create (this, &team_colors, btn_teams_parms, "btn_team");
@@ -270,7 +270,7 @@ void GameFrame::init_control (Control* par) {
 
     ControlParameters smiles_parms (la_speed_parms.x + ONE_COLUMN_W + 17,
             8,
-            22, 146, 8);
+            22, 146, 10);
 
     int smi = 0;
 

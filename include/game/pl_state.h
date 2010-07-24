@@ -26,7 +26,7 @@
  * PS_Clear -> PS_Erased
  */
 typedef enum PlState {
-    PS_Start, PS_Live, PS_Death, PS_Clear, PS_Erased, PS_Count
+    PS_Start, PS_Live, PS_Death, PS_Undeath, PS_Clear, PS_Erased, PS_Count
 } PlState;
 
 inline PlState operator ++(PlState& ps, int) {
