@@ -57,7 +57,7 @@ private:
     plsize_tu bottom;
     plsize_tu bottom_index;
 
-    bool ironized;
+    score_ti ironize_lvl;
 
     vector<Point> updates;
 
@@ -167,8 +167,6 @@ public:
 
     bool is_live () const;
 
-    bool is_ironized () const;
-
     plid_tu get_order () const;
 
     bool operator >(const Player& other) const;
@@ -177,9 +175,13 @@ public:
 
     void set_order (plid_tu value);
 
-    void cancel_ironize ();
+    void set_ironize (score_ti value);
+    
+    void inc_ironize (score_ti delta);
+    
+    void dec_ironize (score_ti delta);
 
-    void ironize ();
+    score_ti get_ironize () const;
 };
 
 

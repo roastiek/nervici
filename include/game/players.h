@@ -58,8 +58,6 @@ namespace Players {
 
     bool is_pl_live (plid_tu plid);
 
-    bool is_pl_ironized (plid_tu plid);
-
     void kill_pl (plid_tu plid);
 
     void set_pl_max_length (plid_tu plid, plsize_tu length);
@@ -70,9 +68,13 @@ namespace Players {
 
     void start_pl (plid_tu plid);
 
-    void cancel_ironize (plid_tu plid);
+    void set_pl_ironize (plid_tu plid, score_ti value);
 
-    void ironize (plid_tu plid);
+    void inc_pl_ironize (plid_tu plid, score_ti delta);
+
+    void dec_pl_ironize (plid_tu plid, score_ti delta);
+
+    score_ti get_pl_ironze (plid_tu plid);
 };
 
 #endif	/* PLAYERS_H */

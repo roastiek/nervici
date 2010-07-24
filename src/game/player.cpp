@@ -48,7 +48,7 @@ void Player::initialize (plid_tu ID, plid_tu team_id, const PlInfo* info, int ma
     timer = 0;
     state = PS_Erased;
     Teams::inc_state (team_id, state);
-    ironized = false;
+    ironize_lvl = 0;
 }
 
 void Player::uninitialize () {
@@ -243,6 +243,7 @@ void Player::give_start (startid_tu start) {
             head_index = 0;
             jumptime = 0;
             length = 0;
+            ironize_lvl = 0;
 
             World::calc_fields (exact, fields);
             pos.x = exact.x - 1;
@@ -364,7 +365,7 @@ bool Player::is_human () const {
 }
 
 void Player::update_score () {
-    Render::draw_player_score (id, order, score, state, ironized);
+    Render::draw_player_score (id, order, score, state, ironize_lvl > 0);
 }
 
 score_ti Player::get_score () const {
@@ -395,10 +396,6 @@ bool Player::is_live () const {
     return state == PS_Live || state == PS_Start;
 }
 
-bool Player::is_ironized () const {
-    return ironized;
-}
-
 plid_tu Player::get_order () const {
     return order;
 }
@@ -423,11 +420,19 @@ void Player::set_order (plid_tu value) {
     order = value;
 }
 
-void Player::cancel_ironize () {
-    ironized = false;
+void Player::set_ironize (score_ti value) {
+    ironize_lvl = value;
 }
 
 
-void Player::ironize () {
-    ironized = true;
+void Player::inc_ironize (score_ti delta) {
+    ironize_lvl+= delta;
+}
+
+void Player::dec_ironize (score_ti delta) {
+    ironize_lvl-= delta;
+}
+
+score_ti Player::get_ironize () const {
+    return ironize_lvl;
 }

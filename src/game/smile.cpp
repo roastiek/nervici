@@ -270,7 +270,6 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;
-        Players::ironize (pid);
         System::mod_on_iron_smile (pid, level);
         Audio::play_effect (pid, ET_SmilePlus);
     }

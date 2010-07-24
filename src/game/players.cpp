@@ -180,16 +180,20 @@ void start_pl (plid_tu plid) {
     players[plid].start ();
 }
 
-bool is_pl_ironized (plid_tu plid) {
-    return players[plid].is_ironized ();
+void set_pl_ironize (plid_tu plid, score_ti value) {
+    players[plid].set_ironize (value);
 }
 
-void cancel_ironize (plid_tu plid) {
-    players[plid].cancel_ironize ();
+void inc_pl_ironize (plid_tu plid, score_ti delta) {
+    players[plid].inc_ironize (delta);
 }
 
-void ironize (plid_tu plid) {
-    players[plid].ironize ();
+void dec_pl_ironize (plid_tu plid, score_ti delta) {
+    players[plid].dec_ironize (delta);
+}
+
+score_ti get_pl_ironze (plid_tu plid) {
+    return players[plid].get_ironize ();
 }
 
 }

@@ -144,10 +144,19 @@ void start_pl (plid_tu plid) {
     Players::start_pl (plid);
 }
 
-int is_pl_ironized (plid_tu plid) {
-    return Players::is_pl_ironized (plid);
+void set_pl_ironize (plid_tu plid, score_ti value) {
+    Players::set_pl_ironize (plid, value);
 }
 
-void pl_cancel_ironize (plid_tu plid) {
-    Players::cancel_ironize (plid);
+void inc_pl_ironize (plid_tu plid, score_ti delta) {
+    Players::inc_pl_ironize (plid, delta);
 }
+
+void dec_pl_ironize (plid_tu plid, score_ti delta) {
+    Players::dec_pl_ironize (plid, delta);
+}
+
+score_ti get_pl_ironzie (plid_tu plid) {
+    return Players::get_pl_ironze (plid);
+}
+

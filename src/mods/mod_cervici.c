@@ -117,20 +117,24 @@ void after_step () {
 }
 
 void on_pozi_smile (plid_tu plid, int lvl) {
-    if (!is_pl_ironized (plid)) {
+    score_ti iron = get_pl_ironzie (plid);
+
+    if (iron <= 0) {
         inc_pl_score (plid, set->bonus * lvl);
     } else {
-        dec_pl_score (plid, set->bonus * lvl);
-        pl_cancel_ironize (plid);
+        dec_pl_score (plid, set->bonus * lvl * iron);
+        set_pl_ironize (plid, 0);
     }
 }
 
 void on_nega_smile (plid_tu plid, int lvl) {
-    if (!is_pl_ironized (plid)) {
+    score_ti iron = get_pl_ironzie (plid);
+
+    if (iron <= 0) {
         dec_pl_score (plid, set->bonus * lvl);
     } else {
-        inc_pl_score (plid, set->bonus * lvl);
-        pl_cancel_ironize (plid);
+        inc_pl_score (plid, set->bonus * lvl + iron);
+        set_pl_ironize (plid, 0);
     }
 }
 
@@ -138,6 +142,7 @@ void on_fleg_smile (plid_tu plid, int lvl) {
 }
 
 void on_iron_smile (plid_tu plid, int lvl) {
+    inc_pl_ironize (plid, lvl);
 }
 
 void on_ham_smile (plid_tu plid, int lvl) {
