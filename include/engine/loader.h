@@ -11,7 +11,7 @@ using namespace std;
 #include "smile_images.h"
 
 namespace Loader {
-    void load_game_images (vector<SDL_Surface*>& images, TTF_Font* font);
+    void load_game_images (vector<SDL_Surface*>& images);
 
     void free_game_images (vector<SDL_Surface*>& images);
 

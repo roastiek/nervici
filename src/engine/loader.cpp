@@ -28,7 +28,7 @@ static const char* const baseFonts[] = {
 
 static const char* const smile_setting = "/smile_setting.png";
 
-void load_game_images (vector<SDL_Surface*>& images, TTF_Font *font) {
+void load_game_images (vector<SDL_Surface*>& images) {
     const SDL_Color color = {255, 255, 255};
     const SDL_Color bg = {0, 0, 0};
     string filename;
@@ -42,13 +42,31 @@ void load_game_images (vector<SDL_Surface*>& images, TTF_Font *font) {
     }
 
     SDLPango_Context* context;
+    SDLPango_Matrix font_color;
+
+    font_color.m[0][0] = 0xff;
+    font_color.m[1][0] = 0xff;
+    font_color.m[2][0] = 0xff;
+    font_color.m[3][0] = 0x00;
+    font_color.m[0][1] = 0xff;
+    font_color.m[1][1] = 0xff;
+    font_color.m[2][1] = 0xff;
+    font_color.m[3][1] = 0xff;
 
     context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
+    SDLPango_SetDefaultColor (context, &font_color);
+    SDLPango_SetSurfaceCreateArgs (context, SDL_SWSURFACE, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
+
+    SDLPango_SetText (context, "0123456789- ", -1);
+    images[IMT_Numbers] = SDLPango_CreateSurfaceDraw (context);
+
+    SDLPango_SetText (context, "0123456789:.", -1);
+    images[IMT_Timer] = SDLPango_CreateSurfaceDraw (context);
 
     SDLPango_FreeContext (context);
 
-    images[IMT_Numbers] = TTF_RenderText_Blended (font, "0123456789- ", color);
-    images[IMT_Timer] = TTF_RenderText_Shaded (font, "0123456789:.", color, bg);
+    //images[IMT_Numbers] = TTF_RenderText_Blended (font, "0123456789- ", color);
+    //images[IMT_Timer] = TTF_RenderText_Shaded (font, "0123456789:.", color, bg);
 }
 
 void free_game_images (vector<SDL_Surface*>& images) {

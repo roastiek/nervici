@@ -196,9 +196,9 @@ void write_player_head (const Point& pos, const Fields& fields,
                         item.player.order = head;
                     }
                     break;
-                /*case IT_HARD_SMILE:
-                    Smiles::eat (item.smile.ID, id);
-                    break;*/
+                    /*case IT_HARD_SMILE:
+                        Smiles::eat (item.smile.ID, id);
+                        break;*/
                 }
                 queue_item (pos.x + x, pos.y + y);
             }
@@ -281,13 +281,12 @@ bool test_smile (smileid_tu sid, const Point& pos) {
     for (int x = 0; x < 20 && result; x++) {
         for (int y = 0; y < 20 && result; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
-            result&= (item.type == IT_FREE) ||
+            result &= (item.type == IT_FREE) ||
                     ((item.type == IT_SOFT_SMILE || item.type == IT_HARD_SMILE) && item.smile.ID == sid);
         }
     }
     return result;
 }
-
 
 
 }

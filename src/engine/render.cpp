@@ -1,5 +1,5 @@
 #include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL_Pango.h>
 #include <iostream>
 using namespace std;
 
@@ -52,12 +52,14 @@ static SDL_Rect dest;
 static SDL_Rect fill_rect;
 static vector<PlayerSurfaces> pl_images;
 static vector<SDL_Surface*> images;
-static vector<TTF_Font*> fonts;
+//static vector<TTF_Font*> fonts;
 static vector<SDL_Surface*> teams;
 static GameScreen gs_inner, gs_outer;
 static ScreenSet setting;
 static SmileImages smile_images;
 static vector<SDL_Surface*> smile_faces;
+static SDLPango_Context* round_context;
+static SDLPango_Context* end_context;
 
 //pojd me do hymen
 
@@ -288,6 +290,41 @@ static void draw_score (int y, SDL_Surface *numbers, int score, PlState state, b
     SDL_UpdateRect (primary, gs_outer.score.x, dest.y, gs_outer.score.w, numbers->h);
 }
 
+static void init_fonts () {
+    SDLPango_Matrix color;
+
+    round_context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
+    SDLPango_SetSurfaceCreateArgs (round_context, SDL_HWSURFACE, 32,
+    0xff, 0xff00, 0xff0000, 0xff000000);
+
+    color.m[0][0] = 0xff;
+    color.m[1][0] = 0xd5;
+    color.m[2][0] = 0xd5;
+    color.m[3][0] = 0;
+
+    color.m[0][1] = 0xff;
+    color.m[1][1] = 0xd5;
+    color.m[2][1] = 0xd5;
+    color.m[3][1] = 0xff;
+    SDLPango_SetDefaultColor (round_context, &color);
+
+    
+    end_context = SDLPango_CreateContext_GivenFontDesc ("Sans 100px");
+    SDLPango_SetSurfaceCreateArgs (end_context, SDL_HWSURFACE, 32,
+    0xff, 0xff00, 0xff0000, 0xff000000);
+
+    color.m[0][0] = 0xff;
+    color.m[1][0] = 0xff;
+    color.m[2][0] = 0x80;
+    color.m[3][0] = 0;
+
+    color.m[0][1] = 0xff;
+    color.m[1][1] = 0xff;
+    color.m[2][1] = 0x80;
+    color.m[3][1] = 0xff;
+    SDLPango_SetDefaultColor (end_context, &color);
+}
+
 bool initialize () {
     int flag;
     load_screen_setting ();
@@ -315,8 +352,9 @@ bool initialize () {
     fill_rect.h -= 2;
     SDL_FillRect (background, &fill_rect, 0x0);
 
-    Loader::load_fonts (fonts);
-    Loader::load_game_images (images, fonts[FNT_Mono20]);
+    init_fonts ();
+//    Loader::load_fonts (fonts);
+    Loader::load_game_images (images);
     Loader::load_smile_faces (smile_images);
     init_game_screen ();
 
@@ -326,7 +364,9 @@ bool initialize () {
 void uninitialize () {
     Loader::free_smile_faces (smile_images);
     Loader::free_game_images (images);
-    Loader::free_fonts (fonts);
+//    Loader::free_fonts (fonts);
+    SDLPango_FreeContext (round_context);
+    SDLPango_FreeContext (end_context);
 
     if (merge != NULL) SDL_FreeSurface (merge);
     if (background != NULL) SDL_FreeSurface (background);
@@ -469,8 +509,8 @@ void draw_semafor (int state) {
 }
 
 void draw_round (round_tu round) {
-    static const SDL_Color fg = {255, 255, 255};
-    static const SDL_Color bg = {0, 0, 0};
+//    static const SDL_Color fg = {255, 255, 255};
+//    static const SDL_Color bg = {0, 0, 0};
     static char tt[] = "kolo:   ";
     SDL_Rect dest = gs_inner.round;
     SDL_Surface *text;
@@ -486,8 +526,11 @@ void draw_round (round_tu round) {
         tt[7] = ' ';
     }
 
-    text = TTF_RenderText_Shaded (fonts[FNT_Mono20], tt, fg, bg);
+//    text = TTF_RenderText_Shaded (fonts[FNT_Mono20], tt, fg, bg);
+    SDLPango_SetText (round_context, tt, -1);
+    text = SDLPango_CreateSurfaceDraw (round_context);
     dest.x += (dest.w - text->w) / 2;
+    dest.y+= (dest.h - text->h) / 2;
     SDL_BlitSurface (text, NULL, primary, &dest);
     SDL_FreeSurface (text);
 
@@ -496,10 +539,12 @@ void draw_round (round_tu round) {
 
 void draw_end () {
     SDL_Rect dest = gs_outer.playerground;
-    static const SDL_Color fg = {255, 255, 127};
+//    static const SDL_Color fg = {255, 255, 127};
     SDL_Surface *text;
 
-    text = TTF_RenderText_Blended (fonts[FNT_Mono100], "The Konec", fg);
+//    text = TTF_RenderText_Blended (fonts[FNT_Mono100], "The Konec", fg);
+    SDLPango_SetMarkup (end_context,  "The Konec", -1);
+    text = SDLPango_CreateSurfaceDraw (end_context);
     dest.x += (dest.w - text->w) / 2;
     dest.y += (dest.h - text->h) / 2;
 
@@ -564,7 +609,7 @@ static SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl) {
     dest.x = 0;
     dest.y = 0;
 
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 20, 20, 0xff, 0xff00, 0xff0000, 0x000000);
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 20, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
 
     //SDL_FillRect (result, NULL, 0xffffffff);
 
@@ -599,14 +644,14 @@ static SDL_Surface* create_ham_face (SmileType type) {
     dest.x = 0;
     dest.y = 0;
 
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 20, 40, 0xff, 0xff00, 0xff0000, 0x000000);
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
 
     SDL_BlitSurface (smile_images.backs[back], NULL, result, &dest);
-    dest.y = 20;
+    dest.x = 20;
     SDL_BlitSurface (smile_images.backs[back], NULL, result, &dest);
     int eyes = random () % smile_images.eyes[type].size ();
 
-    dest.y = 0;
+    dest.x = 0;
     SDL_BlitSurface (smile_images.eyes[type][eyes], NULL, result, &dest);
 
     return result;
@@ -643,7 +688,7 @@ void draw_smile (smileid_tu sid, const Point& pos, int phase) {
     static SDL_Rect src = {0, 0, 20, 20};
     static SDL_Rect dest = {0, 0, 20, 20};
 
-    src.y = phase * 20;
+    src.x = phase * 20;
     dest.x = pos.x + gs_outer.playerground.x;
     dest.y = pos.y + gs_outer.playerground.y;
 
