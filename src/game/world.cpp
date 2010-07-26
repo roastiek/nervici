@@ -288,6 +288,17 @@ bool test_smile (smileid_tu sid, const Point& pos) {
     return result;
 }
 
+bool test_dest_smile (smileid_tu sid, const Point& pos) {
+    bool result = true;
+    for (int x = 0; x < 20 && result; x++) {
+        for (int y = 0; y < 20 && result; y++) {
+            WorldItem& item = get_item (pos.x + x, pos.y + y);
+            result &= (item.type == IT_FREE) || (item.type == IT_PLAYER) ||
+                    ((item.type == IT_SOFT_SMILE || item.type == IT_HARD_SMILE) && item.smile.ID == sid);
+        }
+    }
+    return result;
+}
 
 }
 

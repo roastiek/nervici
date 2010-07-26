@@ -29,8 +29,8 @@ static const char* const baseFonts[] = {
 static const char* const smile_setting = "/smile_setting.png";
 
 void load_game_images (vector<SDL_Surface*>& images) {
-    const SDL_Color color = {255, 255, 255};
-    const SDL_Color bg = {0, 0, 0};
+//    const SDL_Color color = {255, 255, 255};
+//    const SDL_Color bg = {0, 0, 0};
     string filename;
     ImageType i;
 
@@ -146,7 +146,7 @@ void free_smile_setting_images (SmileSettingImages& images) {
 }
 
 static const char* const eyes_masks[] = {
-    "pozieyes", "negaeyes", "flegeyes", "ironeyes", "hami", "dest", "temr"
+    "pozieyes", "negaeyes", "flegeyes", "ironeyes", "hami", "dest", "term"
 };
 
 static const char* const mouth_masks[] = {

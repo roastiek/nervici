@@ -56,6 +56,8 @@ namespace World {
 
     bool test_smile (smileid_tu sid, const Point& pos);
 
+    bool test_dest_smile (smileid_tu sid, const Point& pos);
+
     void erase_smile (const Point& pos);
 
     //void queue_item (wsize_tu x, wsize_tu y);

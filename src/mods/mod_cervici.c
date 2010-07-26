@@ -100,7 +100,7 @@ void after_step () {
         }
     }
 
-    if (live_pls_count () <= 0) {
+    /*if (live_pls_count () <= 0) {
         stop_music ();
         set_semafor (SEMAFOR_OF);
 
@@ -113,7 +113,7 @@ void after_step () {
             next_round ();
             begin_start_procedure ();
         }
-    }
+    }*/
 }
 
 void on_pozi_smile (plid_tu plid, int lvl) {
