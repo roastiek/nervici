@@ -180,11 +180,17 @@ void Player::live () {
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
         survive = World::test_fields (pos, fields, id, head);
-        if (!survive) set_state (PS_Death);
+        if (!survive) {
+            set_state (PS_Death);
+            System::mod_on_death (id);
+        }
         process_fields (pos, fields);
     } else {
         survive = World::simple_test_fields (pos, fields);
-        if (!survive) set_state (PS_Death);
+        if (!survive) {
+            set_state (PS_Death);
+            System::mod_on_death (id);
+        }
     }
 }
 
@@ -194,6 +200,20 @@ void Player::clear_step () {
         System::mod_on_cleared (id);
     } else {
         clear_bottom ();
+    }
+}
+
+void Player::try_revive () {
+    Point pos;
+
+    pos.x = exact.x - 1;
+    pos.y = exact.y - 1;
+    World::calc_fields (exact, fields);
+
+    bool survive = World::test_fields (pos, fields, id, head);
+    if (survive) {
+        set_state (PS_Live);
+        process_fields (pos, fields);
     }
 }
 
@@ -218,6 +238,9 @@ int Player::step (const Uint8 *keys) {
         break;
     case PS_Clear:
         clear_step ();
+        break;
+    case PS_Undeath:
+        try_revive ();
         break;
     default:
         break;
@@ -276,6 +299,7 @@ void Player::fast_clear () {
     case PS_Start:
     case PS_Death:
     case PS_Clear:
+    case PS_Undeath:
         while (length > 0) {
             clear_bottom ();
         }
@@ -341,6 +365,7 @@ void Player::kill () {
     switch (state) {
     case PS_Start:
     case PS_Live:
+    case PS_Undeath:
         set_state (PS_Death);
         break;
     default:
@@ -353,7 +378,19 @@ void Player::clear () {
     case PS_Start:
     case PS_Death:
     case PS_Clear:
+    case PS_Undeath:
         set_state (PS_Clear);
+        break;
+    default:
+        break;
+    }
+}
+
+void Player::revive () {
+    switch (state) {
+    case PS_Death:
+    case PS_Clear:
+        set_state (PS_Undeath);
         break;
     default:
         break;
@@ -408,11 +445,11 @@ void Player::set_state (PlState value) {
     }
 }
 
-bool Player::operator > (const Player& other) const {
+bool Player::operator> (const Player& other) const {
     return score < other.score || (score == other.score && order > other.order);
 }
 
-bool Player::operator < (const Player& other) const {
+bool Player::operator< (const Player& other) const {
     return score > other.score || (score == other.score && order < other.order);
 }
 
@@ -424,13 +461,12 @@ void Player::set_ironize (score_ti value) {
     ironize_lvl = value;
 }
 
-
 void Player::inc_ironize (score_ti delta) {
-    ironize_lvl+= delta;
+    ironize_lvl += delta;
 }
 
 void Player::dec_ironize (score_ti delta) {
-    ironize_lvl-= delta;
+    ironize_lvl -= delta;
 }
 
 score_ti Player::get_ironize () const {

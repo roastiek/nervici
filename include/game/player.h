@@ -73,6 +73,13 @@ private:
 
     void set_state (PlState value);
 
+    /*
+     * Called when state is PS_Clear, clear last part
+     */
+    void clear_step ();
+
+    void try_revive ();
+
 public:
 
     void initialize (plid_tu ID, plid_tu team_id, const PlInfo* plinfo, int max_len);
@@ -82,10 +89,6 @@ public:
      * Set state to PS_Erased
      */
     void erase ();
-    /*
-     * Called when state is PS_Clear, clear last part
-     */
-    void clear_step ();
     /*
      * Update player's timer and posiblly call on_pl_timer event
      */
@@ -143,6 +146,8 @@ public:
      * start clearing player corpose
      */
     void clear ();
+
+    void revive ();
 
     /*
      * draw player's score

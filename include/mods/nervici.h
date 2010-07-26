@@ -76,6 +76,8 @@ void set_pl_timer (plid_tu plid, timer_ti time);
 
 void start_pl (plid_tu plid);
 
+void revive_pl (plid_tu plid);
+
 void set_pl_ironize (plid_tu plid, score_ti value);
 
 void inc_pl_ironize (plid_tu plid, score_ti delta);

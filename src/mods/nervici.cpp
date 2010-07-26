@@ -144,6 +144,10 @@ void start_pl (plid_tu plid) {
     Players::start_pl (plid);
 }
 
+void revive_pl (plid_tu plid) {
+    Players::revive_pl (plid);
+}
+
 void set_pl_ironize (plid_tu plid, score_ti value) {
     Players::set_pl_ironize (plid, value);
 }

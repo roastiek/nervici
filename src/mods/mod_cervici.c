@@ -86,6 +86,7 @@ void on_timer () {
 }
 
 void on_death (int plid) {
+    revive_pl (plid);
 }
 
 void before_step () {

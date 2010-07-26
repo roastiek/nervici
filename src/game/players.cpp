@@ -180,6 +180,11 @@ void start_pl (plid_tu plid) {
     players[plid].start ();
 }
 
+void revive_pl (plid_tu plid) {
+    players[plid].revive ();
+}
+
+
 void set_pl_ironize (plid_tu plid, score_ti value) {
     players[plid].set_ironize (value);
 }
