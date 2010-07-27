@@ -131,6 +131,12 @@ void run () {
     Game::uninitialize ();*/
 }
 
+void quit () {
+    SDL_Event event;
+    event.type = SDL_QUIT;
+    SDL_PushEvent (&event);
+}
+
 static void hide_previous () {
     if (active_frame != NULL)
         active_frame->set_visible (false);
@@ -140,6 +146,7 @@ StartFrame* switch_to_start_frame () {
     hide_previous ();
     start_frame->set_visible (true);
     start_frame->grab_focus ();
+    active_frame = start_frame;
     return start_frame;
 }
 
@@ -147,6 +154,7 @@ GameFrame* switch_game_frame () {
     hide_previous ();
     game_frame->set_visible (true);
     game_frame->grab_focus ();
+    active_frame = game_frame;
     return game_frame;
 }
 }

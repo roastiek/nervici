@@ -535,6 +535,9 @@ void Control::set_visible (bool value) {
     if (visible != value) {
         visible = value;
         invalidate ();
+        if (!visible && get_parent () != NULL) {
+            get_parent ()->invalidate ();
+        }
     }
 }
 

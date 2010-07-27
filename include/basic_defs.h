@@ -12,7 +12,7 @@
 #define angles 160
 #define base_speed 12
 #define TEAMS_COUNT 5
-#define AIS_COUNT 16
+//#define AIS_COUNT 16
 
 #endif	/* BASIC_DEFS_H */
 

@@ -15,6 +15,7 @@ namespace App  {
     void initialize ();
     void uninitialize ();
     void run ();
+    void quit ();
 
     StartFrame* switch_to_start_frame ();
     GameFrame* switch_game_frame ();
