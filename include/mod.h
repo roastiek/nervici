@@ -9,6 +9,7 @@
 #define	MOD_H
 
 #include "mod_runner.h"
+#include "mods/mod_specification.h"
 
 struct Mod {
     const ModRunner *runner;
@@ -16,6 +17,7 @@ struct Mod {
     ustring name;
     ustring autor;
     ustring rules;
+    ModSpecification spec;
 };
 
 

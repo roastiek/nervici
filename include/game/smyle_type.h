@@ -9,13 +9,17 @@
 #define	SMYLE_TYPES_H
 
 enum SmileType {
-    ST_pozi, ST_nega, ST_fleg, ST_iron, ST_ham, ST_dest, ST_term, ST_count
+    ST_pozi, ST_nega, ST_fleg, ST_iron, ST_ham, ST_count
 };
 
-inline SmileType operator ++(SmileType& st, int) {
+
+#ifdef __cplusplus
+
+inline SmileType operator ++ (SmileType& st, int) {
     st = (SmileType) (st + 1);
     return st;
 }
+#endif
 
 
 #endif	/* SMYLE_TYPES_H */

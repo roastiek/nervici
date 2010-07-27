@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-typedef struct _GameSetting {
+struct GameSetting {
     int playersCount;
     int teams_count;
     int startsCount;
@@ -23,7 +23,7 @@ typedef struct _GameSetting {
     int maxLength;
     int maxScore;
     int step;
-} GameSetting;
+};
    
 
 #ifdef	__cplusplus

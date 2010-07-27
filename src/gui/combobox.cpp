@@ -130,6 +130,7 @@ int Combobox::get_items_count () const {
 void Combobox::set_selected (int value) {
     if (selected != value) {
         selected = value;
+        on_selected_changed (selected);
         invalidate ();
     }
 }
@@ -138,3 +139,10 @@ int Combobox::get_selected () const {
     return selected;
 }
 
+void Combobox::on_selected_changed (int sel) {
+    call_selected_changed(this, sel);
+}
+
+void Combobox::register_on_selected_changed (const OnSelectedChanged& handler) {
+    call_selected_changed = handler;
+}

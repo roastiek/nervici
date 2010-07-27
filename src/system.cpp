@@ -11,7 +11,7 @@
 using namespace std;
 
 #include "config.h"
-#include "mods/mods.h"
+#include "mods/mod_interface.h"
 
 #include "system.h"
 
@@ -192,6 +192,7 @@ static void find_scripts (const vector<ustring>& files, vector<ModRunner>& runne
                     entry.autor = minfo->autor;
                     entry.name = minfo->name;
                     entry.rules = minfo->rules;
+                    entry.spec = minfo->spec;
                     mods.push_back (entry);
                 }
             }
@@ -204,6 +205,7 @@ static void find_scripts (const vector<ustring>& files, vector<ModRunner>& runne
             entry.autor = minfo->autor;
             entry.name = minfo->name;
             entry.rules = minfo->rules;
+            entry.spec = minfo->spec;
             mods.push_back (entry);
         }
         dlclose (handle);
@@ -343,7 +345,7 @@ const Mod & get_mod (size_t mid) {
 
 void mod_on_game_start (const GameSetting * set) {
     if (mod_events.on_game_start != NULL)
-        mod_events.on_game_start (set);
+        mod_events.on_game_start (*set);
 }
 
 void mod_on_game_end () {

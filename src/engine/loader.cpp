@@ -146,11 +146,15 @@ void free_smile_setting_images (SmileSettingImages& images) {
 }
 
 static const char* const eyes_masks[] = {
-    "pozieyes", "negaeyes", "flegeyes", "ironeyes", "hami", "dest", "term"
+    "pozieyes", "negaeyes", "flegeyes", "ironeyes"
 };
 
 static const char* const mouth_masks[] = {
     "pozimouth", "negamouth", "flegmouth", "ironmouth"
+};
+
+static const char* const ham_masks[] = {
+    "hami", "dest", "term"
 };
 
 void load_smile_faces (SmileImages& faces) {
@@ -174,7 +178,7 @@ void load_smile_faces (SmileImages& faces) {
     closedir (dir);
     ustring path;
 
-    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
         size_t prefix_len = strlen (eyes_masks[sti]);
         ustring prefix;
 
@@ -189,11 +193,6 @@ void load_smile_faces (SmileImages& faces) {
                 }
             }
         }
-    }
-
-    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
-        size_t prefix_len = strlen (mouth_masks[sti]);
-        ustring prefix;
 
         for (size_t i = 0; i < images.size (); i++) {
             prefix = images[i].substr (0, prefix_len).lowercase ();
@@ -203,6 +202,23 @@ void load_smile_faces (SmileImages& faces) {
                 SDL_Surface* mouth = IMG_Load (path.c_str ());
                 if (mouth != NULL) {
                     faces.mouths[sti].push_back (mouth);
+                }
+            }
+        }
+    }
+
+    for (int hi = 0; hi < 3; hi++) {
+        size_t prefix_len = strlen (ham_masks[hi]);
+        ustring prefix;
+
+        for (size_t i = 0; i < images.size (); i++) {
+            prefix = images[i].substr (0, prefix_len).lowercase ();
+
+            if (prefix.compare (ham_masks[hi]) == 0) {
+                path = smiles_dir + "/" + images[i];
+                SDL_Surface* ham = IMG_Load (path.c_str ());
+                if (ham != NULL) {
+                    faces.hams[hi].push_back (ham);
                 }
             }
         }

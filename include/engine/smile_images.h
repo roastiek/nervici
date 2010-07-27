@@ -16,8 +16,9 @@ using namespace std;
 #include "game/smyle_type.h"
 
 struct SmileImages {
-    vector<SDL_Surface*> eyes[ST_count];
-    vector<SDL_Surface*> mouths[ST_count];
+    vector<SDL_Surface*> eyes[ST_ham];
+    vector<SDL_Surface*> mouths[ST_ham];
+    vector<SDL_Surface*> hams[3];
     SDL_Surface* backs[6];
 };
 

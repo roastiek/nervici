@@ -3,29 +3,46 @@
 #include <string.h>
 
 #include "mods/nervici.h"
-#include "mods/mods.h"
+#include "mods/mod_interface.h"
 
 static const char * const exts[] = {
     "", NULL
 };
 
-static ModRunnerInfo runner_info = {
+static const struct ModRunnerInfo runner_info = {
     NULL
 };
 
-static ModInfo info = {
+static const struct ModInfo info = {
     "cervici",
     "bobo",
     "proste cervici",
+    {16,
+    1,  1,  1, 0, 1, 1,     1,
+    12, 10, 0, 0, 1, 1000,  0,
+    {
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0},
+    },
+    {
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0},
+    }}
 };
 
-static const GameSetting *set;
+static struct GameSetting set;
 
-const ModRunnerInfo *get_mod_runner_info () {
+const struct ModRunnerInfo *get_mod_runner_info () {
     return &runner_info;
 }
 
-const ModInfo *get_mod_info (const char* script) {
+const struct ModInfo *get_mod_info (const char* script) {
     return &info;
 }
 
@@ -37,10 +54,10 @@ static void begin_start_procedure () {
     set_semafor (SEMAFOR_R1);
     game_wait (WAIT_TIME);
 
-    for (int pi = 0; pi < set->playersCount; pi++) {
+    for (int pi = 0; pi < set.playersCount; pi++) {
         if (is_pl_human (pi)) {
             sid = world_find_free_start ();
-            if (sid < set->startsCount) {
+            if (sid < set.startsCount) {
                 give_pl_start (pi, sid);
             }
         }
@@ -49,10 +66,10 @@ static void begin_start_procedure () {
     game_wait (WAIT_TIME);
 
 
-    for (int pi = 0; pi < set->playersCount; pi++) {
+    for (int pi = 0; pi < set.playersCount; pi++) {
         if (!is_pl_human (pi)) {
             sid = world_find_free_start ();
-            if (sid < set->startsCount) {
+            if (sid < set.startsCount) {
                 give_pl_start (pi, sid);
             }
         }
@@ -61,7 +78,7 @@ static void begin_start_procedure () {
     game_wait (WAIT_TIME);
 
     play_music (0);
-    for (int pi = 0; pi < set->playersCount; pi++) {
+    for (int pi = 0; pi < set.playersCount; pi++) {
         start_pl (pi);
     }
     set_semafor (SEMAFOR_G1);
@@ -73,7 +90,7 @@ void load_script (const char* script) {
 void unload_script () {
 }
 
-void on_game_start (const GameSetting *nset) {
+void on_game_start (struct GameSetting nset) {
     set = nset;
 
     begin_start_procedure ();
@@ -95,7 +112,7 @@ void before_step () {
 void after_step () {
     int p;
 
-    for (p = 0; p < set->playersCount; p++) {
+    for (p = 0; p < set.playersCount; p++) {
         if (is_pl_live (p)) {
             inc_pl_score (p, 1);
         }
@@ -121,9 +138,9 @@ void on_pozi_smile (plid_tu plid, int lvl) {
     score_ti iron = get_pl_ironzie (plid);
 
     if (iron <= 0) {
-        inc_pl_score (plid, set->bonus * lvl);
+        inc_pl_score (plid, set.bonus * lvl);
     } else {
-        dec_pl_score (plid, set->bonus * lvl * iron);
+        dec_pl_score (plid, set.bonus * lvl * iron);
         set_pl_ironize (plid, 0);
     }
 }
@@ -132,9 +149,9 @@ void on_nega_smile (plid_tu plid, int lvl) {
     score_ti iron = get_pl_ironzie (plid);
 
     if (iron <= 0) {
-        dec_pl_score (plid, set->bonus * lvl);
+        dec_pl_score (plid, set.bonus * lvl);
     } else {
-        inc_pl_score (plid, set->bonus * lvl + iron);
+        inc_pl_score (plid, set.bonus * lvl + iron);
         set_pl_ironize (plid, 0);
     }
 }

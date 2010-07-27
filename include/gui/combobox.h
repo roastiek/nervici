@@ -12,6 +12,10 @@
 #include "listbox.h"
 
 class Combobox : public InputControl {
+public:
+
+    typedef Event1<Combobox*, int> OnSelectedChanged;
+
 private:
     Listbox* list;
 
@@ -21,6 +25,7 @@ private:
 
     ListboxParameters list_parms;
     ScrollbarParameters port_parms;
+    OnSelectedChanged call_selected_changed;
 
     void list_clicked (Control* ctl);
 
@@ -46,6 +51,8 @@ protected:
 
     void on_focus_lost ();
 
+    virtual void on_selected_changed (int sel);
+
 public:
 
     ~Combobox ();
@@ -61,6 +68,8 @@ public:
     void set_selected (int value);
 
     int get_selected () const;
+
+    virtual void register_on_selected_changed (const OnSelectedChanged& handler);
 
     friend class ComboboxFactory;
 };

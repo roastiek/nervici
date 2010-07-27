@@ -465,7 +465,7 @@ public:
     }
 
     SmileType get_type () {
-        return ST_dest;
+        return ST_ham;
     }
 };
 
@@ -492,8 +492,8 @@ public:
 
         if (visible) {
             if (random () % 20 == 0) {
-                angle+= angles + random () % 41 - 20;
-                angle%= angles;
+                angle += angles + random () % 41 - 20;
+                angle %= angles;
             }
 
             FPoint ftest = exact;
@@ -564,7 +564,7 @@ public:
     }
 
     SmileType get_type () {
-        return ST_term;
+        return ST_ham;
     }
 };
 
@@ -580,11 +580,16 @@ Smile* SmileFactory::create (smileid_tu sid, smileid_tu order, smileid_tu count,
     case ST_iron:
         return new IronSmile (sid, order, count, lvl);
     case ST_ham:
-        return new HamiSmile (sid, order, count, lvl);
-    case ST_dest:
-        return new DestSmile (sid, order, count, lvl);
-    case ST_term:
-        return new TermSmile (sid, order, count, lvl);
+        switch (lvl) {
+        case 1:
+            return new HamiSmile (sid, order, count, lvl);
+        case 2:
+            return new DestSmile (sid, order, count, lvl);
+        case 3:
+            return new TermSmile (sid, order, count, lvl);
+        default:
+            return NULL;
+        }
     default:
         return NULL;
     }

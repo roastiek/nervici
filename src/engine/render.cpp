@@ -295,7 +295,7 @@ static void init_fonts () {
 
     round_context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
     SDLPango_SetSurfaceCreateArgs (round_context, SDL_HWSURFACE, 32,
-    0xff, 0xff00, 0xff0000, 0xff000000);
+            0xff, 0xff00, 0xff0000, 0xff000000);
 
     color.m[0][0] = 0xff;
     color.m[1][0] = 0xd5;
@@ -308,10 +308,10 @@ static void init_fonts () {
     color.m[3][1] = 0xff;
     SDLPango_SetDefaultColor (round_context, &color);
 
-    
+
     end_context = SDLPango_CreateContext_GivenFontDesc ("Sans 100px");
     SDLPango_SetSurfaceCreateArgs (end_context, SDL_HWSURFACE, 32,
-    0xff, 0xff00, 0xff0000, 0xff000000);
+            0xff, 0xff00, 0xff0000, 0xff000000);
 
     color.m[0][0] = 0xff;
     color.m[1][0] = 0xff;
@@ -353,7 +353,7 @@ bool initialize () {
     SDL_FillRect (background, &fill_rect, 0x0);
 
     init_fonts ();
-//    Loader::load_fonts (fonts);
+    //    Loader::load_fonts (fonts);
     Loader::load_game_images (images);
     Loader::load_smile_faces (smile_images);
     init_game_screen ();
@@ -364,7 +364,7 @@ bool initialize () {
 void uninitialize () {
     Loader::free_smile_faces (smile_images);
     Loader::free_game_images (images);
-//    Loader::free_fonts (fonts);
+    //    Loader::free_fonts (fonts);
     SDLPango_FreeContext (round_context);
     SDLPango_FreeContext (end_context);
 
@@ -509,8 +509,8 @@ void draw_semafor (int state) {
 }
 
 void draw_round (round_tu round) {
-//    static const SDL_Color fg = {255, 255, 255};
-//    static const SDL_Color bg = {0, 0, 0};
+    //    static const SDL_Color fg = {255, 255, 255};
+    //    static const SDL_Color bg = {0, 0, 0};
     static char tt[] = "kolo:   ";
     SDL_Rect dest = gs_inner.round;
     SDL_Surface *text;
@@ -526,11 +526,11 @@ void draw_round (round_tu round) {
         tt[7] = ' ';
     }
 
-//    text = TTF_RenderText_Shaded (fonts[FNT_Mono20], tt, fg, bg);
+    //    text = TTF_RenderText_Shaded (fonts[FNT_Mono20], tt, fg, bg);
     SDLPango_SetText (round_context, tt, -1);
     text = SDLPango_CreateSurfaceDraw (round_context);
     dest.x += (dest.w - text->w) / 2;
-    dest.y+= (dest.h - text->h) / 2;
+    dest.y += (dest.h - text->h) / 2;
     SDL_BlitSurface (text, NULL, primary, &dest);
     SDL_FreeSurface (text);
 
@@ -539,11 +539,11 @@ void draw_round (round_tu round) {
 
 void draw_end () {
     SDL_Rect dest = gs_outer.playerground;
-//    static const SDL_Color fg = {255, 255, 127};
+    //    static const SDL_Color fg = {255, 255, 127};
     SDL_Surface *text;
 
-//    text = TTF_RenderText_Blended (fonts[FNT_Mono100], "The Konec", fg);
-    SDLPango_SetMarkup (end_context,  "The Konec", -1);
+    //    text = TTF_RenderText_Blended (fonts[FNT_Mono100], "The Konec", fg);
+    SDLPango_SetMarkup (end_context, "The Konec", -1);
     text = SDLPango_CreateSurfaceDraw (end_context);
     dest.x += (dest.w - text->w) / 2;
     dest.y += (dest.h - text->h) / 2;
@@ -624,35 +624,22 @@ static SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl) {
     return result;
 }
 
-static SDL_Surface* create_ham_face (SmileType type) {
+static SDL_Surface* create_ham_face (smilelvl_tu lvl) {
     SDL_Surface* result;
     SDL_Rect dest;
-    int back;
-
-    switch (type) {
-    case ST_dest:
-        back = 4;
-        break;
-    case ST_term:
-        back = 5;
-        break;
-    default:
-        back = 3;
-        break;
-    }
 
     dest.x = 0;
     dest.y = 0;
 
     result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
 
-    SDL_BlitSurface (smile_images.backs[back], NULL, result, &dest);
+    SDL_BlitSurface (smile_images.backs[3 + lvl], NULL, result, &dest);
     dest.x = 20;
-    SDL_BlitSurface (smile_images.backs[back], NULL, result, &dest);
-    int eyes = random () % smile_images.eyes[type].size ();
+    SDL_BlitSurface (smile_images.backs[3 + lvl], NULL, result, &dest);
+    int eyes = random () % smile_images.hams[lvl].size ();
 
     dest.x = 0;
-    SDL_BlitSurface (smile_images.eyes[type][eyes], NULL, result, &dest);
+    SDL_BlitSurface (smile_images.hams[lvl][eyes], NULL, result, &dest);
 
     return result;
 }
@@ -667,12 +654,10 @@ void load_smiles (const GameInfo& info) {
         }
     }
 
-    for (SmileType sti = ST_ham; sti < ST_count; sti++) {
-        for (int li = 0; li < 3; li++) {
-            for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
-                SDL_Surface* face = create_ham_face (sti);
-                smile_faces.push_back (face);
-            }
+    for (int li = 0; li < 3; li++) {
+        for (int ci = 0; ci < info.smiles.counts[ST_ham][li]; ci++) {
+            SDL_Surface* face = create_ham_face (li);
+            smile_faces.push_back (face);
         }
     }
 }

@@ -1,28 +1,31 @@
-#ifndef __MODS_H__
-#define __MODS_H__
+#ifndef __MOD_INTERFACE_H__
+#define __MOD_INTERFACE_H__
 
 #include "int_type.h"
 #include "game_setting.h"
+#include "game/smyle_type.h"
+#include "mod_specification.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct _ModRunnerInfo {
-    const char * const *extensions;
-} ModRunnerInfo;
+struct ModRunnerInfo {
+    char **extensions;
+};
 
-typedef struct _ModInfo {
-    const char *name;
-    const char *autor;
-    const char *rules;
-} ModInfo;
+struct ModInfo {
+    char *name;
+    char *autor;
+    char *rules;
+    struct ModSpecification spec;
+};
 
-typedef const ModRunnerInfo *(*ModGetModRunnerInfo) ();
-typedef const ModInfo *(*ModGetModInfo) (const char* script);
+typedef const struct ModRunnerInfo *(*ModGetModRunnerInfo) ();
+typedef const struct ModInfo *(*ModGetModInfo) (const char* script);
 typedef void (*LoadScript) (const char* script);
 typedef void (*UnloadScript) ();
-typedef void (*ModOnGameStart) (const GameSetting* set);
+typedef void (*ModOnGameStart) (struct GameSetting set);
 typedef void (*ModOnGameEnd) ();
 typedef void (*ModOnTimer) ();
 typedef void (*ModOnDeath) (plid_tu plid);

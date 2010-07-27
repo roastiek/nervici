@@ -20,33 +20,64 @@
 #include "gui/smile_control.h"
 #include "gui/button.h"
 #include "game/game_info.h"
+#include "mod.h"
 
 class GameFrame : public Control {
 private:
     GameInfo game_info;
+    plid_tu max_players;
 
-    MultilineLabel* la_rules;
+    VLine* separators[3];
+
+    Label *la_rules_caption;
+    MultilineLabel* ml_rules;
+
+    Label* la_mod_caption;
     Combobox* cb_mod;
     TeamButton* btn_teams[16];
     Combobox* cb_players[16];
     TeamColors team_colors;
-    Scale* sc_speed;
+
+    Label* la_speed;
+    Scale* sa_speed;
     Label* la_speed_text;
-    VLine* lines[3];
-    Numberbox* rounds;
-    Numberbox* max_score;
-    Numberbox* max_length;
-    Numberbox* time;
-    Numberbox* step;
-    Numberbox* bonus;
-    SmileControl* smiles[5][3];
+    Label* la_rounds;
+    Numberbox* nb_rounds;
+    Label* la_max_score;
+    Numberbox* nb_max_score;
+    Label* la_max_length;
+    Numberbox* nb_max_length;
+    Label* la_timer;
+    Numberbox* nb_timer;
+    Label* la_step;
+    Numberbox* nb_step;
+    Label* la_bonus;
+    Numberbox* nb_bonus;
+
+    Label* la_smile_caption;
+    SmileControl* sc_smiles[5][3];
     SmileSettingImages smile_images;
+
     Button* btn_start;
     Button* btn_cancel;
 
     void speed_value_changed (Scale* ctl, int value);
 
     void btn_start_clicked (Control* ctl);
+
+    void btn_cancel_clicked (Control* ctl);
+
+    void cb_mob_selected_changed (Combobox* box, int selected);
+
+    void load_mod (Mod mod);
+
+    void update_team_colors ();
+
+    void update_mods ();
+
+    void update_players ();
+
+    void save_state ();
 
 protected:
     GameFrame();
