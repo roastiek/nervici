@@ -10,6 +10,7 @@
 
 #include "frames/start_frame.h"
 #include "frames/game_frame.h"
+#include "frames/pledit_frame.h"
 
 namespace App  {
     void initialize ();
@@ -19,6 +20,9 @@ namespace App  {
 
     StartFrame* switch_to_start_frame ();
     GameFrame* switch_game_frame ();
+    PlEditFrame* switch_to_pledit_frame ();
+
+    GameFrame* get_game_frame ();
 };
 
 #endif	/* APP_H */

@@ -75,8 +75,6 @@ private:
 
     void update_mods ();
 
-    void update_players ();
-
     void save_state ();
 
 protected:
@@ -92,6 +90,8 @@ public:
     bool is_focusable () const;
 
     void preapare ();
+
+    void update_players ();
 };
 
 #endif	/* GAME_FRAME_H */

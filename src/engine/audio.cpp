@@ -530,4 +530,13 @@ void music_update () {
 void music_set_rate (float rate) {
     music_rate = rate;
 }
+
+size_t get_profiles_count () {
+    return sound_profiles.size ();
+}
+
+const ustring& get_profile (size_t id) {
+    return sound_profiles[id].name;
+}
+
 }

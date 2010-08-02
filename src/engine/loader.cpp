@@ -77,7 +77,7 @@ void free_game_images (vector<SDL_Surface*>& images) {
     images.clear ();
 }
 
-void load_fonts (vector<TTF_Font*>& fonts) {
+/*void load_fonts (vector<TTF_Font*>& fonts) {
     string filename;
 
     fonts.resize (FNT_Count);
@@ -100,7 +100,7 @@ void free_fonts (vector<TTF_Font*>& fonts) {
         TTF_CloseFont (fonts[fi]);
     }
     fonts.clear ();
-}
+}*/
 
 void load_smile_setting_images (SmileSettingImages& images) {
     string filename = System::get_images_dir () + smile_setting;

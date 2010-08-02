@@ -11,7 +11,17 @@ namespace PlInfos {
 
     size_t get_count ();
 
+    size_t get_players_count ();
+
+    size_t get_ais_count ();
+
     const PlInfo& get (size_t idi);
+
+    void update (size_t idi, const PlInfo& info);
+
+    void add (const PlInfo& info);
+
+    void remove (size_t idi);
 };
 
 

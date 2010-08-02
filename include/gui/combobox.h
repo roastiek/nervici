@@ -57,17 +57,23 @@ public:
 
     ~Combobox ();
 
-    void clear ();
+    virtual void clear ();
 
-    void add_item (const ustring& text, Uint32 color = C_FOREGROUND);
+    virtual void add_item (const ustring& text, Uint32 color = C_INPUT_TEXT);
 
-    const ListItem& get_item (int index);
+    virtual const ListItem& get_item (int index);
 
-    int get_items_count () const;
+    virtual int get_items_count () const;
 
-    void set_selected (int value);
+    virtual void update_item (int index, const ustring& text, Uint32 color = C_INPUT_TEXT);
 
-    int get_selected () const;
+    virtual void remove_item (int index);
+
+    virtual void insert_item (int index, const ustring& text, Uint32 color = C_INPUT_TEXT);
+
+    virtual void set_selected (int value);
+
+    virtual int get_selected () const;
 
     virtual void register_on_selected_changed (const OnSelectedChanged& handler);
 

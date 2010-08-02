@@ -13,12 +13,9 @@
 
 class StartFrame : public Control {
 private:
-    static ControlParameters parms;
-    static ControlParameters btn_new_game_parms;
-    static ControlParameters btn_quit_parms;
-
     void btn_new_game_clicked (Control* ctl);
     void btn_quit_clicked (Control* ctl);
+    void btn_pledit_clicked (Control* ctl);
 
 protected:
     StartFrame();

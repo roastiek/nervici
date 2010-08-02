@@ -127,7 +127,34 @@ int Combobox::get_items_count () const {
     return list->get_items_count ();
 }
 
+void Combobox::update_item (int index, const ustring& text, Uint32 color) {
+    list->update_item (index, text, color);
+    if (index == get_selected ()) {
+        invalidate ();
+    }
+}
+
+void Combobox::remove_item (int index) {
+    list->remove_item (index);
+    if (get_selected () == index) {
+        set_selected (-1);
+    } else if (get_selected () > index) {
+        set_selected (get_selected () - 1);
+    }
+}
+
+void Combobox::insert_item (int index, const ustring& text, Uint32 color) {
+    list->insert_item (index, text, color);
+    if (get_selected () >= index) {
+        set_selected (get_selected () + 1);
+    }
+}
+
 void Combobox::set_selected (int value) {
+    if (value >= get_items_count ()) {
+        value = get_items_count () - 1;
+    }
+
     if (selected != value) {
         selected = value;
         on_selected_changed (selected);

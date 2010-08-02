@@ -17,8 +17,9 @@ static Control* active_frame = NULL;
 static Screen* screen;
 static StartFrame* start_frame;
 static GameFrame* game_frame;
-static GameInfo gameinfo;
-static GameSetting gameset;
+static PlEditFrame* pledit_frame;
+//static GameInfo gameinfo;
+//static GameSetting gameset;
 static bool abort;
 
 static int paint_filter (const SDL_Event* event) {
@@ -35,9 +36,11 @@ static void init_gui () {
 
     start_frame = StartFrame::create_frame (screen);
     game_frame = GameFrame::create_frame (screen);
+    pledit_frame = PlEditFrame::create_frame (screen);
 
     start_frame->set_visible (false);
     game_frame->set_visible (false);
+    pledit_frame->set_visible (false);
 
     SDL_SetEventFilter (NULL);
 
@@ -57,12 +60,12 @@ void initialize () {
     if (Render::initialize ()) return;
     Audio::initialize ();
 
-    gameset.speed = base_speed;
+   /* gameset.speed = base_speed;
     gameset.rounds = 3;
     gameset.maxLength = 500;
     gameset.startsCount = World::get_starts_count ();
 
-    gameinfo.setting = gameset;
+    gameinfo.setting = gameset;*/
 /*    gameinfo.pl_infos.resize (2);
     gameset.playersCount = gameinfo.pl_infos.size ();
     gameinfo.pl_infos[0].color = 0xff8040;
@@ -155,6 +158,18 @@ GameFrame* switch_game_frame () {
     game_frame->set_visible (true);
     game_frame->grab_focus ();
     active_frame = game_frame;
+    return game_frame;
+}
+
+PlEditFrame* switch_to_pledit_frame () {
+    hide_previous ();
+    pledit_frame->set_visible (true);
+    pledit_frame->grab_focus ();
+    active_frame = pledit_frame;
+    return pledit_frame;
+}
+
+GameFrame* get_game_frame () {
     return game_frame;
 }
 }

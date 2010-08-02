@@ -35,7 +35,7 @@ void load () {
 
     players.resize (count);
     for (size_t pi = 0; pi < players.size (); pi++) {
-        section = "player" + to_string<size_t>(pi);
+        section = "player" + to_string<size_t > (pi);
 
         players[pi].type = PT_Human;
         players[pi].color = Setting::read_int (section, "color", 0xffffff);
@@ -51,7 +51,7 @@ void load () {
     ais.resize (ai_count);
 
     for (size_t pi = 0; pi < DEFAULT_AI_COUNT; pi++) {
-        section = "plastik" + to_string<size_t>(pi);
+        section = "plastik" + to_string<size_t > (pi);
 
         ais[pi].type = PT_AI;
         ais[pi].ai.id = Setting::read_int (section, "id", def_ais[pi].ai.id);
@@ -62,7 +62,7 @@ void load () {
     }
 
     for (size_t pi = DEFAULT_AI_COUNT; pi < ais.size (); pi++) {
-        section = "plastik" + to_string<size_t>(pi);
+        section = "plastik" + to_string<size_t > (pi);
 
         ais[pi].type = PT_AI;
         ais[pi].ai.id = Setting::read_int (section, "id", 0);
@@ -77,8 +77,8 @@ void save () {
     Setting::write_int ("players", "count", players.size ());
     ustring section;
 
-    for (size_t pi = 0; pi < players.size(); pi++) {
-        section = "player" + to_string<size_t>(pi);
+    for (size_t pi = 0; pi < players.size (); pi++) {
+        section = "player" + to_string<size_t > (pi);
 
         Setting::write_int (section, "color", players[pi].color);
         Setting::write_string (section, "name", players[pi].name);
@@ -92,7 +92,7 @@ void save () {
     Setting::write_int ("plastiks", "count", ais.size ());
 
     for (size_t pi = 0; pi < ais.size (); pi++) {
-        section = "plastik" + to_string<size_t>(pi);
+        section = "plastik" + to_string<size_t > (pi);
 
         Setting::write_int (section, "color", ais[pi].color);
         Setting::write_string (section, "name", ais[pi].name);
@@ -106,7 +106,33 @@ size_t get_count () {
     return players.size () + ais.size ();
 }
 
-const PlInfo& get (size_t idi) {
-    return (idi < players.size()) ? players[idi] : ais[idi - players.size()];
+size_t get_players_count () {
+    return players.size ();
 }
+
+size_t get_ais_count () {
+    return ais.size ();
+}
+
+const PlInfo& get (size_t idi) {
+    return (idi < players.size ()) ? players[idi] : ais[idi - players.size ()];
+}
+
+void update (size_t index, const PlInfo& info) {
+    ((index < players.size ()) ? players[index] : ais[index - players.size ()]) = info;
+}
+
+void add (const PlInfo& info) {
+    ((info.type == PT_Human) ? players : ais).push_back (info);
+}
+
+void remove (size_t idi) {
+    if (idi < players.size ()) {
+        players.erase (players.begin () + idi);
+    } else {
+        ais.erase (ais.begin () + idi - players.size ());
+    }
+}
+
+
 }

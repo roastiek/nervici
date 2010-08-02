@@ -15,9 +15,9 @@ namespace Loader {
 
     void free_game_images (vector<SDL_Surface*>& images);
 
-    void load_fonts (vector<TTF_Font*>& fonts);
+  /*  void load_fonts (vector<TTF_Font*>& fonts);
 
-    void free_fonts (vector<TTF_Font*>& fonts);
+    void free_fonts (vector<TTF_Font*>& fonts);*/
 
     void load_smile_setting_images (SmileSettingImages& images);
 

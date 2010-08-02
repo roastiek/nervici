@@ -513,9 +513,9 @@ void GameFrame::update_players () {
             cb_players[ci]->add_item (info.name, trans (info.color));
         }
 
-        cb_players[ci]->set_selected (game_info.pl_ids[ci] + 1);
+        cb_players[ci]->set_selected (0);
 
-        btn_teams[ci]->set_selected (game_info.pls_team[ci]);
+        //btn_teams[ci]->set_selected (0);
     }
 }
 

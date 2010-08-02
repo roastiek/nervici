@@ -67,6 +67,12 @@ public:
 
     virtual int get_items_count () const;
 
+    virtual void update_item (int index, const ustring& text, Uint32 color = C_INPUT_TEXT);
+
+    virtual void remove_item (int index);
+
+    virtual void insert_item (int index, const ustring& text, Uint32 color = C_INPUT_TEXT);
+
     virtual void set_selected (int value);
 
     virtual int get_selected () const;

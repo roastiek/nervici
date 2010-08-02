@@ -20,7 +20,7 @@ lb_parms (parms) {
 
 Listbox* ListboxFactory::create (Control* par, const ListboxParameters& parms,
         const ustring& name) {
-    Listbox* result = new Listbox(parms);
+    Listbox* result = new Listbox (parms);
     result->set_name (name);
     result->init_control (par);
     return result;
@@ -35,8 +35,8 @@ void Listbox::reinitialize () {
     InputControl::reinitialize ();
     int sw = get_screen_width ();
     const ListboxParameters& p = get_parms ();
-        set_min_height (p.min_height * sw / STANDARD_WIDTH);
-        set_item_height (p.item_height * sw / STANDARD_WIDTH);
+    set_min_height (p.min_height * sw / STANDARD_WIDTH);
+    set_item_height (p.item_height * sw / STANDARD_WIDTH);
 }
 
 const ListboxParameters& Listbox::get_parms () {
@@ -142,6 +142,30 @@ const ListItem& Listbox::get_item (int index) {
 
 int Listbox::get_items_count () const {
     return items.size ();
+}
+
+void Listbox::update_item (int index, const ustring& text, Uint32 color) {
+    items[index].text = text;
+    items[index].color = color;
+    invalidate ();
+}
+
+void Listbox::remove_item (int index) {
+    items.erase (items.begin () + index);
+    if (get_selected () == index) {
+        set_selected (-1);
+    } else if (get_selected () > index) {
+        set_selected (get_selected () - 1);
+    }
+    invalidate ();
+}
+
+void Listbox::insert_item (int index, const ustring& text, Uint32 color) {
+    items.insert (items.begin () + index, ListItem (text, color));
+    if (get_selected () >= index) {
+        set_selected (get_selected () + 1);
+    }
+    invalidate ();
 }
 
 void Listbox::set_selected (int value) {

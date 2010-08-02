@@ -1,6 +1,10 @@
 #ifndef __AUDIO_H__
 #define __AUDIO_H__
 
+#include <glibmm/ustring.h>
+using namespace Glib;
+
+
 #include "int_type.h"
 #include "game/game_info.h"
 #include "music_type.h"
@@ -24,6 +28,10 @@ namespace Audio {
     void music_update ();
 
     void music_set_rate (float rate);
+
+    size_t get_profiles_count ();
+
+    const ustring& get_profile (size_t id);
 };
 
 
