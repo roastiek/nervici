@@ -2,7 +2,7 @@
 #include <alc.h>
 #include <SDL.h>
 #include <dirent.h>
-#include <vorbisfile.h>
+#include <vorbis/vorbisfile.h>
 #include <AL/al.h>
 #include <vector>
 #include <iostream>
@@ -227,8 +227,10 @@ static void scan_music_dir (const ustring& path, vector<MusicFile>& files, Music
 static void init_wavs () {
     cout << __func__ << '\n';
 
-    scan_sounds_dir (System::get_sounds_dir (), sound_profiles);
-    scan_sounds_dir (System::get_sounds_dir_home (), sound_profiles);
+    for (size_t di = 0; di < System::get_data_dirs ().size (); di++) {
+        ustring dir = System::get_data_dirs()[di] + "sounds/";
+        scan_sounds_dir (dir, sound_profiles);
+    }
 
     load_buffers (sound_profiles);
 }
@@ -241,20 +243,17 @@ static void free_wavs () {
 }
 
 static void init_music () {
-    static const char* const suffixs[MT_Count] = {"/game", "/game", "/menu", "/stat"};
+    static const char* const suffixs[MT_Count] = {"game/", "game/", "menu/", "stat/"};
     ustring dir_name;
     MusicType mt;
 
     cout << __func__ << '\n';
 
-    for (mt = MT_Short; mt < MT_Count; mt++) {
-        dir_name = System::get_music_dir () + suffixs[mt];
-        scan_music_dir (dir_name, music[mt], mt);
-    }
-
-    for (mt = MT_Short; mt < MT_Count; mt++) {
-        dir_name = System::get_music_dir_home () + suffixs[mt];
-        scan_music_dir (dir_name, music[mt], mt);
+    for (size_t di = 0; di < System::get_data_dirs ().size(); di++) {
+        for (mt = MT_Short; mt < MT_Count; mt++) {
+            dir_name = System::get_data_dirs()[di] + "music/" + suffixs[mt];
+            scan_music_dir (dir_name, music[mt], mt);
+        }
     }
 
     music_loader = new char[setting.buffer];

@@ -69,6 +69,6 @@ namespace Render {
     int get_width ();
 
     int get_height ();
-};
+}
 
 #endif

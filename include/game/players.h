@@ -77,7 +77,7 @@ namespace Players {
     void dec_pl_ironize (plid_tu plid, score_ti delta);
 
     score_ti get_pl_ironze (plid_tu plid);
-};
+}
 
 #endif	/* PLAYERS_H */
 

@@ -22,7 +22,7 @@ namespace Setting {
     void write_string (const ustring& section, const ustring& key, const ustring & value);
 
     void delete_section (const ustring & section);
-};
+}
 
 
 #endif // __SETTING_H__

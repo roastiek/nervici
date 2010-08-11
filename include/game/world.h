@@ -63,7 +63,7 @@ namespace World {
     //void queue_item (wsize_tu x, wsize_tu y);
 
     void render_queue ();
-};
+}
 
 
 #endif

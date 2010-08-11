@@ -30,7 +30,7 @@ namespace Game {
     void wait (timer_ti time);
 
     void wait_for_space ();
-};
+}
 
 
 #endif

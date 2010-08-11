@@ -1,6 +1,7 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 
 #include "system.h"
 #include "utils.h"
@@ -128,7 +129,8 @@ void load () {
     directory->name = "";
     directory->first_entry = NULL;
 
-    stream.open (System::get_profile_file ().c_str (), ios::in);
+    ustring filename = System::get_config_dir() + "nervici.conf";
+    stream.open (filename.c_str (), ios::in);
 
     sec = directory;
 
@@ -168,7 +170,8 @@ void save () {
 
 
     if (changed) {
-        stream.open (System::get_profile_file ().c_str (), ios::out | ios::trunc);
+        ustring filename = System::get_config_dir() + "nervici.conf";
+        stream.open (filename.c_str (), ios::out | ios::trunc);
 
         for (sec = directory; sec != NULL; sec = sec->next) {
             if (sec->name[0] == '\0') {

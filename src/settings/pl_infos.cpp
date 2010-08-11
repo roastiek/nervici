@@ -1,6 +1,7 @@
 #include <SDL_keysym.h>
 #include <vector>
 using namespace std;
+#include <iostream>
 
 #include "basic_defs.h"
 #include "utils.h"
@@ -30,6 +31,7 @@ static vector<PlInfo> players;
 static vector<PlInfo> ais;
 
 void load () {
+    cout << __func__ << '\n';
     int count = Setting::read_int ("players", "count", 0);
     ustring section;
 

@@ -32,7 +32,7 @@ namespace Audio {
     size_t get_profiles_count ();
 
     const ustring& get_profile (size_t id);
-};
+}
 
 
 

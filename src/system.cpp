@@ -9,8 +9,11 @@
 #include <vector>
 #include <iostream>
 using namespace std;
+#include <glibmm/miscutils.h>
+using namespace Glib;
 
-#include "config.h"
+
+//#include "config.h"
 #include "mods/mod_interface.h"
 
 #include "system.h"
@@ -39,84 +42,36 @@ struct ModEvents {
     ModOnPlTimer on_pl_timer;
 };
 
-#define PROFILE_DIR "/.nervici"
-#define PROFILE_FILE "/nervici.conf"
-#define HOME_MODS_DIR "/mods"
-#define HOME_FONTS_DIR "/fonts"
-#define HOME_SOUNDS_DIR "/sounds"
-#define HOME_MUSIC_DIR "/music"
+static ustring config_dir;
+static vector<ustring> data_dirs;
 
-static ustring home_dir;
-static ustring profile_dir;
-static ustring profile_file;
-static ustring mods_dir;
-static ustring mods_dir_home;
-static ustring images_dir;
-static ustring fonts_dir;
-static ustring fonts_dir_home;
-static ustring sounds_dir;
-static ustring sounds_dir_home;
-static ustring music_dir;
-static ustring music_dir_home;
 static vector<ModRunner> mod_runners;
 static vector<Mod> mods;
 static ModEvents mod_events;
 static void* mod_handle;
 
-static ustring resolv_home_dir () {
-    return getenv ("HOME");
-}
-
-static ustring resolv_profile_dir () {
-    return home_dir + PROFILE_DIR;
-}
-
-static ustring resolv_profile_file () {
-    return profile_dir + PROFILE_FILE;
-}
-
-static ustring resolv_dir (const ustring& dir) {
-    string result;
-
-#ifdef USE_WORKING_DIR
-
-    char *cwd = getcwd (NULL, 0);
-    result = cwd + dir;
-    free (cwd);
-
-#else
-
-    result = NERVICI_PREFIX + dir;
-
-#endif
-
-    return result;
-}
-
-static ustring resolv_dir_home (const ustring& dir) {
-    return profile_dir + dir;
-}
-
 void init_paths () {
-    home_dir = resolv_home_dir ();
-    profile_dir = resolv_profile_dir ();
-    profile_file = resolv_profile_file ();
+    config_dir = get_user_config_dir () + "/nervici/";
 
-    mods_dir = resolv_dir (NERVICI_MODS_DIR);
-    mods_dir_home = resolv_dir_home (HOME_MODS_DIR);
-    images_dir = resolv_dir (NERVICI_IMAGES_DIR);
-    fonts_dir = resolv_dir (NERVICI_FONTS_DIR);
-    fonts_dir_home = resolv_dir_home (HOME_FONTS_DIR);
-    sounds_dir = resolv_dir (NERVICI_SOUNDS_DIR);
-    sounds_dir_home = resolv_dir_home (HOME_SOUNDS_DIR);
-    music_dir = resolv_dir (NERVICI_MUSIC_DIR);
-    music_dir_home = resolv_dir_home (HOME_MUSIC_DIR);
+    data_dirs.push_back (get_user_data_dir () + "/nervici/");
 
-    mkdir (profile_dir.c_str (), 0755);
-    mkdir (mods_dir_home.c_str (), 0755);
-    mkdir (fonts_dir_home.c_str (), 0755);
-    mkdir (sounds_dir_home.c_str (), 0755);
-    mkdir (music_dir_home.c_str (), 0755);
+    ustring xdg_data_dirs = Glib::getenv ("XDG_DATA_DIRS");
+    xdg_data_dirs = (xdg_data_dirs != "") ? xdg_data_dirs : "/usr/local/share:/usr/share";
+
+    size_t start = 0;
+    size_t end;
+    
+    end = xdg_data_dirs.find_first_of (':', start);
+    while (end != -1) {
+        data_dirs.push_back (xdg_data_dirs.substr (start, end - start) + "/nervici/");
+        start = end + 1;
+        end = xdg_data_dirs.find_first_of (':', start);
+    }
+    data_dirs.push_back (xdg_data_dirs.substr (start, xdg_data_dirs.length () - start) + "/nervici/");
+
+    for (size_t i = 0; i < data_dirs.size (); i++) {
+        cout << data_dirs[i] << '\n';
+    }
 }
 
 void free_paths () {
@@ -217,8 +172,10 @@ void find_mods () {
 
     vector<ustring> files;
 
-    scan_mods_dir (mods_dir, files);
-    scan_mods_dir (mods_dir_home, files);
+    for (size_t di = 0; di < data_dirs.size (); di++) {
+        ustring dir = data_dirs[di] + "mods/";
+        scan_mods_dir (dir, files);
+    }
 
     find_mod_runners (files, mod_runners);
     find_scripts (files, mod_runners, mods);
@@ -303,36 +260,12 @@ void unload_mod () {
     dlclose (mod_handle);
 }
 
-const ustring & get_profile_file () {
-    return profile_file;
+const ustring& get_config_dir () {
+    return config_dir;
 }
 
-const ustring & get_images_dir () {
-    return images_dir;
-}
-
-const ustring & get_fonts_dir () {
-    return fonts_dir;
-}
-
-const ustring & get_fonts_dir_home () {
-    return fonts_dir_home;
-}
-
-const ustring & get_sounds_dir () {
-    return sounds_dir;
-}
-
-const ustring & get_sounds_dir_home () {
-    return sounds_dir_home;
-}
-
-const ustring & get_music_dir () {
-    return music_dir;
-}
-
-const ustring & get_music_dir_home () {
-    return music_dir_home;
+const vector<ustring>& get_data_dirs () {
+    return data_dirs;
 }
 
 size_t get_mods_count () {

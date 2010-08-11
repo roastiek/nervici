@@ -23,7 +23,7 @@ namespace App  {
     PlEditFrame* switch_to_pledit_frame ();
 
     GameFrame* get_game_frame ();
-};
+}
 
 #endif	/* APP_H */
 

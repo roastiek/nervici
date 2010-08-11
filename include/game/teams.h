@@ -28,7 +28,7 @@ namespace Teams {
 
     void dec_state (plid_tu id, PlState state);
 
-};
+}
 
 #endif	/* TEAMS_H */
 

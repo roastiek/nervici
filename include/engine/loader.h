@@ -26,6 +26,6 @@ namespace Loader {
     void load_smile_faces (SmileImages& faces);
 
     void free_smile_faces (SmileImages& faces);
-};
+}
 
 #endif // __LOADER_H__

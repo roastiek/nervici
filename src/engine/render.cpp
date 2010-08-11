@@ -326,11 +326,11 @@ static void init_fonts () {
 }
 
 bool initialize () {
+    cout << __func__ << '\n';
     int flag;
     load_screen_setting ();
 
     if (SDL_InitSubSystem (SDL_INIT_VIDEO)) return true;
-    TTF_Init ();
 
     flag = SDL_HWSURFACE;
     if (setting.fullscreen) flag |= SDL_FULLSCREEN;
@@ -372,7 +372,6 @@ void uninitialize () {
     if (background != NULL) SDL_FreeSurface (background);
     if (primary != NULL) SDL_FreeSurface (primary);
 
-    TTF_Quit ();
     SDL_QuitSubSystem (SDL_INIT_VIDEO);
 
     save_screen_setting ();

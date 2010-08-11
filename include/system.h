@@ -1,6 +1,9 @@
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
 
+#include <vector>
+using namespace std;
+
 #include <glibmm/ustring.h>
 using namespace Glib;
 
@@ -10,45 +13,9 @@ using namespace Glib;
 
 namespace System {
 
-    /*
-     * location of ~/.nervici/nervici.conf
-     */
-    const ustring & get_profile_file ();
+    const ustring& get_config_dir ();
 
-    /*
-     * location of share/nervici/images
-     */
-    const ustring & get_images_dir ();
-
-    /*
-     * location of share/nervici/fonts
-     */
-    const ustring & get_fonts_dir ();
-
-    /*
-     * location of ~/.nervici/fonts
-     */
-    const ustring & get_fonts_dir_home ();
-
-    /*
-     * location of share/nervici/sound
-     */
-    const ustring & get_sounds_dir ();
-
-    /*
-     * location of ~/.nervici/sounds
-     */
-    const ustring & get_sounds_dir_home ();
-
-    /*
-     * location of share/nervici/fonts
-     */
-    const ustring & get_music_dir ();
-
-    /*
-     * location of ~/.nervici/sounds
-     */
-    const ustring & get_music_dir_home ();
+    const vector<ustring>& get_data_dirs ();
 
     /*
      * populate all system paths
@@ -141,7 +108,7 @@ namespace System {
     void mod_on_cleared (plid_tu plid);
 
     void mod_on_pl_timer (plid_tu plid);
-};
+}
 
 
 #endif // __SYSTEM_H__

@@ -12,7 +12,7 @@
 
 namespace TeamInfos {
     const TeamInfo& get (int id);
-};
+}
 
 
 #endif	/* TEAM_INFOS_H */

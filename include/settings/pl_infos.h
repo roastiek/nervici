@@ -22,7 +22,7 @@ namespace PlInfos {
     void add (const PlInfo& info);
 
     void remove (size_t idi);
-};
+}
 
 
 #endif // __PLINFO_H__

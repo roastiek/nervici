@@ -18,27 +18,27 @@
 namespace Loader {
 
 static const char* const gameImages[] = {
-    "/semafor.png",
-    "/heart.png"
+    "semafor.png",
+    "heart.png"
 };
 
-static const char* const baseFonts[] = {
-    "/mono.ttf"
-};
-
-static const char* const smile_setting = "/smile_setting.png";
+static const char* const smile_setting = "smile_setting.png";
 
 void load_game_images (vector<SDL_Surface*>& images) {
 //    const SDL_Color color = {255, 255, 255};
 //    const SDL_Color bg = {0, 0, 0};
-    string filename;
+    ustring filename;
     ImageType i;
 
-    images.resize (IMT_Count);
+    images.resize (IMT_Count, NULL);
 
-    for (i = IMT_Semafor; i < IMT_Count; i++) {
-        filename = System::get_images_dir () + gameImages[i - IMT_Semafor];
-        images[i] = IMG_Load (filename.c_str ());
+    for (size_t di = 0; di < System::get_data_dirs().size(); di++) {
+        for (i = IMT_Semafor; i < IMT_Count; i++) {
+            if (images[i] == NULL) {
+                filename = System::get_data_dirs ()[di] + "images/" + gameImages[i - IMT_Semafor];
+                images[i] = IMG_Load (filename.c_str ());
+            }
+        }
     }
 
     SDLPango_Context* context;
@@ -103,38 +103,43 @@ void free_fonts (vector<TTF_Font*>& fonts) {
 }*/
 
 void load_smile_setting_images (SmileSettingImages& images) {
-    string filename = System::get_images_dir () + smile_setting;
+    for (size_t di = 0; di < System::get_data_dirs()[di].size(); di++) {
+        ustring filename = System::get_data_dirs()[di] + "images/" + smile_setting;
 
-    SDL_Surface* smiles = IMG_Load (filename.c_str ());
-    SDL_Rect src_area;
-    SDL_Rect dest_area;
+        SDL_Surface* smiles = IMG_Load (filename.c_str ());
+        if (smiles == NULL) continue;
+        
+        SDL_Rect src_area;
+        SDL_Rect dest_area;
 
-    src_area.x = 0;
-    src_area.y = 0;
-    src_area.w = 20;
-    src_area.h = 40;
-    dest_area.x = 0;
-    dest_area.y = 0;
+        src_area.x = 0;
+        src_area.y = 0;
+        src_area.w = 20;
+        src_area.h = 40;
+        dest_area.x = 0;
+        dest_area.y = 0;
 
-    class LoaderCanvas : public Canvas {
-    public:
+        class LoaderCanvas : public Canvas {
+        public:
 
-        SDL_Surface* get_surface () {
-            return impl->surface;
+            SDL_Surface* get_surface () {
+                return impl->surface;
+            }
+        };
+
+        for (int si = 0; si < 21; si++) {
+            LoaderCanvas* lc = new LoaderCanvas ();
+
+            lc->set_width (20);
+            lc->set_height (40);
+            SDL_BlitSurface (smiles, &src_area, lc->get_surface (), &dest_area);
+            images[si] = lc;
+            src_area.x += src_area.w;
         }
-    };
 
-    for (int si = 0; si < 21; si++) {
-        LoaderCanvas* lc = new LoaderCanvas ();
-
-        lc->set_width (20);
-        lc->set_height (40);
-        SDL_BlitSurface (smiles, &src_area, lc->get_surface (), &dest_area);
-        images[si] = lc;
-        src_area.x += src_area.w;
+        SDL_FreeSurface (smiles);
+        break;
     }
-
-    SDL_FreeSurface (smiles);
 }
 
 void free_smile_setting_images (SmileSettingImages& images) {
@@ -158,75 +163,79 @@ static const char* const ham_masks[] = {
 };
 
 void load_smile_faces (SmileImages& faces) {
+    cout << __func__ << '\n';
     DIR* dir;
 
-    ustring smiles_dir = System::get_images_dir () + "/smiles";
-    vector<ustring> images;
+    for (size_t di = 0; di < System::get_data_dirs().size(); di++) {
+        ustring smiles_dir = System::get_data_dirs()[di] + "smiles/";
+        vector<ustring> images;
 
-    dir = opendir (smiles_dir.c_str ());
+        dir = opendir (smiles_dir.c_str ());
+        if (dir == NULL) continue;
 
-    for (struct dirent* ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
-        if (ent->d_name[0] == '.') continue;
+        for (struct dirent* ent = readdir (dir); ent != NULL; ent = readdir (dir)) {
+            if (ent->d_name[0] == '.') continue;
 
-        size_t len = strlen (ent->d_name);
-        if (len < 4) continue;
-        if (strcasecmp (".png", &ent->d_name[len - 4]) != 0) continue;
+            size_t len = strlen (ent->d_name);
+            if (len < 4) continue;
+            if (strcasecmp (".png", &ent->d_name[len - 4]) != 0) continue;
 
-        images.push_back (ent->d_name);
-    }
+            images.push_back (ent->d_name);
+        }
 
-    closedir (dir);
-    ustring path;
+        closedir (dir);
+        ustring path;
 
-    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
-        size_t prefix_len = strlen (eyes_masks[sti]);
-        ustring prefix;
+        for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
+            size_t prefix_len = strlen (eyes_masks[sti]);
+            ustring prefix;
 
-        for (size_t i = 0; i < images.size (); i++) {
-            prefix = images[i].substr (0, prefix_len).lowercase ();
+            for (size_t i = 0; i < images.size (); i++) {
+                prefix = images[i].substr (0, prefix_len).lowercase ();
 
-            if (prefix.compare (eyes_masks[sti]) == 0) {
-                path = smiles_dir + "/" + images[i];
-                SDL_Surface* eyes = IMG_Load (path.c_str ());
-                if (eyes != NULL) {
-                    faces.eyes[sti].push_back (eyes);
+                if (prefix.compare (eyes_masks[sti]) == 0) {
+                    path = smiles_dir + "/" + images[i];
+                    SDL_Surface* eyes = IMG_Load (path.c_str ());
+                    if (eyes != NULL) {
+                        faces.eyes[sti].push_back (eyes);
+                    }
+                }
+            }
+
+            for (size_t i = 0; i < images.size (); i++) {
+                prefix = images[i].substr (0, prefix_len).lowercase ();
+
+                if (prefix.compare (mouth_masks[sti]) == 0) {
+                    path = smiles_dir + "/" + images[i];
+                    SDL_Surface* mouth = IMG_Load (path.c_str ());
+                    if (mouth != NULL) {
+                        faces.mouths[sti].push_back (mouth);
+                    }
                 }
             }
         }
 
-        for (size_t i = 0; i < images.size (); i++) {
-            prefix = images[i].substr (0, prefix_len).lowercase ();
+        for (int hi = 0; hi < 3; hi++) {
+            size_t prefix_len = strlen (ham_masks[hi]);
+            ustring prefix;
 
-            if (prefix.compare (mouth_masks[sti]) == 0) {
-                path = smiles_dir + "/" + images[i];
-                SDL_Surface* mouth = IMG_Load (path.c_str ());
-                if (mouth != NULL) {
-                    faces.mouths[sti].push_back (mouth);
+            for (size_t i = 0; i < images.size (); i++) {
+                prefix = images[i].substr (0, prefix_len).lowercase ();
+
+                if (prefix.compare (ham_masks[hi]) == 0) {
+                    path = smiles_dir + "/" + images[i];
+                    SDL_Surface* ham = IMG_Load (path.c_str ());
+                    if (ham != NULL) {
+                        faces.hams[hi].push_back (ham);
+                    }
                 }
             }
         }
-    }
 
-    for (int hi = 0; hi < 3; hi++) {
-        size_t prefix_len = strlen (ham_masks[hi]);
-        ustring prefix;
-
-        for (size_t i = 0; i < images.size (); i++) {
-            prefix = images[i].substr (0, prefix_len).lowercase ();
-
-            if (prefix.compare (ham_masks[hi]) == 0) {
-                path = smiles_dir + "/" + images[i];
-                SDL_Surface* ham = IMG_Load (path.c_str ());
-                if (ham != NULL) {
-                    faces.hams[hi].push_back (ham);
-                }
-            }
+        for (int bi = 0; bi < 6; bi++) {
+            path = smiles_dir + "/smile" + to_string<int> (bi + 1) + ".png";
+            faces.backs[bi] = IMG_Load (path.c_str ());
         }
-    }
-
-    for (int bi = 0; bi < 6; bi++) {
-        path = smiles_dir + "/smile" + to_string<int> (bi + 1) + ".png";
-        faces.backs[bi] = IMG_Load (path.c_str ());
     }
 }
 
