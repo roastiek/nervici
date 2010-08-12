@@ -69,7 +69,7 @@ void Player::timer_func (timer_ti speed) {
         timer += speed;
         if (timer >= 0) {
             timer = 0;
-            System::mod_on_pl_timer (id);
+            System::mod->on_pl_timer (id);
         }
     } else timer += speed;
 }
@@ -182,14 +182,14 @@ void Player::live () {
         survive = World::test_fields (pos, fields, id, head);
         if (!survive) {
             set_state (PS_Death);
-            System::mod_on_death (id);
+            System::mod->on_death (id);
         }
         process_fields (pos, fields);
     } else {
         survive = World::simple_test_fields (pos, fields);
         if (!survive) {
             set_state (PS_Death);
-            System::mod_on_death (id);
+            System::mod->on_death (id);
         }
     }
 }
@@ -197,7 +197,7 @@ void Player::live () {
 void Player::clear_step () {
     if (length == 0) {
         set_state (PS_Erased);
-        System::mod_on_cleared (id);
+        System::mod->on_cleared (id);
     } else {
         clear_bottom ();
     }

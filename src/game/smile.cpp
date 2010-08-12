@@ -97,7 +97,7 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;
-        System::mod_on_pozi_smile (pid, level);
+        System::mod->on_pozi_smile (pid, level);
         Audio::play_effect (pid, ET_SmilePlus);
     }
 
@@ -155,7 +155,7 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;
-        System::mod_on_nega_smile (pid, level);
+        System::mod->on_nega_smile (pid, level);
         Audio::play_effect (pid, ET_SmileMinus);
     }
 
@@ -213,7 +213,7 @@ public:
         World::erase_smile (pos);*/
         /*visible = false;
         valid = false;*/
-        System::mod_on_fleg_smile (pid, level);
+        System::mod->on_fleg_smile (pid, level);
         Audio::play_effect (pid, ET_SmileMinus);
     }
 
@@ -271,7 +271,7 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;
-        System::mod_on_iron_smile (pid, level);
+        System::mod->on_iron_smile (pid, level);
         Audio::play_effect (pid, ET_SmilePlus);
     }
 
@@ -366,7 +366,7 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
-        System::mod_on_iron_smile (pid, level);
+        System::mod->on_iron_smile (pid, level);
         Audio::play_effect (pid, ET_SmilePlus);
     }
 
@@ -460,7 +460,7 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
-        System::mod_on_iron_smile (pid, level);
+        System::mod->on_iron_smile (pid, level);
         Audio::play_effect (pid, ET_SmilePlus);
     }
 
@@ -559,7 +559,7 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
-        System::mod_on_iron_smile (pid, level);
+        System::mod->on_iron_smile (pid, level);
         Audio::play_effect (pid, ET_SmilePlus);
     }
 

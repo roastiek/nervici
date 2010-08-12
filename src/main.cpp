@@ -1,5 +1,4 @@
 #include <math.h>
-//#include <iostream>
 
 #include "app.h"
 
@@ -14,9 +13,6 @@ using namespace std;
 float icos[angles];
 float isin[angles];
 
-//static GameInfo gameinfo;
-//static GameSetting gameset;
-
 //proc neni cisarsky rez jako zakusek
 
 static void calc_angles () {
@@ -26,29 +22,8 @@ static void calc_angles () {
     }
 }
 
-/*static void print_sdl_matrix (const SDLPango_Matrix& mat) {
-    for (int c = 0; c < 4; c++) {
-        for (int i = 0; i < 4; i++) {
-            cout << int (mat.m[i][c]) << " ";
-        }
-        cout << '\n';
-    }
-}*/
-
 int main (int argc, char *argv[]) {
     calc_angles ();
-
-/*    cout << "black back\n";
-    print_sdl_matrix (*MATRIX_BLACK_BACK);
-    cout << "white back\n";
-    print_sdl_matrix (*MATRIX_WHITE_BACK);
-    cout << "trans black letter\n";
-    print_sdl_matrix (*MATRIX_TRANSPARENT_BACK_BLACK_LETTER);
-    cout << "trans white letter\n";
-    print_sdl_matrix (*MATRIX_TRANSPARENT_BACK_WHITE_LETTER);
-    cout << "trans tran letter\n";
-    print_sdl_matrix (*MATRIX_TRANSPARENT_BACK_TRANSPARENT_LETTER);*/
-
 
     App::initialize ();
     App::run ();

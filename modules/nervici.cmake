@@ -1,6 +1,7 @@
 
 set (NERVICI_SOURCES
-    src/system.cpp 
+    src/system.cpp
+    src/mods/mod_interface.cpp 
     src/engine/audio.cpp
     src/engine/loader.cpp
     src/engine/render.cpp 

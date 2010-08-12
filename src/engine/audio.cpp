@@ -227,8 +227,8 @@ static void scan_music_dir (const ustring& path, vector<MusicFile>& files, Music
 static void init_wavs () {
     cout << __func__ << '\n';
 
-    for (size_t di = 0; di < System::get_data_dirs ().size (); di++) {
-        ustring dir = System::get_data_dirs()[di] + "sounds/";
+    for (size_t di = 0; di < System::get_data_dirs_count(); di++) {
+        ustring dir = System::get_data_dir(di)+ "sounds/";
         scan_sounds_dir (dir, sound_profiles);
     }
 
@@ -249,9 +249,9 @@ static void init_music () {
 
     cout << __func__ << '\n';
 
-    for (size_t di = 0; di < System::get_data_dirs ().size(); di++) {
+    for (size_t di = 0; di < System::get_data_dirs_count(); di++) {
         for (mt = MT_Short; mt < MT_Count; mt++) {
-            dir_name = System::get_data_dirs()[di] + "music/" + suffixs[mt];
+            dir_name = System::get_data_dir(di) + "music/" + suffixs[mt];
             scan_music_dir (dir_name, music[mt], mt);
         }
     }

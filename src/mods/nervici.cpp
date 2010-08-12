@@ -3,10 +3,11 @@
 #include "game/game.h"
 #include "engine/audio.h"
 #include "engine/render.h"
-
-#include "mods/nervici.h"
 #include "game/player.h"
 
+#include "mods/nervici.h"
+
+namespace Nervici {
 
 void clear_playerground () {
     Game::clear_playerground ();
@@ -164,3 +165,4 @@ score_ti get_pl_ironzie (plid_tu plid) {
     return Players::get_pl_ironze (plid);
 }
 
+}

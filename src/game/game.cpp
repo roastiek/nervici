@@ -86,7 +86,7 @@ void run () {
     //clock_gettime (CLOCK_REALTIME, &time);
     sdl_time = SDL_GetTicks ();
     Players::update_score ();
-    System::mod_on_game_start (&set);
+    System::mod->on_game_start (set);
 
     while (!end && !abort) {
         while (SDL_PollEvent (&event)) {
@@ -106,16 +106,16 @@ void run () {
             }
         }
 
-        System::mod_before_step ();
+        System::mod->before_step ();
         Players::step ();
         World::check_starts ();
-        System::mod_after_step ();
+        System::mod->after_step ();
 
-        System::mod_before_step ();
+        System::mod->before_step ();
         Players::step ();
         Smiles::step ();
         World::check_starts ();
-        System::mod_after_step ();
+        System::mod->after_step ();
 
         World::render_queue ();
         Players::update_bodies ();
@@ -133,7 +133,7 @@ void run () {
             if (timer >= 0) {
                 timer = 0;
                 cout << "timer\n";
-                System::mod_on_timer ();
+                System::mod->on_timer ();
             }
         } else timer += speed;
         Players::timer (speed);
@@ -146,7 +146,7 @@ void run () {
         Render::draw_end ();
     }
 
-    System::mod_on_game_end ();
+    System::mod->on_game_end ();
 }
 
 void set_speed (timer_ti value) {

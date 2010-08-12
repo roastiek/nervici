@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6.0)
-project (Nervici CXX C)
+project (Nervici CXX)
 
 set (CMAKE_COLOR_MAKEFILE ON)
 set (CMAKE_VERBOSE_MAKEFILE OFF)

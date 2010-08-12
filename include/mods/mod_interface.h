@@ -1,50 +1,59 @@
 #ifndef __MOD_INTERFACE_H__
 #define __MOD_INTERFACE_H__
 
+#include <vector>
+#include <glibmm/ustring.h>
+
 #include "int_type.h"
 #include "game_setting.h"
 #include "game/smyle_type.h"
 #include "mod_specification.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct ModRunnerInfo {
-    char **extensions;
+    std::vector<Glib::ustring> extensions;
 };
 
 struct ModInfo {
-    char *name;
-    char *autor;
-    char *rules;
-    struct ModSpecification spec;
+    Glib::ustring name;
+    Glib::ustring autor;
+    Glib::ustring rules;
+    ModSpecification spec;
 };
 
-typedef const struct ModRunnerInfo *(*ModGetModRunnerInfo) ();
-typedef const struct ModInfo *(*ModGetModInfo) (const char* script);
-typedef void (*LoadScript) (const char* script);
-typedef void (*UnloadScript) ();
-typedef void (*ModOnGameStart) (struct GameSetting set);
-typedef void (*ModOnGameEnd) ();
-typedef void (*ModOnTimer) ();
-typedef void (*ModOnDeath) (plid_tu plid);
-typedef void (*ModBeforeStep) ();
-typedef void (*ModAfterStep) ();
-typedef void (*ModOnPoziSmile) (plid_tu plid, int lvl);
-typedef void (*ModOnNegaSmile) (plid_tu plid, int lvl);
-typedef void (*ModOnFlegSmile) (plid_tu plid, int lvl);
-typedef void (*ModOnIronSmile) (plid_tu plid, int lvl);
-typedef void (*ModOnHamSmile) (plid_tu plid, int lvl);
-typedef void (*ModOnKilled) (plid_tu plid, plid_tu murder);
-typedef void (*ModOnKill) (plid_tu plid, plid_tu victim);
-typedef void (*ModOnWall) (plid_tu plid);
-typedef void (*ModOnSelfDeath) (plid_tu plid);
-typedef void (*ModOnCleared) (plid_tu plid);
-typedef void (*ModOnPlTimer) (plid_tu plid);
+class ModInterface {
+public:
+    virtual const ModRunnerInfo& get_runner_info () = 0;
+    virtual const ModInfo* get_info (const Glib::ustring& script) = 0;
+    virtual void load_script (const Glib::ustring& script);
+    virtual void unload_script ();
+    virtual void on_game_start (const GameSetting& settting);
+    virtual void on_game_end ();
+    virtual void on_timer ();
+    virtual void on_death (plid_tu plid);
+    virtual void before_step ();
+    virtual void after_step ();
+    virtual void on_pozi_smile (plid_tu plid, int lvl);
+    virtual void on_nega_smile (plid_tu plid, int lvl);
+    virtual void on_fleg_smile (plid_tu plid, int lvl);
+    virtual void on_iron_smile (plid_tu plid, int lvl);
+    virtual void on_ham_smile (plid_tu plid, int lvl);
+    virtual void on_killed (plid_tu plid, plid_tu murder);
+  //  virtual void on_kill (plid_tu plid, plid_tu victim);
+    virtual void on_wall (plid_tu plid);
+//    virtual void on_self_death (plid_tu plid);
+    virtual void on_cleared (plid_tu plid);
+    virtual void on_pl_timer (plid_tu plid);
+};
 
-#ifdef	__cplusplus
+typedef ModInterface* (*GetFace)();
+
+union GetFaceHandle {
+  void* handle;
+  GetFace get_face;
+};
+
+extern "C" {
+    ModInterface* get_face ();
 }
-#endif
 
 #endif // __MODS_H__
