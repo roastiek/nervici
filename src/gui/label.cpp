@@ -1,5 +1,7 @@
 #include "gui/label.h"
 
+using namespace Glib;
+
 Label::Label (const ControlParameters& parms):
 Control(parms) {
 }

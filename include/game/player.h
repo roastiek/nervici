@@ -2,7 +2,6 @@
 #define __PLAYER_H__
 
 #include <vector>
-using namespace std;
 
 #include "settings/pl_info.h"
 #include "pl_state.h"
@@ -59,7 +58,7 @@ private:
 
     score_ti ironize_lvl;
 
-    vector<Point> updates;
+    std::vector<Point> updates;
 
     void clear_bottom ();
 

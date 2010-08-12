@@ -10,8 +10,6 @@
 
 #include <glibmm/ustring.h>
 
-using namespace Glib;
-
 #include "defaults.h"
 
 struct Implementor;
@@ -21,7 +19,7 @@ private:
     int width;
     int height;
     struct {
-        ustring name;
+        Glib::ustring name;
         Uint32 color;
         int size;
     } font;
@@ -38,7 +36,7 @@ public:
 
     void set_height (int value);
 
-    void set_font (const ustring& value);
+    void set_font (const Glib::ustring& value);
 
     void set_font_size (int value);
 
@@ -80,14 +78,14 @@ public:
             int x3, int y3, Uint32 color);
 
     void draw_text (int x, int y, int w, int h, HorizontalAling ha,
-            VerticalAling va, const ustring& text);
+            VerticalAling va, const Glib::ustring& text);
 
     void draw_text (int x, int y, int w, int h, int x_shift,
-            VerticalAling va, const ustring& text);
+            VerticalAling va, const Glib::ustring& text);
 
-    void draw_wrapped_text (int x, int y, int w, int h, const ustring& text);
+    void draw_wrapped_text (int x, int y, int w, int h, const Glib::ustring& text);
 
-    int get_text_width (const ustring& text);
+    int get_text_width (const Glib::ustring& text);
 
     void draw_image (int x, int y, Canvas* image);
 

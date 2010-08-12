@@ -1,5 +1,7 @@
 #include "gui/combobox.h"
 
+using namespace Glib;
+
 void Combobox::list_clicked (Control* ctl) {
     set_selected (list->get_selected ());
     hide_popup ();

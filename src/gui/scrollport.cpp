@@ -1,6 +1,8 @@
 #include "gui/scrollport.h"
 #include "gui/view.h"
 
+using namespace Glib;
+
 ControlParameters Scrollport::view_parms = {
     0.0, 0.0, 0.0, 0.0, 0.1
 };

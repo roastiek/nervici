@@ -2,6 +2,8 @@
 
 #include "gui/smile_control.h"
 
+using namespace Glib;
+
 SmileControl::SmileControl (const ControlParameters& parms, Canvas* face) :
 Control (parms),
 smile (face),

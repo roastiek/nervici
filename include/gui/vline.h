@@ -30,7 +30,7 @@ public:
 class VLineFactory {
 public:
     static VLine* create (Control* parent, const ControlParameters& parms,
-            const ustring& name = "vline");
+            const Glib::ustring& name = "vline");
 };
 
 

@@ -66,7 +66,7 @@ public:
 class SmileControlFactory {
 public:
     static SmileControl* create (Control* parent, Canvas* face,
-            const ControlParameters& parms, const ustring& name = "smile_control");
+            const ControlParameters& parms, const Glib::ustring& name = "smile_control");
 };
 
 #endif	/* SMILE_CONTROL_H */

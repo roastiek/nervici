@@ -16,7 +16,7 @@ protected:
 
     Numberbox (const ControlParameters& parms);
 
-    bool filter (const ustring::value_type& c);
+    bool filter (const Glib::ustring::value_type& c);
 
     friend class NumberboxFactory;
 
@@ -29,7 +29,7 @@ public:
 class NumberboxFactory {
 public:
     static Numberbox* create (Control* parent, const ControlParameters& parms,
-            const ustring& name = "numberbox");
+            const Glib::ustring& name = "numberbox");
 };
 
 

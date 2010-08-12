@@ -13,10 +13,10 @@
 
 struct Mod {
     const ModRunner *runner;
-    ustring script;
-    ustring name;
-    ustring autor;
-    ustring rules;
+    Glib::ustring script;
+    Glib::ustring name;
+    Glib::ustring autor;
+    Glib::ustring rules;
     ModSpecification spec;
 };
 

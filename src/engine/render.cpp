@@ -6,13 +6,14 @@ using namespace std;
 #include "engine/loader.h"
 #include "engine/image_type.h"
 #include "gui/scale.h"
-#include "engine/font_type.h"
 #include "game/world.h"
 #include "settings/pl_infos.h"
 #include "settings/team_infos.h"
 #include "settings/setting.h"
 
 #include "engine/render.h"
+
+using namespace Glib;
 
 namespace Render {
 

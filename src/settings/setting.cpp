@@ -8,6 +8,8 @@
 
 #include "settings/setting.h"
 
+using namespace Glib;
+
 namespace Setting {
 
 struct SetEntry {

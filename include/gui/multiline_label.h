@@ -13,7 +13,7 @@
 
 class MultilineLabel : public Control {
 private:
-    ustring text;
+    Glib::ustring text;
 
 protected:
     MultilineLabel (const ControlParameters& parms);
@@ -24,9 +24,9 @@ protected:
 
 public:
 
-    virtual void set_text (const ustring& value);
+    virtual void set_text (const Glib::ustring& value);
 
-    virtual const ustring& get_text () const;
+    virtual const Glib::ustring& get_text () const;
 
     bool is_focusable () const;
 
@@ -35,8 +35,8 @@ public:
 
 class MultilineLabelFactory {
 public:
-    static MultilineLabel* create (Control* par, const ustring& text,
-            const ControlParameters& parms, const ustring& name = "multiline label");
+    static MultilineLabel* create (Control* par, const Glib::ustring& text,
+            const ControlParameters& parms, const Glib::ustring& name = "multiline label");
 };
 
 

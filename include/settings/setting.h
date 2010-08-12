@@ -2,7 +2,6 @@
 #define __SETTING_H__
 
 #include <glibmm/ustring.h>
-using namespace Glib;
 
 namespace Setting {
     void load ();
@@ -13,15 +12,15 @@ namespace Setting {
 
     void free_directory ();
 
-    long int read_int (const ustring& section, const ustring& key, int def);
+    long int read_int (const Glib::ustring& section, const Glib::ustring& key, int def);
 
-    void write_int (const ustring& section, const ustring& key, long int value);
+    void write_int (const Glib::ustring& section, const Glib::ustring& key, long int value);
 
-    const ustring & read_string (const ustring& section, const ustring& key, const ustring & def);
+    const Glib::ustring & read_string (const Glib::ustring& section, const Glib::ustring& key, const Glib::ustring & def);
 
-    void write_string (const ustring& section, const ustring& key, const ustring & value);
+    void write_string (const Glib::ustring& section, const Glib::ustring& key, const Glib::ustring & value);
 
-    void delete_section (const ustring & section);
+    void delete_section (const Glib::ustring & section);
 }
 
 

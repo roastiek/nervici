@@ -13,8 +13,6 @@
 
 #include <glibmm/ustring.h>
 
-using namespace Glib;
-
 #include "defaults.h"
 #include "event.h"
 #include "canvas.h"
@@ -77,7 +75,7 @@ private:
     int x;
     int y;
     Canvas* canvas;
-    ustring name;
+    Glib::ustring name;
 
     struct {
         Uint32 background;
@@ -176,14 +174,14 @@ protected:
             int x3, int y3, Uint32 color);
 
     virtual void draw_text (int x, int y, int w, int h, HorizontalAling ha,
-            VerticalAling va, const ustring& text);
+            VerticalAling va, const Glib::ustring& text);
 
     virtual void draw_text (int x, int y, int w, int h, int x_shift,
-            VerticalAling va, const ustring& text);
+            VerticalAling va, const Glib::ustring& text);
 
-    virtual void draw_wrapped_text (int x, int y, int w, int h, const ustring& text);
+    virtual void draw_wrapped_text (int x, int y, int w, int h, const Glib::ustring& text);
 
-    virtual int get_text_width (const ustring& text);
+    virtual int get_text_width (const Glib::ustring& text);
 
     virtual void draw_image (int x, int y, Canvas* image);
 
@@ -289,13 +287,13 @@ public:
 
     virtual void set_focused (bool value);
 
-    virtual void set_font (const ustring& font);
+    virtual void set_font (const Glib::ustring& font);
 
     virtual void set_font_color (Uint32 value);
 
     virtual void set_font_size (int value);
 
-    virtual void set_name (const ustring& value);
+    virtual void set_name (const Glib::ustring& value);
 
     virtual int get_width () const;
 
@@ -321,7 +319,7 @@ public:
 
     virtual Uint32 get_frame () const;
 
-    virtual const ustring& get_name () const;
+    virtual const Glib::ustring& get_name () const;
 
     friend class Screen;
 
@@ -331,7 +329,7 @@ public:
 
 class ControlFactory {
 public:
-    static Control* create (Control* par, const ControlParameters& parms, const ustring& = "control");
+    static Control* create (Control* par, const ControlParameters& parms, const Glib::ustring& = "control");
 };
 
 #endif	/* CONTROL_H */

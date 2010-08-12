@@ -77,7 +77,7 @@ public:
 class ScaleFactory {
 public:
     static Scale* create (Control* parent, int small_step, int big_step,
-            const ControlParameters& parms, const ustring& name= "scale");
+            const ControlParameters& parms, const Glib::ustring& name= "scale");
 };
 
 #endif	/* SCALE_H */

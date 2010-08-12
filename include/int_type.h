@@ -10,10 +10,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef uint8_t plid_tu;
 typedef uint16_t plsize_tu;
 typedef int32_t score_ti;
@@ -24,10 +20,6 @@ typedef uint8_t plpart_tu;
 typedef uint8_t round_tu;
 typedef uint16_t smileid_tu;
 typedef uint8_t smilelvl_tu;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif	/* INT_TYPE_H */
 

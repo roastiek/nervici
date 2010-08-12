@@ -2,8 +2,6 @@
 #define __AUDIO_H__
 
 #include <glibmm/ustring.h>
-using namespace Glib;
-
 
 #include "int_type.h"
 #include "game/game_info.h"
@@ -31,7 +29,7 @@ namespace Audio {
 
     size_t get_profiles_count ();
 
-    const ustring& get_profile (size_t id);
+    const Glib::ustring& get_profile (size_t id);
 }
 
 

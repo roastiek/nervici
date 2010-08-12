@@ -1,6 +1,8 @@
 
 #include "gui/textbox.h"
 
+using namespace Glib;
+
 Textbox::Textbox (const ControlParameters& parms) :
 InputControl (parms),
 cursor (0),

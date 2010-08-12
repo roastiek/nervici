@@ -1,5 +1,4 @@
 #include <SDL.h>
-#include <SDL_ttf.h>
 #include <SDL_image.h>
 //#include <SDL/SDL_video.h>
 //#include <SDL/SDL_ttf.h>
@@ -10,11 +9,12 @@
 #include "system.h"
 #include "gui/implementor.h"
 #include "engine/image_type.h"
-#include "engine/font_type.h"
 #include "utils.h"
  
 #include "engine/loader.h"
  
+using namespace Glib;
+
 namespace Loader {
  
 static const char* const gameImages[] = {

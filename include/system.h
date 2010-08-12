@@ -2,10 +2,8 @@
 #define __SYSTEM_H__
  
 #include <glibmm/ustring.h>
-using namespace Glib;
  
 #include "mods/game_setting.h"
-#include "int_type.h"
 #include "mod.h"
 #include "mods/mod_interface.h"
  
@@ -14,7 +12,7 @@ namespace System {
 /*
  * Returns user's configuration's directory, typically ~/.config/nervici/
  */ 
-const ustring& get_config_dir();
+const Glib::ustring& get_config_dir();
  
 /*
  * Returns count of data direcotries
@@ -25,7 +23,7 @@ size_t get_data_dirs_count();
  * Return one data directory, the list typically contains ~/.local/share/nervici/
  * /usr/local/share/nervici/ and /usr/share/nervici/
  */
-const ustring& get_data_dir(size_t index);
+const Glib::ustring& get_data_dir(size_t index);
  
 /*
  * populate all system paths
@@ -63,7 +61,7 @@ const Mod& get_mod(size_t mid);
  * Select and prepare mod before game start.
  * Technically it loads all event funtictions of mod
  */
-void load_mod(size_t mid, const ustring& script);
+void load_mod(size_t mid, const Glib::ustring& script);
  
 /*
  * Disconnect from event function of mod after game ends.

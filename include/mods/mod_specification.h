@@ -10,10 +10,6 @@
 
 #include "game/smyle_type.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct ModSpecification {
     plid_tu max_players;
     int speed_enabled;
@@ -33,10 +29,6 @@ struct ModSpecification {
     int smiles_enabled[ST_count][3];
     uint8_t defualt_smiles_counts[ST_count][3];
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif	/* MOD_SPECIFICATION_H */
 

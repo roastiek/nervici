@@ -1,6 +1,5 @@
 #include <SDL_keysym.h>
 #include <vector>
-using namespace std;
 #include <iostream>
 
 #include "basic_defs.h"
@@ -8,6 +7,9 @@ using namespace std;
 #include "settings/setting.h"
 
 #include "settings/pl_infos.h"
+
+using namespace Glib;
+using namespace std;
 
 namespace PlInfos {
 

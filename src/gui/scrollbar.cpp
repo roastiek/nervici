@@ -1,5 +1,7 @@
 #include "gui/scrollbar.h"
 
+using namespace Glib;
+
 ScrollbarParameters::ScrollbarParameters (float nx, float ny, float nw, float nh,
         float nf, float nss, float nbs) :
 ControlParameters (nx, ny, nw, nh, nf), small_step (nss), big_step (nbs) {

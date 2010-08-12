@@ -1,7 +1,7 @@
 
 set (NERVICI_SOURCES
-    src/system.cpp
     src/mods/mod_interface.cpp 
+    src/system.cpp
     src/engine/audio.cpp
     src/engine/loader.cpp
     src/engine/render.cpp 
@@ -18,9 +18,7 @@ set (NERVICI_SOURCES
     src/settings/pl_infos.cpp 
     src/settings/team_infos.cpp
     src/utils.cpp 
-    src/main.cpp 
     src/mods/nervici.cpp 
-    src/app.cpp
     src/gui/implementor.cpp 
     src/gui/canvas.cpp 
     src/gui/control.cpp 
@@ -28,9 +26,9 @@ set (NERVICI_SOURCES
     src/gui/button.cpp  
     src/gui/screen.cpp 
     src/gui/scrollbar.cpp 
+    src/gui/view.cpp 
     src/gui/scrollport.cpp 
     src/gui/textbox.cpp 
-    src/gui/view.cpp 
     src/gui/listbox.cpp 
     src/gui/combobox.cpp 
     src/gui/multiline_label.cpp 
@@ -44,7 +42,10 @@ set (NERVICI_SOURCES
     src/gui/key_graber.cpp
     src/frames/start_frame.cpp 
     src/frames/game_frame.cpp 
-    src/frames/pledit_frame.cpp)
+    src/frames/pledit_frame.cpp
+    src/app.cpp
+    src/main.cpp 
+)
 
 add_executable (nervici ${NERVICI_SOURCES})
 
@@ -56,7 +57,7 @@ target_link_libraries (nervici
     ${VorbisFile_LIBRARIES} 
     ${GTKMM_LIBRARIES}
     ${SDLPango_LIBRARIES}
-    m dl
+    m
 )
 
 install (TARGETS nervici RUNTIME DESTINATION bin)

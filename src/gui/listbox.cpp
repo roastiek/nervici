@@ -1,5 +1,7 @@
 #include "gui/listbox.h"
 
+using namespace Glib;
+
 ListboxParameters::ListboxParameters (float nx, float ny, float nw, float nh, float nf,
         float nmh, float nih) :
 ControlParameters (nx, ny, nw, nh, nf), min_height (nmh), item_height (nih) {

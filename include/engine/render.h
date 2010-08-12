@@ -2,10 +2,7 @@
 #define __RENDER_H__
 
 #include <vector>
-using namespace std;
-
 #include <glibmm/ustring.h>
-using namespace Glib;
 
 #include "point.h"
 #include "render_semafor.h"
@@ -36,7 +33,7 @@ namespace Render {
 
     void update_player (const Point& pos);
 
-    void draw_world_items_queue (vector<Point>& queue);
+    void draw_world_items_queue (std::vector<Point>& queue);
 
     void draw_game_screen ();
 
@@ -64,7 +61,7 @@ namespace Render {
 
     wsize_tu get_playerground_height ();
 
-    Screen* create_screen (const ustring& name = "");
+    Screen* create_screen (const Glib::ustring& name = "");
 
     int get_width ();
 

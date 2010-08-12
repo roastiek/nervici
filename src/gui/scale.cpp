@@ -1,5 +1,7 @@
 #include "gui/scale.h"
 
+using namespace Glib;
+
 Scale::Scale (const ControlParameters& parms) :
 Control (parms),
 min (0),

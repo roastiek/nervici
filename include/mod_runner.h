@@ -10,10 +10,9 @@
 
 
 #include <glibmm/ustring.h>
-using namespace Glib;
 
 struct ModRunner {
-    ustring filename;
+    Glib::ustring filename;
 };
 
 

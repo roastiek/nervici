@@ -6,7 +6,6 @@
 #include <AL/al.h>
 #include <vector>
 #include <iostream>
-using namespace std;
 
 #include "system.h"
 #include "settings/pl_infos.h"
@@ -14,6 +13,9 @@ using namespace std;
 #include "game/game.h"
 
 #include "engine/audio.h"
+
+using namespace std;
+using namespace Glib;
 
 namespace Audio {
 

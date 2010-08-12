@@ -1,5 +1,7 @@
 #include "gui/vline.h"
 
+using namespace Glib;
+
 VLine::VLine (const ControlParameters& parms):
 Control(parms) {
 }

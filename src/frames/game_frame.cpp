@@ -5,13 +5,15 @@
 #include "game/game.h"
 #include "settings/pl_infos.h"
 #include "utils.h"
-
-#include "frames/game_frame.h"
 #include "settings/team_info.h"
 #include "settings/team_infos.h"
 #include "system.h"
 #include "settings/setting.h"
 #include "app.h"
+
+#include "frames/game_frame.h"
+
+using namespace Glib;
 
 #define ONE_COLUMN_W ((1024 - 16 - 3 * 17) / 4)
 #define ONE_COLUMN_H (24 + 20 + 14 + 26 * 16)

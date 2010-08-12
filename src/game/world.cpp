@@ -7,6 +7,8 @@
 
 #include "game/world.h"
 
+using namespace std;
+
 namespace World {
 
 static wsize_tu width;

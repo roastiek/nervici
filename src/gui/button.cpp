@@ -1,5 +1,7 @@
 #include "gui/button.h"
 
+using namespace Glib;
+
 Button::Button (const ControlParameters& parms):
 Control (parms) {
 }

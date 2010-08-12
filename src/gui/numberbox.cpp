@@ -2,6 +2,8 @@
 
 #include "gui/numberbox.h"
 
+using namespace Glib;
+
 Numberbox::Numberbox (const ControlParameters& parms):
 Textbox (parms) {
 }

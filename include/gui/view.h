@@ -64,7 +64,7 @@ public:
 class ViewFactory {
 public:
     static View* create (Control* par, Control* content,
-            const ControlParameters& parms, const ustring& name = "view");
+            const ControlParameters& parms, const Glib::ustring& name = "view");
 };
 
 #endif	/* VIEW_H */

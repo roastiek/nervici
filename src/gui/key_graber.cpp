@@ -2,6 +2,8 @@
 
 #include "gui/key_graber.h"
 
+using namespace Glib;
+
 KeyGraber::KeyGraber (const ControlParameters& parms) :
 Button (parms), key (-1) {
 }

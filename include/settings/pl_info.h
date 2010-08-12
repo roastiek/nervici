@@ -9,7 +9,6 @@
 #define	PL_INFO_H
 
 #include <glibmm/ustring.h>
-using namespace Glib;
 
 #include "pl_type.h"
 
@@ -26,17 +25,17 @@ struct AIInfo {
 struct PlInfo {
     uint32_t color;
     PlTypes type;
-    ustring name;
+    Glib::ustring name;
     union {
         PlKeys keys;
         AIInfo ai;
     };
-    ustring profil;
+    Glib::ustring profil;
     int pitch;
 
     PlInfo();
 
-    PlInfo (uint32_t nc, const ustring& nn, int nai, const ustring& np, int npi);
+    PlInfo (uint32_t nc, const Glib::ustring& nn, int nai, const Glib::ustring& np, int npi);
 };
 
 #endif	/* PL_INFO_H */

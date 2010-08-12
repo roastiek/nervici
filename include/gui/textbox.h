@@ -13,7 +13,7 @@
 class Textbox : public InputControl {
 
 private:
-    ustring text;
+    Glib::ustring text;
     int cursor;
     int cursor_x;
     int x_offset;
@@ -26,7 +26,7 @@ private:
 
     void insert_at_cursor (const char* part);
 
-    void update_text (const ustring& value);
+    void update_text (const Glib::ustring& value);
 
 protected:
     Textbox (const ControlParameters& parms);
@@ -41,15 +41,15 @@ protected:
 
     void on_focus_lost ();
 
-    virtual bool filter (const ustring::value_type& c);
+    virtual bool filter (const Glib::ustring::value_type& c);
 
 public:
 
-    void set_text (const ustring& value);
+    void set_text (const Glib::ustring& value);
 
     void set_cursor (int value);
 
-    const ustring& get_text () const;
+    const Glib::ustring& get_text () const;
 
     int get_cursor () const;
 
@@ -60,7 +60,7 @@ public:
 class TextboxFactory {
 public:
     static Textbox* create (Control* par, const ControlParameters& parms,
-            const ustring& name = "textbox");
+            const Glib::ustring& name = "textbox");
 };
 #endif	/* TEXTBOX_H */
 

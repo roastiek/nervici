@@ -59,17 +59,17 @@ public:
 
     virtual void clear ();
 
-    virtual void add_item (const ustring& text, Uint32 color = C_INPUT_TEXT);
+    virtual void add_item (const Glib::ustring& text, Uint32 color = C_INPUT_TEXT);
 
     virtual const ListItem& get_item (int index);
 
     virtual int get_items_count () const;
 
-    virtual void update_item (int index, const ustring& text, Uint32 color = C_INPUT_TEXT);
+    virtual void update_item (int index, const Glib::ustring& text, Uint32 color = C_INPUT_TEXT);
 
     virtual void remove_item (int index);
 
-    virtual void insert_item (int index, const ustring& text, Uint32 color = C_INPUT_TEXT);
+    virtual void insert_item (int index, const Glib::ustring& text, Uint32 color = C_INPUT_TEXT);
 
     virtual void set_selected (int value);
 
@@ -83,7 +83,7 @@ public:
 class ComboboxFactory {
 public:
     static Combobox* create (Control* par,
-            const ListboxParameters& parms, const ustring& name = "combobox");
+            const ListboxParameters& parms, const Glib::ustring& name = "combobox");
 };
 
 #endif	/* COMBOBOX_H */

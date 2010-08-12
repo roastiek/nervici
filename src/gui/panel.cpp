@@ -1,5 +1,7 @@
 #include "gui/panel.h"
 
+using namespace Glib;
+
 Panel::Panel (const ControlParameters& parms):
 Control(parms) {
 }

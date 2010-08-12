@@ -12,7 +12,7 @@
 
 class Label: public Control {
 private:
-    ustring text;
+    Glib::ustring text;
 
 protected:
 
@@ -26,17 +26,17 @@ public:
 
     bool is_focusable () const;
 
-    void set_text (const ustring& value);
+    void set_text (const Glib::ustring& value);
 
-    const ustring& get_text () const;
+    const Glib::ustring& get_text () const;
 
     friend class LabelFactory;
 };
 
 class LabelFactory {
 public:
-    static Label* create (Control* parent, const ustring& text,
-            const ControlParameters& parms, const ustring& name = "label");
+    static Label* create (Control* parent, const Glib::ustring& text,
+            const ControlParameters& parms, const Glib::ustring& name = "label");
 };
 
 #endif	/* LABEL_H */

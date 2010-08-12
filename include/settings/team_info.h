@@ -9,11 +9,10 @@
 #define	TEAMINFO_H
 
 #include <glibmm/ustring.h>
-using namespace Glib;
 
 struct TeamInfo {
     uint32_t color;
-    ustring name;
+    Glib::ustring name;
 };
 
 

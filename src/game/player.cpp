@@ -12,6 +12,8 @@
 #define JUMP_LENGTH 24
 #define JUMP_REPEAT 80
 
+using namespace std;
+
 void Player::process_fields (const Point& pos, const Fields& fields) {
     if (state == PS_Live || state == PS_Start) {
         World::write_player_head (pos, fields, id, head);

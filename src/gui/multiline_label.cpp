@@ -1,5 +1,7 @@
 #include "gui/multiline_label.h"
 
+using namespace Glib;
+
 MultilineLabel::MultilineLabel (const ControlParameters& parms):
 Control(parms) {
 }

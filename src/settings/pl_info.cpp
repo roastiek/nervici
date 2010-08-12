@@ -1,5 +1,7 @@
 #include "settings/pl_info.h"
 
+using namespace Glib;
+
 PlInfo::PlInfo () {
 }
 

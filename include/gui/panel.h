@@ -23,7 +23,7 @@ public:
 class PanelFactory {
 public:
     static Panel* create (Control* parent, const ControlParameters& parms,
-            const ustring& name);
+            const Glib::ustring& name);
 };
 
 

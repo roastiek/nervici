@@ -88,7 +88,7 @@ public:
 class ScrollbarFactory {
 public:
     static Scrollbar* create (Control* par, const ScrollbarParameters& parms,
-            const ustring& name = "scrollbar");
+            const Glib::ustring& name = "scrollbar");
 };
 
 #endif	/* SCROLLBAR_H */

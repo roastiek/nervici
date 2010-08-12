@@ -1,5 +1,7 @@
 #include "gui/view.h"
 
+using namespace Glib;
+
 View::View (const ControlParameters& parms) :
 Control (parms),
 content (NULL),

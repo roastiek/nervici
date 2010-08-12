@@ -2,6 +2,8 @@
 
 #include "gui/control.h"
 
+using namespace Glib;
+
 ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
         float nf) :
 x (nx), y (ny), w (nw), h (nh), font_size (nf) {

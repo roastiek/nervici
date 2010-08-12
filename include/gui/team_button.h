@@ -50,7 +50,7 @@ public:
 class TeamButtonFactory {
 public:
     static TeamButton* create (Control* parent, const TeamColors* colors,
-            const ControlParameters& parms, const ustring& name = "team button");
+            const ControlParameters& parms, const Glib::ustring& name = "team button");
 };
 
 #endif	/* TEAM_BUTTON_H */

@@ -8,10 +8,6 @@
 #ifndef GAME_SETTING_H
 #define	GAME_SETTING_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct GameSetting {
     int playersCount;
     int teams_count;
@@ -25,11 +21,6 @@ struct GameSetting {
     int step;
 };
    
-
-#ifdef	__cplusplus
-}
-#endif
-
 
 #endif	/* GAME_SETTING_H */
 

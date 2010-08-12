@@ -13,7 +13,7 @@
 class Button : public Control {
 
 private:
-    ustring text;
+    Glib::ustring text;
 
 protected:
     Button (const ControlParameters& parms);
@@ -28,17 +28,17 @@ protected:
 
 public:
 
-    void set_text (const ustring& value);
+    void set_text (const Glib::ustring& value);
 
-    const ustring& get_text () const;
+    const Glib::ustring& get_text () const;
 
     friend class ButtonFactory;
 };
 
 class ButtonFactory {
 public:
-    static Button* create (Control* par, const ustring& text,
-            const ControlParameters& parms, const ustring& name = "button");
+    static Button* create (Control* par, const Glib::ustring& text,
+            const ControlParameters& parms, const Glib::ustring& name = "button");
 };
 
 #endif	/* BUTTON_H */

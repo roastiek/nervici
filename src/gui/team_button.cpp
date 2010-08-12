@@ -2,6 +2,8 @@
 
 #include "gui/team_button.h"
 
+using namespace Glib;
+
 TeamButton::TeamButton (const ControlParameters& parms):
 Control (parms),
 selected (-1) {

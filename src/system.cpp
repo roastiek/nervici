@@ -1,15 +1,15 @@
-#include <dlfcn.h>
 #include <vector>
 #include <iostream>
-using namespace std;
 #include <glibmm/miscutils.h>
 #include <glibmm/module.h>
 #include <glibmm/fileutils.h>
-using namespace Glib;
 
 #include "mods/mod_interface.h"
 
 #include "system.h"
+
+using namespace std;
+using namespace Glib;
 
 namespace System {
 
