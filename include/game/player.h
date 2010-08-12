@@ -9,8 +9,9 @@
 #include "fields.h"
 #include "fpoint.h"
 #include "point.h"
+#include "mods/iplayer.h"
 
-struct Player {
+struct Player : public IPlayer {
 private:
     plid_tu id;
     const PlInfo* info;
@@ -84,6 +85,7 @@ public:
     void initialize (plid_tu ID, plid_tu team_id, const PlInfo* plinfo, int max_len);
     
     void uninitialize ();
+
     /*
      * Set state to PS_Erased
      */
@@ -186,6 +188,8 @@ public:
     void dec_ironize (score_ti delta);
 
     score_ti get_ironize () const;
+
+    const Glib::ustring& get_name () const;
 };
 
 

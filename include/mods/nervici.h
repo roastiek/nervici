@@ -3,6 +3,7 @@
 
 #include "int_type.h"
 #include "engine/render_semafor.h"
+#include "iplayer.h"
 
 namespace Nervici {
 
@@ -36,53 +37,7 @@ namespace Nervici {
 
     void wait_for_space ();
 
-    void clear_pl (plid_tu plid);
-
-    void cut_pl_at_length (plid_tu plid, plsize_tu length);
-
-    void dec_pl_max_length (plid_tu plid, plsize_tu delta);
-
-    void dec_pl_score (plid_tu plid, score_ti delta);
-
-    void fast_clear_pl (plid_tu plid);
-
-    plsize_tu get_pl_length (plid_tu plid);
-
-    plsize_tu get_pl_max_length (plid_tu plid);
-
-    score_ti get_pl_score (plid_tu plid);
-
-    void give_pl_start (plid_tu plid, startid_tu start);
-
-    void inc_pl_max_length (plid_tu plid, plsize_tu delta);
-
-    void inc_pl_score (plid_tu plid, score_ti delta);
-
-    int is_pl_human (plid_tu plid);
-
-    int is_pl_jumping (plid_tu plid);
-
-    int is_pl_live (plid_tu plid);
-
-    void kill_pl (plid_tu plid);
-
-    void set_pl_max_length (plid_tu plid, plsize_tu length);
-
-    void set_pl_score (plid_tu plid, score_ti score);
-
-    void set_pl_timer (plid_tu plid, timer_ti time);
-
-    void start_pl (plid_tu plid);
-
-    void revive_pl (plid_tu plid);
-
-    void set_pl_ironize (plid_tu plid, score_ti value);
-
-    void inc_pl_ironize (plid_tu plid, score_ti delta);
-
-    void dec_pl_ironize (plid_tu plid, score_ti delta);
-
-    score_ti get_pl_ironzie (plid_tu plid);
+    IPlayer& get_player (plid_tu plid);
 }
 
 #endif // __NERVICI_H__

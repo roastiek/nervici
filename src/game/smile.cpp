@@ -10,6 +10,7 @@
 #include "engine/audio.h"
 #include "game/players.h"
 #include "main.h"
+#include "game/player.h"
 
 Smile::Smile (smileid_tu sid, smileid_tu ord, smileid_tu co, smilelvl_tu lvl) :
 id (sid),
@@ -26,7 +27,7 @@ Smile::~Smile () {
 void Smile::step () {
 }
 
-void Smile::eat (plid_tu pid) {
+void Smile::eat (plid_tu plid) {
 }
 
 void Smile::erase () {
@@ -92,13 +93,13 @@ public:
         }
     }
 
-    void eat (plid_tu pid) {
+    void eat (plid_tu plid) {
         Render::clear_smile (pos);
         World::erase_smile (pos);
         visible = false;
         valid = false;
-        System::mod->on_pozi_smile (pid, level);
-        Audio::play_effect (pid, ET_SmilePlus);
+        System::mod->on_pozi_smile (Players::get_player (plid), level);
+        Audio::play_effect (plid, ET_SmilePlus);
     }
 
     SmileType get_type () {
@@ -150,13 +151,13 @@ public:
         }
     }
 
-    void eat (plid_tu pid) {
+    void eat (plid_tu plid) {
         Render::clear_smile (pos);
         World::erase_smile (pos);
         visible = false;
         valid = false;
-        System::mod->on_nega_smile (pid, level);
-        Audio::play_effect (pid, ET_SmileMinus);
+        System::mod->on_nega_smile (Players::get_player (plid), level);
+        Audio::play_effect (plid, ET_SmileMinus);
     }
 
     SmileType get_type () {
@@ -208,13 +209,13 @@ public:
         }
     }
 
-    void eat (plid_tu pid) {
+    void eat (plid_tu plid) {
         /*Render::clear_smile (pos);
         World::erase_smile (pos);*/
         /*visible = false;
         valid = false;*/
-        System::mod->on_fleg_smile (pid, level);
-        Audio::play_effect (pid, ET_SmileMinus);
+        System::mod->on_fleg_smile (Players::get_player (plid), level);
+        Audio::play_effect (plid, ET_SmileMinus);
     }
 
     SmileType get_type () {
@@ -266,13 +267,13 @@ public:
         }
     }
 
-    void eat (plid_tu pid) {
+    void eat (plid_tu plid) {
         Render::clear_smile (pos);
         World::erase_smile (pos);
         visible = false;
         valid = false;
-        System::mod->on_iron_smile (pid, level);
-        Audio::play_effect (pid, ET_SmilePlus);
+        System::mod->on_iron_smile (Players::get_player (plid), level);
+        Audio::play_effect (plid, ET_SmilePlus);
     }
 
     SmileType get_type () {
@@ -361,13 +362,13 @@ public:
         }
     }
 
-    void eat (plid_tu pid) {
+    void eat (plid_tu plid) {
         /*Render::clear_smile (pos);
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
-        System::mod->on_iron_smile (pid, level);
-        Audio::play_effect (pid, ET_SmilePlus);
+        System::mod->on_iron_smile (Players::get_player (plid), level);
+        Audio::play_effect (plid, ET_SmilePlus);
     }
 
     SmileType get_type () {
@@ -455,13 +456,13 @@ public:
         }
     }
 
-    void eat (plid_tu pid) {
+    void eat (plid_tu plid) {
         /*Render::clear_smile (pos);
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
-        System::mod->on_iron_smile (pid, level);
-        Audio::play_effect (pid, ET_SmilePlus);
+        System::mod->on_iron_smile (Players::get_player (plid), level);
+        Audio::play_effect (plid, ET_SmilePlus);
     }
 
     SmileType get_type () {
@@ -554,13 +555,13 @@ public:
         }
     }
 
-    void eat (plid_tu pid) {
+    void eat (plid_tu plid) {
         /*Render::clear_smile (pos);
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
-        System::mod->on_iron_smile (pid, level);
-        Audio::play_effect (pid, ET_SmilePlus);
+        System::mod->on_iron_smile (Players::get_player (plid), level);
+        Audio::play_effect (plid, ET_SmilePlus);
     }
 
     SmileType get_type () {

@@ -8,6 +8,7 @@
 #include "game_setting.h"
 #include "game/smyle_type.h"
 #include "mod_specification.h"
+#include "iplayer.h"
 
 struct ModRunnerInfo {
     std::vector<Glib::ustring> extensions;
@@ -29,20 +30,18 @@ public:
     virtual void on_game_start (const GameSetting& settting);
     virtual void on_game_end ();
     virtual void on_timer ();
-    virtual void on_death (plid_tu plid);
+    virtual void on_death (IPlayer& player);
     virtual void before_step ();
     virtual void after_step ();
-    virtual void on_pozi_smile (plid_tu plid, int lvl);
-    virtual void on_nega_smile (plid_tu plid, int lvl);
-    virtual void on_fleg_smile (plid_tu plid, int lvl);
-    virtual void on_iron_smile (plid_tu plid, int lvl);
-    virtual void on_ham_smile (plid_tu plid, int lvl);
-    virtual void on_killed (plid_tu plid, plid_tu murder);
-  //  virtual void on_kill (plid_tu plid, plid_tu victim);
-    virtual void on_wall (plid_tu plid);
-//    virtual void on_self_death (plid_tu plid);
-    virtual void on_cleared (plid_tu plid);
-    virtual void on_pl_timer (plid_tu plid);
+    virtual void on_pozi_smile (IPlayer& player, int lvl);
+    virtual void on_nega_smile (IPlayer& player, int lvl);
+    virtual void on_fleg_smile (IPlayer& player, int lvl);
+    virtual void on_iron_smile (IPlayer& player, int lvl);
+    virtual void on_ham_smile (IPlayer& player, int lvl);
+    virtual void on_killed (IPlayer& victim, IPlayer& murder);
+    virtual void on_wall (IPlayer& player);
+    virtual void on_cleared (IPlayer& player);
+    virtual void on_pl_timer (IPlayer& player);
 };
 
 typedef ModInterface* (*GetFace)();

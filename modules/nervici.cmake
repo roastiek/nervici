@@ -1,23 +1,23 @@
 
 set (NERVICI_SOURCES
+    src/utils.cpp 
     src/mods/mod_interface.cpp 
     src/system.cpp
     src/engine/audio.cpp
     src/engine/loader.cpp
     src/engine/render.cpp 
-    src/game/game.cpp 
+    src/game/smile.cpp 
+    src/game/smiles.cpp
     src/game/world.cpp 
+    src/game/game.cpp 
     src/game/player.cpp 
     src/game/players.cpp 
     src/game/team.cpp 
     src/game/teams.cpp 
-    src/game/smile.cpp 
-    src/game/smiles.cpp
     src/settings/setting.cpp 
     src/settings/pl_info.cpp 
     src/settings/pl_infos.cpp 
     src/settings/team_infos.cpp
-    src/utils.cpp 
     src/mods/nervici.cpp 
     src/gui/implementor.cpp 
     src/gui/canvas.cpp 

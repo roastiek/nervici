@@ -55,14 +55,14 @@ static void scan_mods_dir (const ustring& path, vector<ustring>& files) {
     }
 }
 
-static void find_mod_runners (const vector<ustring>& files, vector<ModRunner>& runners) {
-    cout << __func__ << '\n';
+#define RUNNER_SUFFIX ".so"
 
+static void find_mod_runners (const vector<ustring>& files, vector<ModRunner>& runners) {
     for (size_t fi = 0; fi < files.size (); fi++) {
         const ustring& file = files[fi];
         ustring suffix = file.substr (file.length () - 3, 3).lowercase ();
 
-        if (suffix.compare (".so") == 0) {
+        if (suffix.compare (RUNNER_SUFFIX) == 0) {
             ModRunner entry;
             entry.filename = file;
             runners.push_back (entry);
@@ -70,9 +70,8 @@ static void find_mod_runners (const vector<ustring>& files, vector<ModRunner>& r
     }
 }
 
-static void find_scripts (const vector<ustring>& files, vector<ModRunner>& runners,
-        vector<Mod>& mods) {
-    cout << __func__ << '\n';
+static void find_scripts (const vector<ustring>& files, 
+        vector<ModRunner>& runners, vector<Mod>& mods) {
 
     for (size_t ri = 0; ri < runners.size (); ri++) {
         ModRunner& runner = runners[ri];
@@ -142,6 +141,8 @@ void find_mods () {
 }
 
 void free_mods () {
+    mods.clear ();
+    mod_runners.clear ();
 }
 
 void load_mod (size_t mid, const ustring& script) {

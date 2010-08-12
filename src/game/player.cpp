@@ -13,6 +13,7 @@
 #define JUMP_REPEAT 80
 
 using namespace std;
+using namespace Glib;
 
 void Player::process_fields (const Point& pos, const Fields& fields) {
     if (state == PS_Live || state == PS_Start) {
@@ -71,7 +72,7 @@ void Player::timer_func (timer_ti speed) {
         timer += speed;
         if (timer >= 0) {
             timer = 0;
-            System::mod->on_pl_timer (id);
+            System::mod->on_pl_timer (*this);
         }
     } else timer += speed;
 }
@@ -184,14 +185,14 @@ void Player::live () {
         survive = World::test_fields (pos, fields, id, head);
         if (!survive) {
             set_state (PS_Death);
-            System::mod->on_death (id);
+            System::mod->on_death (*this);
         }
         process_fields (pos, fields);
     } else {
         survive = World::simple_test_fields (pos, fields);
         if (!survive) {
             set_state (PS_Death);
-            System::mod->on_death (id);
+            System::mod->on_death (*this);
         }
     }
 }
@@ -199,7 +200,7 @@ void Player::live () {
 void Player::clear_step () {
     if (length == 0) {
         set_state (PS_Erased);
-        System::mod->on_cleared (id);
+        System::mod->on_cleared (*this);
     } else {
         clear_bottom ();
     }
@@ -473,4 +474,8 @@ void Player::dec_ironize (score_ti delta) {
 
 score_ti Player::get_ironize () const {
     return ironize_lvl;
+}
+
+const ustring& Player::get_name () const {
+    return info->name;
 }

@@ -10,6 +10,7 @@
 
 #include "int_type.h"
 #include "game/game_info.h"
+#include "mods/iplayer.h"
 
 namespace Players {
     void initialize (const GameInfo & info);
@@ -77,6 +78,8 @@ namespace Players {
     void dec_pl_ironize (plid_tu plid, score_ti delta);
 
     score_ti get_pl_ironze (plid_tu plid);
+
+    IPlayer& get_player (plid_tu plid);
 }
 
 #endif	/* PLAYERS_H */

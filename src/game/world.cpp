@@ -6,6 +6,7 @@
 #include "main.h"
 
 #include "game/world.h"
+#include "game/player.h"
 
 using namespace std;
 

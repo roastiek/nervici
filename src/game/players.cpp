@@ -201,4 +201,8 @@ score_ti get_pl_ironze (plid_tu plid) {
     return players[plid].get_ironize ();
 }
 
+IPlayer& get_player (plid_tu plid) {
+    return players[plid];
+}
+
 }

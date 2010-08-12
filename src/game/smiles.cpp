@@ -56,8 +56,8 @@ void update () {
     }
 }
 
-void eat (smileid_tu sid, plid_tu pid) {
-    smiles[sid]->eat (pid);
+void eat (smileid_tu sid, plid_tu plid) {
+    smiles[sid]->eat (plid);
 }
 
 }

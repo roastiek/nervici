@@ -6,6 +6,7 @@
 using namespace Nervici;
 
 #include "mods/mod_interface.h"
+#include "game/player.h"
 
 static const char * const exts[] = {
     NULL
@@ -49,10 +50,11 @@ private:
         game_wait (WAIT_TIME);
 
         for (int pi = 0; pi < set.playersCount; pi++) {
-            if (is_pl_human (pi)) {
+            IPlayer& p = get_player (pi);
+            if (p.is_human ()) {
                 sid = world_find_free_start ();
                 if (sid < set.startsCount) {
-                    give_pl_start (pi, sid);
+                    p.give_start (sid);
                 }
             }
         }
@@ -61,10 +63,11 @@ private:
 
 
         for (int pi = 0; pi < set.playersCount; pi++) {
-            if (!is_pl_human (pi)) {
+            IPlayer& p = get_player (pi);
+            if (!p.is_human ()) {
                 sid = world_find_free_start ();
                 if (sid < set.startsCount) {
-                    give_pl_start (pi, sid);
+                    p.give_start (sid);
                 }
             }
         }
@@ -73,7 +76,7 @@ private:
 
         play_music (0);
         for (int pi = 0; pi < set.playersCount; pi++) {
-            start_pl (pi);
+            get_player (pi).start ();
         }
         set_semafor (SEMAFOR_G1);
     }
@@ -105,16 +108,15 @@ public:
         begin_start_procedure ();
     }
 
-    void on_death (int plid) {
-        revive_pl (plid);
+    void on_death (IPlayer& player) {
+        player.revive ();
     }
 
     void after_step () {
-        int p;
-
-        for (p = 0; p < set.playersCount; p++) {
-            if (is_pl_live (p)) {
-                inc_pl_score (p, 1);
+        for (int pi = 0; pi < set.playersCount; pi++) {
+            IPlayer& p = get_player (pi);
+            if (p.is_live ()) {
+                p.inc_score (1);
             }
         }
 
@@ -134,30 +136,30 @@ public:
         }*/
     }
 
-    void on_pozi_smile (plid_tu plid, int lvl) {
-        score_ti iron = get_pl_ironzie (plid);
+    void on_pozi_smile (IPlayer& player, int lvl) {
+        score_ti iron = player.get_ironize ();
 
         if (iron <= 0) {
-            inc_pl_score (plid, set.bonus * lvl);
+            player.inc_score (set.bonus * lvl);
         } else {
-            dec_pl_score (plid, set.bonus * lvl * iron);
-            set_pl_ironize (plid, 0);
+            player.dec_score (set.bonus * lvl * iron);
+            player.set_ironize (0);
         }
     }
 
-    void on_nega_smile (plid_tu plid, int lvl) {
-        score_ti iron = get_pl_ironzie (plid);
+    void on_nega_smile (IPlayer& player, int lvl) {
+        score_ti iron = player.get_ironize ();
 
         if (iron <= 0) {
-            dec_pl_score (plid, set.bonus * lvl);
+            player.dec_score (set.bonus * lvl);
         } else {
-            inc_pl_score (plid, set.bonus * lvl + iron);
-            set_pl_ironize (plid, 0);
+            player.inc_score (set.bonus * lvl + iron);
+            player.set_ironize (0);
         }
     }
 
-    void on_iron_smile (plid_tu plid, int lvl) {
-        inc_pl_ironize (plid, lvl);
+    void on_iron_smile (IPlayer& player, int lvl) {
+        player.inc_ironize (lvl);
     }
 };
 

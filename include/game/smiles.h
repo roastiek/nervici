@@ -9,7 +9,7 @@
 #define	SMILES_H
 
 #include "game_info.h"
-
+#include "mods/iplayer.h"
 
 namespace Smiles {
     void initialize (const GameInfo& info);
@@ -22,7 +22,7 @@ namespace Smiles {
 
     void update ();
 
-    void eat (smileid_tu sid, plid_tu pid);
+    void eat (smileid_tu sid, plid_tu plid);
 }
 
 #endif	/* SMILES_H */
