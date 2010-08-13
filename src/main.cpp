@@ -1,4 +1,6 @@
 #include <math.h>
+#include <glibmm/init.h>
+#include <giomm/init.h>
 
 #include "app.h"
 
@@ -17,17 +19,20 @@ float isin[angles];
 
 static void calc_angles () {
     for (int a = 0; a < angles; a++) {
-        icos[a] = floor (cos(M_PI * 2  * a / angles) * digits) / digits;
-        isin[a] = floor (sin(M_PI * 2  * a / angles) * digits) / digits;
+        icos[a] = floor (cos (M_PI * 2 * a / angles) * digits) / digits;
+        isin[a] = floor (sin (M_PI * 2 * a / angles) * digits) / digits;
     }
 }
 
 int main (int argc, char *argv[]) {
+    Glib::init ();
+    Gio::init ();
+
     calc_angles ();
 
     App::initialize ();
     App::run ();
     App::uninitialize ();
-    
+
     return 0;
 }

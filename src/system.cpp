@@ -1,8 +1,8 @@
 #include <vector>
-#include <iostream>
 #include <glibmm/miscutils.h>
 #include <glibmm/module.h>
 #include <glibmm/fileutils.h>
+#include <giomm/file.h>
 
 #include "mods/mod_interface.h"
 
@@ -10,6 +10,7 @@
 
 using namespace std;
 using namespace Glib;
+using namespace Gio;
 
 namespace System {
 
@@ -23,22 +24,18 @@ ModInterface* mod = NULL;
 
 void init_paths () {
     config_dir = get_user_config_dir () + "/nervici/";
+    RefPtr<File> dir = File::create_for_path (config_dir);
+    try {
+        dir->make_directory_with_parents ();
+    } catch (Gio::Error) {
+    }
 
     data_dirs.push_back (get_user_data_dir () + "/nervici/");
 
-    ustring xdg_data_dirs = Glib::getenv ("XDG_DATA_DIRS");
-    xdg_data_dirs = (xdg_data_dirs != "") ? xdg_data_dirs : "/usr/local/share:/usr/share";
-
-    size_t start = 0;
-    size_t end;
-
-    end = xdg_data_dirs.find_first_of (':', start);
-    while (end != xdg_data_dirs.npos) {
-        data_dirs.push_back (xdg_data_dirs.substr (start, end - start) + "/nervici/");
-        start = end + 1;
-        end = xdg_data_dirs.find_first_of (':', start);
+    const gchar * const *system_data_dirs = g_get_system_data_dirs ();
+    for (size_t di = 0; system_data_dirs[di] != NULL; di++) {
+        data_dirs.push_back (ustring(system_data_dirs[di]) + "/nervici/");
     }
-    data_dirs.push_back (xdg_data_dirs.substr (start, xdg_data_dirs.length () - start) + "/nervici/");
 }
 
 void free_paths () {
@@ -91,8 +88,6 @@ static void find_scripts (const vector<ustring>& files,
             ustring ext = rinfo.extensions[ei].lowercase ();
             size_t ext_len = ext.length ();
 
-            cout << ext << '\n';
-
             for (size_t fi = 0; fi < files.size (); fi++) {
                 const ustring& script = files[fi];
                 ustring suffix = script.substr (script.length () - ext_len, ext_len);
@@ -127,8 +122,6 @@ static void find_scripts (const vector<ustring>& files,
 }
 
 void find_mods () {
-    cout << __func__ << '\n';
-
     vector<ustring> files;
 
     for (size_t di = 0; di < data_dirs.size (); di++) {
@@ -146,8 +139,6 @@ void free_mods () {
 }
 
 void load_mod (size_t mid, const ustring& script) {
-    cout << __func__ << '\n';
-
     mod_runner = new Module (mod_runners[mid].filename);
     GetFaceHandle get_face;
     mod_runner->get_symbol ("get_face", get_face.handle);
@@ -182,89 +173,5 @@ const Mod& get_mod (size_t mid) {
     return mods[mid];
 }
 
-void mod_on_game_start (const GameSetting* set) {
-    /* if (mod_events.on_game_start != NULL)
-         mod_events.on_game_start (*set);*/
-}
-
-void mod_on_game_end () {
-    /*   if (mod_events.on_game_end != NULL)
-           mod_events.on_game_end ();*/
-}
-
-void mod_on_timer () {
-    /*if (mod_events.on_timer != NULL)
-        mod_events.on_timer ();*/
-}
-
-void mod_on_death (plid_tu plid) {
-    /*if (mod_events.on_death != NULL)
-        mod_events.on_death (plid);*/
-}
-
-void mod_before_step () {
-    /*if (mod_events.before_step != NULL)
-        mod_events.before_step ();*/
-}
-
-void mod_after_step () {
-    /*if (mod_events.after_step != NULL)
-        mod_events.after_step ();*/
-}
-
-void mod_on_pozi_smile (plid_tu plid, int lvl) {
-    /*if (mod_events.on_pozi_smile != NULL)
-        mod_events.on_pozi_smile (plid, lvl);*/
-}
-
-void mod_on_nega_smile (plid_tu plid, int lvl) {
-    /*if (mod_events.on_nega_smile != NULL)
-        mod_events.on_nega_smile (plid, lvl);*/
-}
-
-void mod_on_fleg_smile (plid_tu plid, int lvl) {
-    /*if (mod_events.on_fleg_smile != NULL)
-        mod_events.on_fleg_smile (plid, lvl);*/
-}
-
-void mod_on_iron_smile (plid_tu plid, int lvl) {
-    /*if (mod_events.on_iron_smile != NULL)
-        mod_events.on_iron_smile (plid, lvl);*/
-}
-
-void mod_on_ham_smile (plid_tu plid, int lvl) {
-    /*if (mod_events.on_ham_smile != NULL)
-        mod_events.on_ham_smile (plid, lvl);*/
-}
-
-void mod_on_killed (plid_tu plid, plid_tu murder) {
-    /*if (mod_events.on_killed != NULL)
-        mod_events.on_killed (plid, murder);*/
-}
-
-void mod_on_kill (plid_tu plid, plid_tu victim) {
-    /*if (mod_events.on_kill != NULL)
-        mod_events.on_kill (plid, victim);*/
-}
-
-void mod_on_wall (plid_tu plid) {
-    /*if (mod_events.on_wall != NULL)
-        mod_events.on_wall (plid);*/
-}
-
-void mod_on_self_death (plid_tu plid) {
-    /*if (mod_events.on_self_death != NULL)
-        mod_events.on_self_death (plid);*/
-}
-
-void mod_on_cleared (plid_tu plid) {
-    /*if (mod_events.on_cleared != NULL)
-        mod_events.on_cleared (plid);*/
-}
-
-void mod_on_pl_timer (plid_tu plid) {
-    /*if (mod_events.on_pl_timer != NULL)
-        mod_events.on_pl_timer (plid);*/
-}
 }
 

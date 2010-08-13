@@ -32,78 +32,101 @@ static PlInfo def_ais[DEFAULT_AI_COUNT] = {
 static vector<PlInfo> players;
 static vector<PlInfo> ais;
 
-void load () {
-    cout << __func__ << '\n';
-    int count = Setting::read_int ("players", "count", 0);
-    ustring section;
+static void load_players () {
+    Setting& set = Settings::get_players_setting ();
 
-    players.resize (count);
+    vector<ustring> sections = set.get_sections ();
+    players.resize (sections.size ());
+
+    for (size_t pi = 0; pi < players.size (); pi++) {
+        const ustring& section = sections[pi];
+
+        players[pi].type = PT_Human;
+        players[pi].color = set.read_hex (section, "color", 0xffffff);
+        players[pi].name = set.read_string (section, "name", "no name");
+        players[pi].profil = set.read_string (section, "profil", "");
+        players[pi].keys.left = set.read_int (section, "left", SDLK_LEFT);
+        players[pi].keys.right = set.read_int (section, "right", SDLK_RIGHT);
+        players[pi].keys.jump = set.read_int (section, "jump", SDLK_UP);
+        players[pi].pitch = set.read_int (section, "pitch", 5);
+    }
+}
+
+static void load_ais () {
+    Setting& set = Settings::get_ais_setting ();
+
+    vector<ustring> sections = set.get_sections ();
+
+    if (sections.size () == 0) {
+        ais.resize (DEFAULT_AI_COUNT);
+        for (size_t pi = 0; pi < DEFAULT_AI_COUNT; pi++) {
+
+            ais[pi].type = PT_AI;
+            ais[pi].ai.id = def_ais[pi].ai.id;
+            ais[pi].color = def_ais[pi].color;
+            ais[pi].name = def_ais[pi].name;
+            ais[pi].profil = def_ais[pi].profil;
+            ais[pi].pitch = def_ais[pi].pitch;
+        }
+    } else {
+
+        ais.resize (sections.size ());
+
+        for (size_t pi = 0; pi < ais.size (); pi++) {
+            const ustring& section = sections[pi];
+
+            ais[pi].type = PT_AI;
+            ais[pi].ai.id = set.read_int (section, "id", 0);
+            ais[pi].color = set.read_hex (section, "color", 0xff);
+            ais[pi].name = set.read_string (section, "name", "none");
+            ais[pi].profil = set.read_string (section, "profil", "");
+            ais[pi].pitch = set.read_int (section, "pitch", 10);
+        }
+    }
+}
+
+void load () {
+    load_players ();
+    load_ais ();
+}
+
+static void save_players () {
+    Setting& set = Settings::get_players_setting ();
+    set.clear ();
+
+    ustring section;
     for (size_t pi = 0; pi < players.size (); pi++) {
         section = "player" + to_string<size_t > (pi);
 
-        players[pi].type = PT_Human;
-        players[pi].color = Setting::read_int (section, "color", 0xffffff);
-        players[pi].name = Setting::read_string (section, "name", "no name");
-        players[pi].profil = Setting::read_string (section, "profil", "");
-        players[pi].keys.left = Setting::read_int (section, "left", SDLK_LEFT);
-        players[pi].keys.right = Setting::read_int (section, "right", SDLK_RIGHT);
-        players[pi].keys.jump = Setting::read_int (section, "jump", SDLK_UP);
-        players[pi].pitch = Setting::read_int (section, "pitch", 5);
+        set.write_hex (section, "color", players[pi].color);
+        set.write_string (section, "name", players[pi].name);
+        set.write_string (section, "profil", players[pi].profil);
+        set.write_int (section, "left", players[pi].keys.left);
+        set.write_int (section, "right", players[pi].keys.right);
+        set.write_int (section, "jump", players[pi].keys.jump);
+        set.write_int (section, "pitch", players[pi].pitch);
     }
+}
 
-    int ai_count = Setting::read_int ("plastiks", "count", DEFAULT_AI_COUNT);
-    ais.resize (ai_count);
+static void save_ais () {
+    Setting& set = Settings::get_ais_setting ();
+    set.clear ();
 
-    for (size_t pi = 0; pi < DEFAULT_AI_COUNT; pi++) {
+    ustring section;
+    for (size_t pi = 0; pi < ais.size (); pi++) {
         section = "plastik" + to_string<size_t > (pi);
 
-        ais[pi].type = PT_AI;
-        ais[pi].ai.id = Setting::read_int (section, "id", def_ais[pi].ai.id);
-        ais[pi].color = Setting::read_int (section, "color", def_ais[pi].color);
-        ais[pi].name = Setting::read_string (section, "name", def_ais[pi].name);
-        ais[pi].profil = Setting::read_string (section, "profil", def_ais[pi].profil);
-        ais[pi].pitch = Setting::read_int (section, "pitch", def_ais[pi].pitch);
-    }
-
-    for (size_t pi = DEFAULT_AI_COUNT; pi < ais.size (); pi++) {
-        section = "plastik" + to_string<size_t > (pi);
-
-        ais[pi].type = PT_AI;
-        ais[pi].ai.id = Setting::read_int (section, "id", 0);
-        ais[pi].color = Setting::read_int (section, "color", 0xff);
-        ais[pi].name = Setting::read_string (section, "name", "none");
-        ais[pi].profil = Setting::read_string (section, "profil", "");
-        ais[pi].pitch = Setting::read_int (section, "pitch", 10);
+        set.write_hex (section, "color", ais[pi].color);
+        set.write_string (section, "name", ais[pi].name);
+        set.write_string (section, "profil", ais[pi].profil);
+        set.write_int (section, "ai", ais[pi].ai.id);
+        set.write_int (section, "pitch", ais[pi].pitch);
     }
 }
 
 void save () {
-    Setting::write_int ("players", "count", players.size ());
-    ustring section;
-
-    for (size_t pi = 0; pi < players.size (); pi++) {
-        section = "player" + to_string<size_t > (pi);
-
-        Setting::write_int (section, "color", players[pi].color);
-        Setting::write_string (section, "name", players[pi].name);
-        Setting::write_string (section, "profil", players[pi].profil);
-        Setting::write_int (section, "left", players[pi].keys.left);
-        Setting::write_int (section, "right", players[pi].keys.right);
-        Setting::write_int (section, "jump", players[pi].keys.jump);
-        Setting::write_int (section, "pitch", players[pi].pitch);
-    }
-
-    Setting::write_int ("plastiks", "count", ais.size ());
-
-    for (size_t pi = 0; pi < ais.size (); pi++) {
-        section = "plastik" + to_string<size_t > (pi);
-
-        Setting::write_int (section, "color", ais[pi].color);
-        Setting::write_string (section, "name", ais[pi].name);
-        Setting::write_string (section, "profil", ais[pi].profil);
-        Setting::write_int (section, "ai", ais[pi].ai.id);
-        Setting::write_int (section, "pitch", ais[pi].pitch);
-    }
+    save_players ();
+    save_ais ();
 }
 
 size_t get_count () {
@@ -118,15 +141,15 @@ size_t get_ais_count () {
     return ais.size ();
 }
 
-const PlInfo& get (size_t idi) {
+const PlInfo & get (size_t idi) {
     return (idi < players.size ()) ? players[idi] : ais[idi - players.size ()];
 }
 
-void update (size_t index, const PlInfo& info) {
+void update (size_t index, const PlInfo & info) {
     ((index < players.size ()) ? players[index] : ais[index - players.size ()]) = info;
 }
 
-void add (const PlInfo& info) {
+void add (const PlInfo & info) {
     ((info.type == PT_Human) ? players : ais).push_back (info);
 }
 

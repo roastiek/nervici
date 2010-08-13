@@ -3,6 +3,10 @@ set (NERVICI_SOURCES
     src/utils.cpp 
     src/mods/mod_interface.cpp 
     src/system.cpp
+    src/settings/setting.cpp 
+    src/settings/pl_info.cpp 
+    src/settings/pl_infos.cpp 
+    src/settings/team_infos.cpp
     src/engine/audio.cpp
     src/engine/loader.cpp
     src/engine/render.cpp 
@@ -14,10 +18,6 @@ set (NERVICI_SOURCES
     src/game/players.cpp 
     src/game/team.cpp 
     src/game/teams.cpp 
-    src/settings/setting.cpp 
-    src/settings/pl_info.cpp 
-    src/settings/pl_infos.cpp 
-    src/settings/team_infos.cpp
     src/mods/nervici.cpp 
     src/gui/implementor.cpp 
     src/gui/canvas.cpp 
@@ -55,7 +55,8 @@ target_link_libraries (nervici
     ${SDLGFX_LIBRARY} 
     ${OPENAL_LIBRARY} 
     ${VorbisFile_LIBRARIES} 
-    ${GTKMM_LIBRARIES}
+    ${GLIBMM_LIBRARIES}
+    ${GIOMM_LIBRARIES}
     ${SDLPango_LIBRARIES}
     m
 )

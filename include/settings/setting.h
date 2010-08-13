@@ -2,25 +2,63 @@
 #define __SETTING_H__
 
 #include <glibmm/ustring.h>
+#include <glibmm/keyfile.h>
+#include <vector>
 
-namespace Setting {
+class Setting {
+private:
+    Glib::KeyFile values;
+
+    Glib::ustring filename;
+
+public:
+    Setting (const Glib::ustring& place);
+
     void load ();
 
     void save ();
 
-    void print_directory ();
+    int read_int (const Glib::ustring& section,
+            const Glib::ustring& key, int def);
 
-    void free_directory ();
+    void write_int (const Glib::ustring& section,
+            const Glib::ustring& key, int value);
 
-    long int read_int (const Glib::ustring& section, const Glib::ustring& key, int def);
+    unsigned long int read_hex (const Glib::ustring& section,
+            const Glib::ustring& key, unsigned long int def);
 
-    void write_int (const Glib::ustring& section, const Glib::ustring& key, long int value);
+    void write_hex (const Glib::ustring& section,
+            const Glib::ustring& key, unsigned long int value);
 
-    const Glib::ustring & read_string (const Glib::ustring& section, const Glib::ustring& key, const Glib::ustring & def);
+    Glib::ustring read_string (const Glib::ustring& section,
+            const Glib::ustring& key, const Glib::ustring & def);
 
-    void write_string (const Glib::ustring& section, const Glib::ustring& key, const Glib::ustring & value);
+    void write_string (const Glib::ustring& section,
+            const Glib::ustring& key, const Glib::ustring & value);
 
     void delete_section (const Glib::ustring & section);
+
+    void delete_key (const Glib::ustring& section, const Glib::ustring key);
+
+    std::vector<Glib::ustring> get_sections ();
+
+    std::vector<Glib::ustring> get_keys (const Glib::ustring& section);
+
+    void clear ();
+};
+
+namespace Settings {
+    void load ();
+
+    void save ();
+
+    Setting& get_app_setting ();
+
+    Setting& get_players_setting ();
+
+    Setting& get_ais_setting ();
+
+    Setting& get_game_setting ();
 }
 
 

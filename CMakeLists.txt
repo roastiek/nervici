@@ -11,7 +11,8 @@ find_package (SDL_image REQUIRED)
 find_package (OpenAL REQUIRED)
 find_package (PkgConfig REQUIRED)
 find_package (SDL_gfx REQUIRED)
-pkg_check_modules (GTKMM REQUIRED gtkmm-2.4)
+pkg_check_modules (GLIBMM REQUIRED glibmm-2.4)
+pkg_check_modules (GIOMM REQUIRED giomm-2.4)
 pkg_check_modules (SDLPango REQUIRED SDL_Pango)
 pkg_check_modules (VorbisFile REQUIRED vorbisfile)
 
@@ -29,7 +30,8 @@ include_directories (SYSTEM
     ${SDLIMAGE_INCLUDE_DIR} 
     ${SDLGFX_INCLUDE_DIR}
     ${OPENAL_INCLUDE_DIR} 
-    ${GTKMM_INCLUDE_DIRS} 
+    ${GLIBMM_INCLUDE_DIRS} 
+    ${GIOMM_INCLUDE_DIRS} 
     ${SDLPango_INCLUDE_DIRS} 
     ${VorbisFile_INCLUDE_DIRS}    
 )

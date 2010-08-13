@@ -353,10 +353,11 @@ bool GameFrame::is_focusable () const {
 }
 
 void GameFrame::preapare () {
+    Setting& set = Settings::get_game_setting ();
 
     cb_mod->set_selected (-1);
 
-    const ustring& last_mod = Setting::read_string ("game", "last_mod", "");
+    const ustring& last_mod = set.read_string ("game", "last_mod", "");
     for (size_t mi = 0; mi < System::get_mods_count (); mi++) {
         if (last_mod.compare (System::get_mod (mi).name) == 0) {
             cb_mod->set_selected (mi);
@@ -368,7 +369,7 @@ void GameFrame::preapare () {
     }
 
     for (int pi = 0; pi < 16; pi++) {
-        const ustring& name = Setting::read_string ("game", "player" + to_string<int>(pi), "");
+        const ustring& name = set.read_string ("game", "player" + to_string<int>(pi), "");
         cb_players[pi]->set_selected (0);
         for (size_t pli = 0; pli < PlInfos::get_count (); pli++) {
             if (name.compare (PlInfos::get (pli).name) == 0) {
@@ -377,7 +378,7 @@ void GameFrame::preapare () {
             }
         }
 
-        btn_teams[pi]->set_selected (Setting::read_int ("game", "team" + to_string<int>(pi), 0));
+        btn_teams[pi]->set_selected (set.read_int ("game", "team" + to_string<int>(pi), 0));
     }
 }
 
@@ -436,19 +437,20 @@ void GameFrame::cb_mob_selected_changed (Combobox* box, int selected) {
 }
 
 void GameFrame::load_mod (Mod mod) {
+    Setting& set = Settings::get_game_setting ();
 
     max_players = (mod.spec.max_players <= 16) ? mod.spec.max_players : 16;
-    nb_bonus->set_value (Setting::read_int (mod.name, "bonus", mod.spec.default_bonus));
-    nb_timer->set_value (Setting::read_int (mod.name, "timer", mod.spec.default_timer));
-    nb_max_length->set_value (Setting::read_int (mod.name, "max_length", mod.spec.default_max_length));
-    nb_max_score->set_value (Setting::read_int (mod.name, "max_score", mod.spec.default_max_score));
-    nb_rounds->set_value (Setting::read_int (mod.name, "rounds", mod.spec.default_rounds));
-    sa_speed->set_value (Setting::read_int (mod.name, "speed", mod.spec.default_speed));
-    nb_step->set_value (Setting::read_int (mod.name, "step", mod.spec.default_step));
+    nb_bonus->set_value (set.read_int (mod.name, "bonus", mod.spec.default_bonus));
+    nb_timer->set_value (set.read_int (mod.name, "timer", mod.spec.default_timer));
+    nb_max_length->set_value (set.read_int (mod.name, "max_length", mod.spec.default_max_length));
+    nb_max_score->set_value (set.read_int (mod.name, "max_score", mod.spec.default_max_score));
+    nb_rounds->set_value (set.read_int (mod.name, "rounds", mod.spec.default_rounds));
+    sa_speed->set_value (set.read_int (mod.name, "speed", mod.spec.default_speed));
+    nb_step->set_value (set.read_int (mod.name, "step", mod.spec.default_step));
 
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
-            sc_smiles[si][li]->set_value (Setting::read_int (mod.name,
+            sc_smiles[si][li]->set_value (set.read_int (mod.name,
                     "smile" + to_string<int>(si) + "-" + to_string<int>(li),
                     mod.spec.defualt_smiles_counts[si][li]));
         }
@@ -522,29 +524,31 @@ void GameFrame::update_players () {
 }
 
 void GameFrame::save_state () {
+    Setting& set = Settings::get_game_setting ();
+
     const ustring& mod_name = System::get_mod (cb_mod->get_selected ()).name;
 
-    Setting::write_string ("game", "last_mod", mod_name);
+    set.write_string ("game", "last_mod", mod_name);
 
     for (int pi = 0; pi < 16; pi++) {
         int sel = cb_players[pi]->get_selected ();
         const ustring& name = (sel > 0) ? PlInfos::get (sel - 1).name : "";
-        Setting::write_string ("game", "player" + to_string<int>(pi), name);
+        set.write_string ("game", "player" + to_string<int>(pi), name);
 
-        Setting::write_int ("game", "team" + to_string<int>(pi), btn_teams[pi]->get_selected ());
+        set.write_int ("game", "team" + to_string<int>(pi), btn_teams[pi]->get_selected ());
     }
 
-    Setting::write_int (mod_name, "bonus", nb_bonus->get_value ());
-    Setting::write_int (mod_name, "timer", nb_timer->get_value ());
-    Setting::write_int (mod_name, "max_length", nb_max_length->get_value ());
-    Setting::write_int (mod_name, "max_score", nb_max_score->get_value());
-    Setting::write_int (mod_name, "rounds", nb_rounds->get_value ());
-    Setting::write_int (mod_name, "speed", sa_speed->get_value());
-    Setting::write_int (mod_name, "step", nb_step->get_value ());
+    set.write_int (mod_name, "bonus", nb_bonus->get_value ());
+    set.write_int (mod_name, "timer", nb_timer->get_value ());
+    set.write_int (mod_name, "max_length", nb_max_length->get_value ());
+    set.write_int (mod_name, "max_score", nb_max_score->get_value());
+    set.write_int (mod_name, "rounds", nb_rounds->get_value ());
+    set.write_int (mod_name, "speed", sa_speed->get_value());
+    set.write_int (mod_name, "step", nb_step->get_value ());
 
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
-            Setting::write_int (mod_name,
+            set.write_int (mod_name,
                     "smile" + to_string<int>(si) + "-" + to_string<int>(li),
                     sc_smiles[si][li]->get_value ());
         }

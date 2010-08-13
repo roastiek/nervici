@@ -87,15 +87,19 @@ static void put_pixel (SDL_Surface* face, int x, int y, Uint32 p) {
 }
 
 static void load_screen_setting () {
-    setting.width = Setting::read_int (section, st_width, 1024);
-    setting.height = Setting::read_int (section, st_height, 768);
-    setting.fullscreen = Setting::read_int (section, st_fullscreen, 0);
+    Setting& set = Settings::get_app_setting ();
+
+    setting.width = set.read_int (section, st_width, 1024);
+    setting.height = set.read_int (section, st_height, 768);
+    setting.fullscreen = set.read_int (section, st_fullscreen, 0);
 }
 
 static void save_screen_setting () {
-    Setting::write_int (section, st_width, setting.width);
-    Setting::write_int (section, st_height, setting.height);
-    Setting::write_int (section, st_fullscreen, setting.fullscreen);
+    Setting& set = Settings::get_app_setting ();
+
+    set.write_int (section, st_width, setting.width);
+    set.write_int (section, st_height, setting.height);
+    set.write_int (section, st_fullscreen, setting.fullscreen);
 }
 
 static void init_game_screen () {

@@ -51,7 +51,7 @@ void initialize () {
     cout << __func__ << '\n';
 
     System::init_paths ();
-    Setting::load ();
+    Settings::load ();
     System::find_mods ();
     PlInfos::load ();
 
@@ -106,8 +106,7 @@ void uninitialize () {
 
     PlInfos::save ();
     System::free_mods ();
-    Setting::save ();
-    Setting::free_directory ();
+    Settings::save ();
     System::free_paths ();
 }
 

@@ -278,19 +278,21 @@ static void free_music () {
 }
 
 static void load_setting () {
-    cout << __func__ << '\n';
+    Setting& set = Settings::get_app_setting ();
 
-    setting.sound = Setting::read_int (section, st_sound, 20);
-    setting.music = Setting::read_int (section, st_music, 20);
-    setting.buffer = Setting::read_int (section, st_buffer, 0x10000);
-    setting.bfrs_count = Setting::read_int (section, st_bfrCount, 2);
+    setting.sound = set.read_int (section, st_sound, 20);
+    setting.music = set.read_int (section, st_music, 20);
+    setting.buffer = set.read_int (section, st_buffer, 0x10000);
+    setting.bfrs_count = set.read_int (section, st_bfrCount, 2);
 }
 
 static void save_setting () {
-    Setting::write_int (section, st_sound, setting.sound);
-    Setting::write_int (section, st_music, setting.music);
-    Setting::write_int (section, st_buffer, setting.buffer);
-    Setting::write_int (section, st_bfrCount, setting.bfrs_count);
+    Setting& set = Settings::get_app_setting ();
+
+    set.write_int (section, st_sound, setting.sound);
+    set.write_int (section, st_music, setting.music);
+    set.write_int (section, st_buffer, setting.buffer);
+    set.write_int (section, st_bfrCount, setting.bfrs_count);
 }
 
 static int find_profil (const ustring& name) {
