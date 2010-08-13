@@ -185,6 +185,7 @@ static Setting app_setting ("nervici.conf");
 static Setting players_setting ("players.conf");
 static Setting ais_setting ("plastiks.conf");
 static Setting game_setting ("game.conf");
+static Setting teams_setting ("teams.conf");
 
 Setting& get_app_setting () {
     return app_setting;
@@ -202,11 +203,16 @@ Setting& get_game_setting () {
     return game_setting;
 }
 
+Setting& get_teams_setting () {
+    return teams_setting;
+}
+
 void load () {
     app_setting.load ();
     players_setting.load ();
     ais_setting.load ();
     game_setting.load ();
+    teams_setting.load ();
 }
 
 void save () {
@@ -214,6 +220,7 @@ void save () {
     players_setting.save ();
     ais_setting.save ();
     game_setting.save ();
+    teams_setting.save ();
 }
 
 }

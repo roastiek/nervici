@@ -12,6 +12,10 @@
 
 namespace TeamInfos {
     const TeamInfo& get (int id);
+
+    void load ();
+
+    void save ();
 }
 
 

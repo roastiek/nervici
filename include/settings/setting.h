@@ -59,6 +59,8 @@ namespace Settings {
     Setting& get_ais_setting ();
 
     Setting& get_game_setting ();
+
+    Setting& get_teams_setting ();
 }
 
 

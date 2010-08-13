@@ -1,6 +1,7 @@
 #include <math.h>
 #include <glibmm/init.h>
 #include <giomm/init.h>
+#include <SDL.h>
 
 #include "app.h"
 
@@ -27,12 +28,15 @@ static void calc_angles () {
 int main (int argc, char *argv[]) {
     Glib::init ();
     Gio::init ();
+    if (SDL_Init (0)) return 1;
 
     calc_angles ();
 
     App::initialize ();
     App::run ();
     App::uninitialize ();
+
+    SDL_Quit ();
 
     return 0;
 }

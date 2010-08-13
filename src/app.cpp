@@ -1,4 +1,3 @@
-#include <iostream>
 #include <SDL.h>
 
 #include "system.h"
@@ -10,6 +9,8 @@
 #include "game/game.h"
 
 #include "app.h"
+#include "settings/team_info.h"
+#include "settings/team_infos.h"
 
 namespace App {
 
@@ -18,8 +19,6 @@ static Screen* screen;
 static StartFrame* start_frame;
 static GameFrame* game_frame;
 static PlEditFrame* pledit_frame;
-//static GameInfo gameinfo;
-//static GameSetting gameset;
 static bool abort;
 
 static int paint_filter (const SDL_Event* event) {
@@ -27,8 +26,6 @@ static int paint_filter (const SDL_Event* event) {
 }
 
 static void init_gui () {
-    cout << __func__ << "\n";
-
     SDL_SetEventFilter (paint_filter);
 
     screen = Render::create_screen ("nervici");
@@ -48,43 +45,14 @@ static void init_gui () {
 }
 
 void initialize () {
-    cout << __func__ << '\n';
-
     System::init_paths ();
     Settings::load ();
     System::find_mods ();
     PlInfos::load ();
-
-    if (SDL_Init (0)) return;
+    TeamInfos::load ();
 
     if (Render::initialize ()) return;
     Audio::initialize ();
-
-   /* gameset.speed = base_speed;
-    gameset.rounds = 3;
-    gameset.maxLength = 500;
-    gameset.startsCount = World::get_starts_count ();
-
-    gameinfo.setting = gameset;*/
-/*    gameinfo.pl_infos.resize (2);
-    gameset.playersCount = gameinfo.pl_infos.size ();
-    gameinfo.pl_infos[0].color = 0xff8040;
-    gameinfo.pl_infos[0].name = "bobo";
-    gameinfo.pl_infos[0].keys.left = SDLK_LEFT;
-    gameinfo.pl_infos[0].keys.right = SDLK_RIGHT;
-    gameinfo.pl_infos[0].keys.jump = SDLK_UP;
-    gameinfo.pl_infos[0].type = PT_Human;
-    gameinfo.pl_infos[0].profil = "mucha";
-    gameinfo.pl_infos[0].pitch = 10;
-
-    gameinfo.pl_infos[1].color = 0x80ffff;
-    gameinfo.pl_infos[1].name = "mucha";
-    gameinfo.pl_infos[1].keys.left = SDLK_KP1;
-    gameinfo.pl_infos[1].keys.right = SDLK_KP3;
-    gameinfo.pl_infos[1].keys.jump = SDLK_KP2;
-    gameinfo.pl_infos[1].type = PT_Human;
-    gameinfo.pl_infos[1].profil = "broug";
-    gameinfo.pl_infos[1].pitch = 15;*/
 
     srand (SDL_GetTicks ());
     srandom (SDL_GetTicks ());
@@ -95,23 +63,19 @@ void initialize () {
 }
 
 void uninitialize () {
-    cout << __func__ << '\n';
-
     delete screen;
 
     Audio::uninitialize ();
     Render::uninitialize ();
 
-    SDL_Quit ();
-
     PlInfos::save ();
+    TeamInfos::save ();
     System::free_mods ();
     Settings::save ();
     System::free_paths ();
 }
 
 void run () {
-    cout << __func__ << '\n';
     SDL_Event event;
 
     while (!abort) {
@@ -128,9 +92,6 @@ void run () {
             abort = true;
         }
     }
-    /*Game::initialize (gameinfo);
-    Game::run ();
-    Game::uninitialize ();*/
 }
 
 void quit () {
