@@ -36,6 +36,12 @@ public:
     void write_string (const Glib::ustring& section,
             const Glib::ustring& key, const Glib::ustring & value);
 
+    std::vector<Glib::ustring> read_string_list (const Glib::ustring& section,
+            const Glib::ustring& key, const std::vector<Glib::ustring>& def);
+
+    void write_string_list (const Glib::ustring& section,
+            const Glib::ustring& key, const std::vector<Glib::ustring>& value);
+
     void delete_section (const Glib::ustring & section);
 
     void delete_key (const Glib::ustring& section, const Glib::ustring key);

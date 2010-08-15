@@ -2,7 +2,6 @@
 #include <alc.h>
 #include <SDL.h>
 #include <dirent.h>
-#include <vorbis/vorbisfile.h>
 #include <AL/al.h>
 #include <vector>
 #include <iostream>
@@ -13,6 +12,8 @@
 #include "game/game.h"
 
 #include "engine/audio.h"
+#include "engine/audio_decoder.h"
+#include "engine/mplayer_decoder.h"
 
 using namespace std;
 using namespace Glib;
@@ -56,16 +57,12 @@ static const char* const st_music = "music";
 static const char* const st_buffer = "buffer";
 static const char* const st_bfrCount = "bfrCount";
 
-static float music_rate = 1.0;
 static bool music_loop = false;
-static bool music_opened = false;
-static OggVorbis_File music_file;
-static vorbis_info* music_info;
 static ALuint* music_buffers;
 static ALuint music_source;
-static ALenum music_format;
 static MusicType music_type = MT_Count;
-static char* music_loader = NULL;
+static char* music_buffer = NULL;
+static AudioDecoder* music_decoder = NULL;
 static ALCdevice* device;
 static ALCcontext* context;
 static AudioSetting setting;
@@ -176,21 +173,13 @@ static void load_buffers (vector<SoundProfile>& profiles) {
 }
 
 static double ogg_get_length (const ustring& filename) {
-    OggVorbis_File file;
-    double result;
-    size_t len;
-    char *fn;
+    MplayerDecoder dec;
 
-    len = filename.length ();
-    fn = (char *) alloca (len + 1);
-    memcpy (fn, filename.c_str (), len + 1);
-
-    if (ov_fopen (fn, &file)) return -1;
-
-    result = ov_time_total (&file, -1);
-    ov_clear (&file);
-
-    return result;
+    if (dec.open (filename)) {
+        return dec.get_length ();
+    } else {
+        return -1;
+    }
 }
 
 static void scan_music_dir (const ustring& path, vector<MusicFile>& files, MusicType type) {
@@ -258,7 +247,7 @@ static void init_music () {
         }
     }
 
-    music_loader = new char[setting.buffer];
+    music_buffer = new char[setting.buffer];
     music_buffers = new ALuint[setting.bfrs_count];
 
     alGenBuffers (setting.bfrs_count, music_buffers);
@@ -273,7 +262,7 @@ static void free_music () {
     alDeleteBuffers (setting.bfrs_count, music_buffers);
     alDeleteSources (1, &music_source);
 
-    delete [] music_loader;
+    delete [] music_buffer;
     delete [] music_buffers;
 }
 
@@ -306,7 +295,6 @@ static int find_profil (const ustring& name) {
 
 static bool music_open (MusicType type) {
     int f;
-    int op;
     size_t count;
 
     count = 0;
@@ -328,7 +316,14 @@ static bool music_open (MusicType type) {
             music[type][f].played = true;
             count++;
 
-            op = ov_fopen ((char *) music[type][f].filename.c_str (), &music_file);
+            music_decoder = new MplayerDecoder();
+            if (!music_decoder->open (music[type][f].filename)) {
+                delete music_decoder;
+                music_decoder = NULL;
+                continue;
+            }
+
+            /*op = ov_fopen ((char *) music[type][f].filename.c_str (), &music_file);
             if (op) continue;
 
             music_info = ov_info (&music_file, -1);
@@ -340,9 +335,9 @@ static bool music_open (MusicType type) {
             else {
                 ov_clear (&music_file);
                 continue;
-            }
+            }*/
 
-            music_opened = true;
+//            music_opened = true;
             return true;
         }
     }
@@ -351,30 +346,19 @@ static bool music_open (MusicType type) {
 }
 
 static void music_close () {
-    if (music_opened) {
-        ov_clear (&music_file);
-        music_opened = false;
+    if (music_decoder != NULL) {
+        //ov_clear (&music_file);
+        delete music_decoder;
+        music_decoder = NULL;
+        //music_opened = false;
     }
 }
 
 static int music_stream (ALuint buffer) {
-    int size = 0;
-    int section;
-    int result;
-    int bs;
-
-    bs = setting.buffer / 2;
-    while (bs - 1024 >= (setting.buffer / 2) * music_rate) bs -= 1024;
-    while (bs < (setting.buffer / 2) * music_rate) bs += 1024;
-
-    while (size < bs) {
-        result = ov_read (&music_file, music_loader + size, bs - size, 0, 2, 1, &section);
-
-        if (result > 0) size += result;
-        else return result;
+    size_t size = music_decoder->read (music_buffer, setting.buffer);
+    if (size > 0) {
+        alBufferData (buffer, music_decoder->get_format (), music_buffer, size, music_decoder->get_frequency ());
     }
-
-    alBufferData (buffer, music_format, music_loader, size, music_info->rate * music_rate);
     return size;
 }
 
@@ -531,7 +515,7 @@ void music_update () {
 }
 
 void music_set_rate (float rate) {
-    music_rate = rate;
+    alSourcef (music_source, AL_PITCH, rate);
 }
 
 size_t get_profiles_count () {

@@ -14,7 +14,6 @@ find_package (SDL_gfx REQUIRED)
 pkg_check_modules (GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules (GIOMM REQUIRED giomm-2.4)
 pkg_check_modules (SDLPango REQUIRED SDL_Pango)
-pkg_check_modules (VorbisFile REQUIRED vorbisfile)
 
 set (CMAKE_C_FLAGS "-O2 -std=c99")
 set (CMAKE_CXX_FLAGS "-O2 -std=c++0x")
@@ -33,7 +32,6 @@ include_directories (SYSTEM
     ${GLIBMM_INCLUDE_DIRS} 
     ${GIOMM_INCLUDE_DIRS} 
     ${SDLPango_INCLUDE_DIRS} 
-    ${VorbisFile_INCLUDE_DIRS}    
 )
 
 include (nervici)

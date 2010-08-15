@@ -3,7 +3,6 @@
 #include "game/game.h"
 #include "engine/audio.h"
 #include "engine/render.h"
-#include "game/player.h"
 
 #include "mods/nervici.h"
 

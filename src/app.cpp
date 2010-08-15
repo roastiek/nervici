@@ -59,11 +59,15 @@ void initialize () {
     SDL_EnableUNICODE (1);
     SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
+    Audio::music_play (MT_Menu);
+
     init_gui ();
 }
 
 void uninitialize () {
     delete screen;
+
+    Audio::music_stop ();
 
     Audio::uninitialize ();
     Render::uninitialize ();
@@ -79,7 +83,8 @@ void run () {
     SDL_Event event;
 
     while (!abort) {
-        if (SDL_WaitEvent (&event)) {
+        Audio::music_update ();
+        if (SDL_PollEvent (&event)) {
             switch (event.type) {
             case SDL_QUIT:
                 abort = true;
@@ -89,7 +94,7 @@ void run () {
                 break;
             }
         } else {
-            abort = true;
+            SDL_Delay (10);
         }
     }
 }

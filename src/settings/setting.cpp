@@ -14,7 +14,7 @@
 using namespace Glib;
 using namespace Gio;
 
-Setting::Setting (const Glib::ustring& place):
+Setting::Setting (const Glib::ustring& place) :
 filename (place) {
 }
 
@@ -52,22 +52,16 @@ int Setting::read_int (const Glib::ustring& section,
         const Glib::ustring& key, int def) {
     try {
         if (values.has_key (section, key)) {
-            def = values.get_integer (section, key);
+            return values.get_integer (section, key);
         }
     } catch (KeyFileError) {
     }
+    write_int (section, key, def);
     return def;
 }
 
 void Setting::write_int (const Glib::ustring& section,
         const Glib::ustring& key, int value) {
-    try {
-        if (values.has_key (section, key)) {
-            if (values.get_integer (section, key) == value) return;
-        }
-    } catch (KeyFileError) {
-    }
-
     try {
         values.set_integer (section, key, value);
     } catch (KeyFileError) {
@@ -83,11 +77,13 @@ unsigned long int Setting::read_hex (const Glib::ustring& section,
             if (val != "") {
                 stringstream ss (val, ios::in);
                 ss >> std::hex >> def;
+                return def;
             }
         }
     } catch (KeyFileError) {
     }
 
+    write_hex (section, key, def);
     return def;
 }
 
@@ -97,13 +93,6 @@ void Setting::write_hex (const Glib::ustring& section,
     stringstream ss (ios::out);
     ss << std::hex << value;
     ustring hex_value = ss.str ();
-
-    try {
-        if (values.has_key (section, key)) {
-            if (values.get_string (section, key).compare (hex_value) == 0) return;
-        }
-    } catch (KeyFileError) {
-    }
 
     try {
         values.set_string (section, key, hex_value);
@@ -119,20 +108,34 @@ Glib::ustring Setting::read_string (const Glib::ustring& section,
         }
     } catch (KeyFileError) {
     }
+    write_string (section, key, def);
     return def;
 }
 
 void Setting::write_string (const Glib::ustring& section,
         const Glib::ustring& key, const Glib::ustring & value) {
     try {
+        values.set_string (section, key, value);
+    } catch (KeyFileError) {
+    }
+}
+
+vector<ustring> Setting::read_string_list (const ustring& section,
+        const ustring& key, const vector<ustring>& def) {
+    try {
         if (values.has_key (section, key)) {
-            if (values.get_string (section, key).compare (value) == 0) return;
+            return values.get_string_list (section, key);
         }
     } catch (KeyFileError) {
     }
+    write_string_list (section, key, def);
+    return def;
+}
 
+void Setting::write_string_list (const ustring& section,
+        const ustring& key, const vector<ustring>& value) {
     try {
-        values.set_string (section, key, value);
+        values.set_string_list (section, key, value);
     } catch (KeyFileError) {
     }
 }
@@ -174,7 +177,7 @@ std::vector<Glib::ustring> Setting::get_keys (const Glib::ustring& section) {
 void Setting::clear () {
     ArrayHandle<ustring> sections = values.get_groups ();
 
-    for (size_t si = 0; si < sections.size (); si ++) {
+    for (size_t si = 0; si < sections.size (); si++) {
         values.remove_group (sections.data ()[si]);
     }
 }

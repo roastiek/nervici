@@ -7,6 +7,7 @@ set (NERVICI_SOURCES
     src/settings/pl_info.cpp 
     src/settings/pl_infos.cpp 
     src/settings/team_infos.cpp
+    src/engine/mplayer_decoder.cpp
     src/engine/audio.cpp
     src/engine/loader.cpp
     src/engine/render.cpp 
@@ -54,7 +55,6 @@ target_link_libraries (nervici
     ${SDLIMAGE_LIBRARY} 
     ${SDLGFX_LIBRARY} 
     ${OPENAL_LIBRARY} 
-    ${VorbisFile_LIBRARIES} 
     ${GLIBMM_LIBRARIES}
     ${GIOMM_LIBRARIES}
     ${SDLPango_LIBRARIES}
