@@ -80,6 +80,7 @@ bool MplayerDecoder::open (const Glib::ustring& filename) {
 
             frequency = ((header[27] * 256 + header[26]) * 256 + header[25]) * 256 + header[24];
             size = ((header[43] * 256 + header[42]) * 256 + header[41]) * 256 + header[40];
+            size_t other_size = ((header[7] * 256 + header[6]) * 256 + header[5]) * 256 + header[4];
             length = size * 8 / sample / channels / frequency;
 
             return true;
@@ -119,7 +120,6 @@ size_t MplayerDecoder::read (char* buffer, size_t len) {
             case IO_STATUS_NORMAL:
                 break;
             default:
-                cout << "weg\n";
                 return len - remain;
             }
         }

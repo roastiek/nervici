@@ -167,7 +167,7 @@ void Player::live () {
     if (keyst == KS_Right) angle = (angle + 1) % angles;
     if (jumptime == 0 && keyst == KS_Jump) {
         jumptime = JUMP_REPEAT;
-        Audio::play_effect (id, ET_Hop);
+        Audio::play_effect (id, ET_Jump);
     }
 
     exact.x += icos[angle] / 2;

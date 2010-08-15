@@ -9,8 +9,14 @@
 #define	EFFECT_TYPE_H
 
 enum EffectType {
-    ET_Hop, ET_Jau, ET_Self, ET_SmilePlus, ET_SmileMinus, ET_Wall
+    ET_Jump, ET_Au, ET_Self, ET_SmilePlus, ET_SmileMinus, ET_Wall, ET_Count
 };
+
+inline EffectType operator ++(EffectType& et, int) {
+    et = (EffectType) (et + 1);
+    return et;
+}
+
 
 #endif	/* EFFECT_TYPE_H */
 
