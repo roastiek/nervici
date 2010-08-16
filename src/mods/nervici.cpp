@@ -12,7 +12,8 @@ void clear_playerground () {
     Game::clear_playerground ();
 }
 
-void clear_status () {
+void set_status (const char* text) {
+    Render::draw_status (text);
 }
 
 void end_game () {
