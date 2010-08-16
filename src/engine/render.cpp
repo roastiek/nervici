@@ -740,4 +740,27 @@ void draw_timer (timer_ti time) {
    
 }
 
+void draw_status (const ustring& text) {
+    SDL_BlitSurface (background, &gs_outer.statustext, primary, &gs_outer.statustext);
+
+    SDLPango_SetMarkup (status_context, text.c_str (), -1);
+    SDL_Surface* face = SDLPango_CreateSurfaceDraw (status_context);
+
+    SDL_Rect src;
+    SDL_Rect dest;
+
+    src.w = (face->w < gs_inner.statustext.w) ? face->w : gs_inner.statustext.w;
+    src.h = (face->h < gs_inner.statustext.h) ? face->h : gs_inner.statustext.h;
+    src.x = 0;
+    src.y = 0;
+
+    dest.x = gs_inner.statustext.x + 8;
+    dest.y = gs_inner.statustext.y + (gs_inner.statustext.h - src.h) / 2;
+
+    SDL_BlitSurface (face, &src, primary, &dest);
+    SDL_UpdateRects (primary, 1, &dest);
+
+    SDL_FreeSurface (face);
+}
+
 }
