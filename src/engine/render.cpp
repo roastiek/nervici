@@ -302,14 +302,14 @@ static void init_fonts () {
     SDLPango_SetSurfaceCreateArgs (round_context, SDL_HWSURFACE, 32,
             0xff, 0xff00, 0xff0000, 0xff000000);
 
-    color.m[0][0] = 0xff;
+    color.m[0][0] = 0xd5;
     color.m[1][0] = 0xd5;
-    color.m[2][0] = 0xd5;
+    color.m[2][0] = 0xff;
     color.m[3][0] = 0;
 
-    color.m[0][1] = 0xff;
+    color.m[0][1] = 0xd5;
     color.m[1][1] = 0xd5;
-    color.m[2][1] = 0xd5;
+    color.m[2][1] = 0xff;
     color.m[3][1] = 0xff;
     SDLPango_SetDefaultColor (round_context, &color);
 
@@ -317,14 +317,14 @@ static void init_fonts () {
     SDLPango_SetSurfaceCreateArgs (status_context, SDL_HWSURFACE, 32,
             0xff, 0xff00, 0xff0000, 0xff000000);
 
-    color.m[0][0] = 0xff;
+    color.m[0][0] = 0xd5;
     color.m[1][0] = 0xd5;
-    color.m[2][0] = 0xd5;
+    color.m[2][0] = 0xff;
     color.m[3][0] = 0;
 
-    color.m[0][1] = 0xff;
+    color.m[0][1] = 0xd5;
     color.m[1][1] = 0xd5;
-    color.m[2][1] = 0xd5;
+    color.m[2][1] = 0xff;
     color.m[3][1] = 0xff;
     SDLPango_SetDefaultColor (status_context, &color);
 
@@ -536,9 +536,12 @@ void draw_round (round_tu round) {
     }
 
     SDLPango_SetText (round_context, tt, -1);
+    SDLPango_SetMinimumSize (round_context, 0, 20);
+
     text = SDLPango_CreateSurfaceDraw (round_context);
+    cout << text->h << '\n';
     dest.x += (dest.w - text->w) / 2;
-    dest.y += (dest.h - text->h) / 2;
+    dest.y += dest.h - text->h + (dest.h - text->h) / 2;
     SDL_BlitSurface (text, NULL, primary, &dest);
     SDL_FreeSurface (text);
 
@@ -717,7 +720,7 @@ void draw_timer (timer_ti time) {
     src.w = face->w / 11;
     src.y = 0;
 
-    dest.y = gs_inner.timer.y + (gs_inner.timer.h - src.h) / 2;
+    dest.y = gs_inner.timer.y + gs_inner.timer.h - src.h + (gs_inner.timer.h - src.h) / 2;
     dest.x = gs_inner.timer.x;
 
     int parts[8];
@@ -749,13 +752,15 @@ void draw_status (const ustring& text) {
     SDL_Rect src;
     SDL_Rect dest;
 
+    cout << face->h << '\n';
+
     src.w = (face->w < gs_inner.statustext.w) ? face->w : gs_inner.statustext.w;
     src.h = (face->h < gs_inner.statustext.h) ? face->h : gs_inner.statustext.h;
     src.x = 0;
     src.y = 0;
 
     dest.x = gs_inner.statustext.x + 8;
-    dest.y = gs_inner.statustext.y + (gs_inner.statustext.h - src.h) / 2;
+    dest.y = gs_inner.statustext.y + gs_inner.statustext.h - src.h + (gs_inner.statustext.h - src.h) / 2;
 
     SDL_BlitSurface (face, &src, primary, &dest);
     SDL_UpdateRects (primary, 1, &dest);

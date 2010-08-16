@@ -56,14 +56,14 @@ void load_game_images (vector<SDL_Surface*>& images) {
     SDLPango_SetText (context, "0123456789- ", -1);
     images[IMT_Numbers] = SDLPango_CreateSurfaceDraw (context);
 
-    font_color.m[0][0] = 0xff;
+    font_color.m[0][0] = 0xd5;
     font_color.m[1][0] = 0xd5;
-    font_color.m[2][0] = 0xd5;
+    font_color.m[2][0] = 0xff;
     font_color.m[3][0] = 0;
 
-    font_color.m[0][1] = 0xff;
+    font_color.m[0][1] = 0xd5;
     font_color.m[1][1] = 0xd5;
-    font_color.m[2][1] = 0xd5;
+    font_color.m[2][1] = 0xff;
     font_color.m[3][1] = 0xff;
 
     SDLPango_SetText (context, "0123456789:", -1);

@@ -87,6 +87,7 @@ void run () {
     sdl_time = SDL_GetTicks ();
     Players::update_score ();
     Render::draw_timer (timer);
+    Render::draw_status ("status");
     System::mod->on_game_start (set);
 
     while (!end && !abort) {
