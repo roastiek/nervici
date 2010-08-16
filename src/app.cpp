@@ -59,7 +59,7 @@ void initialize () {
     SDL_EnableUNICODE (1);
     SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-    Audio::music_play (MT_Menu);
+    //Audio::music_play (MT_Menu);
 
     init_gui ();
 }

@@ -26,10 +26,6 @@ private:
 
     ALsizei frequency;
 
-    double length;
-
-    size_t size;
-
     void close ();
 
 public:
@@ -45,9 +41,7 @@ public:
 
     size_t read (char* buffer, size_t len);
 
-    double get_length () const;
-
-    size_t get_size () const;
+    double get_length (const Glib::ustring& filename);
 };
 
 #endif	/* MPLAYER_DECODER_H */

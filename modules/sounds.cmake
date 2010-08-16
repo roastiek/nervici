@@ -4,9 +4,9 @@ set (SOUND_PROFILES
 )
 
 set (WAVS 
-    hop.wav 
-    jau1.wav 
-    jau2.wav 
+    jump.wav 
+    au1.wav 
+    au2.wav 
     self.wav 
     smileplus.wav 
     smileminus.wav 

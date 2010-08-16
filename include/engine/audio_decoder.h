@@ -24,9 +24,7 @@ public:
 
     virtual size_t read (char* buffer, size_t len) = 0;
 
-    virtual double get_length () const = 0;
-
-    virtual size_t get_size () const = 0;
+    virtual double get_length (const Glib::ustring& filename) = 0;
 };
 
 #endif	/* AUDIO_DECODER_H */

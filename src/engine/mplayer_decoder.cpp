@@ -1,5 +1,8 @@
-#include <glibmm-2.4/glibmm/fileutils.h>
+#include <glibmm/fileutils.h>
+#include <glibmm/regex.h>
+#include <glibmm/stringutils.h>
 #include <iostream>
+#include <stdexcept>
 
 #include "settings/setting.h"
 
@@ -79,9 +82,6 @@ bool MplayerDecoder::open (const Glib::ustring& filename) {
             }
 
             frequency = ((header[27] * 256 + header[26]) * 256 + header[25]) * 256 + header[24];
-            size = ((header[43] * 256 + header[42]) * 256 + header[41]) * 256 + header[40];
-            size_t other_size = ((header[7] * 256 + header[6]) * 256 + header[5]) * 256 + header[4];
-            length = size * 8 / sample / channels / frequency;
 
             return true;
         } catch (IOChannelError) {
@@ -130,10 +130,55 @@ size_t MplayerDecoder::read (char* buffer, size_t len) {
     }
 }
 
-double MplayerDecoder::get_length () const {
-    return length;
+double MplayerDecoder::get_length (const Glib::ustring& filename) {
+    Setting& set = Settings::get_app_setting ();
+    vector<ustring> cmd;
+    cmd.push_back ("/usr/bin/mplayer");
+    cmd.push_back ("-identify");
+    cmd.push_back ("-novideo");
+    cmd.push_back ("-ao");
+    cmd.push_back ("null");
+    cmd.push_back ("-frames");
+    cmd.push_back ("0");
+    cmd = set.read_string_list ("audio", "info_cmd", cmd);
+    cmd.push_back (filename);
+
+    ustring length_pattern = set.read_string ("audio", "length_pattern", "ID_LENGTH=([0-9]+\\.[0-9]+)");
+    RefPtr<Regex> pat = Regex::create (length_pattern);
+
+    Pid info_pid;
+    int info_fd;
+    ustring line;
+    double result = -1;
+
+    try {
+        spawn_async_with_pipes ("", cmd, SPAWN_STDERR_TO_DEV_NULL, sigc::slot<void>(),
+                &info_pid, NULL, &info_fd, NULL);
+
+        try {
+            RefPtr<IOChannel> info = IOChannel::create_from_fd (info_fd);
+
+            while (info->read_line (line) == IO_STATUS_NORMAL) {
+                vector<ustring> groups = pat->split (line);
+                if (groups.size () > 1) {
+                    try {
+                        result = Ascii::strtod (groups[1]);
+                        break;
+                    } catch (overflow_error) {
+                    } catch (underflow_error) {
+                    }
+                }
+            }
+
+
+        } catch (IOChannelError) {
+        } catch (FileError) {
+        }
+
+        spawn_close_pid (info_pid);
+
+    } catch (SpawnError) {
+    }
+    return result;
 }
 
-size_t MplayerDecoder::get_size () const {
-    return size;
-}

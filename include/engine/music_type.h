@@ -9,7 +9,7 @@
 #define	MUSIC_TYPE_H
 
 enum MusicType {
-    MT_Game, MT_Menu, MT_Stat, MT_Count
+    MT_GameShort, MT_GameLong, MT_Menu, MT_Stat, MT_Count
 };
 
 inline MusicType operator++(MusicType &mt, int) {
