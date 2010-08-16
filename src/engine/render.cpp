@@ -1,7 +1,6 @@
 #include <SDL.h>
 #include <SDL_Pango.h>
 #include <iostream>
-using namespace std;
 
 #include "engine/loader.h"
 #include "engine/image_type.h"
@@ -14,6 +13,7 @@ using namespace std;
 #include "engine/render.h"
 
 using namespace Glib;
+using namespace std;
 
 namespace Render {
 
