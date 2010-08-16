@@ -179,7 +179,7 @@ void Player::live () {
 
     pos.x = exact.x - 1;
     pos.y = exact.y - 1;
-    World::calc_fields (exact, fields);
+    fields.calc (exact);
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
         survive = World::test_fields (pos, fields, id, head);
@@ -211,7 +211,7 @@ void Player::try_revive () {
 
     pos.x = exact.x - 1;
     pos.y = exact.y - 1;
-    World::calc_fields (exact, fields);
+    fields.calc(exact);
 
     bool survive = World::test_fields (pos, fields, id, head);
     if (survive) {
@@ -271,7 +271,7 @@ void Player::give_start (startid_tu start) {
             length = 0;
             ironize_lvl = 0;
 
-            World::calc_fields (exact, fields);
+            fields.calc (exact);
             pos.x = exact.x - 1;
             pos.y = exact.y - 1;
             process_fields (pos, fields);

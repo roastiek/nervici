@@ -7,13 +7,6 @@
 #include "point.h"
 
 /*
- * World items are stored in World::__items, but accessed through World::items,
- * which should work as index
- * It should be possible to allocate standard two dimesonal array,
- * but this solution need only one big allocation and the space will be contineous
- */
-
-/*
  * daleko bliz
  */
 
@@ -40,8 +33,6 @@ namespace World {
 
     startid_tu find_free_start ();
 
-    void calc_fields (const FPoint& pos, Fields & fields);
-
     bool simple_test_fields (const Point& pos, const Fields & fields);
 
     bool test_fields (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
@@ -59,8 +50,6 @@ namespace World {
     bool test_dest_smile (smileid_tu sid, const Point& pos);
 
     void erase_smile (const Point& pos);
-
-    //void queue_item (wsize_tu x, wsize_tu y);
 
     void render_queue ();
 }

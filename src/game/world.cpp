@@ -12,6 +12,13 @@ using namespace std;
 
 namespace World {
 
+/*
+ * World items are stored in World::__items, but accessed through World::items,
+ * which should work as index
+ * It should be possible to allocate standard two dimesonal array,
+ * but this solution need only one big allocation and the space will be contineous
+ */
+
 static wsize_tu width;
 static wsize_tu height;
 static WorldItem** items;
@@ -111,18 +118,6 @@ startid_tu find_free_start () {
         return result;
     }
     return starts.size ();
-}
-
-void calc_fields (const FPoint& pos, Fields& fields) {
-    fields[1][1] = 255;
-    fields[2][1] = 255 * (pos.x - floor (pos.x));
-    fields[0][1] = 255 - fields[2][1];
-    fields[1][2] = 255 * (pos.y - floor (pos.y));
-    fields[1][0] = 255 - fields[1][2];
-    fields[0][0] = fields[0][1] * fields[1][0] / 255;
-    fields[2][0] = fields[2][1] * fields[1][0] / 255;
-    fields[0][2] = fields[0][1] * fields[1][2] / 255;
-    fields[2][2] = fields[1][2] * fields[2][1] / 255;
 }
 
 bool simple_test_fields (const Point& pos, const Fields& fields) {
