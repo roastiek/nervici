@@ -86,6 +86,7 @@ void run () {
     //clock_gettime (CLOCK_REALTIME, &time);
     sdl_time = SDL_GetTicks ();
     Players::update_score ();
+    Render::draw_timer (timer);
     System::mod->on_game_start (set);
 
     while (!end && !abort) {
@@ -128,14 +129,16 @@ void run () {
 
         sleep (speed);
 
-        if (timer < 0) {
-            timer += speed;
+        bool sub_zero = timer < 0;
+        timer += speed;
+        Render::draw_timer (timer);
+
+        if (sub_zero) {
             if (timer >= 0) {
                 timer = 0;
-                cout << "timer\n";
                 System::mod->on_timer ();
             }
-        } else timer += speed;
+        }
         Players::timer (speed);
         steps++;
     }
@@ -241,5 +244,6 @@ round_tu get_round () {
 
 void set_timer (timer_ti value) {
     timer = value;
+    Render::draw_timer (timer);
 }
 }

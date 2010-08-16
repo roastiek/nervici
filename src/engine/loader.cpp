@@ -25,8 +25,6 @@ static const char* const gameImages[] = {
 static const char* const smile_setting = "smile_setting.png";
  
 void load_game_images(vector<SDL_Surface*>& images) {
-//    const SDL_Color color = {255, 255, 255};
-//    const SDL_Color bg = {0, 0, 0};
     ustring filename;
     ImageType i;
  
@@ -60,13 +58,21 @@ void load_game_images(vector<SDL_Surface*>& images) {
     SDLPango_SetText(context, "0123456789- ", -1);
     images[IMT_Numbers] = SDLPango_CreateSurfaceDraw(context);
  
-    SDLPango_SetText(context, "0123456789:.", -1);
+    font_color.m[0][0] = 0xff;
+    font_color.m[1][0] = 0xd5;
+    font_color.m[2][0] = 0xd5;
+    font_color.m[3][0] = 0;
+
+    font_color.m[0][1] = 0xff;
+    font_color.m[1][1] = 0xd5;
+    font_color.m[2][1] = 0xd5;
+    font_color.m[3][1] = 0xff;
+
+    SDLPango_SetText(context, "0123456789:", -1);
+    SDLPango_SetDefaultColor(context, &font_color);
     images[IMT_Timer] = SDLPango_CreateSurfaceDraw(context);
  
     SDLPango_FreeContext(context);
- 
-    //images[IMT_Numbers] = TTF_RenderText_Blended (font, "0123456789- ", color);
-    //images[IMT_Timer] = TTF_RenderText_Shaded (font, "0123456789:.", color, bg);
 }
  
 void free_game_images(vector<SDL_Surface*>& images) {
@@ -76,31 +82,6 @@ void free_game_images(vector<SDL_Surface*>& images) {
  
     images.clear();
 }
- 
-/*void load_fonts (vector<TTF_Font*>& fonts) {
-    string filename;
-
-    fonts.resize (FNT_Count);
-
-    filename = System::get_fonts_dir_home () + baseFonts[0];
-
-    fonts[FNT_Mono20] = TTF_OpenFont (filename.c_str (), 20);
-    fonts[FNT_Mono100] = TTF_OpenFont (filename.c_str (), 100);
-
-    filename = System::get_fonts_dir () + baseFonts[0];
-
-    if (fonts[FNT_Mono20] == NULL)
-        fonts[FNT_Mono20] = TTF_OpenFont (filename.c_str (), 20);
-    if (fonts[FNT_Mono100] == NULL)
-        fonts[FNT_Mono100] = TTF_OpenFont (filename.c_str (), 100);
-}
-
-void free_fonts (vector<TTF_Font*>& fonts) {
-    for (size_t fi = 0; fi < fonts.size (); fi++) {
-        TTF_CloseFont (fonts[fi]);
-    }
-    fonts.clear ();
-}*/
  
 void load_smile_setting_images(SmileSettingImages& images) {
     for(size_t di = 0; di < System::get_data_dirs_count(); di++) {
@@ -144,7 +125,6 @@ void load_smile_setting_images(SmileSettingImages& images) {
  
 void free_smile_setting_images(SmileSettingImages& images) {
     for(int si = 0; si < 21; si++) {
-        //SDL_FreeSurface (images[si]);
         delete images[si];
         images[si] = NULL;
     }

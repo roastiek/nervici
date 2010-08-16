@@ -27,19 +27,11 @@ namespace Render {
 
     void free_smiles ();
 
-    void clear_playerground ();
-
-    //void update_player (wsize_tu x, wsize_tu y);
-
-    void update_player (const Point& pos);
-
-    void draw_world_items_queue (std::vector<Point>& queue);
-
     void draw_game_screen ();
 
-    void update_screen ();
-
     void draw_semafor (int state);
+
+    void draw_world_items_queue (std::vector<Point>& queue);
 
     void draw_player_score (plid_tu plid, plid_tu order, score_ti score,
             PlState state, bool ironized);
@@ -53,7 +45,17 @@ namespace Render {
 
     void draw_smile (smileid_tu sid, const Point& pos, int phase = 0);
 
+    void draw_timer (timer_ti time);
+
+    void draw_status (const Glib::ustring& text);
+
+    void clear_playerground ();
+
     void clear_smile (const Point& pos);
+
+    void update_player (const Point& pos);
+
+    void update_screen ();
 
     void update_smile (const Point& pos);
 

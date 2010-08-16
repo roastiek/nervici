@@ -53,7 +53,6 @@ static SDL_Rect dest;
 static SDL_Rect fill_rect;
 static vector<PlayerSurfaces> pl_images;
 static vector<SDL_Surface*> images;
-//static vector<TTF_Font*> fonts;
 static vector<SDL_Surface*> teams;
 static GameScreen gs_inner, gs_outer;
 static ScreenSet setting;
@@ -61,6 +60,7 @@ static SmileImages smile_images;
 static vector<SDL_Surface*> smile_faces;
 static SDLPango_Context* round_context;
 static SDLPango_Context* end_context;
+static SDLPango_Context* status_context;
 
 //pojd me do hymen
 
@@ -133,7 +133,7 @@ static void init_game_screen () {
     inner_area (gs_outer.status, gs_inner.status);
 
     gs_outer.timer = gs_outer.status;
-    gs_outer.timer.w = images[IMT_Timer]->w / 12 * 8 + 8;
+    gs_outer.timer.w = images[IMT_Timer]->w / 11 * 8 + 8;
     gs_outer.timer.x = gs_outer.status.x + gs_outer.status.w - gs_outer.timer.w;
     inner_area (gs_outer.timer, gs_inner.timer);
 
@@ -313,6 +313,20 @@ static void init_fonts () {
     color.m[3][1] = 0xff;
     SDLPango_SetDefaultColor (round_context, &color);
 
+    status_context = SDLPango_CreateContext_GivenFontDesc ("Sans 20px");
+    SDLPango_SetSurfaceCreateArgs (status_context, SDL_HWSURFACE, 32,
+            0xff, 0xff00, 0xff0000, 0xff000000);
+
+    color.m[0][0] = 0xff;
+    color.m[1][0] = 0xd5;
+    color.m[2][0] = 0xd5;
+    color.m[3][0] = 0;
+
+    color.m[0][1] = 0xff;
+    color.m[1][1] = 0xd5;
+    color.m[2][1] = 0xd5;
+    color.m[3][1] = 0xff;
+    SDLPango_SetDefaultColor (status_context, &color);
 
     end_context = SDLPango_CreateContext_GivenFontDesc ("Sans 100px");
     SDLPango_SetSurfaceCreateArgs (end_context, SDL_HWSURFACE, 32,
@@ -358,7 +372,6 @@ bool initialize () {
     SDL_FillRect (background, &fill_rect, 0x0);
 
     init_fonts ();
-    //    Loader::load_fonts (fonts);
     Loader::load_game_images (images);
     Loader::load_smile_faces (smile_images);
     init_game_screen ();
@@ -369,9 +382,9 @@ bool initialize () {
 void uninitialize () {
     Loader::free_smile_faces (smile_images);
     Loader::free_game_images (images);
-    //    Loader::free_fonts (fonts);
     SDLPango_FreeContext (round_context);
     SDLPango_FreeContext (end_context);
+    SDLPango_FreeContext (status_context);
 
     if (merge != NULL) SDL_FreeSurface (merge);
     if (background != NULL) SDL_FreeSurface (background);
@@ -457,15 +470,9 @@ void draw_world_items_queue (vector<Point>& queue) {
     queue.clear ();
 }
 
-/*void update_player (wsize_tu x, wsize_tu y) {
-    SDL_UpdateRect (primary, x + gs_outer.playerground.x,
-            y + gs_outer.playerground.y, 3, 3);
-}*/
-
 void update_player (const Point& pos) {
     SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x,
             pos.y + gs_outer.playerground.y, 3, 3);
-    //    update_player (pos.x, pos.y);
 }
 
 void draw_game_screen () {
@@ -489,7 +496,7 @@ void draw_game_screen () {
 }
 
 void update_screen () {
-    SDL_UpdateRect (primary, 0, 0, 0, 0);
+    SDL_Flip (primary);
 }
 
 void draw_semafor (int state) {
@@ -513,8 +520,6 @@ void draw_semafor (int state) {
 }
 
 void draw_round (round_tu round) {
-    //    static const SDL_Color fg = {255, 255, 255};
-    //    static const SDL_Color bg = {0, 0, 0};
     static char tt[] = "kolo:   ";
     SDL_Rect dest = gs_inner.round;
     SDL_Surface *text;
@@ -530,7 +535,6 @@ void draw_round (round_tu round) {
         tt[7] = ' ';
     }
 
-    //    text = TTF_RenderText_Shaded (fonts[FNT_Mono20], tt, fg, bg);
     SDLPango_SetText (round_context, tt, -1);
     text = SDLPango_CreateSurfaceDraw (round_context);
     dest.x += (dest.w - text->w) / 2;
@@ -543,10 +547,8 @@ void draw_round (round_tu round) {
 
 void draw_end () {
     SDL_Rect dest = gs_outer.playerground;
-    //    static const SDL_Color fg = {255, 255, 127};
     SDL_Surface *text;
 
-    //    text = TTF_RenderText_Blended (fonts[FNT_Mono100], "The Konec", fg);
     SDLPango_SetMarkup (end_context, "The Konec", -1);
     text = SDLPango_CreateSurfaceDraw (end_context);
     dest.x += (dest.w - text->w) / 2;
@@ -615,8 +617,6 @@ static SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl) {
 
     result = SDL_CreateRGBSurface (SDL_HWSURFACE, 20, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
 
-    //SDL_FillRect (result, NULL, 0xffffffff);
-
     SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
     int eyes = random () % smile_images.eyes[type].size ();
     int mouth = random () % smile_images.mouths[type].size ();
@@ -682,8 +682,6 @@ void draw_smile (smileid_tu sid, const Point& pos, int phase) {
     dest.y = pos.y + gs_outer.playerground.y;
 
     SDL_BlitSurface (smile_faces[sid], &src, primary, &dest);
-    /* SDL_BlitSurface (smile_images.backs[0], NULL, primary, &dest);
-     SDL_BlitSurface (smile_faces[0], NULL, primary, &dest);*/
 }
 
 void clear_smile (const Point& pos) {
@@ -698,6 +696,48 @@ void clear_smile (const Point& pos) {
 void update_smile (const Point& pos) {
     SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x - 1,
             pos.y + gs_outer.playerground.y - 1, 22, 22);
+}
+
+void draw_timer (timer_ti time) {
+    SDL_Rect dest;
+    SDL_Rect src;
+    SDL_Surface* face = images[IMT_Timer];
+
+    size_t abs_time = abs (time);
+
+    size_t miliseconds = abs_time % 1000;
+    abs_time/= 1000;
+    size_t seconds = abs_time % 60;
+    abs_time/= 60;
+    size_t minutes = abs_time % 100;
+
+    SDL_BlitSurface (background, &gs_outer.timer, primary, &gs_outer.timer);
+
+    src.h = face->h;
+    src.w = face->w / 11;
+    src.y = 0;
+
+    dest.y = gs_inner.timer.y + (gs_inner.timer.h - src.h) / 2;
+    dest.x = gs_inner.timer.x;
+
+    int parts[8];
+    parts[0] = minutes / 10;
+    parts[1] = minutes % 10;
+    parts[2] = 10;
+    parts[3] = seconds / 10;
+    parts[4] = seconds % 10;
+    parts[5] = 10;
+    parts[6] = miliseconds / 100;
+    parts[7] = (miliseconds % 100) / 10;
+
+    for (int pi = 0; pi < 8; pi++) {
+        src.x = src.w * parts[pi];
+        SDL_BlitSurface (face, &src, primary, &dest);
+        dest.x+= src.w;
+    }
+
+    SDL_UpdateRects (primary, 1, &gs_outer.timer);
+   
 }
 
 }
