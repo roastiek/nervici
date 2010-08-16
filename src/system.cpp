@@ -82,10 +82,11 @@ static void find_scripts (const vector<ustring>& files,
         if (!mod_lib.get_symbol ("get_face", get_face.handle)) continue;
 
         ModInterface* face = get_face.get_face ();
-        const ModRunnerInfo& rinfo = face->get_runner_info ();
+        const ModRunnerInfo* rinfo = face->get_runner_info ();
+        if (rinfo == NULL) continue;
 
-        for (size_t ei = 0; ei < rinfo.extensions.size (); ei++) {
-            ustring ext = rinfo.extensions[ei].lowercase ();
+        for (size_t ei = 0; rinfo->extensions[ei] != NULL; ei++) {
+            ustring ext = ustring(rinfo->extensions[ei]).lowercase ();
             size_t ext_len = ext.length ();
 
             for (size_t fi = 0; fi < files.size (); fi++) {

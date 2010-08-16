@@ -8,7 +8,12 @@ static const char * const exts[] = {
     NULL
 };
 
-static const struct ModInfo info = {
+static const ModRunnerInfo runner_info = {
+    exts
+
+};
+
+static const ModInfo info = {
     "cervici",
     "bobo",
     "proste cervici",
@@ -36,7 +41,6 @@ static const struct ModInfo info = {
 
 class Cervici : public ModInterface {
 private:
-    ModRunnerInfo runner_info;
     GameSetting set;
 
     void begin_start_procedure () {
@@ -80,18 +84,10 @@ private:
 public:
 
     Cervici () {
-        int ei = 0;
-        const char* ext = exts[ei];
-
-        while (ext != NULL) {
-            runner_info.extensions.push_back (ext);
-            ei++;
-            ext = exts[ei];
-        }
     }
 
-    const ModRunnerInfo & get_runner_info () {
-        return runner_info;
+    const ModRunnerInfo* get_runner_info () {
+        return &runner_info;
     }
 
     const ModInfo * get_info (const Glib::ustring & script) {

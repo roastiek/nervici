@@ -11,19 +11,19 @@
 #include "iplayer.h"
 
 struct ModRunnerInfo {
-    std::vector<Glib::ustring> extensions;
+    const char* const * extensions;
 };
 
 struct ModInfo {
-    Glib::ustring name;
-    Glib::ustring autor;
-    Glib::ustring rules;
+    const char* name;
+    const char* autor;
+    const char* rules;
     ModSpecification spec;
 };
 
 class ModInterface {
 public:
-    virtual const ModRunnerInfo& get_runner_info () = 0;
+    virtual const ModRunnerInfo* get_runner_info () = 0;
     virtual const ModInfo* get_info (const Glib::ustring& script) = 0;
     virtual void load_script (const Glib::ustring& script);
     virtual void unload_script ();
