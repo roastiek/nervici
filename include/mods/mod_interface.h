@@ -39,6 +39,7 @@ public:
     virtual void on_iron_smile (IPlayer& player, int lvl);
     virtual void on_ham_smile (IPlayer& player, int lvl);
     virtual void on_killed (IPlayer& victim, IPlayer& murder);
+    virtual void on_selfdeath (IPlayer& stupid);
     virtual void on_wall (IPlayer& player);
     virtual void on_cleared (IPlayer& player);
     virtual void on_pl_timer (IPlayer& player);

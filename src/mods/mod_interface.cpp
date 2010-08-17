@@ -33,6 +33,9 @@ void ModInterface::on_iron_smile (IPlayer& player, int lvl){
 void ModInterface::on_killed (IPlayer& victim, IPlayer& murder){
 }
 
+void ModInterface::on_selfdeath (IPlayer& stupid) {
+}
+
 void ModInterface::on_nega_smile (IPlayer& player, int lvl){
 }
 

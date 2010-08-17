@@ -11,6 +11,7 @@
 #include "int_type.h"
 #include "settings/team_info.h"
 #include "game/pl_state.h"
+#include "statistic.h"
 
 class Team {
 private:
@@ -23,6 +24,7 @@ private:
     plid_tu states[PS_Count];
 
 public:
+    Statistic stat;
 
     void initialize (plid_tu id, const TeamInfo* info);
 

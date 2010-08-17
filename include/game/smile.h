@@ -40,7 +40,7 @@ public:
 
     virtual SmileType get_type () const;
 
-    virtual smilelvl_tu get_level () const;
+    smilelvl_tu get_level () const;
 };
 
 class SmileFactory {

@@ -120,52 +120,66 @@ startid_tu find_free_start () {
     return starts.size ();
 }
 
-bool simple_test_fields (const Point& pos, const Fields& fields) {
-    bool result = true;
-
-    for (wsize_tu x = 0; x < 3 && result; x++) {
-        for (wsize_tu y = 0; y < 3 && result; y++) {
+bool simple_will_survive (const Point& pos, const Fields& fields) {
+    for (wsize_tu x = 0; x < 3; x++) {
+        for (wsize_tu y = 0; y < 3; y++) {
             if (fields[x][y] != 0) {
-                result &= pos.x + x >= 1 && pos.y + y >= 1 &&
-                        pos.x + x < width - 1 && pos.y + y < height - 1;
+                if (pos.x + x < 1 || pos.y + y < 1 ||
+                        pos.x + x >= width - 1 || pos.y + y >= height - 1)
+                    return false;
             }
         }
     }
-    return result;
+    return true;
 }
 
-bool test_fields (const Point& pos, const Fields& fields,
-        plid_tu id, plsize_tu head) {
+bool will_survive (const Point& pos, const Fields& fields,
+        plid_tu id, plsize_tu head, DeathCause& cause) {
 
-    bool result = true;
-
-    for (wsize_tu x = 0; x < 3 && result; x++) {
-        for (wsize_tu y = 0; y < 3 && result; y++) {
+    for (wsize_tu x = 0; x < 3; x++) {
+        for (wsize_tu y = 0; y < 3; y++) {
             if (fields[x][y] != 0) {
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
                 case IT_FREE:
                 case IT_SOFT_SMILE:
-                    continue;
+                    break;
                 case IT_PLAYER:
-                    result &= (item.player.ID == id) && (
-                            (item.player.order < head)
-                            ? head - item.player.order <= 5
-                            : 0xffff - item.player.order + head <= 5
-                            );
+                    if (item.player.ID != id) {
+                        cause.cause = DC_killed;
+                        cause.murder = item.player.ID;
+                        return false;
+                    } else {
+                        if (item.player.order <= head) {
+                            if (head - item.player.order > 5) {
+                                cause.cause = DC_self;
+                                return false;
+                            }
+                        } else {
+                            if (0x10000 + head - item.player.order > 5) {
+                                cause.cause = DC_self;
+                                return false;
+                            }
+                        }
+                    }
                     break;
 
+                case IT_HARD_SMILE:
+                    cause.cause = DC_smile;
+                    cause.smile = item.smile.ID;
+                    return false;
                 default:
-                    result = false;
-                    break;
+                    cause.cause = DC_wall;
+                    return false;
                 }
             }
         }
     }
-    return result;
+    cause.cause = DC_none;
+    return true;
 }
 
-static void queue_item (wsize_tu x, wsize_tu y) {
+static void queue_changed_item (wsize_tu x, wsize_tu y) {
     Point pos = {x, y};
 
     items_queue.push_back (pos);
@@ -173,7 +187,7 @@ static void queue_item (wsize_tu x, wsize_tu y) {
 }
 
 void write_player_head (const Point& pos, const Fields& fields,
-        plid_tu id, plsize_tu head) {
+        plid_tu id, plsize_tu head, bool living) {
 
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -181,6 +195,7 @@ void write_player_head (const Point& pos, const Fields& fields,
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
                 case IT_SOFT_SMILE:
+                    if (!living) break;
                     Smiles::eat (item.smile.ID, id);
                 case IT_FREE:
                     item.type = IT_PLAYER;
@@ -194,11 +209,8 @@ void write_player_head (const Point& pos, const Fields& fields,
                         item.player.order = head;
                     }
                     break;
-                    /*case IT_HARD_SMILE:
-                        Smiles::eat (item.smile.ID, id);
-                        break;*/
                 }
-                queue_item (pos.x + x, pos.y + y);
+                queue_changed_item (pos.x + x, pos.y + y);
             }
         }
     }
@@ -213,7 +225,7 @@ void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
             case IT_PLAYER:
                 if (item.player.ID == id && item.player.order == bottom) {
                     item.type = IT_FREE;
-                    queue_item (pos.x + x, pos.y + y);
+                    queue_changed_item (pos.x + x, pos.y + y);
                 }
                 break;
             }
@@ -241,7 +253,7 @@ startid_tu get_starts_count () {
     return starts.size ();
 }
 
-void render_queue () {
+void render_changed_items () {
     Render::draw_world_items_queue (items_queue);
 }
 

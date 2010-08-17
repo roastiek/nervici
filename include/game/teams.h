@@ -10,6 +10,7 @@
 
 #include "game_info.h"
 #include "pl_state.h"
+#include "statistic.h"
 
 namespace Teams {
     void initialize (const GameInfo& info);
@@ -28,6 +29,7 @@ namespace Teams {
 
     void dec_state (plid_tu id, PlState state);
 
+    Statistic& stat (plid_tu id);
 }
 
 #endif	/* TEAMS_H */

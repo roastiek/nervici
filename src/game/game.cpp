@@ -119,7 +119,7 @@ void run () {
         World::check_starts ();
         System::mod->after_step ();
 
-        World::render_queue ();
+        World::render_changed_items ();
         Players::update_bodies ();
         Smiles::update ();
         Players::update_score ();
@@ -164,7 +164,7 @@ void wait (timer_ti time) {
     SDL_Event event;
     int rest = time;
 
-    World::render_queue ();
+    World::render_changed_items ();
     Players::update_bodies ();
     Players::update_score ();
     Teams::update_score ();
@@ -191,7 +191,7 @@ void wait (timer_ti time) {
 void wait_for_space () {
     SDL_Event event;
 
-    World::render_queue ();
+    World::render_changed_items ();
     Players::update_bodies ();
     Players::update_score ();
     Teams::update_score ();

@@ -10,6 +10,7 @@
 #include "fpoint.h"
 #include "point.h"
 #include "mods/iplayer.h"
+#include "game/statistic.h"
 
 struct Player : public IPlayer {
 private:
@@ -67,7 +68,7 @@ private:
 
     void live ();
     
-    void process_fields (const Point& pos, const Fields & fields);
+    void write_body_part (const Point& pos, const Fields & fields, bool living);
 
     void resize (plsize_tu new_size);
 
@@ -81,6 +82,7 @@ private:
     void try_revive ();
 
 public:
+    Statistic stat;
 
     void initialize (plid_tu ID, plid_tu team_id, const PlInfo* plinfo, int max_len);
     
@@ -169,6 +171,8 @@ public:
 
     plid_tu get_id () const;
 
+    plid_tu get_team () const;
+
     PlState get_state () const;
 
     bool is_live () const;
@@ -190,6 +194,7 @@ public:
     score_ti get_ironize () const;
 
     const Glib::ustring& get_name () const;
+
 };
 
 

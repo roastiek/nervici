@@ -5,6 +5,7 @@
 #include "start.h"
 #include "fields.h"
 #include "point.h"
+#include "death_cause.h"
 
 /*
  * daleko bliz
@@ -33,11 +34,13 @@ namespace World {
 
     startid_tu find_free_start ();
 
-    bool simple_test_fields (const Point& pos, const Fields & fields);
+    bool simple_will_survive (const Point& pos, const Fields & fields);
 
-    bool test_fields (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
+    bool will_survive (const Point& pos, const Fields& fields,
+            plid_tu id, plsize_tu head, DeathCause& cause);
 
-    void write_player_head (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
+    void write_player_head (const Point& pos, const Fields& fields, 
+            plid_tu id, plsize_tu head, bool living);
 
     void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom);
 
@@ -51,7 +54,7 @@ namespace World {
 
     void erase_smile (const Point& pos);
 
-    void render_queue ();
+    void render_changed_items ();
 }
 
 

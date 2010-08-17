@@ -5,6 +5,7 @@ using namespace std;
 #include "engine/render.h"
 #include "settings/pl_infos.h"
 #include "game/player.h"
+#include "game/teams.h"
 
 #include "game/players.h"
 
@@ -203,6 +204,14 @@ score_ti get_pl_ironze (plid_tu plid) {
 
 IPlayer& get_player (plid_tu plid) {
     return players[plid];
+}
+
+Statistic& stat(plid_tu plid) {
+    return players[plid].stat;
+}
+
+Statistic& team_stat(plid_tu plid) {
+    return Teams::stat(players[plid].get_team ());
 }
 
 }

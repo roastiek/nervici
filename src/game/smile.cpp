@@ -98,6 +98,8 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;
+        Players::stat (plid).smiles[ST_pozi][level]++;
+        Players::team_stat (plid).smiles[ST_pozi][level]++;
         System::mod->on_pozi_smile (Players::get_player (plid), level);
         Audio::play_effect (plid, ET_SmilePlus);
     }
@@ -156,6 +158,8 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;
+        Players::stat (plid).smiles[ST_nega][level]++;
+        Players::team_stat (plid).smiles[ST_nega][level]++;
         System::mod->on_nega_smile (Players::get_player (plid), level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
@@ -214,6 +218,8 @@ public:
         World::erase_smile (pos);*/
         /*visible = false;
         valid = false;*/
+        Players::stat (plid).smiles[ST_fleg][level]++;
+        Players::team_stat (plid).smiles[ST_fleg][level]++;
         System::mod->on_fleg_smile (Players::get_player (plid), level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
@@ -272,6 +278,8 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;
+        Players::stat (plid).smiles[ST_iron][level]++;
+        Players::team_stat (plid).smiles[ST_iron][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
         Audio::play_effect (plid, ET_SmilePlus);
     }
@@ -367,6 +375,8 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
+        Players::stat (plid).smiles[ST_ham][level]++;
+        Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
         Audio::play_effect (plid, ET_SmilePlus);
     }
@@ -461,6 +471,8 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
+        Players::stat (plid).smiles[ST_ham][level]++;
+        Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
         Audio::play_effect (plid, ET_SmilePlus);
     }
@@ -560,6 +572,8 @@ public:
         World::erase_smile (pos);
         visible = false;
         valid = false;*/
+        Players::stat (plid).smiles[ST_ham][level]++;
+        Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
         Audio::play_effect (plid, ET_SmilePlus);
     }

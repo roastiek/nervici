@@ -11,6 +11,7 @@ set (NERVICI_SOURCES
     src/engine/audio.cpp
     src/engine/loader.cpp
     src/engine/render.cpp 
+    src/game/statistic.cpp
     src/game/smile.cpp 
     src/game/smiles.cpp
     src/game/fields.cpp 

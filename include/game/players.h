@@ -11,6 +11,7 @@
 #include "int_type.h"
 #include "game/game_info.h"
 #include "mods/iplayer.h"
+#include "statistic.h"
 
 namespace Players {
     void initialize (const GameInfo & info);
@@ -80,6 +81,10 @@ namespace Players {
     score_ti get_pl_ironze (plid_tu plid);
 
     IPlayer& get_player (plid_tu plid);
+
+    Statistic& stat (plid_tu);
+
+    Statistic& team_stat (plid_tu);
 }
 
 #endif	/* PLAYERS_H */

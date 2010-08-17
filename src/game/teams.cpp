@@ -75,4 +75,8 @@ void dec_state (plid_tu id, PlState state) {
 }
 
 
+Statistic& stat (plid_tu id) {
+    return teams[id].stat;
+}
+
 }

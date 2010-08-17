@@ -8,6 +8,9 @@
 
 #include "game/player.h"
 #include "game/teams.h"
+#include "game/players.h"
+#include "engine/audio_decoder.h"
+#include "game/smiles.h"
 
 #define JUMP_LENGTH 24
 #define JUMP_REPEAT 80
@@ -15,12 +18,10 @@
 using namespace std;
 using namespace Glib;
 
-void Player::process_fields (const Point& pos, const Fields& fields) {
-    if (state == PS_Live || state == PS_Start) {
-        World::write_player_head (pos, fields, id, head);
-        add_part (pos);
-        updates.push_back (pos);
-    }
+void Player::write_body_part (const Point& pos, const Fields& fields, bool living) {
+    World::write_player_head (pos, fields, id, head, living);
+    add_part (pos);
+    updates.push_back (pos);
 }
 
 void Player::update_body () {
@@ -159,7 +160,10 @@ void Player::add_part (const Point& part) {
 
 void Player::live () {
     Point pos;
-    int survive;
+    bool survive;
+    DeathCause cause;
+
+    cout << __func__ << '\n';
 
     check_length ();
 
@@ -167,6 +171,8 @@ void Player::live () {
     if (keyst == KS_Right) angle = (angle + 1) % angles;
     if (jumptime == 0 && keyst == KS_Jump) {
         jumptime = JUMP_REPEAT;
+        stat.jump++;
+        Teams::stat (team_id).jump++;
         Audio::play_effect (id, ET_Jump);
     }
 
@@ -182,15 +188,51 @@ void Player::live () {
     fields.calc (exact);
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
-        survive = World::test_fields (pos, fields, id, head);
+        survive = World::will_survive (pos, fields, id, head, cause);
+        write_body_part (pos, fields, survive);
+        switch (cause.cause) {
+        case DC_killed:
+        {
+            IPlayer& murder = Players::get_player (cause.murder);
+            stat.killed++;
+            Teams::stat (team_id).killed++;
+            Players::stat (cause.murder).kills++;
+            Players::team_stat (cause.murder).kills++;
+            System::mod->on_killed (*this, murder);
+            Audio::play_effect (id, ET_Au);
+            break;
+        }
+        case DC_self:
+            stat.selfs++;
+            Teams::stat (team_id).selfs++;
+            System::mod->on_selfdeath (*this);
+            Audio::play_effect (id, ET_Self);
+            break;
+        case DC_wall:
+            stat.crashes++;
+            Teams::stat (team_id).crashes++;
+            System::mod->on_wall (*this);
+            Audio::play_effect (id, ET_Wall);
+            break;
+        case DC_smile:
+            Smiles::eat (cause.smile, id);
+            break;
+        default:
+            break;
+        }
         if (!survive) {
+            stat.deaths++;
+            Teams::stat (team_id).deaths++;
             set_state (PS_Death);
             System::mod->on_death (*this);
         }
-        process_fields (pos, fields);
     } else {
-        survive = World::simple_test_fields (pos, fields);
+        survive = World::simple_will_survive (pos, fields);
         if (!survive) {
+            stat.crashes++;
+            Teams::stat (team_id).crashes++;
+            System::mod->on_wall (*this);
+            Audio::play_effect (id, ET_Wall);
             set_state (PS_Death);
             System::mod->on_death (*this);
         }
@@ -208,15 +250,16 @@ void Player::clear_step () {
 
 void Player::try_revive () {
     Point pos;
+    DeathCause cause;
 
     pos.x = exact.x - 1;
     pos.y = exact.y - 1;
-    fields.calc(exact);
+    fields.calc (exact);
 
-    bool survive = World::test_fields (pos, fields, id, head);
+    bool survive = World::will_survive (pos, fields, id, head, cause);
     if (survive) {
         set_state (PS_Live);
-        process_fields (pos, fields);
+        write_body_part (pos, fields, survive);
     }
 }
 
@@ -274,7 +317,7 @@ void Player::give_start (startid_tu start) {
             fields.calc (exact);
             pos.x = exact.x - 1;
             pos.y = exact.y - 1;
-            process_fields (pos, fields);
+            write_body_part (pos, fields, true);
         }
     }
 }
@@ -369,6 +412,8 @@ void Player::kill () {
     case PS_Start:
     case PS_Live:
     case PS_Undeath:
+        stat.deaths++;
+        Teams::stat (team_id).deaths++;
         set_state (PS_Death);
         break;
     default:
@@ -478,4 +523,8 @@ score_ti Player::get_ironize () const {
 
 const ustring& Player::get_name () const {
     return info->name;
+}
+
+plid_tu Player::get_team () const {
+    return team_id;
 }
