@@ -12,6 +12,7 @@
 #include "game/game_info.h"
 #include "mods/iplayer.h"
 #include "statistic.h"
+#include "fpoint.h"
 
 namespace Players {
     void initialize (const GameInfo & info);
@@ -85,6 +86,10 @@ namespace Players {
     Statistic& stat (plid_tu);
 
     Statistic& team_stat (plid_tu);
+
+    const FPoint& get_pl_position (plid_tu plid);
+
+    int get_pl_angle (plid_tu plid);
 }
 
 #endif	/* PLAYERS_H */

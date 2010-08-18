@@ -214,4 +214,12 @@ Statistic& team_stat(plid_tu plid) {
     return Teams::stat(players[plid].get_team ());
 }
 
+const FPoint& get_pl_position (plid_tu plid) {
+    return players[plid].get_position ();
+}
+
+int get_pl_angle (plid_tu plid) {
+    return players[plid].get_angle ();
+}
+
 }

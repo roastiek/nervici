@@ -13,6 +13,7 @@ static vector<Smile*> smiles;
 void initialize (const GameInfo& info) {
     smileid_tu order = 0;
 
+
     for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
@@ -47,12 +48,6 @@ void step () {
 void erase () {
     for (size_t si = 0; si < smiles.size (); si++) {
         smiles[si]->erase ();
-    }
-}
-
-void update () {
-    for (size_t si = 0; si < smiles.size (); si++) {
-        smiles[si]->update ();
     }
 }
 

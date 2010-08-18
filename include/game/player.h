@@ -20,8 +20,8 @@ private:
     plid_tu team_id;
 
     FPoint exact;
-    uint_fast16_t angle;
-    uint_fast8_t jumptime;
+    int angle;
+    int jumptime;
     KeySt keyst;
     Fields fields;
     Fields help_fields;
@@ -195,6 +195,9 @@ public:
 
     const Glib::ustring& get_name () const;
 
+    const FPoint& get_position () const;
+
+    int get_angle () const;
 };
 
 

@@ -120,6 +120,9 @@ startid_tu find_free_start () {
     return starts.size ();
 }
 
+/*
+ * the cycles are not needed I think now
+ */
 bool simple_will_survive (const Point& pos, const Fields& fields) {
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -288,6 +291,9 @@ void erase_smile (const Point& pos) {
 
 bool test_smile (smileid_tu sid, const Point& pos) {
     bool result = true;
+    if (pos.x < 1 || pos.y < 1 || pos.x + 20 >= width - 1 || pos.y + 20 >= height - 1)
+        return false;
+
     for (int x = 0; x < 20 && result; x++) {
         for (int y = 0; y < 20 && result; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);

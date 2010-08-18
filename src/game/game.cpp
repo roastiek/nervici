@@ -121,7 +121,6 @@ void run () {
 
         World::render_changed_items ();
         Players::update_bodies ();
-        Smiles::update ();
         Players::update_score ();
         Teams::update_score ();
         //Render::update_screen ();

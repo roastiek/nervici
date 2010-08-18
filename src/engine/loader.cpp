@@ -144,7 +144,7 @@ void load_smile_faces (SmileImages& faces) {
     cout << __func__ << '\n';
 
     for (size_t di = 0; di < System::get_data_dirs_count (); di++) {
-        ustring smiles_dir = System::get_data_dir (di) + "smiles/";
+        ustring smiles_dir = System::get_data_dir (di) + "images/smiles/";
         vector<ustring> images;
 
         try {
@@ -157,7 +157,6 @@ void load_smile_faces (SmileImages& faces) {
                 if (len < 4) continue;
                 ustring suffix = ustring((*it).substr (len - 4, 4)).lowercase();
                 if (suffix.compare (".png") != 0) continue;
-
                 images.push_back (*it);
             }
         } catch (FileError) {
@@ -172,7 +171,7 @@ void load_smile_faces (SmileImages& faces) {
                 prefix = images[i].substr (0, prefix_len).lowercase ();
 
                 if (prefix.compare (eyes_masks[sti]) == 0) {
-                    path = smiles_dir + "/" + images[i];
+                    path = smiles_dir + images[i];
                     SDL_Surface* eyes = IMG_Load (path.c_str ());
                     if (eyes != NULL) {
                         faces.eyes[sti].push_back (eyes);
@@ -180,11 +179,12 @@ void load_smile_faces (SmileImages& faces) {
                 }
             }
 
+            prefix_len = strlen (mouth_masks[sti]);
             for (size_t i = 0; i < images.size (); i++) {
                 prefix = images[i].substr (0, prefix_len).lowercase ();
 
                 if (prefix.compare (mouth_masks[sti]) == 0) {
-                    path = smiles_dir + "/" + images[i];
+                    path = smiles_dir + images[i];
                     SDL_Surface* mouth = IMG_Load (path.c_str ());
                     if (mouth != NULL) {
                         faces.mouths[sti].push_back (mouth);
@@ -201,7 +201,7 @@ void load_smile_faces (SmileImages& faces) {
                 prefix = images[i].substr (0, prefix_len).lowercase ();
 
                 if (prefix.compare (ham_masks[hi]) == 0) {
-                    path = smiles_dir + "/" + images[i];
+                    path = smiles_dir + images[i];
                     SDL_Surface* ham = IMG_Load (path.c_str ());
                     if (ham != NULL) {
                         faces.hams[hi].push_back (ham);

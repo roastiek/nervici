@@ -15,30 +15,24 @@
 class Smile {
 protected:
     const smileid_tu id;
-    const smileid_tu order;
-    const smileid_tu count;
     const smilelvl_tu level;
 
     Point pos;
 
     bool visible;
 
-    bool valid;
-
-    Smile (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl);
+    Smile (smileid_tu sid, smilelvl_tu lvl);
 
 public:
     virtual ~Smile ();
 
-    virtual void step ();
+    virtual void step () = 0;
 
-    virtual void eat (plid_tu pid);
+    virtual void eat (plid_tu pid) = 0;
 
     virtual void erase ();
 
-    virtual void update ();
-
-    virtual SmileType get_type () const;
+    virtual SmileType get_type () const = 0;
 
     smilelvl_tu get_level () const;
 };

@@ -20,8 +20,6 @@ namespace Smiles {
 
     void erase ();
 
-    void update ();
-
     void eat (smileid_tu sid, plid_tu plid);
 }
 

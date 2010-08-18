@@ -638,7 +638,7 @@ static SDL_Surface* create_cham_face (smilelvl_tu lvl) {
     dest.x = 0;
     dest.y = 0;
 
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 80, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
 
     for (int sti = 0; sti < ST_cham; sti++) {
         dest.y = 0;

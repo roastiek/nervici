@@ -163,8 +163,6 @@ void Player::live () {
     bool survive;
     DeathCause cause;
 
-    cout << __func__ << '\n';
-
     check_length ();
 
     if (keyst == KS_Left) angle = (angle + angles - 1) % angles;
@@ -527,4 +525,12 @@ const ustring& Player::get_name () const {
 
 plid_tu Player::get_team () const {
     return team_id;
+}
+
+const FPoint& Player::get_position () const {
+    return exact;
+}
+
+int Player::get_angle () const {
+    return angle;
 }
