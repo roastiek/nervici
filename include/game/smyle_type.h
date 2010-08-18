@@ -9,7 +9,7 @@
 #define	SMYLE_TYPES_H
 
 enum SmileType {
-    ST_pozi, ST_nega, ST_fleg, ST_iron, ST_ham, ST_count
+    ST_pozi, ST_nega, ST_fleg, ST_iron, ST_cham, ST_ham, ST_count
 };
 
 

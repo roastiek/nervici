@@ -26,7 +26,7 @@ struct ModSpecification {
     score_ti default_step;
     score_ti default_bonus;
     timer_ti default_timer;
-    int smiles_enabled[ST_count][3];
+    bool smiles_enabled[ST_count][3];
     uint8_t defualt_smiles_counts[ST_count][3];
 };
 

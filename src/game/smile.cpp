@@ -214,10 +214,6 @@ public:
     }
 
     void eat (plid_tu plid) {
-        /*Render::clear_smile (pos);
-        World::erase_smile (pos);*/
-        /*visible = false;
-        valid = false;*/
         Players::stat (plid).smiles[ST_fleg][level]++;
         Players::team_stat (plid).smiles[ST_fleg][level]++;
         System::mod->on_fleg_smile (Players::get_player (plid), level);
@@ -286,6 +282,109 @@ public:
 
     SmileType get_type () {
         return ST_pozi;
+    }
+
+};
+
+class ChamSmile : public Smile {
+private:
+    int world_diagonal;
+    int delay;
+    int step_length;
+    SmileType face_type;
+
+public:
+
+    ChamSmile (smileid_tu sid, smileid_tu ord, smileid_tu co, smilelvl_tu lvl) :
+    Smile (sid, ord, co, lvl) {
+        world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+        step_length = world_diagonal * (4 - level) / 2;
+        delay = world_diagonal * (4 - level) * order / 2 / count;
+        face_type = ST_fleg;
+    }
+
+    void step () {
+        if (delay <= (random () % 20) && visible) {
+            Render::clear_smile (pos);
+            World::erase_smile (pos);
+            visible = false;
+            valid = false;
+        }
+        if (delay <= 0 && !visible) {
+            for (int tries = 0; tries < 10; tries++) {
+                pos.x = random () % (World::get_width () - 20);
+                pos.y = random () % (World::get_height () - 20);
+                if (World::test_smile (id, pos)) {
+                    World::write_soft_smile (id, pos);
+                    Render::draw_smile (id, pos);
+                    visible = true;
+                    valid = false;
+                    break;
+                }
+            }
+        }
+        if (delay > 0 && visible && random () % 40 == 0) {
+            World::erase_smile (pos);
+            face_type = SmileType (random () % 4);
+            switch (face_type) {
+            case ST_pozi:
+            case ST_nega:
+            case ST_iron:
+                World::write_soft_smile (id, pos);
+                break;
+            default:
+                World::write_hard_smile (id, pos);
+                break;
+            }
+            valid = false;
+        }
+
+        if (delay > 0) {
+            delay--;
+        } else {
+            delay = step_length;
+        }
+    }
+
+    void eat (plid_tu plid) {
+        Players::stat (plid).smiles[face_type][level]++;
+        Players::team_stat (plid).smiles[face_type][level]++;
+        switch (face_type) {
+        case ST_pozi:
+        case ST_nega:
+        case ST_iron:
+            Render::clear_smile (pos);
+            World::erase_smile (pos);
+            visible = false;
+            valid = false;
+            break;
+        default:
+            break;
+        }
+        switch (face_type) {
+        case ST_pozi:
+            System::mod->on_pozi_smile (Players::get_player (plid), level);
+            Audio::play_effect (plid, ET_SmilePlus);
+            break;
+        case ST_nega:
+            System::mod->on_nega_smile (Players::get_player (plid), level);
+            Audio::play_effect (plid, ET_SmileMinus);
+            break;
+        case ST_fleg:
+            System::mod->on_fleg_smile (Players::get_player (plid), level);
+            Audio::play_effect (plid, ET_SmileMinus);
+            break;
+        case ST_iron:
+            System::mod->on_iron_smile (Players::get_player (plid), level);
+            Audio::play_effect (plid, ET_SmilePlus);
+            break;
+        default:
+            break;
+        }
+    }
+
+    SmileType get_type () {
+        return face_type;
     }
 
 };
@@ -371,10 +470,6 @@ public:
     }
 
     void eat (plid_tu plid) {
-        /*Render::clear_smile (pos);
-        World::erase_smile (pos);
-        visible = false;
-        valid = false;*/
         Players::stat (plid).smiles[ST_ham][level]++;
         Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
@@ -467,10 +562,6 @@ public:
     }
 
     void eat (plid_tu plid) {
-        /*Render::clear_smile (pos);
-        World::erase_smile (pos);
-        visible = false;
-        valid = false;*/
         Players::stat (plid).smiles[ST_ham][level]++;
         Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
@@ -568,10 +659,6 @@ public:
     }
 
     void eat (plid_tu plid) {
-        /*Render::clear_smile (pos);
-        World::erase_smile (pos);
-        visible = false;
-        valid = false;*/
         Players::stat (plid).smiles[ST_ham][level]++;
         Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
@@ -594,6 +681,8 @@ Smile* SmileFactory::create (smileid_tu sid, smileid_tu order, smileid_tu count,
         return new FlegSmile (sid, order, count, lvl);
     case ST_iron:
         return new IronSmile (sid, order, count, lvl);
+    case ST_cham:
+        return new ChamSmile (sid, order, count, lvl);
     case ST_ham:
         switch (lvl) {
         case 1:

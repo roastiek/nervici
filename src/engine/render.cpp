@@ -631,6 +631,32 @@ static SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl) {
     return result;
 }
 
+static SDL_Surface* create_cham_face (smilelvl_tu lvl) {
+    SDL_Surface* result;
+    SDL_Rect dest;
+
+    dest.x = 0;
+    dest.y = 0;
+
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
+
+    for (int sti = 0; sti < ST_cham; sti++) {
+        dest.y = 0;
+        SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
+
+        int eyes = random () % smile_images.eyes[sti].size ();
+        int mouth = random () % smile_images.mouths[sti].size ();
+
+        SDL_BlitSurface (smile_images.eyes[sti][eyes], NULL, result, &dest);
+        dest.y = 10;
+        SDL_BlitSurface (smile_images.mouths[sti][mouth], NULL, result, &dest);
+        dest.x += 20;
+    }
+
+
+    return result;
+}
+
 static SDL_Surface* create_ham_face (smilelvl_tu lvl) {
     SDL_Surface* result;
     SDL_Rect dest;
@@ -652,12 +678,19 @@ static SDL_Surface* create_ham_face (smilelvl_tu lvl) {
 }
 
 void load_smiles (const GameInfo& info) {
-    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
+    for (SmileType sti = ST_pozi; sti < ST_cham; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
                 SDL_Surface* face = create_smile_face (sti, li);
                 smile_faces.push_back (face);
             }
+        }
+    }
+
+    for (int li = 0; li < 3; li++) {
+        for (int ci = 0; ci < info.smiles.counts[ST_cham][li]; ci++) {
+            SDL_Surface* face = create_cham_face (li);
+            smile_faces.push_back (face);
         }
     }
 
@@ -709,9 +742,9 @@ void draw_timer (timer_ti time) {
     size_t abs_time = abs (time);
 
     size_t miliseconds = abs_time % 1000;
-    abs_time/= 1000;
+    abs_time /= 1000;
     size_t seconds = abs_time % 60;
-    abs_time/= 60;
+    abs_time /= 60;
     size_t minutes = abs_time % 100;
 
     SDL_BlitSurface (background, &gs_outer.timer, primary, &gs_outer.timer);
@@ -736,11 +769,11 @@ void draw_timer (timer_ti time) {
     for (int pi = 0; pi < 8; pi++) {
         src.x = src.w * parts[pi];
         SDL_BlitSurface (face, &src, primary, &dest);
-        dest.x+= src.w;
+        dest.x += src.w;
     }
 
     SDL_UpdateRects (primary, 1, &gs_outer.timer);
-   
+
 }
 
 void draw_status (const ustring& text) {

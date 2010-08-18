@@ -309,7 +309,7 @@ void GameFrame::init_control (Control* par) {
 
     int smi = 0;
 
-    for (int si = 0; si < 5; si++) {
+    for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
             sc_smiles[si][li] = SmileControlFactory::create (this, smile_images[smi], smiles_parms, "smiles");
             sc_smiles[si][li]->set_count (16);

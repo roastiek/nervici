@@ -11,7 +11,9 @@
 
 #include "gui/canvas.h"
 
-typedef Canvas* SmileSettingImages[21];
+#define SMILE_SETTING_COUNT 25
+
+typedef Canvas* SmileSettingImages[SMILE_SETTING_COUNT];
 
 #endif	/* SMILE_IMAGES_H */
 

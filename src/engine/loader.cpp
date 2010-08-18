@@ -106,7 +106,7 @@ void load_smile_setting_images (SmileSettingImages& images) {
             }
         };
 
-        for (int si = 0; si < 21; si++) {
+        for (int si = 0; si < SMILE_SETTING_COUNT; si++) {
             LoaderCanvas* lc = new LoaderCanvas ();
 
             lc->set_width (20);
@@ -122,21 +122,21 @@ void load_smile_setting_images (SmileSettingImages& images) {
 }
 
 void free_smile_setting_images (SmileSettingImages& images) {
-    for (int si = 0; si < 21; si++) {
+    for (int si = 0; si < SMILE_SETTING_COUNT; si++) {
         delete images[si];
         images[si] = NULL;
     }
 }
 
-static const char* const eyes_masks[] = {
+static const char* const eyes_masks[ST_cham] = {
     "pozieyes", "negaeyes", "flegeyes", "ironeyes"
 };
 
-static const char* const mouth_masks[] = {
+static const char* const mouth_masks[ST_cham] = {
     "pozimouth", "negamouth", "flegmouth", "ironmouth"
 };
 
-static const char* const ham_masks[] = {
+static const char* const ham_masks[3] = {
     "hami", "dest", "term"
 };
 
@@ -164,7 +164,7 @@ void load_smile_faces (SmileImages& faces) {
         }
         ustring path;
 
-        for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
+        for (SmileType sti = ST_pozi; sti < ST_cham; sti++) {
             size_t prefix_len = strlen (eyes_masks[sti]);
             ustring prefix;
 

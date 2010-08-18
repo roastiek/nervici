@@ -55,7 +55,7 @@ private:
     Numberbox* nb_bonus;
 
     Label* la_smile_caption;
-    SmileControl* sc_smiles[5][3];
+    SmileControl* sc_smiles[ST_count][3];
     SmileSettingImages smile_images;
 
     Button* btn_start;
