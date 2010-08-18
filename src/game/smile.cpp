@@ -596,7 +596,7 @@ public:
         Players::stat (plid).smiles[ST_ham][level]++;
         Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
-        Audio::play_effect (plid, ET_SmilePlus);
+        Audio::play_effect (plid, ET_SmileMinus);
     }
 
     SmileType get_type () const {
@@ -687,7 +687,7 @@ public:
         Players::stat (plid).smiles[ST_ham][level]++;
         Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
-        Audio::play_effect (plid, ET_SmilePlus);
+        Audio::play_effect (plid, ET_SmileMinus);
     }
 
     SmileType get_type () const {
@@ -783,7 +783,7 @@ public:
         Players::stat (plid).smiles[ST_ham][level]++;
         Players::team_stat (plid).smiles[ST_ham][level]++;
         System::mod->on_iron_smile (Players::get_player (plid), level);
-        Audio::play_effect (plid, ET_SmilePlus);
+        Audio::play_effect (plid, ET_SmileMinus);
     }
 
     SmileType get_type () const {

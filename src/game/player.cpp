@@ -257,7 +257,6 @@ void Player::try_revive () {
     bool survive = World::will_survive (pos, fields, id, head, cause);
     if (survive) {
         set_state (PS_Live);
-        write_body_part (pos, fields, survive);
     }
 }
 
