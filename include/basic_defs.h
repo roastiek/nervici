@@ -8,7 +8,7 @@
 #ifndef BASIC_DEFS_H
 #define	BASIC_DEFS_H
 
-#define digits 1000
+#define DIGITS 1000
 #define angles 160
 #define base_speed 12
 #define TEAMS_COUNT 5

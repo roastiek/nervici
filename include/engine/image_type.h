@@ -9,7 +9,7 @@
 #define	IMAGE_TYPE_H
 
 enum ImageType {
-    IMT_Numbers, IMT_Timer, IMT_Semafor, IMT_Heart, IMT_Count
+    IMT_Numbers, IMT_Timer, IMT_Semafor, IMT_Heart, IMT_Stats, IMT_Count
 };
 
 

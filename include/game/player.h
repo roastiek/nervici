@@ -26,7 +26,6 @@ private:
     Fields fields;
     Fields help_fields;
 
-    score_ti score;
     plid_tu order;
     timer_ti timer;
 
@@ -198,6 +197,10 @@ public:
     const FPoint& get_position () const;
 
     int get_angle () const;
+    
+    void calc_stats ();
+
+    void draw_stat ();
 };
 
 

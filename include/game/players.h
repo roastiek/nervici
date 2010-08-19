@@ -90,6 +90,14 @@ namespace Players {
     const FPoint& get_pl_position (plid_tu plid);
 
     int get_pl_angle (plid_tu plid);
+    
+    void calc_stats ();
+    
+    void set_pl_order (plid_tu plid, plid_tu order);
+    
+    plid_tu get_pl_order (plid_tu plid);
+
+    void draw_stat ();
 }
 
 #endif	/* PLAYERS_H */

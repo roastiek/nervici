@@ -30,6 +30,18 @@ namespace Teams {
     void dec_state (plid_tu id, PlState state);
 
     Statistic& stat (plid_tu id);
+    
+    void calc_stats ();
+    
+    void set_order (plid_tu id, plid_tu order);
+    
+    plid_tu get_order (plid_tu id);
+    
+    plid_tu get_active_count ();
+    
+    plid_tu get_active_id (plid_tu index);
+    
+    void draw_stat ();
 }
 
 #endif	/* TEAMS_H */

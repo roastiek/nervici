@@ -9,6 +9,8 @@
 #include "game/game_info.h"
 #include "game/pl_state.h"
 #include "gui/screen.h"
+#include "stat_column.h"
+#include "int_type.h"
 
 namespace Render {
     bool initialize ();
@@ -28,6 +30,8 @@ namespace Render {
     void free_smiles ();
 
     void draw_game_screen ();
+
+    void draw_stat_screen ();
 
     void draw_semafor (int state);
 
@@ -68,6 +72,20 @@ namespace Render {
     int get_width ();
 
     int get_height ();
+
+    void reset_columns_sub ();
+
+    int get_column_sub (StatColumn col);
+
+    void cycle_column_sub (StatColumn col);
+
+    StatColumn get_column_from_pos (int x, int y);
+
+    void draw_player_stat (plid_tu id, plid_tu order, const Glib::ustring& name,
+            uint32_t color);
+
+    void draw_team_stat (plid_tu id, plid_tu order, const Glib::ustring& name,
+            uint32_t color);
 }
 
 #endif

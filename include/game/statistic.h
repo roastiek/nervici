@@ -9,11 +9,14 @@
 #define	STATISTIC_H
 
 #include "smyle_type.h"
+#include "int_type.h"
 
 struct Statistic {
 public:
     Statistic();
 
+    score_ti score;
+    int steps;
     int deaths;
     int crashes;
     int killed;

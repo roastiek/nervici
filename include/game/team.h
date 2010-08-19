@@ -20,7 +20,6 @@ private:
 
     const TeamInfo* info;
     
-    score_ti score;
     plid_tu states[PS_Count];
 
 public:
@@ -47,6 +46,14 @@ public:
     bool operator < (const Team& other);
 
     void set_order (plid_tu value);
+    
+    void calc_stats ();
+    
+    void draw_stat ();
+    
+    plid_tu get_id () const;
+    
+    plid_tu get_order () const;
 };
 
 #endif	/* TEAM_H */
