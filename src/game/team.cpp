@@ -61,7 +61,7 @@ void Team::calc_stats () {
 }
 
 void Team::draw_stat () {
-    Render::draw_team_stat (id, order, info.name, info.color);
+    Render::draw_team_stat (id, order, info, stat);
 }
 
 const ustring& Team::get_name () const {

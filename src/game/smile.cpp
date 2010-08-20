@@ -1,5 +1,6 @@
 #include <math.h>
 
+#include "basic_defs.h"
 #include "settings/pl_info.h"
 #include "game/world.h"
 #include "engine/render.h"

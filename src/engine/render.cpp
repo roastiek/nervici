@@ -11,10 +11,7 @@
 #include "settings/team_infos.h"
 #include "settings/setting.h"
 #include "game/statistic.h"
-#include "game/player.h"
-#include "game/players.h"
-#include "game/team.h"
-#include "game/teams.h"
+#include "game/game_info.h"
 
 #include "engine/render.h"
 
@@ -573,14 +570,15 @@ void uninitialize () {
     save_screen_setting ();
 }
 
-void load_players () {
-    pl_images.resize (players.count ());
+void load_players (const std::vector<const PlInfo*>& infos, const vector<
+        const TeamInfo*>& tinfos) {
+    pl_images.resize (infos.size ());
 
-    for (plid_tu pi = 0; pi < players.count (); pi++) {
-        const Player& pl = players[pi];
-        const PlInfo& info = pl.info;
+    for (size_t pi = 0; pi < infos.size (); pi++) {
+        const PlInfo& info = *infos[pi];
+        const TeamInfo& tinfo = *tinfos[pi];
         pl_images[pi].face = create_player_face (info.color);
-        pl_images[pi].numbers = create_numbers (info.color, pl.team.info.color);
+        pl_images[pi].numbers = create_numbers (info.color, tinfo.color);
     }
 
 }
@@ -593,16 +591,16 @@ void free_players () {
     pl_images.clear ();
 }
 
-void load_teams () {
-    team_images.resize (teams.count () + 1);
+void load_teams (const vector<const TeamInfo*>& infos) {
+    team_images.resize (infos.size ());
 
-    for (plid_tu ti = 0; ti <= teams.count (); ti++) {
-        team_images[ti] = create_numbers (teams[ti].info.color, 0x00);
+    for (size_t ti = 0; ti < infos.size (); ti++) {
+        team_images[ti] = create_numbers (infos[ti]->color, 0x00);
     }
 }
 
 void free_teams () {
-    for (size_t ti = 0; ti < team_images.size(); ti++) {
+    for (size_t ti = 0; ti < team_images.size (); ti++) {
         SDL_FreeSurface (team_images[ti]);
     }
 
@@ -1123,17 +1121,17 @@ static void draw_stat (int y, const ustring& name, uint32_t color,
             stat_screen.header.h);
 }
 
-void draw_player_stat (plid_tu id, plid_tu order, const Glib::ustring& name,
-        uint32_t color) {
+void draw_player_stat (plid_tu id, plid_tu order, const PlInfo& info,
+        const Statistic& stat) {
 
-    draw_stat (stat_screen.header.y + (order + 1) * 24, name, color,
-            players[id].stat, pl_images[id].numbers);
+    draw_stat (stat_screen.header.y + (order + 1) * 24, info.name, info.color,
+            stat, pl_images[id].numbers);
 }
 
-void draw_team_stat (plid_tu id, plid_tu order, const Glib::ustring& name,
-        uint32_t color) {
-    draw_stat (stat_screen.teams_in.y + 2 + order * 24, name, color,
-            teams[id].stat, team_images[id]);
+void draw_team_stat (plid_tu id, plid_tu order, const TeamInfo& info,
+        const Statistic& stat) {
+    draw_stat (stat_screen.teams_in.y + 2 + order * 24, info.name, info.color,
+            stat, team_images[id]);
 }
 
 }

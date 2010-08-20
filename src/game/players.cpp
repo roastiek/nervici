@@ -4,6 +4,7 @@
 #include "engine/audio.h"
 #include "engine/render.h"
 #include "settings/pl_infos.h"
+#include "game/game_info.h"
 #include "game/fields.h"
 #include "game/statistic.h"
 #include "game/player.h"
@@ -26,6 +27,8 @@ Players::Players () {
 }
 
 void Players::initialize (const GameInfo& info) {
+    vector<const PlInfo*> infos;
+    vector<const TeamInfo*> tinfos;
 
     Team* team_map[TEAMS_COUNT] = {NULL, NULL, NULL, NULL, NULL};
 
@@ -33,22 +36,28 @@ void Players::initialize (const GameInfo& info) {
         team_map[teams[ti].id] = &teams[ti];
     }
 
-    players.clear();
-    
+    players.clear ();
+
     plid_tu p = 0;
     for (plid_tu pi = 0; pi < 16; pi++) {
         int inf = info.pl_ids[pi];
         if (inf >= 0) {
-            players.push_back (new Player (p, *team_map[info.pls_team[pi]],
-                    PlInfos::get (inf), info.setting.maxLength));
+            const PlInfo& plnfo = PlInfos::get (inf);
+            Team& team = *team_map[info.pls_team[pi]];
+            players.push_back (new Player (p, team, plnfo,
+                    info.setting.maxLength));
+            infos.push_back (&plnfo);
+            tinfos.push_back(&team.info);
             p++;
         }
     }
 
     orders.resize (players.size ());
+    
+    cout << players.size () << '\n';
 
-    Render::load_players ();
-    Audio::load_players (info);
+    Render::load_players (infos, tinfos);
+    Audio::load_players (infos);
 }
 
 void Players::uninitialize () {

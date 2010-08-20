@@ -3,6 +3,7 @@
 #include "engine/render.h"
 #include "settings/team_infos.h"
 #include "game/team.h"
+#include "game/game_info.h"
 
 #include "game/teams.h"
 
@@ -21,18 +22,22 @@ Teams::Teams () {
 
 void Teams::initialize (const GameInfo& info) {
     size_t ati = 0;
+    vector<const TeamInfo*> infos;
     
     for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
         if (info.team_active[ti]) {
-            teams.push_back(new Team (ati, TeamInfos::get(ti)));
+            const TeamInfo& tinfo = TeamInfos::get (ti);
+            teams.push_back(new Team (ati, tinfo));
+            infos.push_back(&tinfo);
             ati++;
         }
     }
     orders.resize (teams.size ());
  
     teams.push_back(new Team (ati, TeamInfos::get(0)));
+    infos.push_back(&TeamInfos::get(0));
     
-    Render::load_teams ();
+    Render::load_teams (infos);
 }
 
 void Teams::uninitialize () {

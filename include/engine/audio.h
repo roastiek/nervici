@@ -1,19 +1,20 @@
 #ifndef __AUDIO_H__
 #define __AUDIO_H__
 
+#include <vector>
 #include <glibmm/ustring.h>
 
 #include "int_type.h"
-#include "game/game_info.h"
 #include "music_type.h"
 #include "effect_type.h"
+#include "fakes/pl_info.h"
 
 namespace Audio {
     void initialize ();
 
     void uninitialize ();
 
-    void load_players (const GameInfo & info);
+    void load_players (const std::vector<const PlInfo*>& infos);
 
     void free_players ();
 

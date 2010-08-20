@@ -45,10 +45,8 @@ struct PlAudio {
 
 #define WAVS_COUNT 8
 
-
-static const char* const efect_mask[ET_Count] = {
-    "jump", "au", "self", "smileplus", "smileminus", "wall"
-};
+static const char* const efect_mask[ET_Count] = {"jump", "au", "self",
+        "smileplus", "smileminus", "wall"};
 
 static const char* const section = "audio";
 static const char* const st_sound = "sound";
@@ -71,7 +69,6 @@ static MusicType music_type = MT_Count;
 static AudioDecoder* music_decoder = NULL;
 static vector<MusicFile> music[MT_Count];
 
-
 static ALfloat source_pos[] = {0.0, 0.0, 0.0};
 static ALfloat source_vel[] = {0.0, 0.0, 0.0};
 
@@ -79,8 +76,8 @@ static ALfloat listener_pos[] = {0.0, 0.0, 0.0};
 static ALfloat listener_vel[] = {0.0, 0.0, 0.0};
 static ALfloat listener_ori[] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0};
 
-static void scan_sounds_dir (const ustring& path, vector<SoundProfile>& profiles,
-        vector<char>& data) {
+static void scan_sounds_dir (const ustring& path,
+        vector<SoundProfile>& profiles, vector<char>& data) {
     ustring prof_path;
     ustring lower;
     size_t sound_count;
@@ -92,7 +89,8 @@ static void scan_sounds_dir (const ustring& path, vector<SoundProfile>& profiles
         Dir sound_dir (path);
 
         for (DirIterator sit = sound_dir.begin (); sit != sound_dir.end (); sit++) {
-            if ((*sit)[0] == '.') continue;
+            if ((*sit)[0] == '.')
+                continue;
             SoundProfile entry;
 
             prof_path = path + (*sit) + "/";
@@ -105,8 +103,10 @@ static void scan_sounds_dir (const ustring& path, vector<SoundProfile>& profiles
             try {
                 Dir prof_dir (prof_path);
 
-                for (DirIterator pit = prof_dir.begin (); pit != prof_dir.end (); pit++) {
-                    if ((*pit)[0] == '.') continue;
+                for (DirIterator pit = prof_dir.begin (); pit
+                        != prof_dir.end (); pit++) {
+                    if ((*pit)[0] == '.')
+                        continue;
                     lower = ustring (*pit).lowercase ();
 
                     for (int eti = 0; eti < ET_Count; eti++) {
@@ -115,7 +115,8 @@ static void scan_sounds_dir (const ustring& path, vector<SoundProfile>& profiles
                             if (dec.open (prof_path + (*pit))) {
                                 size_t pos = 0;
                                 size_t avai = data.size ();
-                                size_t read = dec.read (&data.data ()[pos], avai);
+                                size_t read = dec.read (&data.data ()[pos],
+                                        avai);
                                 size_t whole = 0;
                                 while (read == avai) {
                                     whole += read;
@@ -129,7 +130,8 @@ static void scan_sounds_dir (const ustring& path, vector<SoundProfile>& profiles
 
                                 alGenBuffers (1, &sound_buffer);
                                 alBufferData (sound_buffer, dec.get_format (),
-                                        data.data (), whole, dec.get_frequency ());
+                                        data.data (), whole,
+                                        dec.get_frequency ());
                                 entry.buffers[eti].push_back (sound_buffer);
                                 sound_count++;
                             }
@@ -138,7 +140,7 @@ static void scan_sounds_dir (const ustring& path, vector<SoundProfile>& profiles
 
                 }
 
-            } catch (FileError) {
+            } catch ( FileError) {
             }
 
             if (sound_count > 0) {
@@ -146,11 +148,12 @@ static void scan_sounds_dir (const ustring& path, vector<SoundProfile>& profiles
             }
         }
 
-    } catch (FileError) {
+    } catch ( FileError) {
     }
 }
 
-static void scan_music_dir (const ustring& path, vector<MusicFile>& files, MusicType type) {
+static void scan_music_dir (const ustring& path, vector<MusicFile>& files,
+        MusicType type) {
     double len;
     ustring file_path;
     MusicFile entry;
@@ -160,7 +163,8 @@ static void scan_music_dir (const ustring& path, vector<MusicFile>& files, Music
         Dir dir (path);
 
         for (DirIterator it = dir.begin (); it != dir.end (); it++) {
-            if ((*it)[0] == '.') continue;
+            if ((*it)[0] == '.')
+                continue;
 
             file_path = path + (*it);
 
@@ -168,7 +172,8 @@ static void scan_music_dir (const ustring& path, vector<MusicFile>& files, Music
 
             len = dec.get_length (file_path);
 
-            if (len <= 0) continue;
+            if (len <= 0)
+                continue;
             if (type == MT_GameShort && len > 150) {
                 continue;
             }
@@ -181,7 +186,7 @@ static void scan_music_dir (const ustring& path, vector<MusicFile>& files, Music
             files.push_back (entry);
         }
 
-    } catch (FileError) {
+    } catch ( FileError) {
     }
 }
 
@@ -202,13 +207,15 @@ static void free_wavs () {
         SoundProfile& spi = sound_profiles[pi];
         for (int eti = 0; eti < ET_Count; eti++) {
             if (spi.buffers[eti].size () > 0)
-                alDeleteBuffers (spi.buffers[eti].size (), spi.buffers[eti].data ());
+                alDeleteBuffers (spi.buffers[eti].size (),
+                        spi.buffers[eti].data ());
         }
     }
 }
 
 static void init_music () {
-    static const char* const suffixs[MT_Count] = {"game/", "game/", "menu/", "stat/"};
+    static const char* const suffixs[MT_Count] = {"game/", "game/", "menu/",
+            "stat/"};
     ustring dir_name;
     int mt;
 
@@ -239,8 +246,8 @@ static void free_music () {
     alDeleteBuffers (setting.bfrs_count, music_buffers);
     alDeleteSources (1, &music_source);
 
-    delete [] music_data;
-    delete [] music_buffers;
+    delete[] music_data;
+    delete[] music_buffers;
 }
 
 static void load_setting () {
@@ -323,7 +330,8 @@ static int music_stream (ALuint buffer) {
     size_t size = music_decoder->read (music_data, setting.buffer);
     if (size > 0) {
 
-        alBufferData (buffer, music_decoder->get_format (), music_data, size, music_decoder->get_frequency ());
+        alBufferData (buffer, music_decoder->get_format (), music_data, size,
+                music_decoder->get_frequency ());
     }
     return size;
 }
@@ -357,21 +365,20 @@ void uninitialize () {
     alcCloseDevice (device);
 }
 
-void load_players (const GameInfo& info) {
+void load_players (const std::vector<const PlInfo*>& infos) {
     sounds.clear ();
 
-    for (size_t si = 0; si < 16; si++) {
-        if (info.pl_ids[si] >= 0) {
-
-            PlAudio entry;
-            alGenSources (1, &entry.source);
-            alSourcef (entry.source, AL_PITCH, (PlInfos::get (info.pl_ids[si]).pitch + 5.0) / 10.0);
-            alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
-            alSourcefv (entry.source, AL_VELOCITY, source_vel);
-            alSourcefv (entry.source, AL_POSITION, source_pos);
-            entry.prof = find_profil (PlInfos::get (info.pl_ids[si]).profil);
-            sounds.push_back (entry);
-        }
+    for (size_t si = 0; si < infos.size (); si++) {
+        const PlInfo& info = *infos[si];
+        PlAudio entry;
+        alGenSources (1, &entry.source);
+        alSourcef (entry.source, AL_PITCH, (info.pitch + 5.0) / 10.0);
+        alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
+        alSourcefv (entry.source, AL_VELOCITY, source_vel);
+        alSourcefv (entry.source, AL_POSITION, source_pos);
+        cout << info.profil << '\n';
+        entry.prof = find_profil (info.profil);
+        sounds.push_back (entry);
     }
 }
 
@@ -414,13 +421,15 @@ void music_play (MusicType type) {
 
     alGetSourcei (music_source, AL_SOURCE_STATE, &state);
     if (state == AL_PLAYING) {
-        if (music_type == type) return;
+        if (music_type == type)
+            return;
     }
 
     music_stop ();
 
     music_type = type;
-    if (!music_open (type)) return;
+    if (!music_open (type))
+        return;
 
     for (b = 0; b < setting.bfrs_count; b++) {
         if (music_stream (music_buffers[b]) <= 0) {

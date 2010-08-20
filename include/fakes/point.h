@@ -6,5 +6,5 @@
  */
 
 #ifndef Point
-struct point;
+struct Point;
 #endif 

@@ -10,7 +10,6 @@
 #include "engine/audio_decoder.h"
 #include "game/smiles.h"
 #include "settings/pl_info.h"
-#include "game/statistic.h"
 #include "game/team.h"
 
 #include "game/player.h"
@@ -557,6 +556,6 @@ void Player::calc_stats () {
 }
 
 void Player::draw_stat () {
-    Render::draw_player_stat (id, order, info.name, info.color);
+    Render::draw_player_stat (id, order, info, stat);
 }
 
