@@ -8,7 +8,7 @@
 #ifndef STATISTIC_H
 #define	STATISTIC_H
 
-#include "smyle_type.h"
+#include "smile_type.h"
 #include "int_type.h"
 
 struct Statistic {

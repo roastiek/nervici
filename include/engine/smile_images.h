@@ -11,7 +11,7 @@
 #include <SDL_video.h>
 #include <vector>
 
-#include "game/smyle_type.h"
+#include "game/smile_type.h"
 
 struct SmileImages {
     std::vector<SDL_Surface*> eyes[ST_cham];

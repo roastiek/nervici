@@ -222,7 +222,7 @@ void Player::live () {
             Audio::play_effect (id, ET_Wall);
             break;
         case DC_smile:
-            smiles[cause.smile].eat(id);
+            smiles[cause.smile].eat(*this);
             break;
         default:
             break;

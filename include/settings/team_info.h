@@ -11,6 +11,7 @@
 #include <glibmm/ustring.h>
 
 struct TeamInfo {
+    uint8_t id;
     uint32_t color;
     Glib::ustring name;
 };

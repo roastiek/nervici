@@ -8,7 +8,7 @@
 #ifndef SMILE_SETTING_H
 #define	SMILE_SETTING_H
 
-#include "smyle_type.h"
+#include "smile_type.h"
 #include "int_type.h"
 
 struct SmileSetting {

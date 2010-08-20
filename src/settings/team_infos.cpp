@@ -10,9 +10,9 @@ using namespace Glib;
 
 namespace TeamInfos {
 
-static TeamInfo infos[TEAMS_COUNT] = {
-    {0x000000, ""},  {0xff8080, "team 17"}, {0xff80ff, "team 24"}, {0x80ff80, "team 39"}, {0x8080ff, "team 18+"}
-};
+static TeamInfo infos[TEAMS_COUNT] = { {0, 0x000000, ""}, {1, 0xff8080,
+        "team 17"}, {2, 0xff80ff, "team 24"}, {3, 0x80ff80, "team 39"}, {4,
+        0x8080ff, "team 18+"}};
 
 const TeamInfo& get (int id) {
     return infos[id];

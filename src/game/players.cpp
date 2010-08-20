@@ -11,6 +11,7 @@
 #include "game/player.h"
 #include "game/team.h"
 #include "game/teams.h"
+#include "settings/team_info.h"
 
 #include "game/players.h"
 
@@ -34,7 +35,7 @@ void Players::initialize (const GameInfo& info) {
     Team* team_map[TEAMS_COUNT] = {NULL, NULL, NULL, NULL, NULL};
 
     for (plid_tu ti = 0; ti <= teams.count (); ti++) {
-        team_map[teams[ti].id] = &teams[ti];
+        team_map[teams[ti].info.id] = &teams[ti];
     }
 
     players.clear ();
@@ -93,7 +94,7 @@ void Players::update_score () {
 
     for (plid_tu oi = 0; oi < players.size (); oi++) {
         for (plid_tu pi = 0; pi < players.size (); pi++) {
-            if (players[oi] > players[pi]) {
+            if (*players[oi] > *players[pi]) {
                 orders[oi]++;
             }
         }

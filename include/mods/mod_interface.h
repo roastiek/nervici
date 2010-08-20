@@ -6,7 +6,7 @@
 
 #include "int_type.h"
 #include "game_setting.h"
-#include "game/smyle_type.h"
+#include "game/smile_type.h"
 #include "mod_specification.h"
 #include "iplayer.h"
 

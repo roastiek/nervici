@@ -14,10 +14,8 @@
 
 #include "game/smile.h"
 
-Smile::Smile (smileid_tu sid, smilelvl_tu lvl) :
-id (sid),
-level (lvl),
-visible (false) {
+Smile::Smile (SmileType ntype, smileid_tu sid, smilelvl_tu lvl) :
+    id (sid), level (lvl), type (ntype), visible (false) {
 }
 
 Smile::~Smile () {
@@ -27,20 +25,30 @@ void Smile::erase () {
     visible = false;
 }
 
-smilelvl_tu Smile::get_level () const {
+void Smile::eat (Player& pl) {
+    pl.stat.smiles[type][level]++;
+    pl.team.stat.smiles[type][level]++;
+}
+
+/*smilelvl_tu Smile::get_level () const {
     return level;
 }
 
-class SoftSmile : public Smile {
+
+SmileType Smile::get_type() const {
+    return type;
+}*/
+
+class SoftSmile: public Smile {
 protected:
     int delay;
     int step_length;
 
 public:
 
-    SoftSmile (smileid_tu sid, smilelvl_tu lvl) :
-    Smile (sid, lvl) {
-    };
+    SoftSmile (SmileType type, smileid_tu sid, smilelvl_tu lvl) :
+        Smile (type, sid, lvl) {
+    }
 
     void step () {
         if (delay <= 10 && visible) {
@@ -49,7 +57,7 @@ public:
             Render::update_smile (pos);
             visible = false;
         }
-        if (step_length - delay <= 10 && !visible) {
+        if (step_length - delay <= 1 && !visible) {
             if (found_new_pos ()) {
                 World::write_soft_smile (id, pos);
                 Render::draw_smile (id, pos);
@@ -76,24 +84,25 @@ public:
         return false;
     }
 
-    void eat (plid_tu plid) {
+    void eat (Player& pl) {
         World::erase_smile (pos);
         Render::clear_smile (pos);
         Render::update_smile (pos);
         visible = false;
+        Smile::eat (pl);
     }
 };
 
-class HardSmile : public Smile {
+class HardSmile: public Smile {
 protected:
     int delay;
     int step_length;
 
 public:
 
-    HardSmile (smileid_tu sid, smilelvl_tu lvl) :
-    Smile (sid, lvl) {
-    };
+    HardSmile (SmileType type, smileid_tu sid, smilelvl_tu lvl) :
+        Smile (type, sid, lvl) {
+    }
 
     void step () {
         if (delay <= 10 && visible) {
@@ -102,7 +111,7 @@ public:
             Render::update_smile (pos);
             visible = false;
         }
-        if (step_length - delay <= 10 && !visible) {
+        if (step_length - delay <= 1 && !visible) {
             if (found_new_pos ()) {
                 World::write_hard_smile (id, pos);
                 Render::draw_smile (id, pos);
@@ -131,71 +140,59 @@ public:
 
 };
 
-class PoziSmile : public SoftSmile {
+class PoziSmile: public SoftSmile {
 public:
 
-    PoziSmile (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    SoftSmile (sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+    PoziSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        SoftSmile (ST_pozi, sid, lvl) {
+        int world_diagonal = sqrt (World::get_width () * World::get_width ()
+                + World::get_height () * World::get_height ());
         step_length = world_diagonal * (4 - level) / 2;
         delay = world_diagonal * (4 - level) * order / 2 / count;
     }
 
-    void eat (plid_tu plid) {
-        SoftSmile::eat (plid);
-
-        Player& pl = players[plid];
-        pl.stat.smiles[ST_pozi][level]++;
-        pl.team.stat.smiles[ST_pozi][level]++;
+    void eat (Player& pl) {
+        SoftSmile::eat (pl);
         System::mod->on_pozi_smile (pl, level);
-        Audio::play_effect (plid, ET_SmilePlus);
+        Audio::play_effect (pl.id, ET_SmilePlus);
     }
-
-    SmileType get_type () const {
-        return ST_pozi;
-    }
-
 };
 
-class NegaSmileLvl1 : public SoftSmile {
+class NegaSmileLvl1: public SoftSmile {
 public:
 
-    NegaSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    SoftSmile (sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+    NegaSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        SoftSmile (ST_nega, sid, lvl) {
+        int world_diagonal = sqrt (World::get_width () * World::get_width ()
+                + World::get_height () * World::get_height ());
         step_length = world_diagonal * (4 - level) / 4;
         delay = world_diagonal * (4 - level) * order / 4 / count;
     }
 
-    void eat (plid_tu plid) {
-        SoftSmile::eat (plid);
-        
-        Player& pl = players[plid];
-        pl.stat.smiles[ST_nega][level]++;
-        pl.team.stat.smiles[ST_nega][level]++;
+    void eat (Player& pl) {
+        SoftSmile::eat (pl);
         System::mod->on_nega_smile (pl, level);
-        Audio::play_effect (plid, ET_SmileMinus);
-    }
-
-    SmileType get_type () const {
-        return ST_nega;
+        Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
 
-class NegaSmileLvl2 : public NegaSmileLvl1 {
+class NegaSmileLvl2: public NegaSmileLvl1 {
 public:
 
-    NegaSmileLvl2 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    NegaSmileLvl1 (sid, order, count, lvl) {
+    NegaSmileLvl2 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        NegaSmileLvl1 (sid, order, count, lvl) {
     }
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
             plid_tu target = random () % players.count ();
             Player& pl = players[target];
-            if (pl.is_live()) {
-                const FPoint& pl_pos = pl.get_position();
-                int angle = pl.get_angle();
+            if (pl.is_live ()) {
+                const FPoint& pl_pos = pl.get_position ();
+                int angle = pl.get_angle ();
 
                 pos.x = pl_pos.x + icos[angle] * (100 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (100 + random () % 20) - 10;
@@ -209,20 +206,21 @@ public:
     }
 };
 
-class NegaSmileLvl3 : public NegaSmileLvl1 {
+class NegaSmileLvl3: public NegaSmileLvl1 {
 public:
 
-    NegaSmileLvl3 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    NegaSmileLvl1 (sid, order, count, lvl) {
+    NegaSmileLvl3 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        NegaSmileLvl1 (sid, order, count, lvl) {
     }
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
             plid_tu target = random () % players.count ();
             Player& pl = players[target];
-            if (pl.is_live()) {
-                const FPoint& pl_pos = pl.get_position();
-                int angle = pl.get_angle();
+            if (pl.is_live ()) {
+                const FPoint& pl_pos = pl.get_position ();
+                int angle = pl.get_angle ();
 
                 pos.x = pl_pos.x + icos[angle] * (60 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (60 + random () % 20) - 10;
@@ -236,44 +234,40 @@ public:
     }
 };
 
-class FlegSmileLvl1 : public HardSmile {
+class FlegSmileLvl1: public HardSmile {
 public:
 
-    FlegSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    HardSmile (sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+    FlegSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        HardSmile (ST_fleg, sid, lvl) {
+        int world_diagonal = sqrt (World::get_width () * World::get_width ()
+                + World::get_height () * World::get_height ());
         step_length = world_diagonal * (4 - level);
         delay = world_diagonal * (4 - level) * order / count;
     }
 
-    void eat (plid_tu plid) {
-        Player& pl = players[plid];
-        pl.stat.smiles[ST_fleg][level]++;
-        pl.team.stat.smiles[ST_fleg][level]++;
+    void eat (Player& pl) {
+        HardSmile::eat (pl);
         System::mod->on_fleg_smile (pl, level);
-        Audio::play_effect (plid, ET_SmileMinus);
+        Audio::play_effect (pl.id, ET_SmileMinus);
     }
-
-    SmileType get_type () const {
-        return ST_fleg;
-    }
-
 };
 
-class FlegSmileLvl2 : public FlegSmileLvl1 {
+class FlegSmileLvl2: public FlegSmileLvl1 {
 public:
 
-    FlegSmileLvl2 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    FlegSmileLvl1 (sid, order, count, lvl) {
+    FlegSmileLvl2 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        FlegSmileLvl1 (sid, order, count, lvl) {
     }
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
             plid_tu target = random () % players.count ();
             Player& pl = players[target];
-            if (pl.is_live()) {
-                const FPoint& pl_pos = pl.get_position();
-                int angle = pl.get_angle();
+            if (pl.is_live ()) {
+                const FPoint& pl_pos = pl.get_position ();
+                int angle = pl.get_angle ();
 
                 pos.x = pl_pos.x + icos[angle] * (140 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (140 + random () % 20) - 10;
@@ -287,20 +281,21 @@ public:
     }
 };
 
-class FlegSmileLvl3 : public FlegSmileLvl1 {
+class FlegSmileLvl3: public FlegSmileLvl1 {
 public:
 
-    FlegSmileLvl3 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    FlegSmileLvl1 (sid, order, count, lvl) {
+    FlegSmileLvl3 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        FlegSmileLvl1 (sid, order, count, lvl) {
     }
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
             plid_tu target = random () % players.count ();
             Player& pl = players[target];
-            if (pl.is_live()) {
-                const FPoint& pl_pos = pl.get_position();
-                int angle = pl.get_angle();
+            if (pl.is_live ()) {
+                const FPoint& pl_pos = pl.get_position ();
+                int angle = pl.get_angle ();
 
                 pos.x = pl_pos.x + icos[angle] * (100 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (100 + random () % 20) - 10;
@@ -314,33 +309,26 @@ public:
     }
 };
 
-class IronSmile : public SoftSmile {
+class IronSmile: public SoftSmile {
 public:
 
-    IronSmile (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    SoftSmile (sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+    IronSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        SoftSmile (ST_iron, sid, lvl) {
+        int world_diagonal = sqrt (World::get_width () * World::get_width ()
+                + World::get_height () * World::get_height ());
         step_length = world_diagonal * (4 - level) / 2;
         delay = world_diagonal * (4 - level) * order / 2 / count;
     }
 
-    void eat (plid_tu plid) {
-        SoftSmile::eat (plid);
-        
-        Player& pl = players[plid];
-        pl.stat.smiles[ST_iron][level]++;
-        pl.team.stat.smiles[ST_iron][level]++;
+    void eat (Player& pl) {
+        SoftSmile::eat (pl);
         System::mod->on_iron_smile (pl, level);
-        Audio::play_effect (plid, ET_SmilePlus);
+        Audio::play_effect (pl.id, ET_SmilePlus);
     }
-
-    SmileType get_type () const {
-        return ST_pozi;
-    }
-
 };
 
-class ChamSmileLvl1 : public Smile {
+class ChamSmileLvl1: public Smile {
 private:
     int delay;
     int step_length;
@@ -350,9 +338,11 @@ protected:
 
 public:
 
-    ChamSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    Smile (sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+    ChamSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        Smile (ST_cham, sid, lvl) {
+        int world_diagonal = sqrt (World::get_width () * World::get_width ()
+                + World::get_height () * World::get_height ());
         step_length = world_diagonal * (4 - level) / 2;
         delay = world_diagonal * (4 - level) * order / 2 / count;
         face_type = ST_pozi;
@@ -365,7 +355,7 @@ public:
             Render::update_smile (pos);
             visible = false;
         }
-        if (step_length - delay <= 10 && !visible) {
+        if (step_length - delay <= 1 && !visible) {
             for (int tries = 0; tries < 10; tries++) {
                 pos.x = random () % (World::get_width () - 20);
                 pos.y = random () % (World::get_height () - 20);
@@ -412,12 +402,11 @@ public:
             return true;
         }
         return false;
-    };
+    }
+    ;
 
-    void eat (plid_tu plid) {
-        Player& pl = players[plid];
-        pl.stat.smiles[ST_cham][level]++;
-        pl.team.stat.smiles[ST_cham][level]++;
+    void eat (Player& pl) {
+        Smile::eat (pl);
         pl.stat.smiles[face_type][level]++;
         pl.team.stat.smiles[face_type][level]++;
         switch (face_type) {
@@ -435,48 +424,45 @@ public:
         switch (face_type) {
         case ST_pozi:
             System::mod->on_pozi_smile (pl, level);
-            Audio::play_effect (plid, ET_SmilePlus);
+            Audio::play_effect (pl.id, ET_SmilePlus);
             break;
         case ST_nega:
             System::mod->on_nega_smile (pl, level);
-            Audio::play_effect (plid, ET_SmileMinus);
+            Audio::play_effect (pl.id, ET_SmileMinus);
             break;
         case ST_fleg:
             System::mod->on_fleg_smile (pl, level);
-            Audio::play_effect (plid, ET_SmileMinus);
+            Audio::play_effect (pl.id, ET_SmileMinus);
             break;
         case ST_iron:
             System::mod->on_iron_smile (pl, level);
-            Audio::play_effect (plid, ET_SmilePlus);
+            Audio::play_effect (pl.id, ET_SmilePlus);
             break;
         default:
             break;
         }
     }
-
-    SmileType get_type () const {
-        return face_type;
-    }
-
 };
 
-class ChamSmileLvl2 : public ChamSmileLvl1 {
+class ChamSmileLvl2: public ChamSmileLvl1 {
 public:
 
-    ChamSmileLvl2 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    ChamSmileLvl1 (sid, order, count, lvl) {
+    ChamSmileLvl2 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        ChamSmileLvl1 (sid, order, count, lvl) {
     }
 
     bool try_swich_face () {
         bool someone_near = false;
         for (size_t pi = 0; pi < players.count (); pi++) {
             Player& pl = players[pi];
-            if (pl.is_live()) {
+            if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 FPoint dist;
                 dist.x = pl_pos.x - (pos.x + 10);
                 dist.y = pl_pos.y - (pos.y + 10);
-                someone_near |= (sqrt (dist.x * dist.x + dist.y * dist.y) <= 80);
+                someone_near
+                        |= (sqrt (dist.x * dist.x + dist.y * dist.y) <= 80);
             }
         }
 
@@ -495,23 +481,25 @@ public:
     }
 };
 
-class ChamSmileLvl3 : public ChamSmileLvl1 {
+class ChamSmileLvl3: public ChamSmileLvl1 {
 public:
 
-    ChamSmileLvl3 (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    ChamSmileLvl1 (sid, order, count, lvl) {
+    ChamSmileLvl3 (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        ChamSmileLvl1 (sid, order, count, lvl) {
     }
 
     bool try_swich_face () {
         bool someone_near = false;
         for (size_t pi = 0; pi < players.count (); pi++) {
             Player& pl = players[pi];
-            if (pl.is_live()) {
+            if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 FPoint dist;
                 dist.x = pl_pos.x - (pos.x + 10);
                 dist.y = pl_pos.y - (pos.y + 10);
-                someone_near |= (sqrt (dist.x * dist.x + dist.y * dist.y) <= 80);
+                someone_near
+                        |= (sqrt (dist.x * dist.x + dist.y * dist.y) <= 80);
             }
         }
 
@@ -530,7 +518,7 @@ public:
     }
 };
 
-class HamiSmile : public Smile {
+class HamiSmile: public Smile {
 private:
     int delay;
     int step_length;
@@ -540,9 +528,11 @@ private:
 
 public:
 
-    HamiSmile (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    Smile (sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+    HamiSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        Smile (ST_ham, sid, lvl) {
+        int world_diagonal = sqrt (World::get_width () * World::get_width ()
+                + World::get_height () * World::get_height ());
         step_length = world_diagonal * (4 - level);
         delay = world_diagonal * (4 - level) * order / count;
         ani = 0;
@@ -552,8 +542,8 @@ public:
 
         if (visible) {
             FPoint ftest = exact;
-            ftest.x += icos [angle];
-            ftest.y += isin [angle];
+            ftest.x += icos[angle];
+            ftest.y += isin[angle];
             Point test;
             test.x = ftest.x;
             test.y = ftest.y;
@@ -609,20 +599,14 @@ public:
         }
     }
 
-    void eat (plid_tu plid) {
-        Player& pl = players[plid];
-        pl.stat.smiles[ST_ham][level]++;
-        pl.team.stat.smiles[ST_ham][level]++;
-        System::mod->on_iron_smile (pl, level);
-        Audio::play_effect (plid, ET_SmileMinus);
-    }
-
-    SmileType get_type () const {
-        return ST_ham;
+    void eat (Player& pl) {
+        Smile::eat(pl);
+        System::mod->on_ham_smile(pl, level);
+        Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
 
-class DestSmile : public Smile {
+class DestSmile: public Smile {
 private:
     int delay;
     int step_length;
@@ -632,9 +616,11 @@ private:
 
 public:
 
-    DestSmile (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    Smile (sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+    DestSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        Smile (ST_ham, sid, lvl) {
+        int world_diagonal = sqrt (World::get_width () * World::get_width ()
+                + World::get_height () * World::get_height ());
         step_length = world_diagonal * (4 - level);
         delay = world_diagonal * (4 - level) * order / count;
         ani = 0;
@@ -644,8 +630,8 @@ public:
 
         if (visible) {
             FPoint ftest = exact;
-            ftest.x += icos [angle];
-            ftest.y += isin [angle];
+            ftest.x += icos[angle];
+            ftest.y += isin[angle];
             Point test;
             test.x = ftest.x;
             test.y = ftest.y;
@@ -701,20 +687,14 @@ public:
         }
     }
 
-    void eat (plid_tu plid) {
-        Player& pl = players[plid];
-        pl.stat.smiles[ST_ham][level]++;
-        pl.team.stat.smiles[ST_ham][level]++;
-        System::mod->on_iron_smile (pl, level);
-        Audio::play_effect (plid, ET_SmileMinus);
-    }
-
-    SmileType get_type () const {
-        return ST_ham;
+    void eat (Player& pl) {
+        Smile::eat (pl);
+        System::mod->on_ham_smile (pl, level);
+        Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
 
-class TermSmile : public Smile {
+class TermSmile: public Smile {
 private:
     int delay;
     int step_length;
@@ -724,9 +704,11 @@ private:
 
 public:
 
-    TermSmile (smileid_tu sid, smileid_tu order, smileid_tu count, smilelvl_tu lvl) :
-    Smile (sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width () + World::get_height () * World::get_height ());
+    TermSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
+            smilelvl_tu lvl) :
+        Smile (ST_ham, sid, lvl) {
+        int world_diagonal = sqrt (World::get_width () * World::get_width ()
+                + World::get_height () * World::get_height ());
         step_length = world_diagonal * (4 - level);
         delay = world_diagonal * (4 - level) * order / count;
         ani = 0;
@@ -741,8 +723,8 @@ public:
             }
 
             FPoint ftest = exact;
-            ftest.x += icos [angle];
-            ftest.y += isin [angle];
+            ftest.x += icos[angle];
+            ftest.y += isin[angle];
             Point test;
             test.x = ftest.x;
             test.y = ftest.y;
@@ -798,12 +780,10 @@ public:
         }
     }
 
-    void eat (plid_tu plid) {
-        Player& pl = players[plid];
-        pl.stat.smiles[ST_ham][level]++;
-        pl.team.stat.smiles[ST_ham][level]++;
-        System::mod->on_iron_smile (pl, level);
-        Audio::play_effect (plid, ET_SmileMinus);
+    void eat (Player& pl) {
+        Smile::eat (pl);
+        System::mod->on_ham_smile (pl, level);
+        Audio::play_effect (pl.id, ET_SmileMinus);
     }
 
     SmileType get_type () const {
@@ -811,8 +791,8 @@ public:
     }
 };
 
-Smile* SmileFactory::create (smileid_tu sid, smileid_tu order, smileid_tu count,
-        SmileType stype, smilelvl_tu lvl) {
+Smile* SmileFactory::create (smileid_tu sid, smileid_tu order,
+        smileid_tu count, SmileType stype, smilelvl_tu lvl) {
     switch (stype) {
     case ST_pozi:
         return new PoziSmile (sid, order, count, lvl);

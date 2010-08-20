@@ -8,7 +8,7 @@
 #ifndef MOD_SPECIFICATION_H
 #define	MOD_SPECIFICATION_H
 
-#include "game/smyle_type.h"
+#include "game/smile_type.h"
 
 struct ModSpecification {
     plid_tu max_players;

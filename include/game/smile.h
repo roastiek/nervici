@@ -10,31 +10,35 @@
 
 #include "int_type.h"
 #include "point.h"
-#include "game/smyle_type.h"
+#include "game/smile_type.h"
+#include "fakes/player.h"
 
 class Smile {
 protected:
     const smileid_tu id;
+    
     const smilelvl_tu level;
+    
+    const SmileType type;
 
     Point pos;
 
     bool visible;
 
-    Smile (smileid_tu sid, smilelvl_tu lvl);
+    Smile (SmileType type, smileid_tu sid, smilelvl_tu lvl);
 
 public:
     virtual ~Smile ();
 
     virtual void step () = 0;
 
-    virtual void eat (plid_tu pid) = 0;
+    virtual void eat (Player& pl);
 
     virtual void erase ();
 
-    virtual SmileType get_type () const = 0;
+    /*SmileType get_type () const;
 
-    smilelvl_tu get_level () const;
+    smilelvl_tu get_level () const;*/
 };
 
 class SmileFactory {
