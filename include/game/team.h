@@ -9,9 +9,9 @@
 #define	TEAM_H
 
 #include "int_type.h"
-#include "settings/team_info.h"
 #include "game/pl_state.h"
-#include "statistic.h"
+#include "fakes/team_info.h"
+#include "fakes/statistic.h"
 
 class Team {
 private:
@@ -22,8 +22,9 @@ private:
     
     plid_tu states[PS_Count];
 
+    Statistic statistic;
+
 public:
-    Statistic stat;
 
     void initialize (plid_tu id, const TeamInfo* info);
 
@@ -54,6 +55,12 @@ public:
     plid_tu get_id () const;
     
     plid_tu get_order () const;
+    
+    Statistic& stat();
+    
+    const Statistic& stat() const;
+    
+    const Glib::ustring& get_name () const;
 };
 
 #endif	/* TEAM_H */

@@ -4,9 +4,10 @@
 #include "engine/render.h"
 #include "game/smiles.h"
 #include "main.h"
+#include "game/fields.h"
+//#include "game/player.h"
 
 #include "game/world.h"
-#include "game/player.h"
 
 using namespace std;
 
@@ -51,8 +52,8 @@ void initialize () {
     x /= 2;
     for (startid_tu s = 0; s < starts.size (); s++) {
         starts[s].angle = s * angles / starts.size ();
-        starts[s].pos.x = floor ((width / 2 - (x * icos[starts[s].angle] * 0.8)) * digits) / digits;
-        starts[s].pos.y = floor ((height / 2 - (x * isin[starts[s].angle] * 0.8)) * digits) / digits;
+        starts[s].pos.x = floor ((width / 2 - (x * icos[starts[s].angle] * 0.8)) * DIGITS) / DIGITS;
+        starts[s].pos.y = floor ((height / 2 - (x * isin[starts[s].angle] * 0.8)) * DIGITS) / DIGITS;
         starts[s].ready = 1;
     }
 

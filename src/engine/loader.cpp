@@ -17,7 +17,8 @@ namespace Loader {
 
 static const char* const gameImages[] = {
     "semafor.png",
-    "heart.png"
+    "heart.png",
+    "statistic.png"
 };
 
 static const char* const smile_setting = "smile_setting.png";
@@ -211,8 +212,10 @@ void load_smile_faces (SmileImages& faces) {
         }
 
         for (int bi = 0; bi < 6; bi++) {
-            path = smiles_dir + "/smile" + to_string<int> (bi + 1) + ".png";
-            faces.backs[bi] = IMG_Load (path.c_str ());
+        	if (faces.backs[bi] == NULL) {
+        		path = smiles_dir + "smile" + to_string<int> (bi + 1) + ".png";
+        		faces.backs[bi] = IMG_Load (path.c_str ());
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ set (BASIC_IMAGES
     heart.png 
     semafor.png 
     smile_setting.png
+    statistic.png
 )
 
 set (SMILE_IMAGES 

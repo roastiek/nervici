@@ -5,12 +5,15 @@
 #include "engine/audio.h"
 #include "engine/render.h"
 #include "game/world.h"
-
-#include "game/player.h"
 #include "game/teams.h"
 #include "game/players.h"
 #include "engine/audio_decoder.h"
 #include "game/smiles.h"
+#include "settings/pl_info.h"
+#include "game/statistic.h"
+#include "game/team.h"
+
+#include "game/player.h"
 
 #define JUMP_LENGTH 24
 #define JUMP_REPEAT 80
@@ -31,11 +34,10 @@ void Player::update_body () {
     updates.clear ();
 }
 
-void Player::initialize (plid_tu ID, plid_tu team_id, const PlInfo* info, int max_len) {
+void Player::initialize (plid_tu ID, Team* tem, const PlInfo* info, int max_len) {
     this->id = ID;
     this->info = info;
-    this->team_id = team_id;
-    score = 0;
+    this->team = tem;
     order = ID;
     max_length = max_len;
     size = 0xf;
@@ -51,7 +53,7 @@ void Player::initialize (plid_tu ID, plid_tu team_id, const PlInfo* info, int ma
     bottom_index = 0;
     timer = 0;
     state = PS_Erased;
-    Teams::inc_state (team_id, state);
+    team->inc_state (state);
     ironize_lvl = 0;
 }
 
@@ -169,8 +171,8 @@ void Player::live () {
     if (keyst == KS_Right) angle = (angle + 1) % angles;
     if (jumptime == 0 && keyst == KS_Jump) {
         jumptime = JUMP_REPEAT;
-        stat.jump++;
-        Teams::stat (team_id).jump++;
+        stat().jump++;
+        team_stat ().jump++;
         Audio::play_effect (id, ET_Jump);
     }
 
@@ -191,24 +193,24 @@ void Player::live () {
         switch (cause.cause) {
         case DC_killed:
         {
-            IPlayer& murder = Players::get_player (cause.murder);
-            stat.killed++;
-            Teams::stat (team_id).killed++;
-            Players::stat (cause.murder).kills++;
-            Players::team_stat (cause.murder).kills++;
+            Player& murder = players[cause.murder];
+            stat().killed++;
+            team_stat().killed++;
+            murder.stat().kills++;
+            murder.team_stat ().kills++;
             System::mod->on_killed (*this, murder);
             Audio::play_effect (id, ET_Au);
             break;
         }
         case DC_self:
-            stat.selfs++;
-            Teams::stat (team_id).selfs++;
+            stat().selfs++;
+            team_stat ().selfs++;
             System::mod->on_selfdeath (*this);
             Audio::play_effect (id, ET_Self);
             break;
         case DC_wall:
-            stat.crashes++;
-            Teams::stat (team_id).crashes++;
+            stat().crashes++;
+            team_stat().crashes++;
             System::mod->on_wall (*this);
             Audio::play_effect (id, ET_Wall);
             break;
@@ -219,16 +221,19 @@ void Player::live () {
             break;
         }
         if (!survive) {
-            stat.deaths++;
-            Teams::stat (team_id).deaths++;
+            stat().deaths++;
+            team_stat ().deaths++;
             set_state (PS_Death);
             System::mod->on_death (*this);
+        } else {
+            stat().steps++;
+            team_stat ().steps++;
         }
     } else {
         survive = World::simple_will_survive (pos, fields);
         if (!survive) {
-            stat.crashes++;
-            Teams::stat (team_id).crashes++;
+            stat().crashes++;
+            team_stat ().crashes++;
             System::mod->on_wall (*this);
             Audio::play_effect (id, ET_Wall);
             set_state (PS_Death);
@@ -320,20 +325,20 @@ void Player::give_start (startid_tu start) {
 }
 
 void Player::inc_score (score_ti delta) {
-    score += delta;
-    Teams::inc_score (team_id, delta);
+    stat().score += delta;
+    team_stat().score+= delta;
 }
 
 void Player::dec_score (score_ti delta) {
-    score -= delta;
-    Teams::dec_score (team_id, delta);
+    stat().score -= delta;
+    team_stat().score-= delta;
 }
 
 void Player::set_score (score_ti value) {
-    if (score != value) {
-        Teams::dec_score (team_id, score);
-        score = value;
-        Teams::inc_score (team_id, score);
+    if (stat().score != value) {
+        team_stat().score-= stat().score;
+        stat().score = value;
+        team_stat().score+= stat().score;
     }
 }
 
@@ -409,8 +414,8 @@ void Player::kill () {
     case PS_Start:
     case PS_Live:
     case PS_Undeath:
-        stat.deaths++;
-        Teams::stat (team_id).deaths++;
+        stat().deaths++;
+        team_stat ().deaths++;
         set_state (PS_Death);
         break;
     default:
@@ -447,11 +452,11 @@ bool Player::is_human () const {
 }
 
 void Player::update_score () {
-    Render::draw_player_score (id, order, score, state, ironize_lvl > 0);
+    Render::draw_player_score (id, order, stat().score, state, ironize_lvl > 0);
 }
 
 score_ti Player::get_score () const {
-    return score;
+    return stat().score;
 }
 
 bool Player::is_jumping () const {
@@ -484,18 +489,18 @@ plid_tu Player::get_order () const {
 
 void Player::set_state (PlState value) {
     if (value != state) {
-        Teams::dec_state (team_id, state);
+        team->dec_state (state);
         state = value;
-        Teams::inc_state (team_id, state);
+        team->inc_state (state);
     }
 }
 
 bool Player::operator> (const Player& other) const {
-    return score < other.score || (score == other.score && order > other.order);
+    return stat().score < other.stat().score || (stat().score == other.stat().score && order > other.order);
 }
 
 bool Player::operator< (const Player& other) const {
-    return score > other.score || (score == other.score && order < other.order);
+    return stat().score > other.stat().score || (stat().score == other.stat().score && order < other.order);
 }
 
 void Player::set_order (plid_tu value) {
@@ -522,8 +527,8 @@ const ustring& Player::get_name () const {
     return info->name;
 }
 
-plid_tu Player::get_team () const {
-    return team_id;
+Team* Player::get_team () const {
+    return team;
 }
 
 const FPoint& Player::get_position () const {
@@ -532,4 +537,30 @@ const FPoint& Player::get_position () const {
 
 int Player::get_angle () const {
     return angle;
+}
+
+void Player::calc_stats () {
+	for (int sti = ST_pozi; sti < ST_count; sti++) {
+		stat().smiles[sti][0] = stat().smiles[sti][1] + stat().smiles[sti][2] + stat().smiles[sti][3];
+	}
+}
+
+void Player::draw_stat() {
+	Render::draw_player_stat(id, order, info->name, info->color);
+}
+
+Statistic& Player::stat () {
+    return statistic;
+}
+
+const Statistic& Player::stat () const {
+    return statistic;
+}
+
+Statistic& Player::team_stat () {
+    return team->stat();
+}
+
+const Statistic& Player::team_stat () const {
+    return team->stat();
 }

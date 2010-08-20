@@ -1,12 +1,15 @@
+#include "engine/render.h"
+#include "game/statistic.h"
+#include "settings/team_info.h"
 
 #include "game/team.h"
-#include "engine/render.h"
+
+using namespace Glib;
 
 void Team::initialize (plid_tu id, const TeamInfo* info) {
     this->id = id;
     this->info = info;
 
-    score = 0;
     order = id;
 
     for (PlState st = PS_Start; st < PS_Count; st++) {
@@ -18,15 +21,15 @@ void Team::uninitialize () {
 }
 
 void Team::set_score (score_ti value) {
-    score = value;
+    stat().score = value;
 }
 
 void Team::inc_score (score_ti delta) {
-    score+= delta;
+    stat().score+= delta;
 }
 
 void Team::dec_score (score_ti delta) {
-    score-= delta;
+    stat().score-= delta;
 }
 
 void Team::inc_state (PlState state) {
@@ -50,17 +53,47 @@ void Team::update_score () {
         state = PS_Death;
     }
 
-    Render::draw_team_score (id, order, score, state);
+    Render::draw_team_score (id, order, stat().score, state);
 }
 
 bool Team::operator > (const Team& other) {
-    return score < other.score || (score == other.score && order > other.order);
+    return stat().score < other.stat().score || (stat().score == other.stat().score && order > other.order);
 }
 
 bool Team::operator < (const Team& other) {
-    return score > other.score || (score == other.score && order < other.order);
+    return stat().score > other.stat().score || (stat().score == other.stat().score && order < other.order);
 }
 
 void Team::set_order (plid_tu value) {
     order = value;
+}
+
+void Team::calc_stats () {
+	for (int sti = ST_pozi; sti < ST_count; sti++) {
+		stat().smiles[sti][0] = stat().smiles[sti][1] + stat().smiles[sti][2] + stat().smiles[sti][3];
+	}
+}
+
+void Team::draw_stat() {
+	Render::draw_team_stat(id, order, info->name, info->color);
+}
+
+plid_tu Team::get_id() const {
+	return id;
+}
+
+plid_tu Team::get_order() const {
+	return order;
+}
+
+Statistic& Team::stat () {
+    return statistic;
+}
+
+const Statistic& Team::stat () const {
+    return statistic;
+}
+
+const ustring& Team::get_name() const {
+    return info->name;
 }

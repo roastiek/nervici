@@ -8,13 +8,23 @@
 #ifndef PLAYERS_H
 #define	PLAYERS_H
 
-#include "int_type.h"
-#include "game/game_info.h"
-#include "mods/iplayer.h"
-#include "statistic.h"
-#include "fpoint.h"
+#include <vector>
 
-namespace Players {
+#include "int_type.h"
+#include "fakes/player.h"
+#include "fakes/game_info.h"
+
+class Players {
+private:
+    static Players instance;
+
+    std::vector<Player> players;
+
+    std::vector<plid_tu> orders;
+
+    Players ();
+    
+public:
     void initialize (const GameInfo & info);
 
     void uninitialize ();
@@ -31,74 +41,20 @@ namespace Players {
 
     void erase ();
 
-    plid_tu get_count ();
-
-    void clear_pl (plid_tu plid);
-
-    void cut_pl_at_length (plid_tu plid, plsize_tu length);
-
-    void dec_pl_max_length (plid_tu plid, plsize_tu delta);
-
-    void dec_pl_score (plid_tu plid, score_ti delta);
-
-    void fast_clear_pl (plid_tu plid);
-
-    uint_fast16_t get_pl_length (plid_tu plid);
-
-    uint_fast16_t get_pl_max_length (plid_tu plid);
-
-    int_fast32_t get_pl_score (plid_tu plid);
-
-    void give_pl_start (plid_tu plid, startid_tu start);
-
-    void inc_pl_max_length (plid_tu plid, plsize_tu delta);
-
-    void inc_pl_score (plid_tu plid, score_ti delta);
-
-    bool is_pl_human (plid_tu plid);
-
-    bool is_pl_jumping (plid_tu plid);
-
-    bool is_pl_live (plid_tu plid);
-
-    void kill_pl (plid_tu plid);
-
-    void set_pl_max_length (plid_tu plid, plsize_tu length);
-
-    void set_pl_score (plid_tu plid, score_ti score);
-
-    void set_pl_timer (plid_tu plid, timer_ti time);
-
-    void start_pl (plid_tu plid);
-
-    void revive_pl (plid_tu plid);
-
-    void set_pl_ironize (plid_tu plid, score_ti value);
-
-    void inc_pl_ironize (plid_tu plid, score_ti delta);
-
-    void dec_pl_ironize (plid_tu plid, score_ti delta);
-
-    score_ti get_pl_ironze (plid_tu plid);
-
-    IPlayer& get_player (plid_tu plid);
-
-    Statistic& stat (plid_tu);
-
-    Statistic& team_stat (plid_tu);
-
-    const FPoint& get_pl_position (plid_tu plid);
-
-    int get_pl_angle (plid_tu plid);
+    plid_tu count ();
     
+    Player& operator[] (plid_tu index);
+  
+    const Player& operator[] (plid_tu index) const;
+
     void calc_stats ();
     
-    void set_pl_order (plid_tu plid, plid_tu order);
-    
-    plid_tu get_pl_order (plid_tu plid);
-
     void draw_stat ();
-}
+    
+    static Players& get_instance ();
+};
+
+extern Players& players;
 
 #endif	/* PLAYERS_H */
 

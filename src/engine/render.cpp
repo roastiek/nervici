@@ -2,6 +2,7 @@
 #include <SDL_Pango.h>
 #include <iostream>
 
+#include "engine/stat_column.h"
 #include "engine/loader.h"
 #include "engine/image_type.h"
 #include "gui/scale.h"
@@ -9,6 +10,11 @@
 #include "settings/pl_infos.h"
 #include "settings/team_infos.h"
 #include "settings/setting.h"
+#include "game/statistic.h"
+#include "game/player.h"
+#include "game/players.h"
+#include "game/team.h"
+#include "game/teams.h"
 
 #include "engine/render.h"
 
@@ -33,6 +39,15 @@ struct GameScreen {
     SDL_Rect playerground;
 };
 
+struct StatisticScreen {
+    SDL_Rect columns[STC_count];
+    SDL_Rect players_in;
+    SDL_Rect players_out;
+    SDL_Rect teams_in;
+    SDL_Rect teams_out;
+    SDL_Rect header;
+};
+
 struct ScreenSet {
     int width;
     int height;
@@ -53,7 +68,7 @@ static SDL_Rect dest;
 static SDL_Rect fill_rect;
 static vector<PlayerSurfaces> pl_images;
 static vector<SDL_Surface*> images;
-static vector<SDL_Surface*> teams;
+static vector<SDL_Surface*> team_images;
 static GameScreen gs_inner, gs_outer;
 static ScreenSet setting;
 static SmileImages smile_images;
@@ -61,13 +76,17 @@ static vector<SDL_Surface*> smile_faces;
 static SDLPango_Context* round_context;
 static SDLPango_Context* end_context;
 static SDLPango_Context* status_context;
+static SDLPango_Context* stat_context;
 
+static StatisticScreen stat_screen;
+static SDL_Surface* stat_columns[STC_count];
+static int stat_column_sub[STC_count];
 //pojd me do hymen
 
-static const char *const section = "screen";
-static const char *const st_width = "width";
-static const char *const st_height = "height";
-static const char *const st_fullscreen = "fullscreen";
+static const char * const section = "screen";
+static const char * const st_width = "width";
+static const char * const st_height = "height";
+static const char * const st_fullscreen = "fullscreen";
 
 static void inner_area (const SDL_Rect& outer, SDL_Rect& inner) {
     inner.x = outer.x + 1;
@@ -122,7 +141,8 @@ static void init_game_screen () {
     inner_area (gs_outer.team, gs_inner.team);
 
     gs_outer.score = gs_outer.semafor;
-    gs_outer.score.h = gs_outer.team.y - gs_outer.semafor.y - gs_outer.semafor.h - 2 * inner;
+    gs_outer.score.h = gs_outer.team.y - gs_outer.semafor.y
+            - gs_outer.semafor.h - 2 * inner;
     gs_outer.score.y = gs_outer.semafor.y + gs_outer.semafor.h + inner;
     inner_area (gs_outer.score, gs_inner.score);
 
@@ -142,14 +162,58 @@ static void init_game_screen () {
     inner_area (gs_outer.statustext, gs_inner.statustext);
 
     gs_outer.playerground = gs_outer.status;
-    gs_outer.playerground.h = setting.height - gs_outer.status.h - 2 * outer - inner;
+    gs_outer.playerground.h = setting.height - gs_outer.status.h - 2 * outer
+            - inner;
     gs_outer.playerground.y += gs_outer.status.h + inner;
     inner_area (gs_outer.playerground, gs_inner.playerground);
 }
 
+static void init_stat_screen () {
+    stat_screen.players_out.x = outer;
+    stat_screen.players_out.y = outer;
+    stat_screen.players_out.w = setting.width - 2 * outer;
+    stat_screen.players_out.h = setting.height - 2 * outer - inner - 102;
+    inner_area (stat_screen.players_out, stat_screen.players_in);
+
+    stat_screen.teams_out = stat_screen.players_out;
+    stat_screen.teams_out.h = 102;
+    stat_screen.teams_out.y = stat_screen.players_out.y
+            + stat_screen.players_out.h + inner;
+    inner_area (stat_screen.teams_out, stat_screen.teams_in);
+
+    //inner_area (stat_screen.players_in, stat_screen.header);
+    stat_screen.header = stat_screen.players_in;
+    stat_screen.header.h = 24;
+
+    int letter_width = images[IMT_Numbers]->w / 12;
+
+    stat_screen.columns[STC_name].x = stat_screen.header.x + 2;
+    stat_screen.columns[STC_name].y = stat_screen.header.y + 1;
+    stat_screen.columns[STC_name].w = stat_screen.header.w - letter_width * (12
+            * 4 + 2 * 8) - 16 * 2;
+    stat_screen.columns[STC_name].h = 22;
+
+    stat_screen.columns[STC_score] = stat_screen.columns[STC_name];
+    stat_screen.columns[STC_score].x += stat_screen.columns[STC_name].w + 2;
+    stat_screen.columns[STC_score].w = letter_width * 8;
+
+    stat_screen.columns[STC_length] = stat_screen.columns[STC_score];
+    stat_screen.columns[STC_length].x += stat_screen.columns[STC_score].w + 2;
+
+    stat_screen.columns[STC_deaths] = stat_screen.columns[STC_length];
+    stat_screen.columns[STC_deaths].x += stat_screen.columns[STC_length].w + 2;
+    stat_screen.columns[STC_deaths].w = letter_width * 4;
+
+    for (int sti = STC_crashes; sti < STC_count; sti++) {
+        stat_screen.columns[sti] = stat_screen.columns[sti - 1];
+        stat_screen.columns[sti].x += stat_screen.columns[sti - 1].w + 2;
+    }
+}
+
 static SDL_Surface* create_player_face (Uint32 color) {
     SDL_Surface* result;
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00,
+            0xff0000, 0xff000000);
     if (result != NULL) {
         fill_rect.x = 0;
         fill_rect.y = 0;
@@ -174,11 +238,11 @@ static SDL_Surface* create_numbers (Uint32 color, Uint32 team) {
     Uint32 p;
 
     SDL_Surface *result = SDL_CreateRGBSurface (SDL_HWSURFACE,
-            images[IMT_Numbers]->w + 80,
-            images[IMT_Numbers]->h, 32, 0xff, 0xff00, 0xff0000, 0);
+            images[IMT_Numbers]->w + 80, images[IMT_Numbers]->h, 32, 0xff,
+            0xff00, 0xff0000, 0);
     SDL_Surface *temp = SDL_CreateRGBSurface (SDL_HWSURFACE,
-            images[IMT_Numbers]->w + 80,
-            images[IMT_Numbers]->h, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
+            images[IMT_Numbers]->w + 80, images[IMT_Numbers]->h, 32, 0xff,
+            0xff00, 0xff0000, 0xff000000);
 
     SDL_LockSurface (temp);
     SDL_LockSurface (images[IMT_Heart]);
@@ -223,11 +287,65 @@ static SDL_Surface* create_numbers (Uint32 color, Uint32 team) {
     return result;
 }
 
-static void draw_score (int y, SDL_Surface *numbers, int score, PlState state, bool ironized) {
+static void draw_score_numbers (score_ti score, SDL_Surface* numbers,
+        int x_pos, int y_pos, int digit) {
+    static SDL_Rect src, dest;
+    int c;
+
+    dest.y = y_pos;
+
+    int max = 10;
+    int min = -1;
+    for (int ci = 0; ci < digit - 1; ci++) {
+        max *= 10;
+        min *= 10;
+    }
+
+    int cl = images[IMT_Numbers]->w / 12;
+    src.y = 0;
+    src.w = cl;
+    src.h = images[IMT_Numbers]->h;
+    if (score >= 0) {
+        while (score >= max)
+            score /= 10;
+        for (c = 1; c < digit && (score > 0 || c == 1); c++) {
+            src.x = cl * (score % 10);
+            dest.x = x_pos + cl * (digit - c);
+            SDL_BlitSurface (numbers, &src, primary, &dest);
+            score /= 10;
+        }
+        for (; c <= digit; c++) {
+            src.x = cl * 11;
+            dest.x = x_pos + cl * (digit - c);
+            SDL_BlitSurface (numbers, &src, primary, &dest);
+        }
+    } else {
+        while (score <= min)
+            score /= 10;
+        for (c = 1; c <= digit && score < 0; c++) {
+            src.x = cl * ((-score) % 10);
+            dest.x = x_pos + cl * (digit - c);
+            SDL_BlitSurface (numbers, &src, primary, &dest);
+            score /= 10;
+        }
+        src.x = cl * 10;
+        dest.x = x_pos + cl * (digit - c);
+        SDL_BlitSurface (numbers, &src, primary, &dest);
+        c++;
+        for (; c <= digit; c++) {
+            src.x = cl * 11;
+            dest.x = x_pos + cl * (digit - c);
+            SDL_BlitSurface (numbers, &src, primary, &dest);
+        }
+    }
+}
+
+static void draw_score (int y, SDL_Surface *numbers, int score, PlState state,
+        bool ironized) {
 #define xoff 4
 #define yoff 4
     static SDL_Rect src, dest;
-    int xl, cl, c;
+    int cl;
 
     src.x = images[IMT_Numbers]->w;
     src.y = 0;
@@ -251,56 +369,53 @@ static void draw_score (int y, SDL_Surface *numbers, int score, PlState state, b
     SDL_BlitSurface (numbers, &src, primary, &dest);
 
     cl = images[IMT_Numbers]->w / 12;
-    xl = gs_outer.score.w - 9 * cl - xoff;
-    src.y = 0;
-    src.w = cl;
-    src.h = images[IMT_Numbers]->h;
-    if (score >= 0) {
-        while (score > 99999999) score /= 10;
-        for (c = 0; c < 8 && (score > 0 || c == 0); c++) {
-            src.x = cl * (score % 10);
-            dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-            SDL_BlitSurface (numbers, &src, primary, &dest);
-            score /= 10;
-        }
-        for (; c < 8; c++) {
-            src.x = cl * 11;
-            dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-            SDL_BlitSurface (numbers, &src, primary, &dest);
-        }
-    } else {
-        while (score < -9999999) score /= 10;
-        for (c = 0; c < 8 && score < 0; c++) {
-            src.x = cl * ((-score) % 10);
-            dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-            SDL_BlitSurface (numbers, &src, primary, &dest);
-            score /= 10;
-        }
-        src.x = cl * 10;
-        dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-        SDL_BlitSurface (numbers, &src, primary, &dest);
-        c++;
-        for (; c < 8; c++) {
-            src.x = cl * 11;
-            dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-            SDL_BlitSurface (numbers, &src, primary, &dest);
-        }
-    }
-    for (c = 0; c < 7 && score; c++) {
-
-        if (score % 10 > 0 || c == 0) {
-            src.x = cl * (score % 10);
-        }
-    }
-    SDL_UpdateRect (primary, gs_outer.score.x, dest.y, gs_outer.score.w, numbers->h);
+    /*xl = gs_outer.score.w - 9 * cl - xoff;
+     src.y = 0;
+     src.w = cl;
+     src.h = images[IMT_Numbers]->h;
+     if (score >= 0) {
+     while (score > 99999999) score /= 10;
+     for (c = 0; c < 8 && (score > 0 || c == 0); c++) {
+     src.x = cl * (score % 10);
+     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+     SDL_BlitSurface (numbers, &src, primary, &dest);
+     score /= 10;
+     }
+     for (; c < 8; c++) {
+     src.x = cl * 11;
+     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+     SDL_BlitSurface (numbers, &src, primary, &dest);
+     }
+     } else {
+     while (score < -9999999) score /= 10;
+     for (c = 0; c < 8 && score < 0; c++) {
+     src.x = cl * ((-score) % 10);
+     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+     SDL_BlitSurface (numbers, &src, primary, &dest);
+     score /= 10;
+     }
+     src.x = cl * 10;
+     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+     SDL_BlitSurface (numbers, &src, primary, &dest);
+     c++;
+     for (; c < 8; c++) {
+     src.x = cl * 11;
+     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
+     SDL_BlitSurface (numbers, &src, primary, &dest);
+     }
+     }*/
+    draw_score_numbers (score, numbers, gs_outer.score.x + gs_outer.score.w - 8
+            * cl - xoff, y + yoff, 8);
+    SDL_UpdateRect (primary, gs_outer.score.x, dest.y, gs_outer.score.w,
+            numbers->h);
 }
 
 static void init_fonts () {
     SDLPango_Matrix color;
 
     round_context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
-    SDLPango_SetSurfaceCreateArgs (round_context, SDL_HWSURFACE, 32,
-            0xff, 0xff00, 0xff0000, 0xff000000);
+    SDLPango_SetSurfaceCreateArgs (round_context, SDL_HWSURFACE, 32, 0xff,
+            0xff00, 0xff0000, 0xff000000);
 
     color.m[0][0] = 0xd5;
     color.m[1][0] = 0xd5;
@@ -314,8 +429,8 @@ static void init_fonts () {
     SDLPango_SetDefaultColor (round_context, &color);
 
     status_context = SDLPango_CreateContext_GivenFontDesc ("Sans 20px");
-    SDLPango_SetSurfaceCreateArgs (status_context, SDL_HWSURFACE, 32,
-            0xff, 0xff00, 0xff0000, 0xff000000);
+    SDLPango_SetSurfaceCreateArgs (status_context, SDL_HWSURFACE, 32, 0xff,
+            0xff00, 0xff0000, 0xff000000);
 
     color.m[0][0] = 0xd5;
     color.m[1][0] = 0xd5;
@@ -329,8 +444,8 @@ static void init_fonts () {
     SDLPango_SetDefaultColor (status_context, &color);
 
     end_context = SDLPango_CreateContext_GivenFontDesc ("Sans 100px");
-    SDLPango_SetSurfaceCreateArgs (end_context, SDL_HWSURFACE, 32,
-            0xff, 0xff00, 0xff0000, 0xff000000);
+    SDLPango_SetSurfaceCreateArgs (end_context, SDL_HWSURFACE, 32, 0xff,
+            0xff00, 0xff0000, 0xff000000);
 
     color.m[0][0] = 0xff;
     color.m[1][0] = 0xff;
@@ -342,6 +457,57 @@ static void init_fonts () {
     color.m[2][1] = 0x80;
     color.m[3][1] = 0xff;
     SDLPango_SetDefaultColor (end_context, &color);
+
+    stat_context = SDLPango_CreateContext_GivenFontDesc ("Sans 20px");
+    SDLPango_SetSurfaceCreateArgs (stat_context, SDL_HWSURFACE, 32, 0xff,
+            0xff00, 0xff0000, 0xff000000);
+}
+
+static void init_stat_columns () {
+    static const char * const names[] = {"menno", "score", "delka"};
+
+    for (int sti = STC_name; sti < STC_count; sti++) {
+        stat_columns[sti] = SDL_CreateRGBSurface (SDL_HWSURFACE,
+                stat_screen.columns[sti].w, stat_screen.columns[sti].h * 4, 32,
+                0xff, 0xff00, 0xff0000, 0x00000000);
+        SDL_FillRect (stat_columns[sti], NULL, 0);
+    }
+
+    SDL_Surface* text;
+    SDL_Rect src, dest;
+
+    for (int sti = STC_name; sti < STC_deaths; sti++) {
+        SDLPango_SetMarkup (status_context, names[sti], -1);
+        text = SDLPango_CreateSurfaceDraw (status_context);
+        src.x = 0;
+        src.w = (text->w <= stat_screen.columns[sti].w - 4) ? text->w
+                : (stat_screen.columns[sti].w - 4);
+        src.h = (text->h <= stat_screen.columns[sti].h) ? text->w
+                : stat_screen.columns[sti].h;
+        src.y = (text->h - src.h) / 2;
+        dest.x = 2;
+        dest.y = (stat_screen.columns[sti].h - src.h) / 2;
+        SDL_BlitSurface (text, &src, stat_columns[sti], &dest);
+        SDL_FreeSurface (text);
+    }
+
+    src.x = 0;
+    src.y = 0;
+    src.w = 22;
+    src.h = 88;
+    dest.x = (stat_screen.columns[STC_deaths].w - 22) / 2;
+    dest.y = 0;
+
+    for (int sti = STC_deaths; sti < STC_count; sti++) {
+        SDL_BlitSurface (images[IMT_Stats], &src, stat_columns[sti], &dest);
+        src.x += 22;
+    }
+}
+
+static void free_stat_columns () {
+    for (int sti = STC_name; sti < STC_count; sti++) {
+        SDL_FreeSurface (stat_columns[sti]);
+    }
 }
 
 bool initialize () {
@@ -349,16 +515,21 @@ bool initialize () {
     int flag;
     load_screen_setting ();
 
-    if (SDL_InitSubSystem (SDL_INIT_VIDEO)) return true;
+    if (SDL_InitSubSystem (SDL_INIT_VIDEO))
+        return true;
 
     flag = SDL_HWSURFACE;
-    if (setting.fullscreen) flag |= SDL_FULLSCREEN;
+    if (setting.fullscreen)
+        flag |= SDL_FULLSCREEN;
 
     primary = SDL_SetVideoMode (setting.width, setting.height, 32, flag);
-    if (primary == NULL) return true;
+    if (primary == NULL)
+        return true;
 
-    background = SDL_CreateRGBSurface (SDL_HWSURFACE, setting.width, setting.height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
-    merge = SDL_CreateRGBSurface (SDL_HWSURFACE, 1, 1, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
+    background = SDL_CreateRGBSurface (SDL_HWSURFACE, setting.width,
+            setting.height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
+    merge = SDL_CreateRGBSurface (SDL_HWSURFACE, 1, 1, 32, 0xff, 0xff00,
+            0xff0000, 0x00000000);
 
     fill_rect.x = 0;
     fill_rect.y = 0;
@@ -375,20 +546,27 @@ bool initialize () {
     Loader::load_game_images (images);
     Loader::load_smile_faces (smile_images);
     init_game_screen ();
+    init_stat_screen ();
+    init_stat_columns ();
 
     return false;
 }
 
 void uninitialize () {
+    free_stat_columns ();
     Loader::free_smile_faces (smile_images);
     Loader::free_game_images (images);
     SDLPango_FreeContext (round_context);
     SDLPango_FreeContext (end_context);
     SDLPango_FreeContext (status_context);
+    SDLPango_FreeContext (stat_context);
 
-    if (merge != NULL) SDL_FreeSurface (merge);
-    if (background != NULL) SDL_FreeSurface (background);
-    if (primary != NULL) SDL_FreeSurface (primary);
+    if (merge != NULL)
+        SDL_FreeSurface (merge);
+    if (background != NULL)
+        SDL_FreeSurface (background);
+    if (primary != NULL)
+        SDL_FreeSurface (primary);
 
     SDL_QuitSubSystem (SDL_INIT_VIDEO);
 
@@ -401,8 +579,10 @@ void load_players (const GameInfo& info) {
     int p = 0;
     for (size_t pi = 0; pi < 16; pi++) {
         if (info.pl_ids[pi] >= 0) {
-            pl_images[p].face = create_player_face (PlInfos::get (info.pl_ids[pi]).color);
-            pl_images[p].numbers = create_numbers (PlInfos::get (info.pl_ids[pi]).color,
+            pl_images[p].face = create_player_face (PlInfos::get (
+                    info.pl_ids[pi]).color);
+            pl_images[p].numbers = create_numbers (PlInfos::get (
+                    info.pl_ids[pi]).color,
                     TeamInfos::get (info.pls_team[pi]).color);
             p++;
         }
@@ -419,19 +599,19 @@ void free_players () {
 }
 
 void load_teams (const GameInfo& info) {
-    teams.resize (TEAMS_COUNT);
+    team_images.resize (TEAMS_COUNT);
 
     for (size_t ti = 0; ti < TEAMS_COUNT; ti++) {
-        teams[ti] = create_numbers (TeamInfos::get (ti).color, 0x00);
+        team_images[ti] = create_numbers (TeamInfos::get (ti).color, 0x00);
     }
 }
 
 void free_teams () {
     for (size_t ti = 0; ti < TEAMS_COUNT; ti++) {
-        SDL_FreeSurface (teams[ti]);
+        SDL_FreeSurface (team_images[ti]);
     }
 
-    teams.clear ();
+    team_images.clear ();
 }
 
 void clear_playerground () {
@@ -461,7 +641,8 @@ void draw_world_items_queue (vector<Point>& queue) {
             case IT_PLAYER:
                 SDL_BlitSurface (background, &drawdest, primary, &drawdest);
                 drawsrc.x = item.player.body;
-                SDL_BlitSurface (pl_images[item.player.ID].face, &drawsrc, primary, &drawdest);
+                SDL_BlitSurface (pl_images[item.player.ID].face, &drawsrc,
+                        primary, &drawdest);
                 break;
             }
             item.changed = false;
@@ -471,8 +652,8 @@ void draw_world_items_queue (vector<Point>& queue) {
 }
 
 void update_player (const Point& pos) {
-    SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x,
-            pos.y + gs_outer.playerground.y, 3, 3);
+    SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x, pos.y
+            + gs_outer.playerground.y, 3, 3);
 }
 
 void draw_game_screen () {
@@ -495,6 +676,35 @@ void draw_game_screen () {
     SDL_Flip (primary);
 }
 
+void draw_stat_screen () {
+    SDL_FillRect (background, NULL, SC_BACKGROUND);
+    SDL_FillRect (background, &stat_screen.players_out, SC_HIGHGROUND);
+    SDL_FillRect (background, &stat_screen.teams_out, SC_HIGHGROUND);
+
+    SDL_FillRect (background, &stat_screen.players_in, 0);
+    SDL_FillRect (background, &stat_screen.teams_in, 0);
+
+    SDL_FillRect (background, &stat_screen.header, SC_MEDROUND);
+
+    SDL_BlitSurface (background, NULL, primary, NULL);
+
+    SDL_Rect dest;
+    SDL_Rect src;
+
+    src.x = 0;
+    src.h = 22;
+
+    for (int sti = 0; sti < STC_count; sti++) {
+        dest = stat_screen.columns[sti];
+        src.w = stat_screen.columns[sti].w;
+        src.y = 22 * stat_column_sub[sti];
+
+        SDL_BlitSurface (stat_columns[sti], &src, primary, &dest);
+    }
+
+    SDL_Flip (primary);
+}
+
 void update_screen () {
     SDL_Flip (primary);
 }
@@ -513,7 +723,7 @@ void draw_semafor (int state) {
     }
 
     src.x = (state & SEMAFOR_G1) ? 0 : 21;
-    src.y = 19;
+    src.y = 18;
     SDL_BlitSurface (images[IMT_Semafor], &src, primary, &dest);
 
     SDL_UpdateRects (primary, 1, &gs_inner.semafor);
@@ -526,7 +736,8 @@ void draw_round (round_tu round) {
 
     SDL_BlitSurface (background, &dest, primary, &dest);
 
-    while (round > 99) round /= 10;
+    while (round > 99)
+        round /= 10;
     if (round > 9) {
         tt[6] = '0' + round / 10;
         tt[7] = '0' + round % 10;
@@ -540,8 +751,8 @@ void draw_round (round_tu round) {
 
     text = SDLPango_CreateSurfaceDraw (round_context);
     cout << text->h << '\n';
-    dest.x += (dest.w - text->w) / 2;
-    dest.y += dest.h - text->h + (dest.h - text->h) / 2;
+    dest.x += (dest.w - text->w) / 2 + 2;
+    dest.y += (dest.h - text->h) / 2 + 2;
     SDL_BlitSurface (text, NULL, primary, &dest);
     SDL_FreeSurface (text);
 
@@ -566,12 +777,14 @@ void draw_end () {
 void draw_player_score (plid_tu plid, plid_tu order, score_ti score,
         PlState state, bool ironized) {
     SDL_Surface *numbers = pl_images[plid].numbers;
-    draw_score (gs_outer.score.y + order * numbers->h, numbers, score, state, ironized);
+    draw_score (gs_outer.score.y + order * numbers->h, numbers, score, state,
+            ironized);
 }
 
 void draw_team_score (plid_tu tid, plid_tu order, score_ti score, PlState state) {
-    SDL_Surface *numbers = teams[tid];
-    draw_score (gs_outer.team.y + order * numbers->h, numbers, score, state, false);
+    SDL_Surface *numbers = team_images[tid];
+    draw_score (gs_outer.team.y + order * numbers->h, numbers, score, state,
+            false);
 }
 
 wsize_tu get_playerground_width () {
@@ -584,7 +797,7 @@ wsize_tu get_playerground_height () {
 
 Screen* create_screen (const ustring& name) {
 
-    class RenderScreen : public Screen {
+    class RenderScreen: public Screen {
     public:
 
         void set_primary (SDL_Surface* value) {
@@ -618,7 +831,8 @@ static SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl) {
     dest.x = 0;
     dest.y = 0;
 
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 20, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 20, 20, 32, 0xff, 0xff00,
+            0xff0000, 0x000000);
 
     SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
     int eyes = random () % smile_images.eyes[type].size ();
@@ -638,7 +852,8 @@ static SDL_Surface* create_cham_face (smilelvl_tu lvl) {
     dest.x = 0;
     dest.y = 0;
 
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 80, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 80, 20, 32, 0xff, 0xff00,
+            0xff0000, 0x000000);
 
     for (int sti = 0; sti < ST_cham; sti++) {
         dest.y = 0;
@@ -653,7 +868,6 @@ static SDL_Surface* create_cham_face (smilelvl_tu lvl) {
         dest.x += 20;
     }
 
-
     return result;
 }
 
@@ -664,7 +878,8 @@ static SDL_Surface* create_ham_face (smilelvl_tu lvl) {
     dest.x = 0;
     dest.y = 0;
 
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00, 0xff0000, 0x000000);
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00,
+            0xff0000, 0x000000);
 
     SDL_BlitSurface (smile_images.backs[3 + lvl], NULL, result, &dest);
     dest.x = 20;
@@ -730,8 +945,8 @@ void clear_smile (const Point& pos) {
 }
 
 void update_smile (const Point& pos) {
-    SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x - 1,
-            pos.y + gs_outer.playerground.y - 1, 22, 22);
+    SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x - 1, pos.y
+            + gs_outer.playerground.y - 1, 22, 22);
 }
 
 void draw_timer (timer_ti time) {
@@ -753,7 +968,7 @@ void draw_timer (timer_ti time) {
     src.w = face->w / 11;
     src.y = 0;
 
-    dest.y = gs_inner.timer.y + gs_inner.timer.h - src.h + (gs_inner.timer.h - src.h) / 2;
+    dest.y = gs_inner.timer.y + 2 + (gs_inner.timer.h - src.h) / 2;
     dest.x = gs_inner.timer.x;
 
     int parts[8];
@@ -777,7 +992,8 @@ void draw_timer (timer_ti time) {
 }
 
 void draw_status (const ustring& text) {
-    SDL_BlitSurface (background, &gs_outer.statustext, primary, &gs_outer.statustext);
+    SDL_BlitSurface (background, &gs_outer.statustext, primary,
+            &gs_outer.statustext);
 
     SDLPango_SetMarkup (status_context, text.c_str (), -1);
     SDL_Surface* face = SDLPango_CreateSurfaceDraw (status_context);
@@ -793,12 +1009,136 @@ void draw_status (const ustring& text) {
     src.y = 0;
 
     dest.x = gs_inner.statustext.x + 8;
-    dest.y = gs_inner.statustext.y + gs_inner.statustext.h - src.h + (gs_inner.statustext.h - src.h) / 2;
+    dest.y = gs_inner.statustext.y + 2 + (gs_inner.statustext.h - src.h) / 2;
 
     SDL_BlitSurface (face, &src, primary, &dest);
     SDL_UpdateRects (primary, 1, &dest);
 
     SDL_FreeSurface (face);
+}
+
+void reset_columns_sub () {
+    for (int sti = 0; sti < STC_count; sti++) {
+        stat_column_sub[sti] = 0;
+    }
+}
+
+int get_column_sub (StatColumn col) {
+    return stat_column_sub[col];
+}
+
+void cycle_column_sub (StatColumn col) {
+    stat_column_sub[col]++;
+    stat_column_sub[col] %= 4;
+
+    SDL_Rect dest = stat_screen.columns[col];
+    SDL_Rect src;
+    src.x = 0;
+    src.w = stat_screen.columns[col].w;
+    src.y = 22 * stat_column_sub[col];
+    src.h = 22;
+
+    SDL_BlitSurface (stat_columns[col], &src, primary, &dest);
+    SDL_UpdateRect (primary, dest.x, dest.y, dest.w, dest.h);
+
+}
+
+StatColumn get_column_from_pos (int x, int y) {
+    for (int sti = 0; sti < STC_count; sti++) {
+        const SDL_Rect& area = stat_screen.columns[sti];
+
+        if (x >= area.x && y >= area.y && x < area.x + area.w && y < area.y
+                + area.h)
+            return StatColumn (sti);
+    }
+
+    return STC_count;
+}
+
+static void draw_stat (int y, const ustring& name, uint32_t color,
+        const Statistic& stat, SDL_Surface* numbers) {
+    SDLPango_Matrix mcolor;
+
+    mcolor.m[0][0] = color & 0xff;
+    mcolor.m[1][0] = (color >> 8) & 0xff;
+    mcolor.m[2][0] = (color >> 16) & 0xff;
+    mcolor.m[3][0] = 0;
+
+    mcolor.m[0][1] = color & 0xff;
+    mcolor.m[1][1] = (color >> 8) & 0xff;
+    mcolor.m[2][1] = (color >> 16) & 0xff;
+    mcolor.m[3][1] = 0xff;
+    SDLPango_SetDefaultColor (stat_context, &mcolor);
+
+    SDL_Rect src, dest;
+
+    src = stat_screen.header;
+
+    src.y = y;
+
+    SDL_BlitSurface (background, &src, primary, &src);
+
+    SDLPango_SetText (stat_context, name.c_str (), -1);
+    SDL_Surface* text = SDLPango_CreateSurfaceDraw (stat_context);
+
+    const SDL_Rect& name_area = stat_screen.columns[STC_name];
+
+    src.x = 0;
+    src.w = (text->w <= name_area.w) ? text->w : name_area.w;
+    src.h = (text->h <= 24) ? text->h : 24;
+    src.y = (text->h - src.h) / 2;
+
+    dest.x = name_area.x;
+    dest.y = y + (24 - src.h) / 2;
+
+    SDL_BlitSurface (text, NULL, primary, &dest);
+
+    SDL_FreeSurface (text);
+
+    draw_score_numbers (stat.score, numbers, stat_screen.columns[STC_score].x,
+            y, 8);
+    draw_score_numbers (stat.steps, numbers, stat_screen.columns[STC_length].x,
+            y, 8);
+    draw_score_numbers (stat.deaths, numbers,
+            stat_screen.columns[STC_deaths].x, y, 4);
+    draw_score_numbers (stat.crashes, numbers,
+            stat_screen.columns[STC_crashes].x, y, 4);
+    draw_score_numbers (stat.kills, numbers, stat_screen.columns[STC_kills].x,
+            y, 4);
+    draw_score_numbers (stat.killed, numbers,
+            stat_screen.columns[STC_killed].x, y, 4);
+    draw_score_numbers (stat.selfs, numbers, stat_screen.columns[STC_selfs].x,
+            y, 4);
+    draw_score_numbers (stat.jump, numbers, stat_screen.columns[STC_jumps].x,
+            y, 4);
+    draw_score_numbers (stat.smiles[ST_pozi][stat_column_sub[STC_pozi]],
+            numbers, stat_screen.columns[STC_pozi].x, y, 4);
+    draw_score_numbers (stat.smiles[ST_nega][stat_column_sub[STC_nega]],
+            numbers, stat_screen.columns[STC_nega].x, y, 4);
+    draw_score_numbers (stat.smiles[ST_fleg][stat_column_sub[STC_fleg]],
+            numbers, stat_screen.columns[STC_fleg].x, y, 4);
+    draw_score_numbers (stat.smiles[ST_iron][stat_column_sub[STC_iron]],
+            numbers, stat_screen.columns[STC_iron].x, y, 4);
+    draw_score_numbers (stat.smiles[ST_cham][stat_column_sub[STC_cham]],
+            numbers, stat_screen.columns[STC_cham].x, y, 4);
+    draw_score_numbers (stat.smiles[ST_ham][stat_column_sub[STC_ham]], numbers,
+            stat_screen.columns[STC_ham].x, y, 4);
+
+    SDL_UpdateRect (primary, stat_screen.header.x, y, stat_screen.header.w,
+            stat_screen.header.h);
+}
+
+void draw_player_stat (plid_tu id, plid_tu order, const Glib::ustring& name,
+        uint32_t color) {
+
+    draw_stat (stat_screen.header.y + (order + 1) * 24, name, color,
+            players[id].stat(), pl_images[id].numbers);
+}
+
+void draw_team_stat (plid_tu id, plid_tu order, const Glib::ustring& name,
+        uint32_t color) {
+    draw_stat (stat_screen.teams_in.y + 2 + order * 24, name, color,
+            teams[id].stat (), team_images[id]);
 }
 
 }

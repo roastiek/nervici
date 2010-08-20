@@ -1,82 +1,90 @@
 #include <vector>
-using namespace std;
 
 #include "engine/render.h"
-#include "game/team.h"
 #include "settings/team_infos.h"
+#include "game/statistic.h"
+#include "game/team.h"
 
 #include "game/teams.h"
 
-namespace Teams {
+using namespace std;
 
-static Team teams[TEAMS_COUNT];
-static vector<Team*> active;
-static vector<plid_tu> orders;
+Teams& teams = Teams::get_instance ();
 
-void initialize (const GameInfo& info) {
-    active.resize (0);
+Teams Teams::instance;
 
-    for (int ti = 0; ti < TEAMS_COUNT; ti++) {
-        teams[ti].initialize (ti, &TeamInfos::get (ti));
+Teams& Teams::get_instance() {
+    return instance;
+}
+
+Teams::Teams () {
+}
+
+void Teams::initialize (const GameInfo& info) {
+    teams.resize (info.setting.teams_count + 1);
+
+    teams[0].initialize(0, &TeamInfos::get (0));
+    
+    int ati = 1;
+    for (int ti = 1; ti < TEAMS_COUNT; ti++) {
         if (info.team_active[ti]) {
-            active.push_back (&teams[ti]);
+            teams[ati].initialize (ti, &TeamInfos::get (ti));
+            ati++;
         }
     }
-    orders.resize (active.size ());
+    orders.resize (teams.size ());
 
     Render::load_teams (info);
 }
 
-void uninitialize () {
+void Teams::uninitialize () {
     Render::free_teams ();
 
-    for (int ti = 0; ti < TEAMS_COUNT; ti++) {
+    for (size_t ti = 0; ti < teams.size (); ti++) {
         teams[ti].uninitialize ();
     }
 }
 
-void update_score () {
-    for (size_t ti = 0; ti < orders.size (); ti++) {
+void Teams::update_score () {
+    for (size_t ti = 1; ti < orders.size (); ti++) {
         orders[ti] = 0;
     }
 
-    for (size_t oi = 0; oi < active.size (); oi++) {
-        for (size_t ti = 0; ti < active.size (); ti++) {
-            if ((*active[oi]) > (*active[ti])) {
+    for (size_t oi = 1; oi < teams.size (); oi++) {
+        for (size_t ti = 1; ti < teams.size (); ti++) {
+            if ((teams[oi]) > (teams[ti])) {
                 orders[oi]++;
             }
         }
     }
 
-    for (size_t ti = 0; ti < active.size (); ti++) {
-        active[ti]->set_order (orders[ti]);
-        active[ti]->update_score ();
+    for (size_t ti = 1; ti < teams.size (); ti++) {
+        teams[ti].set_order (orders[ti]);
+        teams[ti].update_score ();
     }
 }
 
-void set_score (plid_tu id, score_ti value) {
-    teams[id].set_score (value);
+void Teams::calc_stats () {
+    for (size_t ti = 1; ti < teams.size (); ti++) {
+        teams[ti].calc_stats();
+    }
 }
 
-void inc_score (plid_tu id, score_ti delta) {
-    teams[id].inc_score (delta);
+int Teams::count () {
+	return teams.size() - 1;
 }
 
-void dec_score (plid_tu id, score_ti delta) {
-    teams[id].dec_score (delta);
+void Teams::draw_stat () {
+    for (size_t ti = 1; ti < teams.size (); ti++) {
+        teams[ti].draw_stat();
+    }
 }
 
-void inc_state (plid_tu id, PlState state) {
-    teams[id].inc_state (state);
+Team& Teams::operator [](int index) {
+    return teams[index + 1];
 }
 
-void dec_state (plid_tu id, PlState state) {
-    teams[id].dec_state (state);
+const Team& Teams::operator [](int index) const {
+    return teams[index + 1];
 }
 
-
-Statistic& stat (plid_tu id) {
-    return teams[id].stat;
-}
-
-}

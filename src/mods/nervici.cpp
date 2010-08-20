@@ -3,6 +3,8 @@
 #include "game/game.h"
 #include "engine/audio.h"
 #include "engine/render.h"
+#include "game/statistic.h"
+#include "game/player.h"
 
 #include "mods/nervici.h"
 
@@ -65,11 +67,11 @@ startid_tu world_find_free_start () {
 }
 
 plid_tu live_pls_count () {
-    return Players::live_pls_count ();
+    return players.live_pls_count ();
 }
 
 IPlayer& get_player (plid_tu plid) {
-    return Players::get_player (plid);
+    return players[plid];
 }
 
 

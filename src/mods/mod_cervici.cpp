@@ -2,7 +2,7 @@
 using namespace Nervici;
 
 #include "mods/mod_interface.h"
-#include "game/player.h"
+//#include "game/player.h"
 
 static const char * const exts[] = {
     NULL
@@ -103,7 +103,7 @@ public:
     }
 
     void on_death (IPlayer& player) {
-        player.revive ();
+        //player.revive ();
     }
 
     void after_step () {
@@ -114,11 +114,11 @@ public:
             }
         }
 
-        /*if (live_pls_count () <= 0) {
+        if (live_pls_count () <= 0) {
             stop_music ();
             set_semafor (SEMAFOR_OF);
 
-            if (get_round () == set->rounds) {
+            if (get_round () == set.rounds) {
                 end_game ();
             } else {
                 wait_for_space ();
@@ -127,7 +127,7 @@ public:
                 next_round ();
                 begin_start_procedure ();
             }
-        }*/
+        }
     }
 
     void on_pozi_smile (IPlayer& player, int lvl) {

@@ -1,14 +1,16 @@
 #include <math.h>
 
-#include "game/smile.h"
 #include "settings/pl_info.h"
 #include "game/world.h"
 #include "engine/render.h"
 #include "system.h"
 #include "engine/audio.h"
-#include "game/players.h"
 #include "main.h"
+#include "game/statistic.h"
 #include "game/player.h"
+#include "game/players.h"
+
+#include "game/smile.h"
 
 Smile::Smile (smileid_tu sid, smilelvl_tu lvl) :
 id (sid),
@@ -140,9 +142,10 @@ public:
     void eat (plid_tu plid) {
         SoftSmile::eat (plid);
 
-        Players::stat (plid).smiles[ST_pozi][level]++;
-        Players::team_stat (plid).smiles[ST_pozi][level]++;
-        System::mod->on_pozi_smile (Players::get_player (plid), level);
+        Player& pl = players[plid];
+        pl.stat().smiles[ST_pozi][level]++;
+        pl.team_stat().smiles[ST_pozi][level]++;
+        System::mod->on_pozi_smile (pl, level);
         Audio::play_effect (plid, ET_SmilePlus);
     }
 
@@ -164,10 +167,11 @@ public:
 
     void eat (plid_tu plid) {
         SoftSmile::eat (plid);
-
-        Players::stat (plid).smiles[ST_nega][level]++;
-        Players::team_stat (plid).smiles[ST_nega][level]++;
-        System::mod->on_nega_smile (Players::get_player (plid), level);
+        
+        Player& pl = players[plid];
+        pl.stat().smiles[ST_nega][level]++;
+        pl.team_stat().smiles[ST_nega][level]++;
+        System::mod->on_nega_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
 
@@ -185,10 +189,11 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % Players::get_count ();
-            if (Players::is_pl_live (target)) {
-                const FPoint& pl_pos = Players::get_pl_position (target);
-                int angle = Players::get_pl_angle (target);
+            plid_tu target = random () % players.count ();
+            Player& pl = players[target];
+            if (pl.is_live()) {
+                const FPoint& pl_pos = pl.get_position();
+                int angle = pl.get_angle();
 
                 pos.x = pl_pos.x + icos[angle] * (100 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (100 + random () % 20) - 10;
@@ -211,10 +216,11 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % Players::get_count ();
-            if (Players::is_pl_live (target)) {
-                const FPoint& pl_pos = Players::get_pl_position (target);
-                int angle = Players::get_pl_angle (target);
+            plid_tu target = random () % players.count ();
+            Player& pl = players[target];
+            if (pl.is_live()) {
+                const FPoint& pl_pos = pl.get_position();
+                int angle = pl.get_angle();
 
                 pos.x = pl_pos.x + icos[angle] * (60 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (60 + random () % 20) - 10;
@@ -239,9 +245,10 @@ public:
     }
 
     void eat (plid_tu plid) {
-        Players::stat (plid).smiles[ST_fleg][level]++;
-        Players::team_stat (plid).smiles[ST_fleg][level]++;
-        System::mod->on_fleg_smile (Players::get_player (plid), level);
+        Player& pl = players[plid];
+        pl.stat().smiles[ST_fleg][level]++;
+        pl.team_stat().smiles[ST_fleg][level]++;
+        System::mod->on_fleg_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
 
@@ -260,10 +267,11 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % Players::get_count ();
-            if (Players::is_pl_live (target)) {
-                const FPoint& pl_pos = Players::get_pl_position (target);
-                int angle = Players::get_pl_angle (target);
+            plid_tu target = random () % players.count ();
+            Player& pl = players[target];
+            if (pl.is_live()) {
+                const FPoint& pl_pos = pl.get_position();
+                int angle = pl.get_angle();
 
                 pos.x = pl_pos.x + icos[angle] * (140 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (140 + random () % 20) - 10;
@@ -286,10 +294,11 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % Players::get_count ();
-            if (Players::is_pl_live (target)) {
-                const FPoint& pl_pos = Players::get_pl_position (target);
-                int angle = Players::get_pl_angle (target);
+            plid_tu target = random () % players.count ();
+            Player& pl = players[target];
+            if (pl.is_live()) {
+                const FPoint& pl_pos = pl.get_position();
+                int angle = pl.get_angle();
 
                 pos.x = pl_pos.x + icos[angle] * (100 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (100 + random () % 20) - 10;
@@ -315,10 +324,11 @@ public:
 
     void eat (plid_tu plid) {
         SoftSmile::eat (plid);
-
-        Players::stat (plid).smiles[ST_iron][level]++;
-        Players::team_stat (plid).smiles[ST_iron][level]++;
-        System::mod->on_iron_smile (Players::get_player (plid), level);
+        
+        Player& pl = players[plid];
+        pl.stat().smiles[ST_iron][level]++;
+        pl.team_stat().smiles[ST_iron][level]++;
+        System::mod->on_iron_smile (pl, level);
         Audio::play_effect (plid, ET_SmilePlus);
     }
 
@@ -403,8 +413,11 @@ public:
     };
 
     void eat (plid_tu plid) {
-        Players::stat (plid).smiles[face_type][level]++;
-        Players::team_stat (plid).smiles[face_type][level]++;
+        Player& pl = players[plid];
+        pl.stat().smiles[ST_cham][level]++;
+        pl.team_stat().smiles[ST_cham][level]++;
+        pl.stat().smiles[face_type][level]++;
+        pl.team_stat().smiles[face_type][level]++;
         switch (face_type) {
         case ST_pozi:
         case ST_nega:
@@ -419,19 +432,19 @@ public:
         }
         switch (face_type) {
         case ST_pozi:
-            System::mod->on_pozi_smile (Players::get_player (plid), level);
+            System::mod->on_pozi_smile (pl, level);
             Audio::play_effect (plid, ET_SmilePlus);
             break;
         case ST_nega:
-            System::mod->on_nega_smile (Players::get_player (plid), level);
+            System::mod->on_nega_smile (pl, level);
             Audio::play_effect (plid, ET_SmileMinus);
             break;
         case ST_fleg:
-            System::mod->on_fleg_smile (Players::get_player (plid), level);
+            System::mod->on_fleg_smile (pl, level);
             Audio::play_effect (plid, ET_SmileMinus);
             break;
         case ST_iron:
-            System::mod->on_iron_smile (Players::get_player (plid), level);
+            System::mod->on_iron_smile (pl, level);
             Audio::play_effect (plid, ET_SmilePlus);
             break;
         default:
@@ -454,9 +467,10 @@ public:
 
     bool try_swich_face () {
         bool someone_near = false;
-        for (size_t pi = 0; pi < Players::get_count (); pi++) {
-            if (Players::is_pl_live (pi)) {
-                const FPoint& pl_pos = Players::get_pl_position (pi);
+        for (size_t pi = 0; pi < players.count (); pi++) {
+            Player& pl = players[pi];
+            if (pl.is_live()) {
+                const FPoint& pl_pos = pl.get_position ();
                 FPoint dist;
                 dist.x = pl_pos.x - (pos.x + 10);
                 dist.y = pl_pos.y - (pos.y + 10);
@@ -488,9 +502,10 @@ public:
 
     bool try_swich_face () {
         bool someone_near = false;
-        for (size_t pi = 0; pi < Players::get_count (); pi++) {
-            if (Players::is_pl_live (pi)) {
-                const FPoint& pl_pos = Players::get_pl_position (pi);
+        for (size_t pi = 0; pi < players.count (); pi++) {
+            Player& pl = players[pi];
+            if (pl.is_live()) {
+                const FPoint& pl_pos = pl.get_position ();
                 FPoint dist;
                 dist.x = pl_pos.x - (pos.x + 10);
                 dist.y = pl_pos.y - (pos.y + 10);
@@ -593,9 +608,10 @@ public:
     }
 
     void eat (plid_tu plid) {
-        Players::stat (plid).smiles[ST_ham][level]++;
-        Players::team_stat (plid).smiles[ST_ham][level]++;
-        System::mod->on_iron_smile (Players::get_player (plid), level);
+        Player& pl = players[plid];
+        pl.stat().smiles[ST_ham][level]++;
+        pl.team_stat().smiles[ST_ham][level]++;
+        System::mod->on_iron_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
 
@@ -684,9 +700,10 @@ public:
     }
 
     void eat (plid_tu plid) {
-        Players::stat (plid).smiles[ST_ham][level]++;
-        Players::team_stat (plid).smiles[ST_ham][level]++;
-        System::mod->on_iron_smile (Players::get_player (plid), level);
+        Player& pl = players[plid];
+        pl.stat().smiles[ST_ham][level]++;
+        pl.team_stat().smiles[ST_ham][level]++;
+        System::mod->on_iron_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
 
@@ -780,9 +797,10 @@ public:
     }
 
     void eat (plid_tu plid) {
-        Players::stat (plid).smiles[ST_ham][level]++;
-        Players::team_stat (plid).smiles[ST_ham][level]++;
-        System::mod->on_iron_smile (Players::get_player (plid), level);
+        Player& pl = players[plid];
+        pl.stat().smiles[ST_ham][level]++;
+        pl.team_stat().smiles[ST_ham][level]++;
+        System::mod->on_iron_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
 

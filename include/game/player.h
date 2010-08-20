@@ -3,21 +3,22 @@
 
 #include <vector>
 
-#include "settings/pl_info.h"
 #include "pl_state.h"
 #include "key_state.h"
-#include "fields.h"
-#include "fpoint.h"
-#include "point.h"
 #include "mods/iplayer.h"
-#include "game/statistic.h"
+#include "fakes/point.h"
+#include "fakes/fpoint.h"
+#include "fakes/fields.h" 
+#include "fakes/statistic.h"
+#include "fakes/pl_info.h"
+#include "fakes/team.h"
 
-struct Player : public IPlayer {
+class Player : public IPlayer {
 private:
     plid_tu id;
     const PlInfo* info;
     PlState state;
-    plid_tu team_id;
+    Team* team;
 
     FPoint exact;
     int angle;
@@ -61,6 +62,8 @@ private:
 
     std::vector<Point> updates;
 
+    Statistic statistic;
+
     void clear_bottom ();
 
     void check_length ();
@@ -81,9 +84,8 @@ private:
     void try_revive ();
 
 public:
-    Statistic stat;
 
-    void initialize (plid_tu ID, plid_tu team_id, const PlInfo* plinfo, int max_len);
+    void initialize (plid_tu ID, Team* team, const PlInfo* plinfo, int max_len);
     
     void uninitialize ();
 
@@ -170,7 +172,7 @@ public:
 
     plid_tu get_id () const;
 
-    plid_tu get_team () const;
+    Team* get_team () const;
 
     PlState get_state () const;
 
@@ -201,6 +203,14 @@ public:
     void calc_stats ();
 
     void draw_stat ();
+    
+    Statistic& stat ();
+    
+    const Statistic& stat () const;
+
+    Statistic& team_stat ();
+
+    const Statistic& team_stat () const;
 };
 
 

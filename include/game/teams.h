@@ -8,41 +8,42 @@
 #ifndef TEAMS_H
 #define	TEAMS_H
 
-#include "game_info.h"
-#include "pl_state.h"
-#include "statistic.h"
+#include <vector>
 
-namespace Teams {
+#include "pl_state.h"
+#include "fakes/team.h"
+#include "fakes/game_info.h"
+
+class Teams {
+private:
+    std::vector<Team> teams;
+    std::vector<plid_tu> orders;
+    
+    static Teams instance;
+    
+    Teams ();
+    
+public:
     void initialize (const GameInfo& info);
 
     void uninitialize ();
 
     void update_score ();
 
-    void set_score (plid_tu id, score_ti value);
-
-    void inc_score (plid_tu id, score_ti delta);
-
-    void dec_score (plid_tu id, score_ti delta);
-
-    void inc_state (plid_tu id, PlState state);
-
-    void dec_state (plid_tu id, PlState state);
-
-    Statistic& stat (plid_tu id);
-    
     void calc_stats ();
+
+    int count ();
     
-    void set_order (plid_tu id, plid_tu order);
+    Team& operator[] (int index);
     
-    plid_tu get_order (plid_tu id);
-    
-    plid_tu get_active_count ();
-    
-    plid_tu get_active_id (plid_tu index);
-    
+    const Team& operator[] (int index) const;
+
     void draw_stat ();
-}
+    
+    static Teams& get_instance ();
+};
+
+extern Teams& teams;
 
 #endif	/* TEAMS_H */
 

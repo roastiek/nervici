@@ -1,6 +1,8 @@
 #include "game/statistic.h"
 
 Statistic::Statistic () :
+score (0),
+steps (0),
 deaths (0),
 crashes (0),
 killed (0),
