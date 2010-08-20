@@ -17,16 +17,11 @@
 
 using namespace std;
 
-Players& players = Players::get_instance ();
+Players players;
 
-Players Players::instance;
+vector<Player*> Players::players;
 
-Players& Players::get_instance () {
-    return instance;
-}
-
-Players::Players () {
-}
+vector<plid_tu> Players::orders;
 
 void Players::initialize (const GameInfo& info) {
     vector<const PlInfo*> infos;

@@ -8,7 +8,7 @@
 #ifndef MOD_H
 #define	MOD_H
 
-#include "mod_runner.h"
+#include "fakes/mod_runner.h"
 #include "mods/mod_specification.h"
 
 struct Mod {

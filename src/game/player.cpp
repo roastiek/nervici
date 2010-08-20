@@ -16,6 +16,7 @@
 #include "game/smile.h"
 #include "game/start.h"
 #include "game/death_cause.h"
+#include "mods/mod_interface.h"
 
 #include "game/player.h"
 

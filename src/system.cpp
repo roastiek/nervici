@@ -5,6 +5,8 @@
 #include <giomm/file.h>
 
 #include "mods/mod_interface.h"
+#include "mod_runner.h"
+#include "mod.h"
 
 #include "system.h"
 

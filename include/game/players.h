@@ -16,13 +16,9 @@
 
 class Players {
 private:
-    static Players instance;
+    static std::vector<Player*> players;
 
-    std::vector<Player*> players;
-
-    std::vector<plid_tu> orders;
-
-    Players ();
+    static std::vector<plid_tu> orders;
     
 public:
     void initialize (const GameInfo & info);
@@ -50,11 +46,9 @@ public:
     void calc_stats ();
     
     void draw_stat ();
-    
-    static Players& get_instance ();
 };
 
-extern Players& players;
+extern Players players;
 
 #endif	/* PLAYERS_H */
 

@@ -3,9 +3,8 @@
  
 #include <glibmm/ustring.h>
  
-#include "mods/game_setting.h"
-#include "mod.h"
-#include "mods/mod_interface.h"
+#include "fakes/mod_interface.h"
+#include "fakes/mod.h"
  
 namespace System {
 

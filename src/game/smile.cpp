@@ -10,6 +10,7 @@
 #include "game/player.h"
 #include "game/players.h"
 #include "game/team.h"
+#include "mods/mod_interface.h"
 
 #include "game/smile.h"
 

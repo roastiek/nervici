@@ -17,6 +17,7 @@ using namespace std;
 #include "game/team.h"
 #include "game/teams.h"
 #include "game/game_info.h"
+#include "mods/mod_interface.h"
 
 #include "game/game.h"
 
