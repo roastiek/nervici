@@ -8,6 +8,7 @@
 #include "system.h"
 #include "settings/pl_info.h"
 #include "settings/setting.h"
+#include "settings/settings.h"
 #include "game/game.h"
 #include "engine/audio_decoder.h"
 #include "engine/mplayer_decoder.h"
@@ -252,7 +253,7 @@ static void free_music () {
 
 static void load_setting () {
 
-    Setting& set = Settings::get_app_setting ();
+    Setting& set = settings.app ();
 
     setting.sound = set.read_int (section, st_sound, 20);
     setting.music = set.read_int (section, st_music, 20);
@@ -262,7 +263,7 @@ static void load_setting () {
 
 static void save_setting () {
 
-    Setting& set = Settings::get_app_setting ();
+    Setting& set = settings.app ();
 
     set.write_int (section, st_sound, setting.sound);
     set.write_int (section, st_music, setting.music);

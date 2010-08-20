@@ -10,6 +10,7 @@
 #include "settings/pl_info.h"
 #include "settings/team_info.h"
 #include "settings/setting.h"
+#include "settings/settings.h"
 #include "game/statistic.h"
 #include "game/game_info.h"
 #include "gui/screen.h"
@@ -107,7 +108,7 @@ static void put_pixel (SDL_Surface* face, int x, int y, Uint32 p) {
 }
 
 static void load_screen_setting () {
-    Setting& set = Settings::get_app_setting ();
+    Setting& set = settings.app ();
 
     setting.width = set.read_int (section, st_width, 1024);
     setting.height = set.read_int (section, st_height, 768);
@@ -115,7 +116,7 @@ static void load_screen_setting () {
 }
 
 static void save_screen_setting () {
-    Setting& set = Settings::get_app_setting ();
+    Setting& set = settings.app ();
 
     set.write_int (section, st_width, setting.width);
     set.write_int (section, st_height, setting.height);

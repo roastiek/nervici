@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "settings/setting.h"
+#include "settings/settings.h"
 
 #include "engine/mplayer_decoder.h"
 
@@ -12,7 +13,7 @@ using namespace Glib;
 using namespace std;
 
 MplayerDecoder::MplayerDecoder () :
-pid (0) {
+    pid (0) {
 }
 
 MplayerDecoder::~MplayerDecoder () {
@@ -20,7 +21,7 @@ MplayerDecoder::~MplayerDecoder () {
 }
 
 bool MplayerDecoder::open (const Glib::ustring& filename) {
-    Setting& set = Settings::get_app_setting ();
+    Setting& set = settings.app ();
     vector<ustring> cmd;
     cmd.push_back ("/usr/bin/mplayer");
     cmd.push_back ("-really-quiet");
@@ -32,8 +33,8 @@ bool MplayerDecoder::open (const Glib::ustring& filename) {
     cmd.push_back (filename);
 
     try {
-        spawn_async_with_pipes ("", cmd, SPAWN_STDERR_TO_DEV_NULL, sigc::slot<void>(),
-                &pid, NULL, &source_fd, NULL);
+        spawn_async_with_pipes ("", cmd, SPAWN_STDERR_TO_DEV_NULL, sigc::slot<
+                void> (), &pid, NULL, &source_fd, NULL);
 
         try {
             source = IOChannel::create_from_fd (source_fd);
@@ -42,20 +43,24 @@ bool MplayerDecoder::open (const Glib::ustring& filename) {
             unsigned char header[44];
             size_t read = 0;
             size_t remain = 44;
-            for (char *target = (char*) header; remain > 0; target += read, remain -= read) {
+            for (char *target = (char*) header; remain > 0; target += read, remain
+                    -= read) {
                 if (source->read (target, remain, read) != IO_STATUS_NORMAL)
                     return false;
             }
 
-            if (header[0] != 'R' || header[1] != 'I' || header[2] != 'F' || header[3] != 'F') {
+            if (header[0] != 'R' || header[1] != 'I' || header[2] != 'F'
+                    || header[3] != 'F') {
                 return false;
             }
 
-            if (header[8] != 'W' || header[9] != 'A' || header[10] != 'V' || header[11] != 'E') {
+            if (header[8] != 'W' || header[9] != 'A' || header[10] != 'V'
+                    || header[11] != 'E') {
                 return false;
             }
 
-            if (header[12] != 'f' || header[13] != 'm' || header[14] != 't' || header[15] != ' ') {
+            if (header[12] != 'f' || header[13] != 'm' || header[14] != 't'
+                    || header[15] != ' ') {
                 return false;
             }
 
@@ -81,7 +86,8 @@ bool MplayerDecoder::open (const Glib::ustring& filename) {
                 return false;
             }
 
-            frequency = ((header[27] * 256 + header[26]) * 256 + header[25]) * 256 + header[24];
+            frequency = ((header[27] * 256 + header[26]) * 256 + header[25])
+                    * 256 + header[24];
 
             return true;
         } catch (IOChannelError) {
@@ -131,7 +137,7 @@ size_t MplayerDecoder::read (char* buffer, size_t len) {
 }
 
 double MplayerDecoder::get_length (const Glib::ustring& filename) {
-    Setting& set = Settings::get_app_setting ();
+    Setting& set = settings.app ();
     vector<ustring> cmd;
     cmd.push_back ("/usr/bin/mplayer");
     cmd.push_back ("-identify");
@@ -143,7 +149,8 @@ double MplayerDecoder::get_length (const Glib::ustring& filename) {
     cmd = set.read_string_list ("audio", "info_cmd", cmd);
     cmd.push_back (filename);
 
-    ustring length_pattern = set.read_string ("audio", "length_pattern", "ID_LENGTH=([0-9]+\\.[0-9]+)");
+    ustring length_pattern = set.read_string ("audio", "length_pattern",
+            "ID_LENGTH=([0-9]+\\.[0-9]+)");
     RefPtr<Regex> pat = Regex::create (length_pattern);
 
     Pid info_pid;
@@ -152,8 +159,8 @@ double MplayerDecoder::get_length (const Glib::ustring& filename) {
     double result = -1;
 
     try {
-        spawn_async_with_pipes ("", cmd, SPAWN_STDERR_TO_DEV_NULL, sigc::slot<void>(),
-                &info_pid, NULL, &info_fd, NULL);
+        spawn_async_with_pipes ("", cmd, SPAWN_STDERR_TO_DEV_NULL, sigc::slot<
+                void> (), &info_pid, NULL, &info_fd, NULL);
 
         try {
             RefPtr<IOChannel> info = IOChannel::create_from_fd (info_fd);
@@ -169,7 +176,6 @@ double MplayerDecoder::get_length (const Glib::ustring& filename) {
                     }
                 }
             }
-
 
         } catch (IOChannelError) {
         } catch (FileError) {

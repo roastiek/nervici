@@ -5,6 +5,7 @@
 #include "basic_defs.h"
 #include "utils.h"
 #include "settings/setting.h"
+#include "settings/settings.h"
 #include "settings/pl_info.h"
 
 #include "settings/pl_infos.h"
@@ -14,29 +15,25 @@ using namespace std;
 
 #define DEFAULT_AI_COUNT 11
 
-static PlInfo def_ais[DEFAULT_AI_COUNT] = {
-    PlInfo (0x6600ff, "Bunnie", 0, "mucha", 1),
-    PlInfo (0x00cc00, "Feeze", 0, "mucha", 1),
-    PlInfo (0x66ffff, "Dyzzi", 0, "mucha", 1),
-    PlInfo (0x6666ff, "Mexx", 0, "mucha", 1),
-    PlInfo (0x999900, "Mr. Magor", 0, "mucha", 1),
-    PlInfo (0x99ccff, "Der Křeček", 0, "mucha", 1),
-    PlInfo (0x0066ff, "Butterflyek", 0, "mucha", 1),
-    PlInfo (0xff3366, "cw. Orange", 0, "mucha", 1),
-    PlInfo (0xccffff, "Lemonie", 0, "mucha", 1),
-    PlInfo (0x66ff00, "Rabbyte", 0, "mucha", 1),
-    PlInfo (0x0099ff, "Mortzsche", 0, "mucha", 1)
-};
+static PlInfo def_ais[DEFAULT_AI_COUNT] = {PlInfo (0x6600ff, "Bunnie", 0,
+        "mucha", 1), PlInfo (0x00cc00, "Feeze", 0, "mucha", 1), PlInfo (
+        0x66ffff, "Dyzzi", 0, "mucha", 1), PlInfo (0x6666ff, "Mexx", 0,
+        "mucha", 1), PlInfo (0x999900, "Mr. Magor", 0, "mucha", 1), PlInfo (
+        0x99ccff, "Der Křeček", 0, "mucha", 1), PlInfo (0x0066ff,
+        "Butterflyek", 0, "mucha", 1), PlInfo (0xff3366, "cw. Orange", 0,
+        "mucha", 1), PlInfo (0xccffff, "Lemonie", 0, "mucha", 1), PlInfo (
+        0x66ff00, "Rabbyte", 0, "mucha", 1), PlInfo (0x0099ff, "Mortzsche", 0,
+        "mucha", 1)};
 
 PlInfos PlInfos::instance;
 
-PlInfos& pl_infos = PlInfos::get_instance();
+PlInfos& pl_infos = PlInfos::get_instance ();
 
 PlInfos::PlInfos () {
 }
 
 void PlInfos::load_players () {
-    Setting& set = Settings::get_players_setting ();
+    Setting& set = settings.players ();
 
     vector<ustring> sections = set.get_sections ();
     players.resize (sections.size ());
@@ -56,7 +53,7 @@ void PlInfos::load_players () {
 }
 
 void PlInfos::load_ais () {
-    Setting& set = Settings::get_ais_setting ();
+    Setting& set = settings.ais ();
 
     vector<ustring> sections = set.get_sections ();
 
@@ -94,12 +91,12 @@ void PlInfos::load () {
 }
 
 void PlInfos::save_players () {
-    Setting& set = Settings::get_players_setting ();
+    Setting& set = settings.players ();
     set.clear ();
 
     ustring section;
     for (size_t pi = 0; pi < players.size (); pi++) {
-        section = "player" + to_string<size_t > (pi);
+        section = "player" + to_string<size_t> (pi);
 
         set.write_hex (section, "color", players[pi].color);
         set.write_string (section, "name", players[pi].name);
@@ -112,12 +109,12 @@ void PlInfos::save_players () {
 }
 
 void PlInfos::save_ais () {
-    Setting& set = Settings::get_ais_setting ();
+    Setting& set = settings.ais ();
     set.clear ();
 
     ustring section;
     for (size_t pi = 0; pi < ais.size (); pi++) {
-        section = "plastik" + to_string<size_t > (pi);
+        section = "plastik" + to_string<size_t> (pi);
 
         set.write_hex (section, "color", ais[pi].color);
         set.write_string (section, "name", ais[pi].name);
@@ -145,11 +142,13 @@ size_t PlInfos::ais_count () {
 }
 
 const PlInfo & PlInfos::operator [] (size_t index) const {
-    return (index < players.size ()) ? players[index] : ais[index - players.size ()];
+    return (index < players.size ()) ? players[index] : ais[index
+            - players.size ()];
 }
 
 PlInfo & PlInfos::operator [] (size_t index) {
-    return (index < players.size ()) ? players[index] : ais[index - players.size ()];
+    return (index < players.size ()) ? players[index] : ais[index
+            - players.size ()];
 }
 
 void PlInfos::add (const PlInfo & info) {
@@ -164,6 +163,6 @@ void PlInfos::remove (size_t index) {
     }
 }
 
-PlInfos& PlInfos::get_instance() {
+PlInfos& PlInfos::get_instance () {
     return instance;
 }

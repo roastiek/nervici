@@ -53,21 +53,4 @@ public:
     void clear ();
 };
 
-namespace Settings {
-    void load ();
-
-    void save ();
-
-    Setting& get_app_setting ();
-
-    Setting& get_players_setting ();
-
-    Setting& get_ais_setting ();
-
-    Setting& get_game_setting ();
-
-    Setting& get_teams_setting ();
-}
-
-
 #endif // __SETTING_H__

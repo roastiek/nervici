@@ -1,7 +1,7 @@
 #include <SDL.h>
 
 #include "system.h"
-#include "settings/setting.h"
+#include "settings/settings.h"
 #include "settings/pl_infos.h"
 #include "engine/render.h"
 #include "engine/audio.h"
@@ -46,7 +46,7 @@ static void init_gui () {
 
 void initialize () {
     System::init_paths ();
-    Settings::load ();
+    settings.load ();
     System::find_mods ();
     pl_infos.load ();
     team_infos.load ();
@@ -75,7 +75,7 @@ void uninitialize () {
     pl_infos.save ();
     team_infos.save ();
     System::free_mods ();
-    Settings::save ();
+    settings.save ();
     System::free_paths ();
 }
 

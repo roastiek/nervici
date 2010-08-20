@@ -10,6 +10,7 @@
 #include "settings/team_infos.h"
 #include "system.h"
 #include "settings/setting.h"
+#include "settings/settings.h"
 #include "app.h"
 
 #include "frames/game_frame.h"
@@ -354,7 +355,7 @@ bool GameFrame::is_focusable () const {
 }
 
 void GameFrame::preapare () {
-    Setting& set = Settings::get_game_setting ();
+    Setting& set = settings.game ();
 
     cb_mod->set_selected (-1);
 
@@ -438,7 +439,7 @@ void GameFrame::cb_mob_selected_changed (Combobox* box, int selected) {
 }
 
 void GameFrame::load_mod (Mod mod) {
-    Setting& set = Settings::get_game_setting ();
+    Setting& set = settings.game ();
 
     max_players = (mod.spec.max_players <= 16) ? mod.spec.max_players : 16;
     nb_bonus->set_value (set.read_int (mod.name, "bonus", mod.spec.default_bonus));
@@ -525,7 +526,7 @@ void GameFrame::update_players () {
 }
 
 void GameFrame::save_state () {
-    Setting& set = Settings::get_game_setting ();
+    Setting& set = settings.game ();
 
     const ustring& mod_name = System::get_mod (cb_mod->get_selected ()).name;
 

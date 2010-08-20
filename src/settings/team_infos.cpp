@@ -2,6 +2,7 @@
 
 #include "basic_defs.h"
 #include "settings/setting.h"
+#include "settings/settings.h"
 #include "utils.h"
 #include "settings/team_info.h"
 
@@ -33,7 +34,7 @@ const TeamInfo& TeamInfos::operator [] (size_t id) const {
 }
 
 void TeamInfos::load () {
-    Setting& set = Settings::get_teams_setting ();
+    Setting& set = settings.teams ();
 
     ustring section;
 
@@ -51,7 +52,7 @@ void TeamInfos::load () {
 }
 
 void TeamInfos::save () {
-    Setting& set = Settings::get_teams_setting ();
+    Setting& set = settings.teams ();
 
     ustring section;
 
