@@ -1,11 +1,13 @@
 #include <iostream>
 #include <math.h>
 
+#include "basic_defs.h"
 #include "engine/render.h"
 #include "game/smiles.h"
 #include "main.h"
 #include "game/fields.h"
 //#include "game/player.h"
+#include "game/smile.h"
 
 #include "game/world.h"
 
@@ -200,7 +202,7 @@ void write_player_head (const Point& pos, const Fields& fields,
                 switch (item.type) {
                 case IT_SOFT_SMILE:
                     if (!living) break;
-                    Smiles::eat (item.smile.ID, id);
+                    smiles[item.smile.ID].eat(id);
                 case IT_FREE:
                     item.type = IT_PLAYER;
                     item.player.ID = id;

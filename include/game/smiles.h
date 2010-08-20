@@ -8,10 +8,20 @@
 #ifndef SMILES_H
 #define	SMILES_H
 
-#include "game_info.h"
-#include "mods/iplayer.h"
+#include <vector>
 
-namespace Smiles {
+#include "fakes/game_info.h"
+#include "fakes/smile.h"
+
+class Smiles {
+private:
+    std::vector<Smile*> smiles;
+
+    static Smiles instance;
+
+    Smiles ();
+
+public:
     void initialize (const GameInfo& info);
 
     void uninitialize ();
@@ -20,8 +30,16 @@ namespace Smiles {
 
     void erase ();
 
-    void eat (smileid_tu sid, plid_tu plid);
-}
+    smileid_tu count () const;
+
+    Smile& operator[] (smileid_tu index);
+
+    const Smile& operator[] (smileid_tu index) const;
+
+    static Smiles& get_instance ();
+};
+
+extern Smiles& smiles;
 
 #endif	/* SMILES_H */
 

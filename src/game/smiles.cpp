@@ -1,35 +1,37 @@
 #include <vector>
 using namespace std;
 
-#include "game/smile.h"
 #include "engine/render.h"
+#include "game/smile.h"
+#include "game/game_info.h"
 
 #include "game/smiles.h"
 
-namespace Smiles {
+Smiles Smiles::instance;
 
-static vector<Smile*> smiles;
+Smiles& smiles = Smiles::get_instance ();
 
-void initialize (const GameInfo& info) {
+Smiles::Smiles () {
+}
+
+void Smiles::initialize (const GameInfo& info) {
     smileid_tu order = 0;
-
 
     for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
-                Smile* sm = SmileFactory::create (smiles.size (),
-                        order, info.smiles.counts[sti][li], sti, li + 1);
-                smiles.push_back (sm);
+                smiles.push_back (SmileFactory::create (smiles.size (), order,
+                        info.smiles.counts[sti][li], sti, li + 1));
                 order++;
             }
             order = 0;
         }
     }
 
-    Render::load_smiles (info);
+    Render::load_smiles (info.smiles);
 }
 
-void uninitialize () {
+void Smiles::uninitialize () {
     Render::free_smiles ();
 
     for (size_t si = 0; si < smiles.size (); si++) {
@@ -39,20 +41,30 @@ void uninitialize () {
     smiles.clear ();
 }
 
-void step () {
+void Smiles::step () {
     for (size_t si = 0; si < smiles.size (); si++) {
         smiles[si]->step ();
     }
 }
 
-void erase () {
+void Smiles::erase () {
     for (size_t si = 0; si < smiles.size (); si++) {
         smiles[si]->erase ();
     }
 }
 
-void eat (smileid_tu sid, plid_tu plid) {
-    smiles[sid]->eat (plid);
+smileid_tu Smiles::count () const {
+    return smiles.size ();
 }
 
+Smile& Smiles::operator [] (smileid_tu index) {
+    return *smiles[index];
+}
+
+const Smile& Smiles::operator [] (smileid_tu index) const {
+    return *smiles[index];
+}
+
+Smiles& Smiles::get_instance () {
+    return instance;
 }

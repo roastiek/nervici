@@ -1,6 +1,8 @@
 #include <iostream>
+#include <string.h>
 
 #include "main.h"
+#include "basic_defs.h"
 #include "system.h"
 #include "engine/audio.h"
 #include "engine/render.h"
@@ -11,6 +13,7 @@
 #include "game/smiles.h"
 #include "settings/pl_info.h"
 #include "game/team.h"
+#include "game/smile.h"
 
 #include "game/player.h"
 
@@ -219,7 +222,7 @@ void Player::live () {
             Audio::play_effect (id, ET_Wall);
             break;
         case DC_smile:
-            Smiles::eat (cause.smile, id);
+            smiles[cause.smile].eat(id);
             break;
         default:
             break;
@@ -269,7 +272,7 @@ void Player::try_revive () {
     }
 }
 
-int Player::step (const Uint8 *keys) {
+int Player::step (const uint8_t *keys) {
     if (info.type == PT_Human) {
         if (jumptime == 0 && keys[info.keys.jump]) {
             keyst = KS_Jump;

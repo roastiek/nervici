@@ -12,6 +12,7 @@
 #include "settings/setting.h"
 #include "game/statistic.h"
 #include "game/game_info.h"
+#include "gui/screen.h"
 
 #include "engine/render.h"
 
@@ -885,10 +886,10 @@ static SDL_Surface* create_ham_face (smilelvl_tu lvl) {
     return result;
 }
 
-void load_smiles (const GameInfo& info) {
+void load_smiles (const SmileSetting& info) {
     for (SmileType sti = ST_pozi; sti < ST_cham; sti++) {
         for (int li = 0; li < 3; li++) {
-            for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
+            for (int ci = 0; ci < info.counts[sti][li]; ci++) {
                 SDL_Surface* face = create_smile_face (sti, li);
                 smile_faces.push_back (face);
             }
@@ -896,14 +897,14 @@ void load_smiles (const GameInfo& info) {
     }
 
     for (int li = 0; li < 3; li++) {
-        for (int ci = 0; ci < info.smiles.counts[ST_cham][li]; ci++) {
+        for (int ci = 0; ci < info.counts[ST_cham][li]; ci++) {
             SDL_Surface* face = create_cham_face (li);
             smile_faces.push_back (face);
         }
     }
 
     for (int li = 0; li < 3; li++) {
-        for (int ci = 0; ci < info.smiles.counts[ST_ham][li]; ci++) {
+        for (int ci = 0; ci < info.counts[ST_ham][li]; ci++) {
             SDL_Surface* face = create_ham_face (li);
             smile_faces.push_back (face);
         }

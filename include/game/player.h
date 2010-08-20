@@ -86,7 +86,7 @@ public:
     const plid_tu id;
 
     const PlInfo& info;
-
+    
     Statistic stat;
 
     Team& team;

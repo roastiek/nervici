@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <SDL.h>
 
 #include "engine/audio.h"
 #include "engine/render.h"

@@ -39,7 +39,7 @@ void initialize (const GameInfo& info) {
 	World::initialize();
 	teams.initialize(info);
 	players.initialize(info); 
-	Smiles::initialize(info);
+	smiles.initialize(info);
 
 	set.startsCount = World::get_starts_count();
 
@@ -61,7 +61,7 @@ void uninitialize () {
 
 	System::unload_mod();
 
-	Smiles::uninitialize();
+	smiles.uninitialize();
 	players.uninitialize();
 	teams.uninitialize();
 	World::uninitialize();
@@ -289,7 +289,7 @@ void run () {
 
 		System::mod->before_step();
 		players.step();
-		Smiles::step();
+		smiles.step();
 		World::check_starts();
 		System::mod->after_step();
 
@@ -407,7 +407,7 @@ void clear_playerground () {
 	World::clear();
 	Render::clear_playerground();
 	players.erase();
-	Smiles::erase();
+	smiles.erase();
 }
 
 void end_game () {

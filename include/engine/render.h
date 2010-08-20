@@ -8,12 +8,13 @@
 #include "stat_column.h"
 #include "render_semafor.h"
 #include "game/pl_state.h"
-#include "gui/screen.h"
+#include "fakes/gui/screen.h"
 #include "fakes/point.h"
-#include "fakes/game_info.h"
 #include "fakes/pl_info.h"
 #include "fakes/team_info.h"
+#include "fakes/smile_setting.h"
 #include "fakes/statistic.h"
+
 
 namespace Render {
 bool initialize ();
@@ -29,7 +30,7 @@ void load_teams (const std::vector<const TeamInfo*>& infos);
 
 void free_teams ();
 
-void load_smiles (const GameInfo& info);
+void load_smiles (const SmileSetting& info);
 
 void free_smiles ();
 
