@@ -1,4 +1,6 @@
-#include "math.h"
+#include <math.h>
+
+#include "fpoint.h"
 
 #include "game/fields.h"
 

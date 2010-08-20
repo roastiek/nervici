@@ -37,12 +37,5 @@ typedef enum PlState {
     PS_Start, PS_Live, PS_Death, PS_Undeath, PS_Clear, PS_Erased, PS_Count
 } PlState;
 
-inline PlState operator ++(PlState& ps, int) {
-    ps = (PlState) (ps + 1);
-    return ps;
-}
-
-
-
 #endif	/* PL_STATE_H */
 

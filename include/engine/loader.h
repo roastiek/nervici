@@ -2,10 +2,10 @@
 #define __LOADER_H__
 
 #include <vector>
-#include <SDL.h>
 
 #include "smile_set_images.h"
-#include "smile_images.h"
+#include "fakes/sdl_decl.h"
+#include "fakes/smile_images.h"
 
 namespace Loader {
     void load_game_images (std::vector<SDL_Surface*>& images);

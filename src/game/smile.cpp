@@ -1,7 +1,6 @@
 #include <math.h>
 
 #include "basic_defs.h"
-#include "settings/pl_info.h"
 #include "game/world.h"
 #include "engine/render.h"
 #include "system.h"
@@ -29,15 +28,6 @@ void Smile::eat (Player& pl) {
     pl.stat.smiles[type][level]++;
     pl.team.stat.smiles[type][level]++;
 }
-
-/*smilelvl_tu Smile::get_level () const {
-    return level;
-}
-
-
-SmileType Smile::get_type() const {
-    return type;
-}*/
 
 class SoftSmile: public Smile {
 protected:

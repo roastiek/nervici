@@ -7,12 +7,15 @@
 #include "engine/image_type.h"
 #include "gui/scale.h"
 #include "game/world.h"
-#include "settings/pl_infos.h"
-#include "settings/team_infos.h"
+#include "settings/pl_info.h"
+#include "settings/team_info.h"
 #include "settings/setting.h"
 #include "game/statistic.h"
 #include "game/game_info.h"
 #include "gui/screen.h"
+#include "game/world_item.h"
+#include "point.h"
+#include "engine/smile_images.h"
 
 #include "engine/render.h"
 
@@ -716,7 +719,7 @@ void draw_semafor (int state) {
         dest.x += 29;
     }
 
-    src.x = (state & SEMAFOR_G1) ? 0 : 21;
+    src.x = (state & SEMAFOR_GREEN) ? 0 : 21;
     src.y = 18;
     SDL_BlitSurface (images[IMT_Semafor], &src, primary, &dest);
 
@@ -887,10 +890,10 @@ static SDL_Surface* create_ham_face (smilelvl_tu lvl) {
 }
 
 void load_smiles (const SmileSetting& info) {
-    for (SmileType sti = ST_pozi; sti < ST_cham; sti++) {
+    for (int sti = ST_pozi; sti < ST_cham; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.counts[sti][li]; ci++) {
-                SDL_Surface* face = create_smile_face (sti, li);
+                SDL_Surface* face = create_smile_face (SmileType(sti), li);
                 smile_faces.push_back (face);
             }
         }

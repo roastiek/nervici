@@ -8,6 +8,8 @@
 #include "gui/implementor.h"
 #include "engine/image_type.h"
 #include "utils.h"
+#include "engine/smile_images.h"
+#include "gui/canvas.h"
 
 #include "engine/loader.h"
 
@@ -25,12 +27,11 @@ static const char* const smile_setting = "smile_setting.png";
 
 void load_game_images (vector<SDL_Surface*>& images) {
     ustring filename;
-    ImageType i;
 
     images.resize (IMT_Count, NULL);
 
     for (size_t di = 0; di < System::get_data_dirs_count (); di++) {
-        for (i = IMT_Semafor; i < IMT_Count; i++) {
+        for (int i = IMT_Semafor; i < IMT_Count; i++) {
             if (images[i] == NULL) {
                 filename = System::get_data_dir (di) + "images/" + gameImages[i - IMT_Semafor];
                 images[i] = IMG_Load (filename.c_str ());
@@ -164,7 +165,7 @@ void load_smile_faces (SmileImages& faces) {
         }
         ustring path;
 
-        for (SmileType sti = ST_pozi; sti < ST_cham; sti++) {
+        for (int sti = ST_pozi; sti < ST_cham; sti++) {
             size_t prefix_len = strlen (eyes_masks[sti]);
             ustring prefix;
 
@@ -221,14 +222,14 @@ void load_smile_faces (SmileImages& faces) {
 }
 
 void free_smile_faces (SmileImages& faces) {
-    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+    for (int sti = ST_pozi; sti < ST_count; sti++) {
         for (size_t i = 0; i < faces.eyes[sti].size (); i++) {
             SDL_FreeSurface (faces.eyes[sti][i]);
         }
         faces.eyes[sti].clear ();
     }
 
-    for (SmileType sti = ST_pozi; sti < ST_ham; sti++) {
+    for (int sti = ST_pozi; sti < ST_ham; sti++) {
         for (size_t i = 0; i < faces.mouths[sti].size (); i++) {
             SDL_FreeSurface (faces.mouths[sti][i]);
         }

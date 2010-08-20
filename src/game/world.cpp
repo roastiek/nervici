@@ -8,6 +8,9 @@
 #include "game/fields.h"
 #include "game/players.h"
 #include "game/smile.h"
+#include "game/world_item.h"
+#include "game/start.h"
+#include "game/death_cause.h"
 
 #include "game/world.h"
 

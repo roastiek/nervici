@@ -3,6 +3,7 @@
 #include "gui/label.h"
 #include "engine/loader.h"
 #include "game/game.h"
+#include "settings/pl_info.h"
 #include "settings/pl_infos.h"
 #include "utils.h"
 #include "settings/team_info.h"
@@ -220,7 +221,7 @@ Control (frame_parms) {
         game_info.pls_team[pi] = 0;
     }
 
-    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+    for (int sti = ST_pozi; sti < ST_count; sti++) {
         for (int li = 0; li < 3; li++) {
             game_info.smiles.counts[sti][li] = 0;
         }
@@ -371,8 +372,8 @@ void GameFrame::preapare () {
     for (int pi = 0; pi < 16; pi++) {
         const ustring& name = set.read_string ("game", "player" + to_string<int>(pi), "");
         cb_players[pi]->set_selected (0);
-        for (size_t pli = 0; pli < PlInfos::get_count (); pli++) {
-            if (name.compare (PlInfos::get (pli).name) == 0) {
+        for (size_t pli = 0; pli < pl_infos.count (); pli++) {
+            if (name.compare (pl_infos[pli].name) == 0) {
                 cb_players[pi]->set_selected (pli + 1);
                 break;
             }
@@ -414,7 +415,7 @@ void GameFrame::btn_start_clicked (Control* ctl) {
         }
     }
 
-    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+    for (int sti = ST_pozi; sti < ST_count; sti++) {
         for (int li = 0; li < 3; li++) {
             game_info.smiles.counts[sti][li] = (sc_smiles[sti][li]->is_smile_enabled ()) ?
                     sc_smiles[sti][li]->get_value () : 0;
@@ -491,10 +492,10 @@ void GameFrame::load_mod (Mod mod) {
 }
 
 void GameFrame::update_team_colors () {
-    team_colors[1] = trans (TeamInfos::get (1).color);
-    team_colors[2] = trans (TeamInfos::get (2).color);
-    team_colors[3] = trans (TeamInfos::get (3).color);
-    team_colors[4] = trans (TeamInfos::get (4).color);
+    team_colors[1] = trans (team_infos[1].color);
+    team_colors[2] = trans (team_infos[2].color);
+    team_colors[3] = trans (team_infos[3].color);
+    team_colors[4] = trans (team_infos[4].color);
 }
 
 void GameFrame::update_mods () {
@@ -512,8 +513,8 @@ void GameFrame::update_players () {
 
         cb_players[ci]->add_item ("(zadny)", 0x808080ff);
 
-        for (size_t pi = 0; pi < PlInfos::get_count (); pi++) {
-            const PlInfo& info = PlInfos::get (pi);
+        for (size_t pi = 0; pi < pl_infos.count (); pi++) {
+            const PlInfo& info = pl_infos[pi];
             cb_players[ci]->add_item (info.name, trans (info.color));
         }
 
@@ -532,7 +533,7 @@ void GameFrame::save_state () {
 
     for (int pi = 0; pi < 16; pi++) {
         int sel = cb_players[pi]->get_selected ();
-        const ustring& name = (sel > 0) ? PlInfos::get (sel - 1).name : "";
+        const ustring& name = (sel > 0) ? pl_infos[sel - 1].name : "";
         set.write_string ("game", "player" + to_string<int>(pi), name);
 
         set.write_int ("game", "team" + to_string<int>(pi), btn_teams[pi]->get_selected ());

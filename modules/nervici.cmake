@@ -4,6 +4,7 @@ set (NERVICI_SOURCES
     src/mods/mod_interface.cpp 
     src/system.cpp
     src/settings/setting.cpp 
+    src/settings/settings.cpp 
     src/settings/pl_info.cpp 
     src/settings/pl_infos.cpp 
     src/settings/team_infos.cpp

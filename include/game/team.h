@@ -9,10 +9,10 @@
 #define	TEAM_H
 
 #include "int_type.h"
-#include "game/pl_state.h"
+#include "pl_state.h"
 #include "mods/iteam.h"
-#include "fakes/team_info.h"
 #include "game/statistic.h"
+#include "fakes/team_info.h"
 
 class Team : public ITeam {
 private:

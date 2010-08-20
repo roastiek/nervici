@@ -6,7 +6,7 @@
 #include <glibmm/stringutils.h>
 
 #include "system.h"
-#include "settings/pl_infos.h"
+#include "settings/pl_info.h"
 #include "settings/setting.h"
 #include "game/game.h"
 #include "engine/audio_decoder.h"

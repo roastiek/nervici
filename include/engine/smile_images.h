@@ -8,10 +8,10 @@
 #ifndef SMILE_IMAGES_H
 #define	SMILE_IMAGES_H
 
-#include <SDL_video.h>
 #include <vector>
 
 #include "game/smile_type.h"
+#include "fakes/sdl_decl.h"
 
 struct SmileImages {
     std::vector<SDL_Surface*> eyes[ST_cham];

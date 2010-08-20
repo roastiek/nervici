@@ -35,10 +35,6 @@ public:
     virtual void eat (Player& pl);
 
     virtual void erase ();
-
-    /*SmileType get_type () const;
-
-    smilelvl_tu get_level () const;*/
 };
 
 class SmileFactory {

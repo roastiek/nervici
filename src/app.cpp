@@ -7,10 +7,10 @@
 #include "engine/audio.h"
 #include "game/world.h"
 #include "game/game.h"
-
-#include "app.h"
 #include "settings/team_info.h"
 #include "settings/team_infos.h"
+
+#include "app.h"
 
 namespace App {
 
@@ -48,8 +48,8 @@ void initialize () {
     System::init_paths ();
     Settings::load ();
     System::find_mods ();
-    PlInfos::load ();
-    TeamInfos::load ();
+    pl_infos.load ();
+    team_infos.load ();
 
     if (Render::initialize ()) return;
     Audio::initialize ();
@@ -72,8 +72,8 @@ void uninitialize () {
     Audio::uninitialize ();
     Render::uninitialize ();
 
-    PlInfos::save ();
-    TeamInfos::save ();
+    pl_infos.save ();
+    team_infos.save ();
     System::free_mods ();
     Settings::save ();
     System::free_paths ();

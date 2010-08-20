@@ -48,7 +48,7 @@ private:
     void begin_start_procedure () {
         int sid;
 
-        set_semafor (SEMAFOR_R1);
+        set_semafor (SEMAFOR_RED_1);
         game_wait (WAIT_TIME);
 
         for (int pi = 0; pi < set.playersCount; pi++) {
@@ -60,7 +60,7 @@ private:
                 }
             }
         }
-        set_semafor (SEMAFOR_R1 | SEMAFOR_R2);
+        set_semafor (SEMAFOR_RED_1 | SEMAFOR_RED_2);
         game_wait (WAIT_TIME);
 
 
@@ -73,14 +73,14 @@ private:
                 }
             }
         }
-        set_semafor (SEMAFOR_R1 | SEMAFOR_R2 | SEMAFOR_R3);
+        set_semafor (SEMAFOR_RED_1 | SEMAFOR_RED_2 | SEMAFOR_RED_3);
         game_wait (WAIT_TIME);
 
         play_music (0);
         for (int pi = 0; pi < set.playersCount; pi++) {
             get_player (pi).start ();
         }
-        set_semafor (SEMAFOR_G1);
+        set_semafor (SEMAFOR_GREEN);
     }
 
 public:
@@ -116,7 +116,7 @@ public:
 
         if (live_pls_count () <= 0) {
             stop_music ();
-            set_semafor (SEMAFOR_OF);
+            set_semafor (SEMAFOR_OFF);
 
             if (get_round () == set.rounds) {
                 end_game ();

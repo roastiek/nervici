@@ -15,7 +15,6 @@
 #include "fakes/smile_setting.h"
 #include "fakes/statistic.h"
 
-
 namespace Render {
 bool initialize ();
 

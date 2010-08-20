@@ -33,9 +33,10 @@ struct PlInfo {
     Glib::ustring profil;
     int pitch;
 
-    PlInfo();
+    PlInfo ();
 
-    PlInfo (uint32_t nc, const Glib::ustring& nn, int nai, const Glib::ustring& np, int npi);
+    PlInfo (uint32_t nc, const Glib::ustring& nn, int nai,
+            const Glib::ustring& np, int npi);
 };
 
 #endif	/* PL_INFO_H */

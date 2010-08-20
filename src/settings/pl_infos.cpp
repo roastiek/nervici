@@ -5,13 +5,12 @@
 #include "basic_defs.h"
 #include "utils.h"
 #include "settings/setting.h"
+#include "settings/pl_info.h"
 
 #include "settings/pl_infos.h"
 
 using namespace Glib;
 using namespace std;
-
-namespace PlInfos {
 
 #define DEFAULT_AI_COUNT 11
 
@@ -29,10 +28,14 @@ static PlInfo def_ais[DEFAULT_AI_COUNT] = {
     PlInfo (0x0099ff, "Mortzsche", 0, "mucha", 1)
 };
 
-static vector<PlInfo> players;
-static vector<PlInfo> ais;
+PlInfos PlInfos::instance;
 
-static void load_players () {
+PlInfos& pl_infos = PlInfos::get_instance();
+
+PlInfos::PlInfos () {
+}
+
+void PlInfos::load_players () {
     Setting& set = Settings::get_players_setting ();
 
     vector<ustring> sections = set.get_sections ();
@@ -52,7 +55,7 @@ static void load_players () {
     }
 }
 
-static void load_ais () {
+void PlInfos::load_ais () {
     Setting& set = Settings::get_ais_setting ();
 
     vector<ustring> sections = set.get_sections ();
@@ -85,12 +88,12 @@ static void load_ais () {
     }
 }
 
-void load () {
+void PlInfos::load () {
     load_players ();
     load_ais ();
 }
 
-static void save_players () {
+void PlInfos::save_players () {
     Setting& set = Settings::get_players_setting ();
     set.clear ();
 
@@ -108,7 +111,7 @@ static void save_players () {
     }
 }
 
-static void save_ais () {
+void PlInfos::save_ais () {
     Setting& set = Settings::get_ais_setting ();
     set.clear ();
 
@@ -124,42 +127,43 @@ static void save_ais () {
     }
 }
 
-void save () {
+void PlInfos::save () {
     save_players ();
     save_ais ();
 }
 
-size_t get_count () {
+size_t PlInfos::count () {
     return players.size () + ais.size ();
 }
 
-size_t get_players_count () {
+size_t PlInfos::players_count () {
     return players.size ();
 }
 
-size_t get_ais_count () {
+size_t PlInfos::ais_count () {
     return ais.size ();
 }
 
-const PlInfo & get (size_t idi) {
-    return (idi < players.size ()) ? players[idi] : ais[idi - players.size ()];
+const PlInfo & PlInfos::operator [] (size_t index) const {
+    return (index < players.size ()) ? players[index] : ais[index - players.size ()];
 }
 
-void update (size_t index, const PlInfo & info) {
-    ((index < players.size ()) ? players[index] : ais[index - players.size ()]) = info;
+PlInfo & PlInfos::operator [] (size_t index) {
+    return (index < players.size ()) ? players[index] : ais[index - players.size ()];
 }
 
-void add (const PlInfo & info) {
+void PlInfos::add (const PlInfo & info) {
     ((info.type == PT_Human) ? players : ais).push_back (info);
 }
 
-void remove (size_t idi) {
-    if (idi < players.size ()) {
-        players.erase (players.begin () + idi);
+void PlInfos::remove (size_t index) {
+    if (index < players.size ()) {
+        players.erase (players.begin () + index);
     } else {
-        ais.erase (ais.begin () + idi - players.size ());
+        ais.erase (ais.begin () + index - players.size ());
     }
 }
 
-
+PlInfos& PlInfos::get_instance() {
+    return instance;
 }

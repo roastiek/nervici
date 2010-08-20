@@ -17,11 +17,11 @@ Smiles::Smiles () {
 void Smiles::initialize (const GameInfo& info) {
     smileid_tu order = 0;
 
-    for (SmileType sti = ST_pozi; sti < ST_count; sti++) {
+    for (int sti = ST_pozi; sti < ST_count; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.smiles.counts[sti][li]; ci++) {
                 smiles.push_back (SmileFactory::create (smiles.size (), order,
-                        info.smiles.counts[sti][li], sti, li + 1));
+                        info.smiles.counts[sti][li], SmileType(sti), li + 1));
                 order++;
             }
             order = 0;

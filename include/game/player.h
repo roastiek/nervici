@@ -6,10 +6,10 @@
 #include "pl_state.h"
 #include "key_state.h"
 #include "mods/iplayer.h"
-#include "fakes/point.h"
 #include "fpoint.h"
 #include "game/fields.h" 
 #include "game/statistic.h"
+#include "fakes/point.h"
 #include "fakes/pl_info.h"
 #include "fakes/team.h"
 

@@ -1,11 +1,12 @@
 #ifndef __WORLD_H__
 #define __WORLD_H__
 
-#include "world_item.h"
-#include "start.h"
-#include "fields.h"
-#include "point.h"
-#include "death_cause.h"
+#include "int_type.h"
+#include "fakes/death_cause.h"
+#include "fakes/fields.h"
+#include "fakes/point.h"
+#include "fakes/world_item.h"
+#include "fakes/start.h"
 
 /*
  * daleko bliz

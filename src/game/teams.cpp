@@ -26,7 +26,7 @@ void Teams::initialize (const GameInfo& info) {
     
     for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
         if (info.team_active[ti]) {
-            const TeamInfo& tinfo = TeamInfos::get (ti);
+            const TeamInfo& tinfo = team_infos[ti];
             teams.push_back(new Team (ati, tinfo));
             infos.push_back(&tinfo);
             ati++;
@@ -34,8 +34,8 @@ void Teams::initialize (const GameInfo& info) {
     }
     orders.resize (teams.size ());
  
-    teams.push_back(new Team (ati, TeamInfos::get(0)));
-    infos.push_back(&TeamInfos::get(0));
+    teams.push_back(new Team (ati, team_infos[0]));
+    infos.push_back(&team_infos[0]);
     
     Render::load_teams (infos);
 }

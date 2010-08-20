@@ -12,10 +12,5 @@ enum MusicType {
     MT_GameShort, MT_GameLong, MT_Menu, MT_Stat, MT_Count
 };
 
-inline MusicType operator++(MusicType &mt, int) {
-    mt = (MusicType) (mt + 1);
-    return mt;
-}
-
 #endif	/* MUSIC_TYPE_H */
 

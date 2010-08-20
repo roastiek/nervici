@@ -2,7 +2,7 @@
 #define __GAME_H__
 
 #include "int_type.h"
-#include "game_info.h"
+#include "fakes/game_info.h"
 
 namespace Game {
     void initialize (const GameInfo & info);

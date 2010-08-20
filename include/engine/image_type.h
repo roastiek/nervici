@@ -12,12 +12,5 @@ enum ImageType {
     IMT_Numbers, IMT_Timer, IMT_Semafor, IMT_Heart, IMT_Stats, IMT_Count
 };
 
-
-inline ImageType operator ++(ImageType& it, int) {
-    it = (ImageType) (it + 1);
-    return it;
-}
-
-
 #endif	/* IMAGE_TYPE_H */
 

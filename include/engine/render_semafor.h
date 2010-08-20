@@ -8,12 +8,13 @@
 #ifndef RENDER_SEMAFOR_H
 #define	RENDER_SEMAFOR_H
 
-#define SEMAFOR_OF 0x0
-#define SEMAFOR_R1 0x1
-#define SEMAFOR_R2 0x2
-#define SEMAFOR_R3 0x4
-#define SEMAFOR_G1 0x8
-
+enum Semafor {
+    SEMAFOR_OFF = 0x0,
+    SEMAFOR_RED_1 = 0x1,
+    SEMAFOR_RED_2 = 0x2,
+    SEMAFOR_RED_3 = 0x4,
+    SEMAFOR_GREEN = 0x8
+};
 
 #endif	/* RENDER_SEMAFOR_H */
 

@@ -44,7 +44,7 @@ void Players::initialize (const GameInfo& info) {
     for (plid_tu pi = 0; pi < 16; pi++) {
         int inf = info.pl_ids[pi];
         if (inf >= 0) {
-            const PlInfo& plnfo = PlInfos::get (inf);
+            const PlInfo& plnfo = pl_infos[inf];
             Team& team = *team_map[info.pls_team[pi]];
             players.push_back (new Player (p, team, plnfo,
                     info.setting.maxLength));

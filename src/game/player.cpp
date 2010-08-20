@@ -14,6 +14,8 @@
 #include "settings/pl_info.h"
 #include "game/team.h"
 #include "game/smile.h"
+#include "game/start.h"
+#include "game/death_cause.h"
 
 #include "game/player.h"
 

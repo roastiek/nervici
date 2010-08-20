@@ -9,24 +9,7 @@
 #define	FIELDS_H
 
 #include "int_type.h"
-#include "fpoint.h"
-
-//typedef plpart_tu Fields[3][3];
-
-/*struct FieldsRow {
-private:
-    plpart_tu row[3];
-public:
-    template <class R>
-    inline plpart_tu& operator[] (R index) {
-        return row[index];
-    }
-
-    template <class R>
-    inline const plpart_tu& operator[] (R index) const {
-        return row[index];
-    }
-};*/
+#include "fakes/fpoint.h"
 
 struct Fields {
 private:
@@ -45,7 +28,6 @@ public:
     void calc (const FPoint& pos);
 
 };
-
 
 #endif	/* FIELDS_H */
 
