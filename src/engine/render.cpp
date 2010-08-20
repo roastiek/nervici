@@ -573,19 +573,14 @@ void uninitialize () {
     save_screen_setting ();
 }
 
-void load_players (const GameInfo& info) {
-    pl_images.resize (info.setting.playersCount);
+void load_players () {
+    pl_images.resize (players.count ());
 
-    int p = 0;
-    for (size_t pi = 0; pi < 16; pi++) {
-        if (info.pl_ids[pi] >= 0) {
-            pl_images[p].face = create_player_face (PlInfos::get (
-                    info.pl_ids[pi]).color);
-            pl_images[p].numbers = create_numbers (PlInfos::get (
-                    info.pl_ids[pi]).color,
-                    TeamInfos::get (info.pls_team[pi]).color);
-            p++;
-        }
+    for (plid_tu pi = 0; pi < players.count (); pi++) {
+        const Player& pl = players[pi];
+        const PlInfo& info = pl.info;
+        pl_images[pi].face = create_player_face (info.color);
+        pl_images[pi].numbers = create_numbers (info.color, pl.team.info.color);
     }
 
 }
@@ -598,16 +593,16 @@ void free_players () {
     pl_images.clear ();
 }
 
-void load_teams (const GameInfo& info) {
-    team_images.resize (TEAMS_COUNT);
+void load_teams () {
+    team_images.resize (teams.count () + 1);
 
-    for (size_t ti = 0; ti < TEAMS_COUNT; ti++) {
-        team_images[ti] = create_numbers (TeamInfos::get (ti).color, 0x00);
+    for (plid_tu ti = 0; ti <= teams.count (); ti++) {
+        team_images[ti] = create_numbers (teams[ti].info.color, 0x00);
     }
 }
 
 void free_teams () {
-    for (size_t ti = 0; ti < TEAMS_COUNT; ti++) {
+    for (size_t ti = 0; ti < team_images.size(); ti++) {
         SDL_FreeSurface (team_images[ti]);
     }
 
@@ -1132,13 +1127,13 @@ void draw_player_stat (plid_tu id, plid_tu order, const Glib::ustring& name,
         uint32_t color) {
 
     draw_stat (stat_screen.header.y + (order + 1) * 24, name, color,
-            players[id].stat(), pl_images[id].numbers);
+            players[id].stat, pl_images[id].numbers);
 }
 
 void draw_team_stat (plid_tu id, plid_tu order, const Glib::ustring& name,
         uint32_t color) {
     draw_stat (stat_screen.teams_in.y + 2 + order * 24, name, color,
-            teams[id].stat (), team_images[id]);
+            teams[id].stat, team_images[id]);
 }
 
 }

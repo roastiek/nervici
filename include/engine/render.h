@@ -17,11 +17,11 @@ namespace Render {
 
     void uninitialize ();
 
-    void load_players (const GameInfo & info);
+    void load_players ();
 
     void free_players ();
 
-    void load_teams (const GameInfo& info);
+    void load_teams ();
 
     void free_teams ();
 

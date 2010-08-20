@@ -9,6 +9,7 @@
 #include "game/statistic.h"
 #include "game/player.h"
 #include "game/players.h"
+#include "game/team.h"
 
 #include "game/smile.h"
 
@@ -143,8 +144,8 @@ public:
         SoftSmile::eat (plid);
 
         Player& pl = players[plid];
-        pl.stat().smiles[ST_pozi][level]++;
-        pl.team_stat().smiles[ST_pozi][level]++;
+        pl.stat.smiles[ST_pozi][level]++;
+        pl.team.stat.smiles[ST_pozi][level]++;
         System::mod->on_pozi_smile (pl, level);
         Audio::play_effect (plid, ET_SmilePlus);
     }
@@ -169,8 +170,8 @@ public:
         SoftSmile::eat (plid);
         
         Player& pl = players[plid];
-        pl.stat().smiles[ST_nega][level]++;
-        pl.team_stat().smiles[ST_nega][level]++;
+        pl.stat.smiles[ST_nega][level]++;
+        pl.team.stat.smiles[ST_nega][level]++;
         System::mod->on_nega_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
@@ -246,8 +247,8 @@ public:
 
     void eat (plid_tu plid) {
         Player& pl = players[plid];
-        pl.stat().smiles[ST_fleg][level]++;
-        pl.team_stat().smiles[ST_fleg][level]++;
+        pl.stat.smiles[ST_fleg][level]++;
+        pl.team.stat.smiles[ST_fleg][level]++;
         System::mod->on_fleg_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
@@ -326,8 +327,8 @@ public:
         SoftSmile::eat (plid);
         
         Player& pl = players[plid];
-        pl.stat().smiles[ST_iron][level]++;
-        pl.team_stat().smiles[ST_iron][level]++;
+        pl.stat.smiles[ST_iron][level]++;
+        pl.team.stat.smiles[ST_iron][level]++;
         System::mod->on_iron_smile (pl, level);
         Audio::play_effect (plid, ET_SmilePlus);
     }
@@ -414,10 +415,10 @@ public:
 
     void eat (plid_tu plid) {
         Player& pl = players[plid];
-        pl.stat().smiles[ST_cham][level]++;
-        pl.team_stat().smiles[ST_cham][level]++;
-        pl.stat().smiles[face_type][level]++;
-        pl.team_stat().smiles[face_type][level]++;
+        pl.stat.smiles[ST_cham][level]++;
+        pl.team.stat.smiles[ST_cham][level]++;
+        pl.stat.smiles[face_type][level]++;
+        pl.team.stat.smiles[face_type][level]++;
         switch (face_type) {
         case ST_pozi:
         case ST_nega:
@@ -609,8 +610,8 @@ public:
 
     void eat (plid_tu plid) {
         Player& pl = players[plid];
-        pl.stat().smiles[ST_ham][level]++;
-        pl.team_stat().smiles[ST_ham][level]++;
+        pl.stat.smiles[ST_ham][level]++;
+        pl.team.stat.smiles[ST_ham][level]++;
         System::mod->on_iron_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
@@ -701,8 +702,8 @@ public:
 
     void eat (plid_tu plid) {
         Player& pl = players[plid];
-        pl.stat().smiles[ST_ham][level]++;
-        pl.team_stat().smiles[ST_ham][level]++;
+        pl.stat.smiles[ST_ham][level]++;
+        pl.team.stat.smiles[ST_ham][level]++;
         System::mod->on_iron_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }
@@ -798,8 +799,8 @@ public:
 
     void eat (plid_tu plid) {
         Player& pl = players[plid];
-        pl.stat().smiles[ST_ham][level]++;
-        pl.team_stat().smiles[ST_ham][level]++;
+        pl.stat.smiles[ST_ham][level]++;
+        pl.team.stat.smiles[ST_ham][level]++;
         System::mod->on_iron_smile (pl, level);
         Audio::play_effect (plid, ET_SmileMinus);
     }

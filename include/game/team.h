@@ -10,57 +10,45 @@
 
 #include "int_type.h"
 #include "game/pl_state.h"
+#include "mods/iteam.h"
 #include "fakes/team_info.h"
-#include "fakes/statistic.h"
+#include "game/statistic.h"
 
-class Team {
+class Team : public ITeam {
 private:
-    plid_tu id;
+
+    plid_tu states[PS_Count];
+    
+public:
+    const plid_tu id;
+
+    const TeamInfo& info;
+
     plid_tu order;
 
-    const TeamInfo* info;
-    
-    plid_tu states[PS_Count];
+    Statistic stat;
 
-    Statistic statistic;
+    Team (plid_tu id, const TeamInfo& info);
 
-public:
-
-    void initialize (plid_tu id, const TeamInfo* info);
-
-    void uninitialize ();
-
-    void set_score (score_ti value);
-
-    void inc_score (score_ti delta);
-
-    void dec_score (score_ti delta);
+    ~Team ();
 
     void inc_state (PlState state);
-    
+
     void dec_state (PlState state);
 
     void update_score ();
 
-    bool operator > (const Team& other);
+    bool operator > (const Team& other) const;
 
-    bool operator < (const Team& other);
+    bool operator < (const Team& other) const;
 
-    void set_order (plid_tu value);
-    
     void calc_stats ();
-    
+
     void draw_stat ();
     
-    plid_tu get_id () const;
-    
-    plid_tu get_order () const;
-    
-    Statistic& stat();
-    
-    const Statistic& stat() const;
-    
     const Glib::ustring& get_name () const;
+    
+    plid_tu get_id () const;
 };
 
 #endif	/* TEAM_H */

@@ -16,7 +16,7 @@
 
 class Teams {
 private:
-    std::vector<Team> teams;
+    std::vector<Team*> teams;
     std::vector<plid_tu> orders;
     
     static Teams instance;
@@ -32,11 +32,11 @@ public:
 
     void calc_stats ();
 
-    int count ();
+    plid_tu count ();
     
-    Team& operator[] (int index);
+    Team& operator[] (plid_tu index);
     
-    const Team& operator[] (int index) const;
+    const Team& operator[] (plid_tu index) const;
 
     void draw_stat ();
     

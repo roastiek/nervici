@@ -18,7 +18,7 @@ class Players {
 private:
     static Players instance;
 
-    std::vector<Player> players;
+    std::vector<Player*> players;
 
     std::vector<plid_tu> orders;
 

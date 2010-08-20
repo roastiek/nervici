@@ -6,30 +6,17 @@
 
 using namespace Glib;
 
-void Team::initialize (plid_tu id, const TeamInfo* info) {
-    this->id = id;
-    this->info = info;
+Team::Team (plid_tu nid, const TeamInfo& ninfo) :
+    id (nid), info (ninfo) {
 
-    order = id;
+    order = nid;
 
-    for (PlState st = PS_Start; st < PS_Count; st++) {
+    for (int st = 0; st < PS_Count; st++) {
         states[st] = 0;
     }
 }
 
-void Team::uninitialize () {
-}
-
-void Team::set_score (score_ti value) {
-    stat().score = value;
-}
-
-void Team::inc_score (score_ti delta) {
-    stat().score+= delta;
-}
-
-void Team::dec_score (score_ti delta) {
-    stat().score-= delta;
+Team::~Team () {
 }
 
 void Team::inc_state (PlState state) {
@@ -53,47 +40,34 @@ void Team::update_score () {
         state = PS_Death;
     }
 
-    Render::draw_team_score (id, order, stat().score, state);
+    Render::draw_team_score (id, order, stat.score, state);
 }
 
-bool Team::operator > (const Team& other) {
-    return stat().score < other.stat().score || (stat().score == other.stat().score && order > other.order);
+bool Team::operator > (const Team& other) const {
+    return stat.score < other.stat.score || (stat.score == other.stat.score
+            && order > other.order);
 }
 
-bool Team::operator < (const Team& other) {
-    return stat().score > other.stat().score || (stat().score == other.stat().score && order < other.order);
-}
-
-void Team::set_order (plid_tu value) {
-    order = value;
+bool Team::operator < (const Team& other) const {
+    return stat.score > other.stat.score || (stat.score == other.stat.score
+            && order < other.order);
 }
 
 void Team::calc_stats () {
-	for (int sti = ST_pozi; sti < ST_count; sti++) {
-		stat().smiles[sti][0] = stat().smiles[sti][1] + stat().smiles[sti][2] + stat().smiles[sti][3];
-	}
+    for (int sti = ST_pozi; sti < ST_count; sti++) {
+        stat.smiles[sti][0] = stat.smiles[sti][1] + stat.smiles[sti][2]
+                + stat .smiles[sti][3];
+    }
 }
 
-void Team::draw_stat() {
-	Render::draw_team_stat(id, order, info->name, info->color);
+void Team::draw_stat () {
+    Render::draw_team_stat (id, order, info.name, info.color);
+}
+
+const ustring& Team::get_name () const {
+    return info.name;
 }
 
 plid_tu Team::get_id() const {
-	return id;
-}
-
-plid_tu Team::get_order() const {
-	return order;
-}
-
-Statistic& Team::stat () {
-    return statistic;
-}
-
-const Statistic& Team::stat () const {
-    return statistic;
-}
-
-const ustring& Team::get_name() const {
-    return info->name;
+    return id;
 }

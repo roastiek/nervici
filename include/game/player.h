@@ -7,18 +7,15 @@
 #include "key_state.h"
 #include "mods/iplayer.h"
 #include "fakes/point.h"
-#include "fakes/fpoint.h"
-#include "fakes/fields.h" 
-#include "fakes/statistic.h"
+#include "fpoint.h"
+#include "game/fields.h" 
+#include "game/statistic.h"
 #include "fakes/pl_info.h"
 #include "fakes/team.h"
 
 class Player : public IPlayer {
 private:
-    plid_tu id;
-    const PlInfo* info;
     PlState state;
-    Team* team;
 
     FPoint exact;
     int angle;
@@ -27,7 +24,6 @@ private:
     Fields fields;
     Fields help_fields;
 
-    plid_tu order;
     timer_ti timer;
 
     /*
@@ -62,7 +58,10 @@ private:
 
     std::vector<Point> updates;
 
-    Statistic statistic;
+    /*
+     * add part to players body
+     */
+    void add_part (const Point & part);
 
     void clear_bottom ();
 
@@ -84,10 +83,19 @@ private:
     void try_revive ();
 
 public:
+    const plid_tu id;
 
-    void initialize (plid_tu ID, Team* team, const PlInfo* plinfo, int max_len);
+    const PlInfo& info;
+
+    Statistic stat;
+
+    Team& team;
     
-    void uninitialize ();
+    plid_tu order;
+
+    Player (plid_tu ID, Team& team, const PlInfo& plinfo, int max_len);
+    
+    ~Player ();
 
     /*
      * Set state to PS_Erased
@@ -102,10 +110,6 @@ public:
      * do only something in PS_Live or PS_Clear states
      */
     int step (const uint8_t * keys);
-    /*
-     * add part to players body
-     */
-    void add_part (const Point & part);
     /*
      * player claims start, draw one dot and set state to PS_Start
      */
@@ -135,8 +139,11 @@ public:
      * if max is lower than current length, corpose decays at double speed
      */
     void dec_max_length (plsize_tu delta);
+    
     void inc_max_length (plsize_tu delta);
+    
     void set_max_length (plsize_tu length);
+    
     void set_timer (timer_ti time);
     /*
      * Change state from PS_Start to PS_Live
@@ -172,7 +179,9 @@ public:
 
     plid_tu get_id () const;
 
-    Team* get_team () const;
+    Team& get_team ();
+
+    const ITeam& get_team () const;
 
     PlState get_state () const;
 
@@ -203,14 +212,6 @@ public:
     void calc_stats ();
 
     void draw_stat ();
-    
-    Statistic& stat ();
-    
-    const Statistic& stat () const;
-
-    Statistic& team_stat ();
-
-    const Statistic& team_stat () const;
 };
 
 

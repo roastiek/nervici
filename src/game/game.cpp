@@ -130,16 +130,16 @@ static int compare_pl (plid_tu id1, plid_tu id2, StatColumn col) {
 	case STC_name:
 		return players[id1].get_name().compare(players[id2].get_name());
 	default:
-		return compare_stat(players[id1].stat(), players[id2].stat(), col);
+		return compare_stat(players[id1].stat, players[id2].stat, col);
 	}
 }
 
 static int compare_team (const Team& te1, const Team& te2, StatColumn col) {
 	switch (col) {
 	case STC_name:
-		return te1.get_name().compare(te2.get_name());
+		return te1.info.name.compare(te2.info.name);
 	default:
-		return compare_stat(te1.stat(), te2.stat(), col);
+		return compare_stat(te1.stat, te2.stat, col);
 	}
 }
 
@@ -208,21 +208,21 @@ static void run_statistic () {
 							for (plid_tu tid = 0; tid < teams.count(); tid++) {
 								team_orders[tid] = 0;
                                 const Team& te = teams[tid];
-								plid_tu old_order = te.get_order();
+								plid_tu old_order = te.order;
 								for (plid_tu otheri = 0; otheri < teams.count(); otheri++) {
 								    const Team& other = teams[otheri];
 									int cmp = compare_team(te, other, order_col); 
 									if (cmp < 0) {								
 										team_orders[tid]++;
 									} else if (cmp == 0) {
-										if (old_order > other.get_order()) {
+										if (old_order > other.order) {
 											team_orders[tid]++;
 										}
 									}
 								}
 							}
 							for (plid_tu tid = 0; tid < teams.count(); tid++) {
-							    teams[tid].set_order(team_orders[tid]);
+							    teams[tid].order = team_orders[tid];
 							}
 						} else {
 							for (plid_tu plid = 0; plid < players.count(); plid++) {
@@ -231,7 +231,7 @@ static void run_statistic () {
 							}
 							for (plid_tu tid = 0; tid < teams.count(); tid++) {
 								Team& te = teams[tid];
-								te.set_order(teams.count() - te.get_order() - 1);
+								te.order = teams.count() - te.order - 1;
 							}
 						}
 						players.draw_stat();

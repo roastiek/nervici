@@ -21,7 +21,8 @@
 using namespace std;
 using namespace Glib;
 
-void Player::write_body_part (const Point& pos, const Fields& fields, bool living) {
+void Player::write_body_part (const Point& pos, const Fields& fields,
+        bool living) {
     World::write_player_head (pos, fields, id, head, living);
     add_part (pos);
     updates.push_back (pos);
@@ -34,10 +35,8 @@ void Player::update_body () {
     updates.clear ();
 }
 
-void Player::initialize (plid_tu ID, Team* tem, const PlInfo* info, int max_len) {
-    this->id = ID;
-    this->info = info;
-    this->team = tem;
+Player::Player (plid_tu ID, Team& nteam, const PlInfo& ninfo, int max_len) :
+    id (ID), info (ninfo), team (nteam) {
     order = ID;
     max_length = max_len;
     size = 0xf;
@@ -53,12 +52,12 @@ void Player::initialize (plid_tu ID, Team* tem, const PlInfo* info, int max_len)
     bottom_index = 0;
     timer = 0;
     state = PS_Erased;
-    team->inc_state (state);
+    team.inc_state (state);
     ironize_lvl = 0;
 }
 
-void Player::uninitialize () {
-    delete [] body;
+Player::~Player () {
+    delete[] body;
 }
 
 void Player::erase () {
@@ -77,7 +76,8 @@ void Player::timer_func (timer_ti speed) {
             timer = 0;
             System::mod->on_pl_timer (*this);
         }
-    } else timer += speed;
+    } else
+        timer += speed;
 }
 
 void Player::clear_bottom () {
@@ -98,24 +98,26 @@ void Player::resize (plsize_tu new_size) {
         plsize_tu delta = new_size - size;
 
         if (head_index > bottom_index) {
-            memcpy (new_body, body, size * sizeof (Point));
+            memcpy (new_body, body, size * sizeof(Point));
         } else {
-            memcpy (new_body, body, (head_index + 1) * sizeof (Point));
-            memcpy (&new_body[delta + bottom_index], &body[bottom_index], (size - bottom_index) * sizeof (Point));
+            memcpy (new_body, body, (head_index + 1) * sizeof(Point));
+            memcpy (&new_body[delta + bottom_index], &body[bottom_index], (size
+                    - bottom_index) * sizeof(Point));
             for (int i = 0; i <= head_index; i++) {
                 if (body[i].x != new_body[i].x || body[i].y != new_body[i].y) {
                     cout << "chyba pri kopirovani\n";
                 }
             }
             for (int i = bottom_index; i < size; i++) {
-                if (body[i].x != new_body[i + delta].x || body[i].y != new_body[i + delta].y) {
+                if (body[i].x != new_body[i + delta].x || body[i].y
+                        != new_body[i + delta].y) {
                     cout << "chyba pri kopirovani\n";
                 }
             }
 
             bottom_index += delta;
         }
-        delete [] body;
+        delete[] body;
 
         size = new_size;
         body = new_body;
@@ -147,7 +149,8 @@ void Player::add_part (const Point& part) {
             head++;
             head &= 0xffff;
             length++;
-        } else cerr << "error: not enough bodysize\n";
+        } else
+            cerr << "error: not enough bodysize\n";
     } else {
         if (length < max_length) {
             body[head_index] = part;
@@ -156,7 +159,8 @@ void Player::add_part (const Point& part) {
             head++;
             head &= 0xffff;
             length++;
-        } else cerr << "error: not enough maxlength\n";
+        } else
+            cerr << "error: not enough maxlength\n";
     }
 }
 
@@ -167,12 +171,14 @@ void Player::live () {
 
     check_length ();
 
-    if (keyst == KS_Left) angle = (angle + angles - 1) % angles;
-    if (keyst == KS_Right) angle = (angle + 1) % angles;
+    if (keyst == KS_Left)
+        angle = (angle + angles - 1) % angles;
+    if (keyst == KS_Right)
+        angle = (angle + 1) % angles;
     if (jumptime == 0 && keyst == KS_Jump) {
         jumptime = JUMP_REPEAT;
-        stat().jump++;
-        team_stat ().jump++;
+        stat.jump++;
+        team.stat.jump++;
         Audio::play_effect (id, ET_Jump);
     }
 
@@ -191,26 +197,25 @@ void Player::live () {
         survive = World::will_survive (pos, fields, id, head, cause);
         write_body_part (pos, fields, survive);
         switch (cause.cause) {
-        case DC_killed:
-        {
+        case DC_killed: {
             Player& murder = players[cause.murder];
-            stat().killed++;
-            team_stat().killed++;
-            murder.stat().kills++;
-            murder.team_stat ().kills++;
+            stat.killed++;
+            team.stat.killed++;
+            murder.stat.kills++;
+            murder.team.stat.kills++;
             System::mod->on_killed (*this, murder);
             Audio::play_effect (id, ET_Au);
             break;
         }
         case DC_self:
-            stat().selfs++;
-            team_stat ().selfs++;
+            stat.selfs++;
+            team.stat.selfs++;
             System::mod->on_selfdeath (*this);
             Audio::play_effect (id, ET_Self);
             break;
         case DC_wall:
-            stat().crashes++;
-            team_stat().crashes++;
+            stat.crashes++;
+            team.stat.crashes++;
             System::mod->on_wall (*this);
             Audio::play_effect (id, ET_Wall);
             break;
@@ -221,19 +226,19 @@ void Player::live () {
             break;
         }
         if (!survive) {
-            stat().deaths++;
-            team_stat ().deaths++;
+            stat.deaths++;
+            team.stat.deaths++;
             set_state (PS_Death);
             System::mod->on_death (*this);
         } else {
-            stat().steps++;
-            team_stat ().steps++;
+            stat.steps++;
+            team.stat.steps++;
         }
     } else {
         survive = World::simple_will_survive (pos, fields);
         if (!survive) {
-            stat().crashes++;
-            team_stat ().crashes++;
+            stat.crashes++;
+            team.stat.crashes++;
             System::mod->on_wall (*this);
             Audio::play_effect (id, ET_Wall);
             set_state (PS_Death);
@@ -266,14 +271,14 @@ void Player::try_revive () {
 }
 
 int Player::step (const Uint8 *keys) {
-    if (info->type == PT_Human) {
-        if (jumptime == 0 && keys[info->keys.jump]) {
+    if (info.type == PT_Human) {
+        if (jumptime == 0 && keys[info.keys.jump]) {
             keyst = KS_Jump;
-        } else if (keys[info->keys.left] && keys[info->keys.right]) {
+        } else if (keys[info.keys.left] && keys[info.keys.right]) {
             keyst = KS_Power;
-        } else if (keys[info->keys.left]) {
+        } else if (keys[info.keys.left]) {
             keyst = KS_Left;
-        } else if (keys[info->keys.right]) {
+        } else if (keys[info.keys.right]) {
             keyst = KS_Right;
         } else {
             keyst = KS_None;
@@ -303,7 +308,8 @@ void Player::give_start (startid_tu start) {
     if (start >= 0) {
         st = World::get_start (start);
         if (st != NULL) {
-            cout << "give pl start " << (int) id << ' ' << (int) st->angle << '\n';
+            cout << "give pl start " << (int) id << ' ' << (int) st->angle
+                    << '\n';
 
             exact = st->pos;
             angle = st->angle;
@@ -325,20 +331,20 @@ void Player::give_start (startid_tu start) {
 }
 
 void Player::inc_score (score_ti delta) {
-    stat().score += delta;
-    team_stat().score+= delta;
+    stat.score += delta;
+    team.stat.score += delta;
 }
 
 void Player::dec_score (score_ti delta) {
-    stat().score -= delta;
-    team_stat().score-= delta;
+    stat.score -= delta;
+    team.stat.score -= delta;
 }
 
 void Player::set_score (score_ti value) {
-    if (stat().score != value) {
-        team_stat().score-= stat().score;
-        stat().score = value;
-        team_stat().score+= stat().score;
+    if (stat.score != value) {
+        team.stat.score -= stat.score;
+        stat.score = value;
+        team.stat.score += stat.score;
     }
 }
 
@@ -360,7 +366,8 @@ void Player::fast_clear () {
 }
 
 void Player::cut_at_length (plsize_tu nlength) {
-    if (nlength < 1) nlength = 1;
+    if (nlength < 1)
+        nlength = 1;
     while (length > 0) {
         clear_bottom ();
     }
@@ -369,7 +376,8 @@ void Player::cut_at_length (plsize_tu nlength) {
 
 void Player::dec_max_length (plsize_tu delta) {
     int maxlen = max_length - delta;
-    if (maxlen < 0) maxlen = 0;
+    if (maxlen < 0)
+        maxlen = 0;
 
     max_length = maxlen;
 }
@@ -414,8 +422,8 @@ void Player::kill () {
     case PS_Start:
     case PS_Live:
     case PS_Undeath:
-        stat().deaths++;
-        team_stat ().deaths++;
+        stat.deaths++;
+        team.stat.deaths++;
         set_state (PS_Death);
         break;
     default:
@@ -448,15 +456,15 @@ void Player::revive () {
 }
 
 bool Player::is_human () const {
-    return info->type == PT_Human;
+    return info.type == PT_Human;
 }
 
 void Player::update_score () {
-    Render::draw_player_score (id, order, stat().score, state, ironize_lvl > 0);
+    Render::draw_player_score (id, order, stat.score, state, ironize_lvl > 0);
 }
 
 score_ti Player::get_score () const {
-    return stat().score;
+    return stat.score;
 }
 
 bool Player::is_jumping () const {
@@ -489,18 +497,20 @@ plid_tu Player::get_order () const {
 
 void Player::set_state (PlState value) {
     if (value != state) {
-        team->dec_state (state);
+        team.dec_state (state);
         state = value;
-        team->inc_state (state);
+        team.inc_state (state);
     }
 }
 
 bool Player::operator> (const Player& other) const {
-    return stat().score < other.stat().score || (stat().score == other.stat().score && order > other.order);
+    return stat.score < other.stat.score || (stat.score == other.stat.score
+            && order > other.order);
 }
 
 bool Player::operator< (const Player& other) const {
-    return stat().score > other.stat().score || (stat().score == other.stat().score && order < other.order);
+    return stat.score > other.stat.score || (stat.score == other.stat.score
+            && order < other.order);
 }
 
 void Player::set_order (plid_tu value) {
@@ -524,10 +534,10 @@ score_ti Player::get_ironize () const {
 }
 
 const ustring& Player::get_name () const {
-    return info->name;
+    return info.name;
 }
 
-Team* Player::get_team () const {
+const ITeam& Player::get_team () const {
     return team;
 }
 
@@ -540,27 +550,13 @@ int Player::get_angle () const {
 }
 
 void Player::calc_stats () {
-	for (int sti = ST_pozi; sti < ST_count; sti++) {
-		stat().smiles[sti][0] = stat().smiles[sti][1] + stat().smiles[sti][2] + stat().smiles[sti][3];
-	}
+    for (int sti = ST_pozi; sti < ST_count; sti++) {
+        stat.smiles[sti][0] = stat.smiles[sti][1]
+                + stat.smiles[sti][2] + stat.smiles[sti][3];
+    }
 }
 
-void Player::draw_stat() {
-	Render::draw_player_stat(id, order, info->name, info->color);
+void Player::draw_stat () {
+    Render::draw_player_stat (id, order, info.name, info.color);
 }
 
-Statistic& Player::stat () {
-    return statistic;
-}
-
-const Statistic& Player::stat () const {
-    return statistic;
-}
-
-Statistic& Player::team_stat () {
-    return team->stat();
-}
-
-const Statistic& Player::team_stat () const {
-    return team->stat();
-}

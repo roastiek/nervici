@@ -11,12 +11,13 @@
 #include <glibmm/ustring.h>
 
 #include "int_type.h"
+#include "iteam.h"
 
 class IPlayer {
 public:
     virtual plid_tu get_id () const = 0;
 
-    //virtual plid_tu get_team () const = 0;
+    virtual const ITeam& get_team () const = 0;
 
     virtual const Glib::ustring& get_name () const = 0;
 
