@@ -3,6 +3,7 @@ set (NERVICI_SOURCES
     src/utils.cpp 
     src/mods/mod_interface.cpp 
     src/system.cpp
+    src/mods/mods.cpp
     src/settings/setting.cpp 
     src/settings/settings.cpp 
     src/settings/pl_info.cpp 
@@ -23,6 +24,7 @@ set (NERVICI_SOURCES
     src/game/team.cpp 
     src/game/teams.cpp 
     src/mods/nervici.cpp 
+    src/mods/mod_cervici.cpp
     src/gui/implementor.cpp 
     src/gui/canvas.cpp 
     src/gui/control.cpp 

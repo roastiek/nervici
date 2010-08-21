@@ -39,7 +39,7 @@ public:
 };
 
 inline plid_tu Teams::count() {
-    return teams.size();
+    return orders.size();
 }
 
 inline Team& Teams::at (plid_tu index) {

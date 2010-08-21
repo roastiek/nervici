@@ -20,7 +20,7 @@
 #include "gui/smile_control.h"
 #include "gui/button.h"
 #include "game/game_info.h"
-#include "mod.h"
+#include "fakes/mod.h"
 
 class GameFrame : public Control {
 private:
@@ -69,7 +69,7 @@ private:
 
     void cb_mob_selected_changed (Combobox* box, int selected);
 
-    void load_mod (Mod mod);
+    void load_mod (const Mod& mod);
 
     void update_team_colors ();
 

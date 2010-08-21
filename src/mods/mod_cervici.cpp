@@ -157,7 +157,7 @@ public:
     }
 };
 
-ModInterface* get_face () {
+ModInterface* get_cervici_face () {
     return new Cervici ();
 }
 

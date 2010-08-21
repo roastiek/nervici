@@ -10,8 +10,16 @@
 
 #include <glibmm/ustring.h>
 
+#include "get_face.h"
+
 struct ModRunner {
     Glib::ustring filename;
+    GetFace get_face;
+
+    ModRunner (const Glib::ustring& nfilename, GetFace face) :
+        filename (nfilename), get_face (face) {
+
+    }
 };
 
 #endif	/* MOD_RUNNER_H */

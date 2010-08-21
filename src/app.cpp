@@ -5,6 +5,7 @@
 #include "engine/audio.h"
 #include "settings/settings.h"
 #include "settings/pl_infos.h"
+#include "mods/mods.h"
 #include "game/world.h"
 #include "game/game.h"
 #include "settings/team_infos.h"
@@ -46,7 +47,7 @@ static void init_gui () {
 void initialize () {
     System::init_paths ();
     settings.load ();
-    System::find_mods ();
+    Mods::find_mods ();
     pl_infos.load ();
     team_infos.load ();
 
@@ -73,7 +74,7 @@ void uninitialize () {
 
     pl_infos.save ();
     team_infos.save ();
-    System::free_mods ();
+    Mods::free_mods ();
     settings.save ();
     System::free_paths ();
 }

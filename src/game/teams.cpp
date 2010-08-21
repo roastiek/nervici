@@ -53,7 +53,7 @@ void Teams::update_score () {
 
     for (size_t oi = 0; oi < orders.size (); oi++) {
         for (size_t ti = 0; ti < orders.size (); ti++) {
-            if ((teams[oi]) > (teams[ti])) {
+            if ((*teams[oi]) > (*teams[ti])) {
                 orders[oi]++;
             }
         }

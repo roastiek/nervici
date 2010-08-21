@@ -2,16 +2,17 @@
 
 #include "app.h"
 #include "utils.h"
-#include "system.h"
-#include "settings/pl_info.h"
-#include "settings/pl_infos.h"
 #include "engine/loader.h"
-#include "gui/label.h"
-#include "game/game.h"
 #include "settings/team_info.h"
 #include "settings/team_infos.h"
 #include "settings/setting.h"
 #include "settings/settings.h"
+#include "settings/pl_info.h"
+#include "settings/pl_infos.h"
+#include "mods/mod.h"
+#include "mods/mods.h"
+#include "gui/label.h"
+#include "game/game.h"
 
 #include "frames/game_frame.h"
 
@@ -353,8 +354,8 @@ void GameFrame::preapare () {
     cb_mod->set_selected (-1);
 
     const ustring& last_mod = set.read_string ("game", "last_mod", "");
-    for (size_t mi = 0; mi < System::get_mods_count (); mi++) {
-        if (last_mod.compare (System::get_mod (mi).name) == 0) {
+    for (size_t mi = 0; mi < Mods::count (); mi++) {
+        if (last_mod.compare (Mods::at (mi).name) == 0) {
             cb_mod->set_selected (mi);
             break;
         }
@@ -431,10 +432,10 @@ void GameFrame::btn_cancel_clicked (Control* ctl) {
 
 void GameFrame::cb_mob_selected_changed (Combobox* box, int selected) {
     if (selected >= 0)
-        load_mod (System::get_mod (selected));
+        load_mod (Mods::at (selected));
 }
 
-void GameFrame::load_mod (Mod mod) {
+void GameFrame::load_mod (const Mod& mod) {
     Setting& set = settings.game ();
 
     max_players = (mod.spec.max_players <= 16) ? mod.spec.max_players : 16;
@@ -504,8 +505,8 @@ void GameFrame::update_team_colors () {
 void GameFrame::update_mods () {
     cb_mod->clear ();
 
-    for (size_t mi = 0; mi < System::get_mods_count (); mi++) {
-        const Mod& mod = System::get_mod (mi);
+    for (size_t mi = 0; mi < Mods::count (); mi++) {
+        const Mod& mod = Mods::at (mi);
         cb_mod->add_item (mod.name);
     }
 }
@@ -530,7 +531,7 @@ void GameFrame::update_players () {
 void GameFrame::save_state () {
     Setting& set = settings.game ();
 
-    const ustring& mod_name = System::get_mod (cb_mod->get_selected ()).name;
+    const ustring& mod_name = Mods::at (cb_mod->get_selected ()).name;
 
     set.write_string ("game", "last_mod", mod_name);
 

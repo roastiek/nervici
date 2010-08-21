@@ -45,15 +45,4 @@ public:
     virtual void on_pl_timer (IPlayer& player);
 };
 
-typedef ModInterface* (*GetFace) ();
-
-union GetFaceHandle {
-    void* handle;
-    GetFace get_face;
-};
-
-extern "C" {
-ModInterface* get_face ();
-}
-
 #endif // __MODS_H__

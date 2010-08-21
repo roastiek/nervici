@@ -2,11 +2,11 @@
 #include <math.h>
 #include <iostream>
 
-#include "system.h"
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "settings/team_info.h"
 #include "mods/mod_interface.h"
+#include "mods/mods.h"
 #include "game/statistic.h"
 #include "game/world.h"
 #include "game/smiles.h"
@@ -55,13 +55,13 @@ void initialize (const GameInfo& info) {
 
     clear_playerground ();
 
-    System::load_mod (0, "");
+    Mods::load_mod (0);
 }
 
 void uninitialize () {
     cout << __func__ << '\n';
 
-    System::unload_mod ();
+    Mods::unload_mod ();
 
     smiles.uninitialize ();
     Players::uninitialize ();
@@ -270,7 +270,7 @@ void run () {
     Players::update_score ();
     Render::draw_timer (timer);
     Render::draw_status ("status");
-    System::mod->on_game_start (set);
+    Mods::mod->on_game_start (set);
 
     while (!end && !abort) {
         while (SDL_PollEvent (&event)) {
@@ -292,16 +292,16 @@ void run () {
 
         keys = SDL_GetKeyState (NULL);
 
-        System::mod->before_step ();
+        Mods::mod->before_step ();
         Players::step (keys);
         World::check_starts ();
-        System::mod->after_step ();
+        Mods::mod->after_step ();
 
-        System::mod->before_step ();
+        Mods::mod->before_step ();
         Players::step (keys);
         smiles.step ();
         World::check_starts ();
-        System::mod->after_step ();
+        Mods::mod->after_step ();
 
         World::render_changed_items ();
         Players::update_bodies ();
@@ -320,7 +320,7 @@ void run () {
         if (sub_zero) {
             if (timer >= 0) {
                 timer = 0;
-                System::mod->on_timer ();
+                Mods::mod->on_timer ();
             }
         }
         Players::timer (speed);
@@ -337,7 +337,7 @@ void run () {
         run_statistic ();
     }
 
-    System::mod->on_game_end ();
+    Mods::mod->on_game_end ();
 }
 
 void set_speed (timer_ti value) {

@@ -3,11 +3,11 @@
 
 #include "main.h"
 #include "basic_defs.h"
-#include "system.h"
 #include "engine/audio.h"
 #include "engine/render.h"
 #include "settings/pl_info.h"
 #include "mods/mod_interface.h"
+#include "mods/mods.h"
 #include "game/world.h"
 #include "game/players.h"
 #include "game/smile.h"
@@ -78,7 +78,7 @@ void Player::timer_func (timer_ti speed) {
         timer += speed;
         if (timer >= 0) {
             timer = 0;
-            System::mod->on_pl_timer (*this);
+            Mods::mod->on_pl_timer (*this);
         }
     } else
         timer += speed;
@@ -207,20 +207,20 @@ void Player::live () {
             team.stat.killed++;
             murder.stat.kills++;
             murder.team.stat.kills++;
-            System::mod->on_killed (*this, murder);
+            Mods::mod->on_killed (*this, murder);
             Audio::play_effect (id, ET_Au);
             break;
         }
         case DC_self:
             stat.selfs++;
             team.stat.selfs++;
-            System::mod->on_selfdeath (*this);
+            Mods::mod->on_selfdeath (*this);
             Audio::play_effect (id, ET_Self);
             break;
         case DC_wall:
             stat.crashes++;
             team.stat.crashes++;
-            System::mod->on_wall (*this);
+            Mods::mod->on_wall (*this);
             Audio::play_effect (id, ET_Wall);
             break;
         case DC_smile:
@@ -233,7 +233,7 @@ void Player::live () {
             stat.deaths++;
             team.stat.deaths++;
             set_state (PS_Death);
-            System::mod->on_death (*this);
+            Mods::mod->on_death (*this);
         } else {
             stat.steps++;
             team.stat.steps++;
@@ -243,10 +243,10 @@ void Player::live () {
         if (!survive) {
             stat.crashes++;
             team.stat.crashes++;
-            System::mod->on_wall (*this);
+            Mods::mod->on_wall (*this);
             Audio::play_effect (id, ET_Wall);
             set_state (PS_Death);
-            System::mod->on_death (*this);
+            Mods::mod->on_death (*this);
         }
     }
 }
@@ -254,7 +254,7 @@ void Player::live () {
 void Player::clear_step () {
     if (length == 0) {
         set_state (PS_Erased);
-        System::mod->on_cleared (*this);
+        Mods::mod->on_cleared (*this);
     } else {
         clear_bottom ();
     }
@@ -429,6 +429,7 @@ void Player::kill () {
         stat.deaths++;
         team.stat.deaths++;
         set_state (PS_Death);
+        Mods::mod->on_death (*this);
         break;
     default:
         break;

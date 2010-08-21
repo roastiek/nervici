@@ -2,10 +2,10 @@
 
 #include "basic_defs.h"
 #include "main.h"
-#include "system.h"
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "mods/mod_interface.h"
+#include "mods/mods.h"
 #include "game/world.h"
 #include "game/statistic.h"
 #include "game/player.h"
@@ -18,7 +18,7 @@ Smile::Smile (SmileType ntype, smileid_tu sid, smilelvl_tu lvl) :
     id (sid), level (lvl), type (ntype), visible (false) {
 }
 
-Smile::~Smile () {
+Smile::~Smile () { 
 }
 
 void Smile::erase () {
@@ -145,7 +145,7 @@ public:
 
     void eat (Player& pl) {
         SoftSmile::eat (pl);
-        System::mod->on_pozi_smile (pl, level);
+        Mods::mod->on_pozi_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmilePlus);
     }
 };
@@ -164,7 +164,7 @@ public:
 
     void eat (Player& pl) {
         SoftSmile::eat (pl);
-        System::mod->on_nega_smile (pl, level);
+        Mods::mod->on_nega_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
@@ -239,7 +239,7 @@ public:
 
     void eat (Player& pl) {
         HardSmile::eat (pl);
-        System::mod->on_fleg_smile (pl, level);
+        Mods::mod->on_fleg_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
@@ -314,7 +314,7 @@ public:
 
     void eat (Player& pl) {
         SoftSmile::eat (pl);
-        System::mod->on_iron_smile (pl, level);
+        Mods::mod->on_iron_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmilePlus);
     }
 };
@@ -414,19 +414,19 @@ public:
         }
         switch (face_type) {
         case ST_pozi:
-            System::mod->on_pozi_smile (pl, level);
+            Mods::mod->on_pozi_smile (pl, level);
             Audio::play_effect (pl.id, ET_SmilePlus);
             break;
         case ST_nega:
-            System::mod->on_nega_smile (pl, level);
+            Mods::mod->on_nega_smile (pl, level);
             Audio::play_effect (pl.id, ET_SmileMinus);
             break;
         case ST_fleg:
-            System::mod->on_fleg_smile (pl, level);
+            Mods::mod->on_fleg_smile (pl, level);
             Audio::play_effect (pl.id, ET_SmileMinus);
             break;
         case ST_iron:
-            System::mod->on_iron_smile (pl, level);
+            Mods::mod->on_iron_smile (pl, level);
             Audio::play_effect (pl.id, ET_SmilePlus);
             break;
         default:
@@ -592,7 +592,7 @@ public:
 
     void eat (Player& pl) {
         Smile::eat (pl);
-        System::mod->on_ham_smile (pl, level);
+        Mods::mod->on_ham_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
@@ -680,7 +680,7 @@ public:
 
     void eat (Player& pl) {
         Smile::eat (pl);
-        System::mod->on_ham_smile (pl, level);
+        Mods::mod->on_ham_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
@@ -773,7 +773,7 @@ public:
 
     void eat (Player& pl) {
         Smile::eat (pl);
-        System::mod->on_ham_smile (pl, level);
+        Mods::mod->on_ham_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 

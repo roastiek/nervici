@@ -36,7 +36,6 @@ include_directories (SYSTEM
 cd)
 
 include (nervici)
-include (mods)
 include (images)
 include (sounds)
 include (music)

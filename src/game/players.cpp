@@ -36,6 +36,7 @@ void Players::initialize (const GameInfo& info) {
         NULL};
 
     for (plid_tu ti = 0; ti <= Teams::count (); ti++) {
+        cout << int(ti) << '\n';
         team_map[Teams::at (ti).info.id] = &Teams::at (ti);
     }
 
