@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "mods/nervici.h"
 #include "mods/mod_runner_info.h"
 #include "mods/mod_info.h"
@@ -22,8 +24,7 @@ static const ModInfo info = {
     "bobo",
     "proste cervici",
     {16,
-        1, 1, 1, 0, 1, 1, 1,
-        12, 10, 0, 0, 1, 1000, 0,
+        true, true, true, true, true, true, true,
         {
             {true, true, true},
             {true, true, true},
@@ -32,14 +33,15 @@ static const ModInfo info = {
             {true, true, true},
             {true, true, true},
         },
-        {
+        {12, 10, 0, 0, 1, 1000, 0},
+        {{
             {0, 0, 0},
             {0, 0, 0},
             {0, 0, 0},
             {0, 0, 0},
             {0, 0, 0},
             {0, 0, 0},
-        }}
+        }}}
 };
 
 
@@ -59,7 +61,7 @@ private:
             IPlayer& p = get_player (pi);
             if (p.is_human ()) {
                 sid = world_find_free_start ();
-                if (sid < set.starts_count) {
+                if (sid < get_starts_count ()) {
                     p.give_start (sid);
                 }
             }
@@ -72,7 +74,7 @@ private:
             IPlayer& p = get_player (pi);
             if (!p.is_human ()) {
                 sid = world_find_free_start ();
-                if (sid < set.starts_count) {
+                if (sid < get_starts_count ()) {
                     p.give_start (sid);
                 }
             }
@@ -100,7 +102,7 @@ public:
         return &info;
     }
 
-    void on_game_start (const GameSetting & nset) {
+    void on_game_start (const GameSetting & nset, const SmileSetting& smiles) {
         set = nset;
 
         begin_start_procedure ();

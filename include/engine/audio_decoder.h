@@ -8,8 +8,10 @@
 #ifndef AUDIO_DECODER_H
 #define	AUDIO_DECODER_H
 
-#include <glibmm/ustring.h>
+//#include <glibmm/ustring.h>
 #include <al.h>
+
+#include "fakes/glibmm_decl.h"
 
 class AudioDecoder {
 public:

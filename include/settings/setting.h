@@ -1,9 +1,9 @@
 #ifndef __SETTING_H__
 #define __SETTING_H__
 
-#include <glibmm/ustring.h>
 #include <glibmm/keyfile.h>
 #include <vector>
+
 
 class Setting {
 private:

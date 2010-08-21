@@ -2,7 +2,6 @@
 #define __RENDER_H__
 
 #include <vector>
-#include <glibmm/ustring.h>
 
 #include "int_type.h"
 #include "stat_column.h"
@@ -14,6 +13,7 @@
 #include "fakes/team_info.h"
 #include "fakes/smile_setting.h"
 #include "fakes/statistic.h"
+#include "fakes/glibmm_decl.h"
 
 namespace Render {
 bool initialize ();
@@ -21,7 +21,7 @@ bool initialize ();
 void uninitialize ();
 
 void load_players (const std::vector<const PlInfo*>& infos, const std::vector<
-        const TeamInfo*>& tinfos);
+        uint32_t>& tcolors);
 
 void free_players ();
 
@@ -71,7 +71,7 @@ wsize_tu get_playerground_width ();
 
 wsize_tu get_playerground_height ();
 
-Screen* create_screen (const Glib::ustring& name = "");
+Screen* create_screen (const Glib::ustring& name);
 
 int get_width ();
 

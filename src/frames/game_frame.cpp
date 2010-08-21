@@ -190,12 +190,11 @@ GameFrame::GameFrame () :
     Control (frame_parms) {
     max_players = 16;
     game_info.setting.bonus = 1000;
-    game_info.setting.gameTime = 0;
-    game_info.setting.maxLength = 0;
-    game_info.setting.maxScore = 0;
+    game_info.setting.game_time = 0;
+    game_info.setting.max_length = 0;
+    game_info.setting.max_score = 0;
     game_info.setting.rounds = 10;
     game_info.setting.speed = base_speed;
-    game_info.setting.starts_count = 40;
     game_info.setting.step = 1;
 
     for (int sti = ST_pozi; sti < ST_count; sti++) {
@@ -379,9 +378,9 @@ void GameFrame::btn_start_clicked (Control* ctl) {
     save_state ();
 
     game_info.setting.bonus = nb_bonus->get_value ();
-    game_info.setting.gameTime = nb_timer->get_value ();
-    game_info.setting.maxLength = nb_max_length->get_value ();
-    game_info.setting.maxScore = nb_max_score->get_value ();
+    game_info.setting.game_time = nb_timer->get_value ();
+    game_info.setting.max_length = nb_max_length->get_value ();
+    game_info.setting.max_score = nb_max_score->get_value ();
     game_info.setting.rounds = nb_rounds->get_value ();
     game_info.setting.speed = sa_speed->get_value ();
     game_info.setting.step = nb_step->get_value ();
@@ -440,24 +439,24 @@ void GameFrame::load_mod (const Mod& mod) {
 
     max_players = (mod.spec.max_players <= 16) ? mod.spec.max_players : 16;
     nb_bonus->set_value (set.read_int (mod.name, "bonus",
-            mod.spec.default_bonus));
+            mod.spec.defaults.bonus));
     nb_timer->set_value (set.read_int (mod.name, "timer",
-            mod.spec.default_timer));
+            mod.spec.defaults.game_time));
     nb_max_length->set_value (set.read_int (mod.name, "max_length",
-            mod.spec.default_max_length));
+            mod.spec.defaults.max_length));
     nb_max_score->set_value (set.read_int (mod.name, "max_score",
-            mod.spec.default_max_score));
+            mod.spec.defaults.max_score));
     nb_rounds->set_value (set.read_int (mod.name, "rounds",
-            mod.spec.default_rounds));
+            mod.spec.defaults.rounds));
     sa_speed->set_value (set.read_int (mod.name, "speed",
-            mod.spec.default_speed));
-    nb_step->set_value (set.read_int (mod.name, "step", mod.spec.default_step));
+            mod.spec.defaults.speed));
+    nb_step->set_value (set.read_int (mod.name, "step", mod.spec.defaults.step));
 
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
             sc_smiles[si][li]->set_value (set.read_int (mod.name, "smile"
                     + to_string<int> (si) + "-" + to_string<int> (li),
-                    mod.spec.defualt_smiles_counts[si][li]));
+                    mod.spec.default_smiles.counts[si][li]));
         }
     }
 

@@ -1,11 +1,12 @@
 #include <vector>
-using namespace std;
 
 #include "engine/render.h"
 #include "game/smile.h"
 #include "game/game_info.h"
 
 #include "game/smiles.h"
+
+using namespace std;
 
 Smiles Smiles::instance;
 

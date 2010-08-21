@@ -24,6 +24,7 @@ using namespace std;
 namespace Game {
 
 static GameSetting set;
+static SmileSetting smile_set;
 static round_tu round;
 static bool end;
 static bool abort;
@@ -36,14 +37,13 @@ void initialize (const GameInfo& info) {
 
     set = info.setting;
     set_speed (info.setting.speed);
+    smile_set = info.smiles;
 
     Render::draw_game_screen ();
     World::initialize ();
-    Teams::initialize (info);
-    Players::initialize (info);
+    Teams::initialize (info.team_infos);
+    Players::initialize (info.pl_infos, info.pl_teams, info.setting.max_length);
     smiles.initialize (info);
-
-    set.starts_count = World::get_starts_count ();
 
     end = false;
     abort = false;
@@ -270,7 +270,7 @@ void run () {
     Players::update_score ();
     Render::draw_timer (timer);
     Render::draw_status ("status");
-    Mods::mod->on_game_start (set);
+    Mods::mod->on_game_start (set, smile_set);
 
     while (!end && !abort) {
         while (SDL_PollEvent (&event)) {

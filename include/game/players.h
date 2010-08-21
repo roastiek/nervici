@@ -12,7 +12,7 @@
 
 #include "int_type.h"
 #include "fakes/player.h"
-#include "fakes/game_info.h"
+#include "fakes/pl_info.h"
 
 class Players {
 private:
@@ -23,7 +23,8 @@ private:
     Players ();
 
 public:
-    static void initialize (const GameInfo & info);
+    static void initialize (const std::vector<const PlInfo*>& infos,
+            const std::vector<plid_tu>& pl_teams, plsize_tu max_length);
 
     static void uninitialize ();
 

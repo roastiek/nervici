@@ -3,7 +3,6 @@
 #include "engine/render.h"
 #include "settings/team_infos.h"
 #include "game/team.h"
-#include "game/game_info.h"
 
 #include "game/teams.h"
 
@@ -16,16 +15,16 @@ vector<plid_tu> Teams::orders;
 Teams::Teams () {
 }
 
-void Teams::initialize (const GameInfo& info) {
-    for (size_t ti = 0; ti < info.team_infos.size (); ti++) {
-        const TeamInfo& tinfo = *info.team_infos[ti];
+void Teams::initialize (const std::vector<const TeamInfo*>& infos) {
+    for (size_t ti = 0; ti < infos.size (); ti++) {
+        const TeamInfo& tinfo = *infos[ti];
         teams.push_back (new Team (ti, tinfo));
     }
     orders.resize (teams.size ());
 
     teams.push_back (new Team (orders.size (), team_infos[0]));
 
-    Render::load_teams (info.team_infos);
+    Render::load_teams (infos);
 }
 
 void Teams::uninitialize () {

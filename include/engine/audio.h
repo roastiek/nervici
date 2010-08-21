@@ -2,12 +2,12 @@
 #define __AUDIO_H__
 
 #include <vector>
-#include <glibmm/ustring.h>
 
 #include "int_type.h"
 #include "music_type.h"
 #include "effect_type.h"
 #include "fakes/pl_info.h"
+#include "fakes/glibmm_decl.h"
 
 namespace Audio {
 void initialize ();

@@ -3,9 +3,7 @@
 
 #include "engine/audio.h"
 #include "engine/render.h"
-#include "settings/pl_infos.h"
 #include "settings/team_info.h"
-#include "game/game_info.h"
 #include "game/fields.h"
 #include "game/statistic.h"
 #include "game/player.h"
@@ -24,22 +22,23 @@ Players::Players () {
 
 }
 
-void Players::initialize (const GameInfo& info) {
-    vector<const TeamInfo*> tinfos;
+void Players::initialize (const std::vector<const PlInfo*>& infos,
+        const std::vector<plid_tu>& pl_teams, plsize_tu max_length) {
+    vector<uint32_t> tcolors;
 
     players.clear ();
 
-    for (plid_tu pi = 0; pi < info.pl_infos.size (); pi++) {
-        const PlInfo& plnfo = *info.pl_infos[pi];
-        Team& team = Teams::at (info.pl_teams[pi]);
-        players.push_back (new Player (pi, team, plnfo, info.setting.maxLength));
-        tinfos.push_back (&team.info);
+    for (plid_tu pi = 0; pi < infos.size (); pi++) {
+        const PlInfo& plnfo = *infos[pi];
+        Team& team = Teams::at (pl_teams[pi]);
+        players.push_back (new Player (pi, team, plnfo, max_length));
+        tcolors.push_back (team.info.color);
     }
 
     orders.resize (players.size ());
 
-    Render::load_players (info.pl_infos, tinfos);
-    Audio::load_players (info.pl_infos);
+    Render::load_players (infos, tcolors);
+    Audio::load_players (infos);
 }
 
 void Players::uninitialize () {

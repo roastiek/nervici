@@ -11,8 +11,8 @@
 #include <vector>
 
 #include "pl_state.h"
-#include "fakes/team.h"
-#include "fakes/game_info.h"
+#include "fakes/team.h" 
+#include "fakes/team_info.h"
 
 class Teams {
 private:
@@ -23,7 +23,7 @@ private:
     Teams ();
     
 public:
-    static void initialize (const GameInfo& info);
+    static void initialize (const std::vector<const TeamInfo*>& infos);
 
     static void uninitialize ();
 

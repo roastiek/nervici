@@ -577,15 +577,14 @@ void uninitialize () {
     save_screen_setting ();
 }
 
-void load_players (const std::vector<const PlInfo*>& infos, const vector<
-        const TeamInfo*>& tinfos) {
+void load_players (const std::vector<const PlInfo*>& infos, const vector<uint32_t
+       >& tcolors) {
     pl_images.resize (infos.size ());
 
     for (size_t pi = 0; pi < infos.size (); pi++) {
         const PlInfo& info = *infos[pi];
-        const TeamInfo& tinfo = *tinfos[pi];
         pl_images[pi].face = create_player_face (info.color);
-        pl_images[pi].numbers = create_numbers (info.color, tinfo.color);
+        pl_images[pi].numbers = create_numbers (info.color, tcolors[pi]);
     }
 
 }

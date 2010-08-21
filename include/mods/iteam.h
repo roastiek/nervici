@@ -8,7 +8,7 @@
 #ifndef ITEAM_H_
 #define ITEAM_H_
 
-#include <glibmm/ustring.h>
+#include "fakes/glibmm_decl.h"
 
 class ITeam {
 public:

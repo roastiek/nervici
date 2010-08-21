@@ -8,10 +8,9 @@
 #ifndef PLAYER_H
 #define	PLAYER_H
 
-#include <glibmm/ustring.h>
-
 #include "int_type.h"
-#include "iteam.h"
+#include "fakes/iteam.h"
+#include "fakes/glibmm_decl.h"
 
 class IPlayer {
 public:

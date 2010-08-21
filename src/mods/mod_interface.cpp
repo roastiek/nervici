@@ -21,7 +21,7 @@ void ModInterface::on_fleg_smile (IPlayer& player, int lvl) {
 void ModInterface::on_game_end () {
 }
 
-void ModInterface::on_game_start (const GameSetting& settting) {
+void ModInterface::on_game_start (const GameSetting& settting, const SmileSetting& smiles) {
 }
 
 void ModInterface::on_ham_smile (IPlayer& player, int lvl) {

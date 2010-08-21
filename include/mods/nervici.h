@@ -44,6 +44,9 @@ IPlayer& get_player (plid_tu plid);
 plid_tu get_teams_count ();
 
 ITeam& get_team (plid_tu tid);
+
+startid_tu get_starts_count ();
+
 }
 
 #endif // __NERVICI_H__

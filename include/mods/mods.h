@@ -9,12 +9,13 @@
 #define MODS_H_
 
 #include <vector>
-#include <glibmm/module.h>
-#include <glibmm/ustring.h>
+//#include <glibmm/module.h>
+//#include <glibmm/ustring.h>
 
 #include "fakes/mod_interface.h"
 #include "fakes/mod.h"
 #include "fakes/mod_runner.h"
+#include "fakes/glibmm_decl.h"
 
 class Mods {
 private:

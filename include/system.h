@@ -1,7 +1,7 @@
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
 
-#include <glibmm/ustring.h>
+#include "fakes/glibmm_decl.h"
 
 namespace System {
 

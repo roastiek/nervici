@@ -1,4 +1,5 @@
 #include <glibmm/fileutils.h>
+#include <glibmm/module.h>
 
 #include "system.h"
 #include "mods/mod_runner.h"

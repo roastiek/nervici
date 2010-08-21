@@ -1,13 +1,15 @@
 #ifndef __MOD_INTERFACE_H__
 #define __MOD_INTERFACE_H__
 
-#include <glibmm/ustring.h>
+//#include <glibmm/ustring.h>
 
 #include "int_type.h"
 #include "iplayer.h"
 #include "fakes/game_setting.h"
+#include "fakes/smile_setting.h"
 #include "fakes/mod_runner_info.h"
 #include "fakes/mod_info.h"
+#include "fakes/glibmm_decl.h"
 
 class ModInterface {
 public:
@@ -19,7 +21,7 @@ public:
     
     virtual void unload_script ();
     
-    virtual void on_game_start (const GameSetting& settting);
+    virtual void on_game_start (const GameSetting& settting, const SmileSetting& smiles);
     
     virtual void on_game_end ();
     

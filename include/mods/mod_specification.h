@@ -9,25 +9,21 @@
 #define	MOD_SPECIFICATION_H
 
 #include "game/smile_type.h"
+#include "mods/game_setting.h"
+#include "game/smile_setting.h"
 
 struct ModSpecification {
     plid_tu max_players;
-    int speed_enabled;
-    int rounds_enabled;
-    int max_score_enabled;
-    int max_length_enabled;
-    int step_enabled;
-    int bonus_enabled;
-    int timer_enabled;
-    timer_ti default_speed;
-    round_tu default_rounds;
-    score_ti default_max_score;
-    plsize_tu default_max_length;
-    score_ti default_step;
-    score_ti default_bonus;
-    timer_ti default_timer;
+    bool speed_enabled;
+    bool rounds_enabled;
+    bool max_score_enabled;
+    bool max_length_enabled;
+    bool step_enabled;
+    bool bonus_enabled;
+    bool timer_enabled;
     bool smiles_enabled[ST_count][3];
-    uint8_t defualt_smiles_counts[ST_count][3];
+    GameSetting defaults;
+    SmileSetting default_smiles;
 };
 
 #endif	/* MOD_SPECIFICATION_H */

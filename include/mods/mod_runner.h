@@ -8,9 +8,8 @@
 #ifndef MOD_RUNNER_H
 #define	MOD_RUNNER_H
 
-#include <glibmm/ustring.h>
-
 #include "get_face.h"
+#include "fakes/glibmm_decl.h"
 
 struct ModRunner {
     Glib::ustring filename;

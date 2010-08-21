@@ -1,3 +1,5 @@
+#include <glibmm/ustring.h>
+
 #include "engine/audio.h"
 #include "engine/render.h"
 #include "game/world.h"
@@ -88,4 +90,9 @@ plid_tu get_teams_count () {
 ITeam& get_team (plid_tu tid) {
     return Teams::at (tid);
 }
+
+startid_tu get_starts_count () {
+    return World::get_starts_count();
+}
+
 }
