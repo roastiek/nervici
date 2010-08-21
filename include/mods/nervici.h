@@ -7,37 +7,37 @@
 
 namespace Nervici {
 
-    void clear_playerground ();
+void clear_playerground ();
 
-    void set_status (const char* text);
+void set_status (const char* text);
 
-    void end_game ();
+void end_game ();
 
-    startid_tu world_find_free_start ();
+startid_tu world_find_free_start ();
 
-    timer_ti get_speed ();
+timer_ti get_speed ();
 
-    plid_tu live_pls_count ();
+plid_tu live_pls_count ();
 
-    void next_round ();
+void next_round ();
 
-    void play_music (int type);
+void play_music (int type);
 
-    round_tu get_round ();
+round_tu get_round ();
 
-    void set_semafor (int state);
+void set_semafor (int state);
 
-    void set_speed (timer_ti speed);
+void set_speed (timer_ti speed);
 
-    void set_timer (timer_ti time);
+void set_timer (timer_ti time);
 
-    void stop_music ();
+void stop_music ();
 
-    void game_wait (timer_ti time);
+void game_wait (timer_ti time);
 
-    void wait_for_space ();
+void wait_for_space ();
 
-    IPlayer& get_player (plid_tu plid);
+IPlayer& get_player (plid_tu plid);
 }
 
 #endif // __NERVICI_H__

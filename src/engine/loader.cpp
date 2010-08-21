@@ -5,11 +5,11 @@
 #include <glibmm/fileutils.h>
 
 #include "system.h"
+#include "gui/canvas.h"
 #include "gui/implementor.h"
 #include "engine/image_type.h"
-#include "utils.h"
 #include "engine/smile_images.h"
-#include "gui/canvas.h"
+#include "utils.h"
 
 #include "engine/loader.h"
 
@@ -20,8 +20,7 @@ namespace Loader {
 static const char* const gameImages[] = {
     "semafor.png",
     "heart.png",
-    "statistic.png"
-};
+    "statistic.png"};
 
 static const char* const smile_setting = "smile_setting.png";
 
@@ -33,7 +32,8 @@ void load_game_images (vector<SDL_Surface*>& images) {
     for (size_t di = 0; di < System::get_data_dirs_count (); di++) {
         for (int i = IMT_Semafor; i < IMT_Count; i++) {
             if (images[i] == NULL) {
-                filename = System::get_data_dir (di) + "images/" + gameImages[i - IMT_Semafor];
+                filename = System::get_data_dir (di) + "images/" + gameImages[i
+                        - IMT_Semafor];
                 images[i] = IMG_Load (filename.c_str ());
             }
         }
@@ -53,7 +53,8 @@ void load_game_images (vector<SDL_Surface*>& images) {
 
     context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
     SDLPango_SetDefaultColor (context, &font_color);
-    SDLPango_SetSurfaceCreateArgs (context, SDL_SWSURFACE, 32, 0xff, 0xff00, 0xff0000, 0xff000000);
+    SDLPango_SetSurfaceCreateArgs (context, SDL_SWSURFACE, 32, 0xff, 0xff00,
+            0xff0000, 0xff000000);
 
     SDLPango_SetText (context, "0123456789- ", -1);
     images[IMT_Numbers] = SDLPango_CreateSurfaceDraw (context);
@@ -85,10 +86,12 @@ void free_game_images (vector<SDL_Surface*>& images) {
 
 void load_smile_setting_images (SmileSettingImages& images) {
     for (size_t di = 0; di < System::get_data_dirs_count (); di++) {
-        ustring filename = System::get_data_dir (di) + "images/" + smile_setting;
+        ustring filename = System::get_data_dir (di) + "images/"
+                + smile_setting;
 
         SDL_Surface* smiles = IMG_Load (filename.c_str ());
-        if (smiles == NULL) continue;
+        if (smiles == NULL)
+            continue;
 
         SDL_Rect src_area;
         SDL_Rect dest_area;
@@ -100,7 +103,7 @@ void load_smile_setting_images (SmileSettingImages& images) {
         dest_area.x = 0;
         dest_area.y = 0;
 
-        class LoaderCanvas : public Canvas {
+        class LoaderCanvas: public Canvas {
         public:
 
             SDL_Surface* get_surface () {
@@ -131,16 +134,21 @@ void free_smile_setting_images (SmileSettingImages& images) {
 }
 
 static const char* const eyes_masks[ST_cham] = {
-    "pozieyes", "negaeyes", "flegeyes", "ironeyes"
-};
+    "pozieyes",
+    "negaeyes",
+    "flegeyes",
+    "ironeyes"};
 
 static const char* const mouth_masks[ST_cham] = {
-    "pozimouth", "negamouth", "flegmouth", "ironmouth"
-};
+    "pozimouth",
+    "negamouth",
+    "flegmouth",
+    "ironmouth"};
 
 static const char* const ham_masks[3] = {
-    "hami", "dest", "term"
-};
+    "hami",
+    "dest",
+    "term"};
 
 void load_smile_faces (SmileImages& faces) {
     cout << __func__ << '\n';
@@ -153,12 +161,16 @@ void load_smile_faces (SmileImages& faces) {
             Dir dir (smiles_dir);
 
             for (DirIterator it = dir.begin (); it != dir.end (); it++) {
-                if ((*it)[0] == '.') continue;
+                if ((*it)[0] == '.')
+                    continue;
 
                 size_t len = (*it).length ();
-                if (len < 4) continue;
-                ustring suffix = ustring((*it).substr (len - 4, 4)).lowercase();
-                if (suffix.compare (".png") != 0) continue;
+                if (len < 4)
+                    continue;
+                ustring suffix =
+                        ustring ((*it).substr (len - 4, 4)).lowercase ();
+                if (suffix.compare (".png") != 0)
+                    continue;
                 images.push_back (*it);
             }
         } catch (FileError) {
@@ -213,9 +225,9 @@ void load_smile_faces (SmileImages& faces) {
         }
 
         for (int bi = 0; bi < 6; bi++) {
-        	if (faces.backs[bi] == NULL) {
-        		path = smiles_dir + "smile" + to_string<int> (bi + 1) + ".png";
-        		faces.backs[bi] = IMG_Load (path.c_str ());
+            if (faces.backs[bi] == NULL) {
+                path = smiles_dir + "smile" + to_string<int> (bi + 1) + ".png";
+                faces.backs[bi] = IMG_Load (path.c_str ());
             }
         }
     }
@@ -241,9 +253,5 @@ void free_smile_faces (SmileImages& faces) {
     }
 }
 
-
 }
-
-
-
 

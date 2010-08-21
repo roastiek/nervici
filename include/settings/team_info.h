@@ -16,7 +16,5 @@ struct TeamInfo {
     Glib::ustring name;
 };
 
-
-
 #endif	/* TEAMINFO_H */
 

@@ -15,14 +15,14 @@
 class Settings {
 private:
     std::vector<Setting*> settings;
-    
+
     static Settings instance;
-    
+
     Settings ();
-    
-public:    
+
+public:
     ~Settings ();
-    
+
     void load ();
 
     void save ();
@@ -36,8 +36,8 @@ public:
     Setting& game ();
 
     Setting& teams ();
-    
-    static Settings& get_instance ();     
+
+    static Settings& get_instance ();
 };
 
 extern Settings& settings;

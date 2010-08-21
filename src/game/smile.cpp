@@ -1,16 +1,16 @@
 #include <math.h>
 
 #include "basic_defs.h"
-#include "game/world.h"
-#include "engine/render.h"
-#include "system.h"
-#include "engine/audio.h"
 #include "main.h"
+#include "system.h"
+#include "engine/render.h"
+#include "engine/audio.h"
+#include "mods/mod_interface.h"
+#include "game/world.h"
 #include "game/statistic.h"
 #include "game/player.h"
 #include "game/players.h"
 #include "game/team.h"
-#include "mods/mod_interface.h"
 
 #include "game/smile.h"
 
@@ -179,8 +179,8 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % players.count ();
-            Player& pl = players[target];
+            plid_tu target = random () % Players::count ();
+            Player& pl = Players::at (target);
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 int angle = pl.get_angle ();
@@ -207,8 +207,8 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % players.count ();
-            Player& pl = players[target];
+            plid_tu target = random () % Players::count ();
+            Player& pl = Players::at (target);
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 int angle = pl.get_angle ();
@@ -254,8 +254,8 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % players.count ();
-            Player& pl = players[target];
+            plid_tu target = random () % Players::count ();
+            Player& pl = Players::at (target);
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 int angle = pl.get_angle ();
@@ -282,8 +282,8 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % players.count ();
-            Player& pl = players[target];
+            plid_tu target = random () % Players::count ();
+            Player& pl = Players::at (target);
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 int angle = pl.get_angle ();
@@ -445,8 +445,8 @@ public:
 
     bool try_swich_face () {
         bool someone_near = false;
-        for (size_t pi = 0; pi < players.count (); pi++) {
-            Player& pl = players[pi];
+        for (size_t pi = 0; pi < Players::count (); pi++) {
+            Player& pl = Players::at (pi);
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 FPoint dist;
@@ -482,8 +482,8 @@ public:
 
     bool try_swich_face () {
         bool someone_near = false;
-        for (size_t pi = 0; pi < players.count (); pi++) {
-            Player& pl = players[pi];
+        for (size_t pi = 0; pi < Players::count (); pi++) {
+            Player& pl = Players::at (pi);
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 FPoint dist;
@@ -591,8 +591,8 @@ public:
     }
 
     void eat (Player& pl) {
-        Smile::eat(pl);
-        System::mod->on_ham_smile(pl, level);
+        Smile::eat (pl);
+        System::mod->on_ham_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };

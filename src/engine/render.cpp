@@ -2,21 +2,20 @@
 #include <SDL_Pango.h>
 #include <iostream>
 
+#include "point.h"
 #include "engine/stat_column.h"
 #include "engine/loader.h"
 #include "engine/image_type.h"
-#include "gui/scale.h"
-#include "game/world.h"
+#include "engine/smile_images.h"
+#include "gui/screen.h"
 #include "settings/pl_info.h"
 #include "settings/team_info.h"
 #include "settings/setting.h"
 #include "settings/settings.h"
-#include "game/statistic.h"
-#include "game/game_info.h"
-#include "gui/screen.h"
 #include "game/world_item.h"
-#include "point.h"
-#include "engine/smile_images.h"
+#include "game/world.h"
+#include "game/statistic.h"
+#include "game/smile_setting.h"
 
 #include "engine/render.h"
 
@@ -466,7 +465,10 @@ static void init_fonts () {
 }
 
 static void init_stat_columns () {
-    static const char * const names[] = {"menno", "score", "delka"};
+    static const char * const names[] = {
+        "menno",
+        "score",
+        "delka"};
 
     for (int sti = STC_name; sti < STC_count; sti++) {
         stat_columns[sti] = SDL_CreateRGBSurface (SDL_HWSURFACE,
@@ -619,9 +621,17 @@ void clear_playerground () {
     SDL_UpdateRects (primary, 1, &blit);
 }
 
-void draw_world_items_queue (vector<Point>& queue) {
-    static SDL_Rect drawsrc = {0, 0, 1, 1};
-    static SDL_Rect drawdest = {0, 0, 1, 1};
+void draw_world_items_queue (const vector<Point>& queue) {
+    static SDL_Rect drawsrc = {
+        0,
+        0,
+        1,
+        1};
+    static SDL_Rect drawdest = {
+        0,
+        0,
+        1,
+        1};
 
     for (size_t i = 0; i < queue.size (); i++) {
         const Point& pos = queue[i];
@@ -646,7 +656,6 @@ void draw_world_items_queue (vector<Point>& queue) {
             item.changed = false;
         }
     }
-    queue.clear ();
 }
 
 void update_player (const Point& pos) {
@@ -708,7 +717,11 @@ void update_screen () {
 }
 
 void draw_semafor (int state) {
-    static SDL_Rect src = {0, 0, 21, 18};
+    static SDL_Rect src = {
+        0,
+        0,
+        21,
+        18};
     int s;
 
     dest.x = gs_outer.semafor.x + 19;
@@ -894,7 +907,7 @@ void load_smiles (const SmileSetting& info) {
     for (int sti = ST_pozi; sti < ST_cham; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.counts[sti][li]; ci++) {
-                SDL_Surface* face = create_smile_face (SmileType(sti), li);
+                SDL_Surface* face = create_smile_face (SmileType (sti), li);
                 smile_faces.push_back (face);
             }
         }
@@ -923,8 +936,16 @@ void free_smiles () {
 }
 
 void draw_smile (smileid_tu sid, const Point& pos, int phase) {
-    static SDL_Rect src = {0, 0, 20, 20};
-    static SDL_Rect dest = {0, 0, 20, 20};
+    static SDL_Rect src = {
+        0,
+        0,
+        20,
+        20};
+    static SDL_Rect dest = {
+        0,
+        0,
+        20,
+        20};
 
     src.x = phase * 20;
     dest.x = pos.x + gs_outer.playerground.x;
@@ -934,7 +955,11 @@ void draw_smile (smileid_tu sid, const Point& pos, int phase) {
 }
 
 void clear_smile (const Point& pos) {
-    static SDL_Rect dest = {0, 0, 20, 20};
+    static SDL_Rect dest = {
+        0,
+        0,
+        20,
+        20};
 
     dest.x = pos.x + gs_outer.playerground.x;
     dest.y = pos.y + gs_outer.playerground.y;

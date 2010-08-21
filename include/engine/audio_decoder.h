@@ -9,11 +9,11 @@
 #define	AUDIO_DECODER_H
 
 #include <glibmm/ustring.h>
-#include <AL/al.h>
+#include <al.h>
 
 class AudioDecoder {
 public:
-    virtual ~AudioDecoder() {
+    virtual ~AudioDecoder () {
     }
 
     virtual bool open (const Glib::ustring& filename) = 0;

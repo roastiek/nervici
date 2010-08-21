@@ -1,6 +1,6 @@
 #include <al.h>
 #include <alc.h>
-#include <vector>
+//#include <vector>
 #include <iostream>
 #include <glibmm/fileutils.h>
 #include <glibmm/stringutils.h>
@@ -9,7 +9,6 @@
 #include "settings/pl_info.h"
 #include "settings/setting.h"
 #include "settings/settings.h"
-#include "game/game.h"
 #include "engine/audio_decoder.h"
 #include "engine/mplayer_decoder.h"
 
@@ -46,8 +45,13 @@ struct PlAudio {
 
 #define WAVS_COUNT 8
 
-static const char* const efect_mask[ET_Count] = {"jump", "au", "self",
-        "smileplus", "smileminus", "wall"};
+static const char* const efect_mask[ET_Count] = {
+    "jump",
+    "au",
+    "self",
+    "smileplus",
+    "smileminus",
+    "wall"};
 
 static const char* const section = "audio";
 static const char* const st_sound = "sound";
@@ -70,12 +74,30 @@ static MusicType music_type = MT_Count;
 static AudioDecoder* music_decoder = NULL;
 static vector<MusicFile> music[MT_Count];
 
-static ALfloat source_pos[] = {0.0, 0.0, 0.0};
-static ALfloat source_vel[] = {0.0, 0.0, 0.0};
+static ALfloat source_pos[] = {
+    0.0,
+    0.0,
+    0.0};
+static ALfloat source_vel[] = {
+    0.0,
+    0.0,
+    0.0};
 
-static ALfloat listener_pos[] = {0.0, 0.0, 0.0};
-static ALfloat listener_vel[] = {0.0, 0.0, 0.0};
-static ALfloat listener_ori[] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0};
+static ALfloat listener_pos[] = {
+    0.0,
+    0.0,
+    0.0};
+static ALfloat listener_vel[] = {
+    0.0,
+    0.0,
+    0.0};
+static ALfloat listener_ori[] = {
+    0.0,
+    0.0,
+    -1.0,
+    0.0,
+    1.0,
+    0.0};
 
 static void scan_sounds_dir (const ustring& path,
         vector<SoundProfile>& profiles, vector<char>& data) {
@@ -141,7 +163,7 @@ static void scan_sounds_dir (const ustring& path,
 
                 }
 
-            } catch ( FileError) {
+            } catch (FileError) {
             }
 
             if (sound_count > 0) {
@@ -149,7 +171,7 @@ static void scan_sounds_dir (const ustring& path,
             }
         }
 
-    } catch ( FileError) {
+    } catch (FileError) {
     }
 }
 
@@ -187,7 +209,7 @@ static void scan_music_dir (const ustring& path, vector<MusicFile>& files,
             files.push_back (entry);
         }
 
-    } catch ( FileError) {
+    } catch (FileError) {
     }
 }
 
@@ -215,8 +237,11 @@ static void free_wavs () {
 }
 
 static void init_music () {
-    static const char* const suffixs[MT_Count] = {"game/", "game/", "menu/",
-            "stat/"};
+    static const char* const suffixs[MT_Count] = {
+        "game/",
+        "game/",
+        "menu/",
+        "stat/"};
     ustring dir_name;
     int mt;
 

@@ -6,17 +6,16 @@
 #include "system.h"
 #include "engine/audio.h"
 #include "engine/render.h"
-#include "game/world.h"
-#include "game/teams.h"
-#include "game/players.h"
-#include "engine/audio_decoder.h"
-#include "game/smiles.h"
 #include "settings/pl_info.h"
-#include "game/team.h"
+#include "mods/mod_interface.h"
+#include "game/world.h"
+#include "game/players.h"
 #include "game/smile.h"
+#include "game/smiles.h"
+#include "game/team.h"
+#include "game/teams.h"
 #include "game/start.h"
 #include "game/death_cause.h"
-#include "mods/mod_interface.h"
 
 #include "game/player.h"
 
@@ -203,7 +202,7 @@ void Player::live () {
         write_body_part (pos, fields, survive);
         switch (cause.cause) {
         case DC_killed: {
-            Player& murder = players[cause.murder];
+            Player& murder = Players::at (cause.murder);
             stat.killed++;
             team.stat.killed++;
             murder.stat.kills++;
@@ -225,7 +224,7 @@ void Player::live () {
             Audio::play_effect (id, ET_Wall);
             break;
         case DC_smile:
-            smiles[cause.smile].eat(*this);
+            smiles[cause.smile].eat (*this);
             break;
         default:
             break;
@@ -556,8 +555,8 @@ int Player::get_angle () const {
 
 void Player::calc_stats () {
     for (int sti = ST_pozi; sti < ST_count; sti++) {
-        stat.smiles[sti][0] = stat.smiles[sti][1]
-                + stat.smiles[sti][2] + stat.smiles[sti][3];
+        stat.smiles[sti][0] = stat.smiles[sti][1] + stat.smiles[sti][2]
+                + stat.smiles[sti][3];
     }
 }
 

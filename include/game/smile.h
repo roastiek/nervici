@@ -16,9 +16,9 @@
 class Smile {
 protected:
     const smileid_tu id;
-    
+
     const smilelvl_tu level;
-    
+
     const SmileType type;
 
     Point pos;

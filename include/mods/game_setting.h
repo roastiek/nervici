@@ -20,7 +20,6 @@ struct GameSetting {
     int maxScore;
     int step;
 };
-   
 
 #endif	/* GAME_SETTING_H */
 

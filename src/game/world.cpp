@@ -2,12 +2,12 @@
 #include <math.h>
 
 #include "basic_defs.h"
-#include "engine/render.h"
-#include "game/smiles.h"
 #include "main.h"
+#include "engine/render.h"
 #include "game/fields.h"
 #include "game/players.h"
 #include "game/smile.h"
+#include "game/smiles.h"
 #include "game/world_item.h"
 #include "game/start.h"
 #include "game/death_cause.h"
@@ -40,7 +40,6 @@ void initialize () {
     width = Render::get_playerground_width ();
     height = Render::get_playerground_height ();
 
-
     __items = new WorldItem[width * height];
     items = new WorldItem*[width];
     if (items == NULL) {
@@ -50,23 +49,25 @@ void initialize () {
         items[x] = &__items[x * height];
     }
 
-
     starts.resize (40);
 
     x = (width >= height) ? height : width;
     x /= 2;
     for (startid_tu s = 0; s < starts.size (); s++) {
         starts[s].angle = s * angles / starts.size ();
-        starts[s].pos.x = floor ((width / 2 - (x * icos[starts[s].angle] * 0.8)) * DIGITS) / DIGITS;
-        starts[s].pos.y = floor ((height / 2 - (x * isin[starts[s].angle] * 0.8)) * DIGITS) / DIGITS;
+        starts[s].pos.x = floor (
+                (width / 2 - (x * icos[starts[s].angle] * 0.8)) * DIGITS)
+                / DIGITS;
+        starts[s].pos.y = floor ((height / 2
+                - (x * isin[starts[s].angle] * 0.8)) * DIGITS) / DIGITS;
         starts[s].ready = 1;
     }
 
 }
 
 void uninitialize () {
-    delete [] items;
-    delete [] __items;
+    delete[] items;
+    delete[] __items;
     starts.clear ();
 }
 
@@ -106,7 +107,8 @@ const Start* get_start (startid_tu stid) {
     if (result->ready) {
         result->ready = false;
         return result;
-    } else return NULL;
+    } else
+        return NULL;
 }
 
 startid_tu find_free_start () {
@@ -133,8 +135,8 @@ bool simple_will_survive (const Point& pos, const Fields& fields) {
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
             if (fields[x][y] != 0) {
-                if (pos.x + x < 1 || pos.y + y < 1 ||
-                        pos.x + x >= width - 1 || pos.y + y >= height - 1)
+                if (pos.x + x < 1 || pos.y + y < 1 || pos.x + x >= width - 1
+                        || pos.y + y >= height - 1)
                     return false;
             }
         }
@@ -142,8 +144,8 @@ bool simple_will_survive (const Point& pos, const Fields& fields) {
     return true;
 }
 
-bool will_survive (const Point& pos, const Fields& fields,
-        plid_tu id, plsize_tu head, DeathCause& cause) {
+bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
+        plsize_tu head, DeathCause& cause) {
 
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -189,14 +191,16 @@ bool will_survive (const Point& pos, const Fields& fields,
 }
 
 static void queue_changed_item (wsize_tu x, wsize_tu y) {
-    Point pos = {x, y};
+    Point pos = {
+        x,
+        y};
 
     items_queue.push_back (pos);
     World::get_item (x, y).changed = true;
 }
 
-void write_player_head (const Point& pos, const Fields& fields,
-        plid_tu id, plsize_tu head, bool living) {
+void write_player_head (const Point& pos, const Fields& fields, plid_tu id,
+        plsize_tu head, bool living) {
 
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -204,8 +208,9 @@ void write_player_head (const Point& pos, const Fields& fields,
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
                 case IT_SOFT_SMILE:
-                    if (!living) break;
-                    smiles[item.smile.ID].eat(players[id]);
+                    if (!living)
+                        break;
+                    smiles[item.smile.ID].eat (Players::at (id));
                 case IT_FREE:
                     item.type = IT_PLAYER;
                     item.player.ID = id;
@@ -264,6 +269,7 @@ startid_tu get_starts_count () {
 
 void render_changed_items () {
     Render::draw_world_items_queue (items_queue);
+    items_queue.clear ();
 }
 
 void write_soft_smile (smileid_tu sid, const Point& pos) {
@@ -297,14 +303,15 @@ void erase_smile (const Point& pos) {
 
 bool test_smile (smileid_tu sid, const Point& pos) {
     bool result = true;
-    if (pos.x < 1 || pos.y < 1 || pos.x + 20 >= width - 1 || pos.y + 20 >= height - 1)
+    if (pos.x < 1 || pos.y < 1 || pos.x + 20 >= width - 1 || pos.y + 20
+            >= height - 1)
         return false;
 
     for (int x = 0; x < 20 && result; x++) {
         for (int y = 0; y < 20 && result; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
-            result &= (item.type == IT_FREE) ||
-                    ((item.type == IT_SOFT_SMILE || item.type == IT_HARD_SMILE) && item.smile.ID == sid);
+            result &= (item.type == IT_FREE) || ((item.type == IT_SOFT_SMILE
+                    || item.type == IT_HARD_SMILE) && item.smile.ID == sid);
         }
     }
     return result;
@@ -315,8 +322,9 @@ bool test_dest_smile (smileid_tu sid, const Point& pos) {
     for (int x = 0; x < 20 && result; x++) {
         for (int y = 0; y < 20 && result; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
-            result &= (item.type == IT_FREE) || (item.type == IT_PLAYER) ||
-                    ((item.type == IT_SOFT_SMILE || item.type == IT_HARD_SMILE) && item.smile.ID == sid);
+            result &= (item.type == IT_FREE) || (item.type == IT_PLAYER)
+                    || ((item.type == IT_SOFT_SMILE || item.type
+                            == IT_HARD_SMILE) && item.smile.ID == sid);
         }
     }
     return result;

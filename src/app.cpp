@@ -1,13 +1,12 @@
 #include <SDL.h>
 
 #include "system.h"
-#include "settings/settings.h"
-#include "settings/pl_infos.h"
 #include "engine/render.h"
 #include "engine/audio.h"
+#include "settings/settings.h"
+#include "settings/pl_infos.h"
 #include "game/world.h"
 #include "game/game.h"
-#include "settings/team_info.h"
 #include "settings/team_infos.h"
 
 #include "app.h"

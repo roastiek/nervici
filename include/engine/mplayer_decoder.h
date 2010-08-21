@@ -13,8 +13,7 @@
 
 #include "audio_decoder.h"
 
-
-class MplayerDecoder : public AudioDecoder {
+class MplayerDecoder: public AudioDecoder {
 private:
     Glib::Pid pid;
 
@@ -29,13 +28,13 @@ private:
     void close ();
 
 public:
-    MplayerDecoder();
+    MplayerDecoder ();
 
-    ~MplayerDecoder();
+    ~MplayerDecoder ();
 
     bool open (const Glib::ustring& filename);
 
-    ALenum get_format () const ;
+    ALenum get_format () const;
 
     ALsizei get_frequency () const;
 

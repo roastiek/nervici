@@ -1,6 +1,6 @@
 #include "engine/render.h"
-#include "game/statistic.h"
 #include "settings/team_info.h"
+#include "game/statistic.h"
 
 #include "game/team.h"
 
@@ -68,6 +68,6 @@ const ustring& Team::get_name () const {
     return info.name;
 }
 
-plid_tu Team::get_id() const {
+plid_tu Team::get_id () const {
     return id;
 }

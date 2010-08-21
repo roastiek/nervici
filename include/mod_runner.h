@@ -8,13 +8,11 @@
 #ifndef MOD_RUNNER_H
 #define	MOD_RUNNER_H
 
-
 #include <glibmm/ustring.h>
 
 struct ModRunner {
     Glib::ustring filename;
 };
-
 
 #endif	/* MOD_RUNNER_H */
 

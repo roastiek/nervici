@@ -14,11 +14,11 @@
 #include "game/statistic.h"
 #include "fakes/team_info.h"
 
-class Team : public ITeam {
+class Team: public ITeam {
 private:
 
     plid_tu states[PS_Count];
-    
+
 public:
     const plid_tu id;
 
@@ -45,9 +45,9 @@ public:
     void calc_stats ();
 
     void draw_stat ();
-    
+
     const Glib::ustring& get_name () const;
-    
+
     plid_tu get_id () const;
 };
 

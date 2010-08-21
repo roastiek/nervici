@@ -12,6 +12,5 @@ typedef enum KeySt {
     KS_None, KS_Left, KS_Right, KS_Jump, KS_Power
 } KeySt;
 
-
 #endif	/* KEY_STATE_H */
 

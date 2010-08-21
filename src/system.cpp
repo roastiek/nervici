@@ -36,7 +36,7 @@ void init_paths () {
 
     const gchar * const *system_data_dirs = g_get_system_data_dirs ();
     for (size_t di = 0; system_data_dirs[di] != NULL; di++) {
-        data_dirs.push_back (ustring(system_data_dirs[di]) + "/nervici/");
+        data_dirs.push_back (ustring (system_data_dirs[di]) + "/nervici/");
     }
 }
 
@@ -47,7 +47,8 @@ static void scan_mods_dir (const ustring& path, vector<ustring>& files) {
     try {
         Dir dir (path);
         for (DirIterator it = dir.begin (); it != dir.end (); it++) {
-            if ((*it)[0] == '.') continue;
+            if ((*it)[0] == '.')
+                continue;
             files.push_back (path + (*it));
         }
     } catch (FileError fe) {
@@ -56,7 +57,8 @@ static void scan_mods_dir (const ustring& path, vector<ustring>& files) {
 
 #define RUNNER_SUFFIX ".so"
 
-static void find_mod_runners (const vector<ustring>& files, vector<ModRunner>& runners) {
+static void find_mod_runners (const vector<ustring>& files,
+        vector<ModRunner>& runners) {
     for (size_t fi = 0; fi < files.size (); fi++) {
         const ustring& file = files[fi];
         ustring suffix = file.substr (file.length () - 3, 3).lowercase ();
@@ -69,7 +71,7 @@ static void find_mod_runners (const vector<ustring>& files, vector<ModRunner>& r
     }
 }
 
-static void find_scripts (const vector<ustring>& files, 
+static void find_scripts (const vector<ustring>& files,
         vector<ModRunner>& runners, vector<Mod>& mods) {
 
     for (size_t ri = 0; ri < runners.size (); ri++) {
@@ -78,27 +80,33 @@ static void find_scripts (const vector<ustring>& files,
         const ModInfo* minfo;
 
         Module mod_lib (runner.filename);
-        if (!mod_lib) continue;
+        if (!mod_lib)
+            continue;
 
         GetFaceHandle get_face;
-        if (!mod_lib.get_symbol ("get_face", get_face.handle)) continue;
+        if (!mod_lib.get_symbol ("get_face", get_face.handle))
+            continue;
 
         ModInterface* face = get_face.get_face ();
         const ModRunnerInfo* rinfo = face->get_runner_info ();
-        if (rinfo == NULL) continue;
+        if (rinfo == NULL)
+            continue;
 
         for (size_t ei = 0; rinfo->extensions[ei] != NULL; ei++) {
-            ustring ext = ustring(rinfo->extensions[ei]).lowercase ();
+            ustring ext = ustring (rinfo->extensions[ei]).lowercase ();
             size_t ext_len = ext.length ();
 
             for (size_t fi = 0; fi < files.size (); fi++) {
                 const ustring& script = files[fi];
-                ustring suffix = script.substr (script.length () - ext_len, ext_len);
+                ustring suffix = script.substr (script.length () - ext_len,
+                        ext_len);
 
-                if (ext.compare (suffix) != 0) continue;
+                if (ext.compare (suffix) != 0)
+                    continue;
 
                 minfo = face->get_info (script);
-                if (minfo == NULL) continue;
+                if (minfo == NULL)
+                    continue;
 
                 entry.runner = &runner;
                 entry.script = script;
@@ -145,7 +153,7 @@ void load_mod (size_t mid, const ustring& script) {
     mod_runner = new Module (mod_runners[mid].filename);
     GetFaceHandle get_face;
     mod_runner->get_symbol ("get_face", get_face.handle);
-    mod = get_face.get_face();
+    mod = get_face.get_face ();
     mod->load_script (script);
 }
 

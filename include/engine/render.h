@@ -39,7 +39,7 @@ void draw_stat_screen ();
 
 void draw_semafor (int state);
 
-void draw_world_items_queue (std::vector<Point>& queue);
+void draw_world_items_queue (const std::vector<Point>& queue);
 
 void draw_player_score (plid_tu plid, plid_tu order, score_ti score,
         PlState state, bool ironized);

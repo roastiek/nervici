@@ -14,16 +14,16 @@
 
 class TeamInfos {
 private:
-    
+
     std::vector<TeamInfo> infos;
-    
+
     static TeamInfos instance;
-    
+
     TeamInfos ();
-    
+
 public:
     size_t count () const;
-    
+
     TeamInfo& operator[] (size_t index);
 
     const TeamInfo& operator[] (size_t index) const;
@@ -31,7 +31,7 @@ public:
     void load ();
 
     void save ();
-    
+
     static TeamInfos& get_instance ();
 };
 

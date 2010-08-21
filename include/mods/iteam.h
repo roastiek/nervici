@@ -13,8 +13,8 @@
 class ITeam {
 public:
     virtual plid_tu get_id () const = 0;
-    
-    virtual const Glib::ustring& get_name () const = 0; 
+
+    virtual const Glib::ustring& get_name () const = 0;
 };
 
 #endif /* ITEAM_H_ */

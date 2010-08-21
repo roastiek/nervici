@@ -18,23 +18,23 @@ public:
 
     void save ();
 
-    int read_int (const Glib::ustring& section,
-            const Glib::ustring& key, int def);
+    int read_int (const Glib::ustring& section, const Glib::ustring& key,
+            int def);
 
-    void write_int (const Glib::ustring& section,
-            const Glib::ustring& key, int value);
+    void write_int (const Glib::ustring& section, const Glib::ustring& key,
+            int value);
 
     unsigned long int read_hex (const Glib::ustring& section,
             const Glib::ustring& key, unsigned long int def);
 
-    void write_hex (const Glib::ustring& section,
-            const Glib::ustring& key, unsigned long int value);
+    void write_hex (const Glib::ustring& section, const Glib::ustring& key,
+            unsigned long int value);
 
     Glib::ustring read_string (const Glib::ustring& section,
             const Glib::ustring& key, const Glib::ustring & def);
 
-    void write_string (const Glib::ustring& section,
-            const Glib::ustring& key, const Glib::ustring & value);
+    void write_string (const Glib::ustring& section, const Glib::ustring& key,
+            const Glib::ustring & value);
 
     std::vector<Glib::ustring> read_string_list (const Glib::ustring& section,
             const Glib::ustring& key, const std::vector<Glib::ustring>& def);

@@ -28,7 +28,8 @@ static void calc_angles () {
 int main (int argc, char *argv[]) {
     Glib::init ();
     Gio::init ();
-    if (SDL_Init (0)) return 1;
+    if (SDL_Init (0))
+        return 1;
 
     calc_angles ();
 

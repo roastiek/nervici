@@ -5,32 +5,31 @@
 #include "fakes/game_info.h"
 
 namespace Game {
-    void initialize (const GameInfo & info);
+void initialize (const GameInfo & info);
 
-    void run ();
+void run ();
 
-    void uninitialize ();
+void uninitialize ();
 
-    void clear_playerground ();
+void clear_playerground ();
 
-    void clear_status ();
+void clear_status ();
 
-    void end_game ();
+void end_game ();
 
-    timer_ti get_speed ();
+timer_ti get_speed ();
 
-    void next_round ();
+void next_round ();
 
-    round_tu get_round ();
+round_tu get_round ();
 
-    void set_speed (timer_ti value);
+void set_speed (timer_ti value);
 
-    void set_timer (timer_ti value);
+void set_timer (timer_ti value);
 
-    void wait (timer_ti time);
+void wait (timer_ti time);
 
-    void wait_for_space ();
+void wait_for_space ();
 }
-
 
 #endif

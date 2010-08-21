@@ -12,17 +12,17 @@
 #include "frames/game_frame.h"
 #include "frames/pledit_frame.h"
 
-namespace App  {
-    void initialize ();
-    void uninitialize ();
-    void run ();
-    void quit ();
+namespace App {
+void initialize ();
+void uninitialize ();
+void run ();
+void quit ();
 
-    StartFrame* switch_to_start_frame ();
-    GameFrame* switch_game_frame ();
-    PlEditFrame* switch_to_pledit_frame ();
+StartFrame* switch_to_start_frame ();
+GameFrame* switch_game_frame ();
+PlEditFrame* switch_to_pledit_frame ();
 
-    GameFrame* get_game_frame ();
+GameFrame* get_game_frame ();
 }
 
 #endif	/* APP_H */

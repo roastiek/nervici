@@ -15,12 +15,12 @@ struct Fields {
 private:
     plpart_tu data[3][3];
 public:
-    template <class T>
+    template<class T>
     inline plpart_tu* operator[] (T index) {
         return data[index];
     }
 
-    template <class T>
+    template<class T>
     inline const plpart_tu* operator[] (T index) const {
         return data[index];
     }

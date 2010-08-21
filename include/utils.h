@@ -12,7 +12,7 @@
 
 using namespace std;
 
-template <class T>
+template<class T>
 inline string to_string (const T& value) {
     stringstream ss;
     ss << value;

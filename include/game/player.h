@@ -13,7 +13,7 @@
 #include "fakes/pl_info.h"
 #include "fakes/team.h"
 
-class Player : public IPlayer {
+class Player: public IPlayer {
 private:
     PlState state;
 
@@ -68,7 +68,7 @@ private:
     void check_length ();
 
     void live ();
-    
+
     void write_body_part (const Point& pos, const Fields & fields, bool living);
 
     void resize (plsize_tu new_size);
@@ -86,15 +86,15 @@ public:
     const plid_tu id;
 
     const PlInfo& info;
-    
+
     Statistic stat;
 
     Team& team;
-    
+
     plid_tu order;
 
     Player (plid_tu ID, Team& team, const PlInfo& plinfo, int max_len);
-    
+
     ~Player ();
 
     /*
@@ -139,11 +139,11 @@ public:
      * if max is lower than current length, corpose decays at double speed
      */
     void dec_max_length (plsize_tu delta);
-    
+
     void inc_max_length (plsize_tu delta);
-    
+
     void set_max_length (plsize_tu length);
-    
+
     void set_timer (timer_ti time);
     /*
      * Change state from PS_Start to PS_Live
@@ -189,16 +189,16 @@ public:
 
     plid_tu get_order () const;
 
-    bool operator >(const Player& other) const;
+    bool operator > (const Player& other) const;
 
-    bool operator <(const Player& other) const;
+    bool operator < (const Player& other) const;
 
     void set_order (plid_tu value);
 
     void set_ironize (score_ti value);
-    
+
     void inc_ironize (score_ti delta);
-    
+
     void dec_ironize (score_ti delta);
 
     score_ti get_ironize () const;
@@ -208,11 +208,10 @@ public:
     const FPoint& get_position () const;
 
     int get_angle () const;
-    
+
     void calc_stats ();
 
     void draw_stat ();
 };
-
 
 #endif

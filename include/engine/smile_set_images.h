@@ -8,7 +8,6 @@
 #ifndef SMILE_SET_IMAGES_H
 #define	SMILE_SET_IMAGES_H
 
-
 #include "fakes/gui/canvas.h"
 
 #define SMILE_SETTING_COUNT 25

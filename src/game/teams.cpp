@@ -9,13 +9,9 @@
 
 using namespace std;
 
-Teams& teams = Teams::get_instance ();
+vector<Team*> Teams::teams;
 
-Teams Teams::instance;
-
-Teams& Teams::get_instance() {
-    return instance;
-}
+vector<plid_tu> Teams::orders;
 
 Teams::Teams () {
 }
@@ -23,20 +19,20 @@ Teams::Teams () {
 void Teams::initialize (const GameInfo& info) {
     size_t ati = 0;
     vector<const TeamInfo*> infos;
-    
+
     for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
         if (info.team_active[ti]) {
             const TeamInfo& tinfo = team_infos[ti];
-            teams.push_back(new Team (ati, tinfo));
-            infos.push_back(&tinfo);
+            teams.push_back (new Team (ati, tinfo));
+            infos.push_back (&tinfo);
             ati++;
         }
     }
     orders.resize (teams.size ());
- 
-    teams.push_back(new Team (ati, team_infos[0]));
-    infos.push_back(&team_infos[0]);
-    
+
+    teams.push_back (new Team (ati, team_infos[0]));
+    infos.push_back (&team_infos[0]);
+
     Render::load_teams (infos);
 }
 
@@ -46,8 +42,8 @@ void Teams::uninitialize () {
     for (size_t ti = 0; ti < teams.size (); ti++) {
         delete teams[ti];
     }
-    teams.resize(0);
-    orders.resize(0);
+    teams.resize (0);
+    orders.resize (0);
 }
 
 void Teams::update_score () {
@@ -64,32 +60,20 @@ void Teams::update_score () {
     }
 
     for (size_t ti = 0; ti < orders.size (); ti++) {
-        teams[ti]->order  = orders[ti];
+        teams[ti]->order = orders[ti];
         teams[ti]->update_score ();
     }
 }
 
 void Teams::calc_stats () {
     for (size_t ti = 0; ti < orders.size (); ti++) {
-        teams[ti]->calc_stats();
+        teams[ti]->calc_stats ();
     }
-}
-
-plid_tu Teams::count () {
-	return orders.size();
 }
 
 void Teams::draw_stat () {
     for (size_t ti = 0; ti < orders.size (); ti++) {
-        teams[ti]->draw_stat();
+        teams[ti]->draw_stat ();
     }
-}
-
-Team& Teams::operator [](plid_tu index) {
-    return *teams[index];
-}
-
-const Team& Teams::operator [](plid_tu index) const {
-    return *teams[index];
 }
 

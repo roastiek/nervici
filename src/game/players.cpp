@@ -1,36 +1,42 @@
 #include <vector>
 #include <iostream>
-#include <SDL.h>
 
 #include "engine/audio.h"
 #include "engine/render.h"
 #include "settings/pl_infos.h"
+#include "settings/team_info.h"
 #include "game/game_info.h"
 #include "game/fields.h"
 #include "game/statistic.h"
 #include "game/player.h"
 #include "game/team.h"
 #include "game/teams.h"
-#include "settings/team_info.h"
 
 #include "game/players.h"
 
 using namespace std;
 
-Players players;
-
 vector<Player*> Players::players;
 
 vector<plid_tu> Players::orders;
+
+Players::Players () {
+
+}
 
 void Players::initialize (const GameInfo& info) {
     vector<const PlInfo*> infos;
     vector<const TeamInfo*> tinfos;
 
-    Team* team_map[TEAMS_COUNT] = {NULL, NULL, NULL, NULL, NULL};
+    Team* team_map[TEAMS_COUNT] = {
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL};
 
-    for (plid_tu ti = 0; ti <= teams.count (); ti++) {
-        team_map[teams[ti].info.id] = &teams[ti];
+    for (plid_tu ti = 0; ti <= Teams::count (); ti++) {
+        team_map[Teams::at (ti).info.id] = &Teams::at (ti);
     }
 
     players.clear ();
@@ -44,14 +50,12 @@ void Players::initialize (const GameInfo& info) {
             players.push_back (new Player (p, team, plnfo,
                     info.setting.maxLength));
             infos.push_back (&plnfo);
-            tinfos.push_back(&team.info);
+            tinfos.push_back (&team.info);
             p++;
         }
     }
 
     orders.resize (players.size ());
-    
-    cout << players.size () << '\n';
 
     Render::load_players (infos, tinfos);
     Audio::load_players (infos);
@@ -68,15 +72,11 @@ void Players::uninitialize () {
     players.clear ();
 }
 
-plid_tu Players::step () {
-    uint8_t *keys;
+plid_tu Players::step (const uint8_t * keys) {
     plid_tu result = 0;
-
-    keys = SDL_GetKeyState (NULL);
 
     for (plid_tu pi = 0; pi < players.size (); pi++) {
         result += players[pi]->step (keys);
-        //result += (players[pi].state == psLive);
     }
 
     return result;
@@ -127,18 +127,6 @@ void Players::erase () {
     }
 }
 
-plid_tu Players::count () {
-    return players.size ();
-}
-
-Player& Players::operator [] (plid_tu index) {
-    return *players[index];
-}
-
-const Player& Players::operator [] (plid_tu index) const {
-    return *players[index];
-}
-
 void Players::calc_stats () {
     for (plid_tu pi = 0; pi < players.size (); pi++) {
         players[pi]->calc_stats ();
@@ -150,4 +138,3 @@ void Players::draw_stat () {
         players[pi]->draw_stat ();
     }
 }
-

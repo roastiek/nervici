@@ -16,9 +16,11 @@ struct Float {
 private:
     uint32_t value;
 public:
-    inline Float (int v):value (v * PRECISION) {
+    inline Float (int v) :
+        value (v * PRECISION) {
     }
-    inline Float (float v): value (v * PRECISION) {
+    inline Float (float v) :
+        value (v * PRECISION) {
     }
 
     inline Float& operator = (int val) {
@@ -32,32 +34,32 @@ public:
     }
 
     inline Float& operator + (const Float& val) {
-        value+= val.value;
+        value += val.value;
         return *this;
     }
 
     inline Float& operator + (int val) {
-        value+= val * PRECISION;
+        value += val * PRECISION;
         return *this;
     }
 
     inline Float& operator + (float val) {
-        value+= val * PRECISION;
+        value += val * PRECISION;
         return *this;
     }
 
     inline Float& operator - (const Float& val) {
-        value-= val.value;
+        value -= val.value;
         return *this;
     }
 
     inline Float& operator - (int val) {
-        value-= val * PRECISION;
+        value -= val * PRECISION;
         return *this;
     }
 
     inline Float& operator - (float val) {
-        value-= val * PRECISION;
+        value -= val * PRECISION;
         return *this;
     }
 };

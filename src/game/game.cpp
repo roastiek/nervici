@@ -2,24 +2,24 @@
 #include <math.h>
 #include <iostream>
 
-using namespace std;
-
-#include "game/statistic.h"
+#include "system.h"
 #include "engine/render.h"
 #include "engine/audio.h"
-#include "system.h"
+#include "settings/team_info.h"
+#include "mods/mod_interface.h"
+#include "game/statistic.h"
 #include "game/world.h"
 #include "game/smiles.h"
 #include "game/smile.h"
-#include "settings/team_info.h"
 #include "game/player.h"
 #include "game/players.h"
 #include "game/team.h"
 #include "game/teams.h"
 #include "game/game_info.h"
-#include "mods/mod_interface.h"
 
 #include "game/game.h"
+
+using namespace std;
 
 namespace Game {
 
@@ -39,8 +39,8 @@ void initialize (const GameInfo& info) {
 
     Render::draw_game_screen ();
     World::initialize ();
-    teams.initialize (info);
-    players.initialize (info);
+    Teams::initialize (info);
+    Players::initialize (info);
     smiles.initialize (info);
 
     set.startsCount = World::get_starts_count ();
@@ -64,8 +64,8 @@ void uninitialize () {
     System::unload_mod ();
 
     smiles.uninitialize ();
-    players.uninitialize ();
-    teams.uninitialize ();
+    Players::uninitialize ();
+    Teams::uninitialize ();
     World::uninitialize ();
 }
 
@@ -127,12 +127,12 @@ static int compare_stat (const Statistic& st1, const Statistic& st2,
     }
 }
 
-static int compare_pl (plid_tu id1, plid_tu id2, StatColumn col) {
+static int compare_pl (const Player& pl1, const Player& pl2, StatColumn col) {
     switch (col) {
     case STC_name:
-        return players[id1].get_name ().compare (players[id2].get_name ());
+        return pl1.get_name ().compare (pl2.get_name ());
     default:
-        return compare_stat (players[id1].stat, players[id2].stat, col);
+        return compare_stat (pl1.stat, pl2.stat, col);
     }
 }
 
@@ -152,15 +152,15 @@ static void run_statistic () {
 
     StatColumn order_col = STC_score;
 
-    players.calc_stats ();
-    teams.calc_stats ();
-    players.draw_stat ();
-    teams.draw_stat ();
+    Players::calc_stats ();
+    Teams::calc_stats ();
+    Players::draw_stat ();
+    Teams::draw_stat ();
 
     vector<plid_tu> pl_orders;
-    pl_orders.resize (players.count ());
+    pl_orders.resize (Players::count ());
     vector<plid_tu> team_orders;
-    team_orders.resize (teams.count ());
+    team_orders.resize (Teams::count ());
 
     while (!abort) {
         if (SDL_WaitEvent (&event)) {
@@ -189,34 +189,33 @@ static void run_statistic () {
                         if (order_col != col) {
                             order_col = col;
 
-                            for (plid_tu plid = 0; plid < players.count (); plid++) {
+                            for (plid_tu plid = 0; plid < Players::count (); plid++) {
+                                const Player& pl = Players::at (plid);
                                 pl_orders[plid] = 0;
-                                plid_tu old_order = players[plid].get_order ();
-                                for (plid_tu other = 0; other
-                                        < players.count (); other++) {
-                                    int cmp = compare_pl (plid, other,
-                                            order_col);
+                                for (plid_tu otherid = 0; otherid
+                                        < Players::count (); otherid++) {
+                                    const Player& other = Players::at (otherid);
+                                    int cmp = compare_pl (pl, other, order_col);
                                     if (cmp < 0) {
                                         pl_orders[plid]++;
                                     } else if (cmp == 0) {
-                                        if (old_order
-                                                > players[other].get_order ()) {
+                                        if (pl.order > other.order) {
                                             pl_orders[plid]++;
                                         }
                                     }
                                 }
                             }
-                            for (plid_tu plid = 0; plid < players.count (); plid++) {
-                                players[plid].set_order (pl_orders[plid]);
+                            for (plid_tu plid = 0; plid < Players::count (); plid++) {
+                                Players::at (plid).order = pl_orders[plid];
                             }
 
-                            for (plid_tu tid = 0; tid < teams.count (); tid++) {
+                            for (plid_tu tid = 0; tid < Teams::count (); tid++) {
                                 team_orders[tid] = 0;
-                                const Team& te = teams[tid];
+                                const Team& te = Teams::at (tid);
                                 plid_tu old_order = te.order;
                                 for (plid_tu otheri = 0; otheri
-                                        < teams.count (); otheri++) {
-                                    const Team& other = teams[otheri];
+                                        < Teams::count (); otheri++) {
+                                    const Team& other = Teams::at (otheri);
                                     int cmp = compare_team (te, other,
                                             order_col);
                                     if (cmp < 0) {
@@ -228,22 +227,22 @@ static void run_statistic () {
                                     }
                                 }
                             }
-                            for (plid_tu tid = 0; tid < teams.count (); tid++) {
-                                teams[tid].order = team_orders[tid];
+                            for (plid_tu tid = 0; tid < Teams::count (); tid++) {
+                                Teams::at (tid).order = team_orders[tid];
                             }
                         } else {
-                            for (plid_tu plid = 0; plid < players.count (); plid++) {
-                                Player& pl = players[plid];
-                                pl.set_order (players.count ()
+                            for (plid_tu plid = 0; plid < Players::count (); plid++) {
+                                Player& pl = Players::at (plid);
+                                pl.set_order (Players::count ()
                                         - pl.get_order () - 1);
                             }
-                            for (plid_tu tid = 0; tid < teams.count (); tid++) {
-                                Team& te = teams[tid];
-                                te.order = teams.count () - te.order - 1;
+                            for (plid_tu tid = 0; tid < Teams::count (); tid++) {
+                                Team& te = Teams::at (tid);
+                                te.order = Teams::count () - te.order - 1;
                             }
                         }
-                        players.draw_stat ();
-                        teams.draw_stat ();
+                        Players::draw_stat ();
+                        Teams::draw_stat ();
 
                         break;
                     }
@@ -262,12 +261,13 @@ static void run_statistic () {
 void run () {
     SDL_Event event;
     size_t steps = 0;
+    uint8_t *keys;
 
     cout << __func__ << '\n';
 
     //clock_gettime (CLOCK_REALTIME, &time);
     sdl_time = SDL_GetTicks ();
-    players.update_score ();
+    Players::update_score ();
     Render::draw_timer (timer);
     Render::draw_status ("status");
     System::mod->on_game_start (set);
@@ -290,21 +290,23 @@ void run () {
             }
         }
 
+        keys = SDL_GetKeyState (NULL);
+
         System::mod->before_step ();
-        players.step ();
+        Players::step (keys);
         World::check_starts ();
         System::mod->after_step ();
 
         System::mod->before_step ();
-        players.step ();
+        Players::step (keys);
         smiles.step ();
         World::check_starts ();
         System::mod->after_step ();
 
         World::render_changed_items ();
-        players.update_bodies ();
-        players.update_score ();
-        teams.update_score ();
+        Players::update_bodies ();
+        Players::update_score ();
+        Teams::update_score ();
         //Render::update_screen ();
 
         Audio::music_update ();
@@ -321,7 +323,7 @@ void run () {
                 System::mod->on_timer ();
             }
         }
-        players.timer (speed);
+        Players::timer (speed);
         steps++;
     }
 
@@ -352,9 +354,9 @@ void wait (timer_ti time) {
     int rest = time;
 
     World::render_changed_items ();
-    players.update_bodies ();
-    players.update_score ();
-    teams.update_score ();
+    Players::update_bodies ();
+    Players::update_score ();
+    Teams::update_score ();
 
     while (!end && !abort && rest > 0) {
 
@@ -379,9 +381,9 @@ void wait_for_space () {
     SDL_Event event;
 
     World::render_changed_items ();
-    players.update_bodies ();
-    players.update_score ();
-    teams.update_score ();
+    Players::update_bodies ();
+    Players::update_score ();
+    Teams::update_score ();
 
     while (!abort) {
         while (SDL_PollEvent (&event)) {
@@ -414,7 +416,7 @@ void next_round () {
 void clear_playerground () {
     World::clear ();
     Render::clear_playerground ();
-    players.erase ();
+    Players::erase ();
     smiles.erase ();
 }
 

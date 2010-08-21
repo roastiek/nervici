@@ -1,10 +1,9 @@
-#include "game/players.h"
-#include "game/world.h"
-#include "game/game.h"
 #include "engine/audio.h"
 #include "engine/render.h"
-#include "game/statistic.h"
+#include "game/world.h"
+#include "game/game.h"
 #include "game/player.h"
+#include "game/players.h"
 
 #include "mods/nervici.h"
 
@@ -67,12 +66,11 @@ startid_tu world_find_free_start () {
 }
 
 plid_tu live_pls_count () {
-    return players.live_pls_count ();
+    return Players::live_pls_count ();
 }
 
 IPlayer& get_player (plid_tu plid) {
-    return players[plid];
+    return Players::at (plid);
 }
-
 
 }

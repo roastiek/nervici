@@ -8,17 +8,17 @@
 #include "fakes/smile_images.h"
 
 namespace Loader {
-    void load_game_images (std::vector<SDL_Surface*>& images);
+void load_game_images (std::vector<SDL_Surface*>& images);
 
-    void free_game_images (std::vector<SDL_Surface*>& images);
+void free_game_images (std::vector<SDL_Surface*>& images);
 
-    void load_smile_setting_images (SmileSettingImages& images);
+void load_smile_setting_images (SmileSettingImages& images);
 
-    void free_smile_setting_images (SmileSettingImages& images);
+void free_smile_setting_images (SmileSettingImages& images);
 
-    void load_smile_faces (SmileImages& faces);
+void load_smile_faces (SmileImages& faces);
 
-    void free_smile_faces (SmileImages& faces);
+void free_smile_faces (SmileImages& faces);
 }
 
 #endif // __LOADER_H__

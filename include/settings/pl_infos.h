@@ -8,21 +8,21 @@
 
 class PlInfos {
 private:
-    
+
     std::vector<PlInfo> players;
-    
+
     std::vector<PlInfo> ais;
-    
+
     static PlInfos instance;
-    
+
     PlInfos ();
-    
+
     void load_players ();
 
     void load_ais ();
-    
+
     void save_players ();
-    
+
     void save_ais ();
 
 public:
@@ -37,13 +37,13 @@ public:
     size_t ais_count ();
 
     const PlInfo& operator[] (size_t index) const;
-    
+
     PlInfo& operator[] (size_t index);
 
     void add (const PlInfo& info);
 
     void remove (size_t idi);
-    
+
     static PlInfos& get_instance ();
 };
 

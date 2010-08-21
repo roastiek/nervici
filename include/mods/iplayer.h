@@ -22,7 +22,7 @@ public:
     virtual const Glib::ustring& get_name () const = 0;
 
     virtual void clear () = 0;
-    
+
     virtual void fast_clear () = 0;
 
     virtual void give_start (startid_tu start) = 0;

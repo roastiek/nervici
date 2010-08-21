@@ -8,8 +8,8 @@
 #ifndef MOD_H
 #define	MOD_H
 
-#include "fakes/mod_runner.h"
 #include "mods/mod_specification.h"
+#include "fakes/mod_runner.h"
 
 struct Mod {
     const ModRunner *runner;
@@ -19,7 +19,6 @@ struct Mod {
     Glib::ustring rules;
     ModSpecification spec;
 };
-
 
 #endif	/* MOD_H */
 

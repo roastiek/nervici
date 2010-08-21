@@ -20,7 +20,5 @@ struct GameInfo {
     int pls_team[16];
 };
 
-
-
 #endif	/* GAME_INFO_H */
 

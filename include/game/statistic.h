@@ -13,7 +13,7 @@
 
 struct Statistic {
 public:
-    Statistic();
+    Statistic ();
 
     score_ti score;
     int steps;

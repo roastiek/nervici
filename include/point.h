@@ -15,6 +15,5 @@ struct Point {
     wsize_tu y;
 };
 
-
 #endif	/* POINT_H */
 

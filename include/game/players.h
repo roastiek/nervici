@@ -19,36 +19,42 @@ private:
     static std::vector<Player*> players;
 
     static std::vector<plid_tu> orders;
-    
+
+    Players ();
+
 public:
-    void initialize (const GameInfo & info);
+    static void initialize (const GameInfo & info);
 
-    void uninitialize ();
+    static void uninitialize ();
 
-    plid_tu step ();
+    static plid_tu step (const uint8_t * keys);
 
-    void update_score ();
+    static void update_score ();
 
-    void timer (timer_ti speed);
+    static void timer (timer_ti speed);
 
-    plid_tu live_pls_count ();
+    static plid_tu live_pls_count ();
 
-    void update_bodies ();
+    static void update_bodies ();
 
-    void erase ();
+    static void erase ();
 
-    plid_tu count ();
-    
-    Player& operator[] (plid_tu index);
-  
-    const Player& operator[] (plid_tu index) const;
+    static plid_tu count ();
 
-    void calc_stats ();
-    
-    void draw_stat ();
+    static Player& at (plid_tu index);
+
+    static void calc_stats ();
+
+    static void draw_stat ();
 };
 
-extern Players players;
+inline plid_tu Players::count () {
+    return players.size ();
+}
+
+inline Player& Players::at (plid_tu index) {
+    return *players[index];
+}
 
 #endif	/* PLAYERS_H */
 
