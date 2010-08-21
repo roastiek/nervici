@@ -4,6 +4,8 @@
 #include "game/game.h"
 #include "game/player.h"
 #include "game/players.h"
+#include "game/team.h"
+#include "game/teams.h"
 
 #include "mods/nervici.h"
 
@@ -69,8 +71,21 @@ plid_tu live_pls_count () {
     return Players::live_pls_count ();
 }
 
+plid_tu get_players_count () {
+    return Players::count ();
+}
+
 IPlayer& get_player (plid_tu plid) {
     return Players::at (plid);
 }
 
+IPlayer& get_player (plid_tu plid);
+
+plid_tu get_teams_count () {
+    return Teams::count ();
+}
+
+ITeam& get_team (plid_tu tid) {
+    return Teams::at (tid);
+}
 }

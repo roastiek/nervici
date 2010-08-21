@@ -9,9 +9,9 @@
 #define	GAME_SETTING_H
 
 struct GameSetting {
-    int playersCount;
+//    int players_count;
     int teams_count;
-    int startsCount;
+    int starts_count;
     int rounds;
     int bonus;
     int gameTime;

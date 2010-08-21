@@ -193,15 +193,10 @@ GameFrame::GameFrame () :
     game_info.setting.gameTime = 0;
     game_info.setting.maxLength = 0;
     game_info.setting.maxScore = 0;
-    game_info.setting.playersCount = 0;
     game_info.setting.rounds = 10;
     game_info.setting.speed = base_speed;
-    game_info.setting.startsCount = 40;
+    game_info.setting.starts_count = 40;
     game_info.setting.step = 1;
-    for (int pi = 0; pi < 16; pi++) {
-        game_info.pl_ids[pi] = -1;
-        game_info.pls_team[pi] = 0;
-    }
 
     for (int sti = ST_pozi; sti < ST_count; sti++) {
         for (int li = 0; li < 3; li++) {
@@ -391,25 +386,30 @@ void GameFrame::btn_start_clicked (Control* ctl) {
     game_info.setting.speed = sa_speed->get_value ();
     game_info.setting.step = nb_step->get_value ();
 
-    game_info.setting.teams_count = 0;
-    for (int ti = 0; ti < TEAMS_COUNT; ti++)
-        game_info.team_active[ti] = false;
+    vector<int> team_id;
+    team_id.resize (team_infos.count (), -1);
 
-    game_info.setting.playersCount = 0;
+    game_info.team_infos.clear ();
+    game_info.pl_infos.clear ();
+    game_info.pl_teams.clear ();
     for (int pi = 0; pi < 16; pi++) {
-        game_info.pl_ids[pi] = cb_players[pi]->get_selected () - 1;
-        if (game_info.pl_ids[pi] >= 0) {
-            game_info.setting.playersCount++;
-            game_info.pls_team[pi] = btn_teams[pi]->get_selected ();
-            if (game_info.pls_team[pi] > 0) {
-                if (!game_info.team_active[game_info.pls_team[pi]]) {
-                    game_info.team_active[game_info.pls_team[pi]] = true;
-                    game_info.setting.teams_count++;
+        int plid = cb_players[pi]->get_selected () - 1;
+        if (plid >= 0) {
+            game_info.pl_infos.push_back (&pl_infos[plid]);
+            int tid = btn_teams[pi]->get_selected ();
+            game_info.pl_teams.push_back (tid);
+            if (tid > 0) {
+                if (team_id[tid] == -1) {
+                    team_id[tid] = game_info.team_infos.size ();
+                    game_info.team_infos.push_back (&team_infos[tid]);
                 }
             }
-        } else {
-            game_info.pls_team[pi] = 0;
         }
+    }
+    team_id[0] = game_info.team_infos.size ();
+
+    for (size_t pi = 0; pi < game_info.pl_teams.size (); pi++) {
+        game_info.pl_teams[pi] = team_id[game_info.pl_teams[pi]];
     }
 
     for (int sti = ST_pozi; sti < ST_count; sti++) {

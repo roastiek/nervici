@@ -6,6 +6,8 @@
 #include "mods/mod_interface.h"
 #include "mods/get_face.h"
 #include "mods/standard_mods.h"
+#include "mods/mod_runner_info.h"
+#include "mods/mod_info.h"
 
 #include "mods/mods.h"
 

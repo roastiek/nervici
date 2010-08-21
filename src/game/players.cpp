@@ -25,41 +25,21 @@ Players::Players () {
 }
 
 void Players::initialize (const GameInfo& info) {
-    vector<const PlInfo*> infos;
     vector<const TeamInfo*> tinfos;
-
-    Team* team_map[TEAMS_COUNT] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL};
-
-    for (plid_tu ti = 0; ti <= Teams::count (); ti++) {
-        cout << int(ti) << '\n';
-        team_map[Teams::at (ti).info.id] = &Teams::at (ti);
-    }
 
     players.clear ();
 
-    plid_tu p = 0;
-    for (plid_tu pi = 0; pi < 16; pi++) {
-        int inf = info.pl_ids[pi];
-        if (inf >= 0) {
-            const PlInfo& plnfo = pl_infos[inf];
-            Team& team = *team_map[info.pls_team[pi]];
-            players.push_back (new Player (p, team, plnfo,
-                    info.setting.maxLength));
-            infos.push_back (&plnfo);
-            tinfos.push_back (&team.info);
-            p++;
-        }
+    for (plid_tu pi = 0; pi < info.pl_infos.size (); pi++) {
+        const PlInfo& plnfo = *info.pl_infos[pi];
+        Team& team = Teams::at (info.pl_teams[pi]);
+        players.push_back (new Player (pi, team, plnfo, info.setting.maxLength));
+        tinfos.push_back (&team.info);
     }
 
     orders.resize (players.size ());
 
-    Render::load_players (infos, tinfos);
-    Audio::load_players (infos);
+    Render::load_players (info.pl_infos, tinfos);
+    Audio::load_players (info.pl_infos);
 }
 
 void Players::uninitialize () {

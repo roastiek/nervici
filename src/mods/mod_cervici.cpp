@@ -1,4 +1,8 @@
 #include "mods/nervici.h"
+#include "mods/mod_runner_info.h"
+#include "mods/mod_info.h"
+#include "mods/game_setting.h"
+
 using namespace Nervici;
 
 #include "mods/mod_interface.h"
@@ -51,11 +55,11 @@ private:
         set_semafor (SEMAFOR_RED_1);
         game_wait (WAIT_TIME);
 
-        for (int pi = 0; pi < set.playersCount; pi++) {
+        for (int pi = 0; pi < get_players_count(); pi++) {
             IPlayer& p = get_player (pi);
             if (p.is_human ()) {
                 sid = world_find_free_start ();
-                if (sid < set.startsCount) {
+                if (sid < set.starts_count) {
                     p.give_start (sid);
                 }
             }
@@ -64,11 +68,11 @@ private:
         game_wait (WAIT_TIME);
 
 
-        for (int pi = 0; pi < set.playersCount; pi++) {
+        for (int pi = 0; pi < get_players_count (); pi++) {
             IPlayer& p = get_player (pi);
             if (!p.is_human ()) {
                 sid = world_find_free_start ();
-                if (sid < set.startsCount) {
+                if (sid < set.starts_count) {
                     p.give_start (sid);
                 }
             }
@@ -77,7 +81,7 @@ private:
         game_wait (WAIT_TIME);
 
         play_music (0);
-        for (int pi = 0; pi < set.playersCount; pi++) {
+        for (int pi = 0; pi < get_players_count (); pi++) {
             get_player (pi).start ();
         }
         set_semafor (SEMAFOR_GREEN);
@@ -107,7 +111,7 @@ public:
     }
 
     void after_step () {
-        for (int pi = 0; pi < set.playersCount; pi++) {
+        for (int pi = 0; pi < get_players_count (); pi++) {
             IPlayer& p = get_player (pi);
             if (p.is_live ()) {
                 p.inc_score (1);

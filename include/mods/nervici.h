@@ -37,7 +37,13 @@ void game_wait (timer_ti time);
 
 void wait_for_space ();
 
+plid_tu get_players_count ();
+
 IPlayer& get_player (plid_tu plid);
+
+plid_tu get_teams_count ();
+
+ITeam& get_team (plid_tu tid);
 }
 
 #endif // __NERVICI_H__

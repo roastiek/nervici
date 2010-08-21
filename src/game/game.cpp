@@ -43,7 +43,7 @@ void initialize (const GameInfo& info) {
     Players::initialize (info);
     smiles.initialize (info);
 
-    set.startsCount = World::get_starts_count ();
+    set.starts_count = World::get_starts_count ();
 
     end = false;
     abort = false;

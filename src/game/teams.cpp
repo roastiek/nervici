@@ -17,23 +17,15 @@ Teams::Teams () {
 }
 
 void Teams::initialize (const GameInfo& info) {
-    size_t ati = 0;
-    vector<const TeamInfo*> infos;
-
-    for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
-        if (info.team_active[ti]) {
-            const TeamInfo& tinfo = team_infos[ti];
-            teams.push_back (new Team (ati, tinfo));
-            infos.push_back (&tinfo);
-            ati++;
-        }
+    for (size_t ti = 0; ti < info.team_infos.size (); ti++) {
+        const TeamInfo& tinfo = *info.team_infos[ti];
+        teams.push_back (new Team (ti, tinfo));
     }
     orders.resize (teams.size ());
 
-    teams.push_back (new Team (ati, team_infos[0]));
-    infos.push_back (&team_infos[0]);
+    teams.push_back (new Team (orders.size (), team_infos[0]));
 
-    Render::load_teams (infos);
+    Render::load_teams (info.team_infos);
 }
 
 void Teams::uninitialize () {
