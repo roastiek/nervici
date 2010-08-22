@@ -9,28 +9,33 @@
 #include "settings/team_infos.h"
 
 using namespace Glib;
+using namespace std;
 
-const static TeamInfo def_infos[TEAMS_COUNT] = { {0, 0x000000, ""}, {1,
-        0xff8080, "team 17"}, {2, 0xff80ff, "team 24"},
-        {3, 0x80ff80, "team 39"}, {4, 0x8080ff, "team 18+"}};
+const static TeamInfo def_infos[TEAMS_COUNT] = {
+    {
+        0,
+        0x000000,
+        ""},
+    {
+        1,
+        0xff8080,
+        "team 17"},
+    {
+        2,
+        0xff80ff,
+        "team 24"},
+    {
+        3,
+        0x80ff80,
+        "team 39"},
+    {
+        4,
+        0x8080ff,
+        "team 18+"}};
 
-TeamInfos TeamInfos::instance;
-
-TeamInfos& team_infos = TeamInfos::get_instance ();
+vector<TeamInfo*> TeamInfos::infos;
 
 TeamInfos::TeamInfos () {
-}
-
-size_t TeamInfos::count () const {
-    return infos.size ();
-}
-
-TeamInfo& TeamInfos::operator [] (size_t id) {
-    return infos[id];
-}
-
-const TeamInfo& TeamInfos::operator [] (size_t id) const {
-    return infos[id];
 }
 
 void TeamInfos::load () {
@@ -40,30 +45,31 @@ void TeamInfos::load () {
 
     infos.resize (TEAMS_COUNT);
 
-    infos[0] = def_infos[0];
+    infos[0] = new TeamInfo ();
+    *infos[0] = def_infos[0];
 
     for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
         section = "team" + to_string<size_t> (ti);
 
-        infos[ti].id = ti;
-        infos[ti].color = set.read_hex (section, "color", def_infos[ti].color);
-        infos[ti].name = set.read_string (section, "name", def_infos[ti].name);
+        infos[ti] = new TeamInfo ();
+        infos[ti]->id = ti;
+        infos[ti]->color = set.read_hex (section, "color", def_infos[ti].color);
+        infos[ti]->name = set.read_string (section, "name", def_infos[ti].name);
     }
 }
 
-void TeamInfos::save () {
+void TeamInfos::save_and_free () {
     Setting& set = settings.teams ();
 
     ustring section;
 
-    for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
+    for (size_t ti = 1; ti < infos.size(); ti++) {
         section = "team" + to_string<size_t> (ti);
 
-        set.write_hex (section, "color", infos[ti].color);
-        set.write_string (section, "name", infos[ti].name);
+        set.write_hex (section, "color", infos[ti]->color);
+        set.write_string (section, "name", infos[ti]->name);
+        delete infos[ti];
     }
-}
-
-TeamInfos& TeamInfos::get_instance () {
-    return instance;
+    
+    infos.clear();
 }

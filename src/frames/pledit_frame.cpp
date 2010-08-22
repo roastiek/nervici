@@ -267,8 +267,8 @@ void PlEditFrame::preapare () {
     cb_select->add_item ("novy", 0xffffffff);
     cb_select->add_item ("novy plastik", 0xffffffff);
 
-    for (size_t pi = 0; pi < pl_infos.count (); pi++) {
-        const PlInfo& info = pl_infos[pi];
+    for (size_t pi = 0; pi < PlInfos::count (); pi++) {
+        const PlInfo& info = PlInfos::at(pi);
         cb_select->add_item (info.name, trans (info.color));
     }
 
@@ -279,7 +279,7 @@ void PlEditFrame::on_btn_del_clicked (Control* ctl) {
     int index = cb_select->get_selected ();
 
     if (index > 1) {
-        pl_infos.remove (index - 2);
+        PlInfos::remove (index - 2);
         cb_select->remove_item (index);
         cb_select->set_selected (index);
     }
@@ -307,18 +307,18 @@ void PlEditFrame::on_btn_save_clicked (Control* ctl) {
         int index = cb_select->get_selected ();
         switch (index) {
         case 0:
-            pl_infos.add (info);
-            cb_select->insert_item (pl_infos.players_count () + 1, info.name,
+            PlInfos::add (info);
+            cb_select->insert_item (PlInfos::players_count () + 1, info.name,
                     trans (info.color));
-            cb_select->set_selected (pl_infos.players_count () + 1);
+            cb_select->set_selected (PlInfos::players_count () + 1);
             break;
         case 1:
-            pl_infos.add (info);
+            PlInfos::add (info);
             cb_select->add_item (info.name, trans (info.color));
             cb_select->set_selected (cb_select->get_items_count () - 1);
             break;
         default:
-            pl_infos[index - 2] = info;
+            PlInfos::at(index - 2) = info;
             cb_select->update_item (index, info.name, trans (info.color));
             break;
         }
@@ -362,7 +362,7 @@ void PlEditFrame::on_cb_select_changed (Combobox* ctl, int value) {
             cb_ai->set_selected (0);
             break;
         default:
-            const PlInfo& info = pl_infos[value - 2];
+            const PlInfo& info = PlInfos::at(value - 2);
             pl_type = info.type;
             te_name->set_text (info.name);
             sa_red->set_value (info.color & 0xff);

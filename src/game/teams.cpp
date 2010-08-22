@@ -22,7 +22,7 @@ void Teams::initialize (const std::vector<const TeamInfo*>& infos) {
     }
     orders.resize (teams.size ());
 
-    teams.push_back (new Team (orders.size (), team_infos[0]));
+    teams.push_back (new Team (orders.size (), TeamInfos::at(0)));
 
     Render::load_teams (infos);
 }
@@ -33,8 +33,8 @@ void Teams::uninitialize () {
     for (size_t ti = 0; ti < teams.size (); ti++) {
         delete teams[ti];
     }
-    teams.resize (0);
-    orders.resize (0);
+    teams.clear ();
+    orders.clear ();
 }
 
 void Teams::update_score () {

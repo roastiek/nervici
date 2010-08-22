@@ -14,6 +14,7 @@
 #include "engine/loader.h"
 
 using namespace Glib;
+using namespace std;
 
 namespace Loader {
 

@@ -52,7 +52,7 @@ struct StatisticScreen {
 struct ScreenSet {
     int width;
     int height;
-    int fullscreen;
+    bool fullscreen;
 };
 
 #define SC_BACKGROUND    0x00442204
@@ -370,41 +370,6 @@ static void draw_score (int y, SDL_Surface *numbers, int score, PlState state,
     SDL_BlitSurface (numbers, &src, primary, &dest);
 
     cl = images[IMT_Numbers]->w / 12;
-    /*xl = gs_outer.score.w - 9 * cl - xoff;
-     src.y = 0;
-     src.w = cl;
-     src.h = images[IMT_Numbers]->h;
-     if (score >= 0) {
-     while (score > 99999999) score /= 10;
-     for (c = 0; c < 8 && (score > 0 || c == 0); c++) {
-     src.x = cl * (score % 10);
-     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-     SDL_BlitSurface (numbers, &src, primary, &dest);
-     score /= 10;
-     }
-     for (; c < 8; c++) {
-     src.x = cl * 11;
-     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-     SDL_BlitSurface (numbers, &src, primary, &dest);
-     }
-     } else {
-     while (score < -9999999) score /= 10;
-     for (c = 0; c < 8 && score < 0; c++) {
-     src.x = cl * ((-score) % 10);
-     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-     SDL_BlitSurface (numbers, &src, primary, &dest);
-     score /= 10;
-     }
-     src.x = cl * 10;
-     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-     SDL_BlitSurface (numbers, &src, primary, &dest);
-     c++;
-     for (; c < 8; c++) {
-     src.x = cl * 11;
-     dest.x = gs_outer.score.x + cl * (8 - c) + xl;
-     SDL_BlitSurface (numbers, &src, primary, &dest);
-     }
-     }*/
     draw_score_numbers (score, numbers, gs_outer.score.x + gs_outer.score.w - 8
             * cl - xoff, y + yoff, 8);
     SDL_UpdateRect (primary, gs_outer.score.x, dest.y, gs_outer.score.w,

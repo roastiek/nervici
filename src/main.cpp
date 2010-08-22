@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 #include <glibmm/init.h>
 #include <giomm/init.h>
 #include <SDL.h>

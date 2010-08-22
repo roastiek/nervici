@@ -10,11 +10,11 @@
 
 #include <sstream>
 
-using namespace std;
+//using namespace std;
 
 template<class T>
-inline string to_string (const T& value) {
-    stringstream ss;
+inline std::string to_string (const T& value) {
+    std::stringstream ss;
     ss << value;
     return ss.str ();
 }

@@ -48,8 +48,8 @@ void initialize () {
     System::init_paths ();
     settings.load ();
     Mods::find_mods ();
-    pl_infos.load ();
-    team_infos.load ();
+    PlInfos::load ();
+    TeamInfos::load ();
 
     if (Render::initialize ()) return;
     Audio::initialize ();
@@ -72,8 +72,8 @@ void uninitialize () {
     Audio::uninitialize ();
     Render::uninitialize ();
 
-    pl_infos.save ();
-    team_infos.save ();
+    PlInfos::save_and_free ();
+    TeamInfos::save_and_free ();
     Mods::free_mods ();
     settings.save ();
     System::free_paths ();

@@ -13,6 +13,7 @@
 
 using namespace Glib;
 using namespace Gio;
+using namespace std;
 
 Setting::Setting (const Glib::ustring& place) :
 filename (place) {
