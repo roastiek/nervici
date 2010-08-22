@@ -1,4 +1,6 @@
 #include "app.h"
+#include "frames/game_frame.h"
+#include "frames/pledit_frame.h"
 
 #include "frames/start_frame.h"
 
@@ -68,13 +70,15 @@ bool StartFrame::is_focusable () const {
 }
 
 void StartFrame::btn_new_game_clicked (Control* ctl) {
-    App::switch_game_frame ()->preapare ();
+    app.switch_to_game_frame ();
+    app.get_game_frame ().preapare ();
 }
 
 void StartFrame::btn_pledit_clicked (Control* ctl) {
-    App::switch_to_pledit_frame ()->preapare ();
+    app.switch_to_pledit_frame ();
+    app.get_pledit_frame().preapare();
 }
 
 void StartFrame::btn_quit_clicked (Control* ctl) {
-    App::quit ();
+    app.quit ();
 }

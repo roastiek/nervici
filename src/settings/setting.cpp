@@ -21,7 +21,7 @@ filename (place) {
 
 void Setting::load () {
     try {
-        values.load_from_file (System::get_config_dir () + filename);
+        values.load_from_file (paths.get_config_dir () + filename);
     } catch (FileError) {
     } catch (KeyFileError) {
     }
@@ -31,7 +31,7 @@ void Setting::save () {
     ustring old_data = "";
     try {
         KeyFile old;
-        old.load_from_file (System::get_config_dir () + filename);
+        old.load_from_file (paths.get_config_dir () + filename);
         old_data = old.to_data ();
     } catch (FileError) {
     } catch (KeyFileError) {
@@ -40,7 +40,7 @@ void Setting::save () {
     ustring new_data = values.to_data ();
 
     if (old_data.compare (new_data) != 0) {
-        RefPtr<File> file = File::create_for_path (System::get_config_dir () + filename);
+        RefPtr<File> file = File::create_for_path (paths.get_config_dir () + filename);
         string tag = "";
         try {
             file->replace_contents (new_data, tag, tag);

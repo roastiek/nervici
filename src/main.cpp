@@ -4,6 +4,7 @@
 #include <SDL.h>
 
 #include "app.h"
+#include "basic_defs.h"
 
 #include "main.h"
 
@@ -33,9 +34,9 @@ int main (int argc, char *argv[]) {
 
     calc_angles ();
 
-    App::initialize ();
-    App::run ();
-    App::uninitialize ();
+    app.initialize ();
+    app.run ();
+    app.uninitialize ();
 
     SDL_Quit ();
 

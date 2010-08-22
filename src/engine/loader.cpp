@@ -30,10 +30,10 @@ void load_game_images (vector<SDL_Surface*>& images) {
 
     images.resize (IMT_Count, NULL);
 
-    for (size_t di = 0; di < System::get_data_dirs_count (); di++) {
+    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
         for (int i = IMT_Semafor; i < IMT_Count; i++) {
             if (images[i] == NULL) {
-                filename = System::get_data_dir (di) + "images/" + gameImages[i
+                filename = paths.get_data_dir (di) + "images/" + gameImages[i
                         - IMT_Semafor];
                 images[i] = IMG_Load (filename.c_str ());
             }
@@ -86,8 +86,8 @@ void free_game_images (vector<SDL_Surface*>& images) {
 }
 
 void load_smile_setting_images (SmileSettingImages& images) {
-    for (size_t di = 0; di < System::get_data_dirs_count (); di++) {
-        ustring filename = System::get_data_dir (di) + "images/"
+    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
+        ustring filename = paths.get_data_dir (di) + "images/"
                 + smile_setting;
 
         SDL_Surface* smiles = IMG_Load (filename.c_str ());
@@ -154,8 +154,8 @@ static const char* const ham_masks[3] = {
 void load_smile_faces (SmileImages& faces) {
     cout << __func__ << '\n';
 
-    for (size_t di = 0; di < System::get_data_dirs_count (); di++) {
-        ustring smiles_dir = System::get_data_dir (di) + "images/smiles/";
+    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
+        ustring smiles_dir = paths.get_data_dir (di) + "images/smiles/";
         vector<ustring> images;
 
         try {

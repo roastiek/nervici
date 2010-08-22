@@ -426,7 +426,7 @@ void GameFrame::btn_start_clicked (Control* ctl) {
 }
 
 void GameFrame::btn_cancel_clicked (Control* ctl) {
-    App::switch_to_start_frame ();
+    app.switch_to_start_frame ();
 }
 
 void GameFrame::cb_mob_selected_changed (Combobox* box, int selected) {

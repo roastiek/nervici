@@ -9,23 +9,26 @@
 #include "game/world.h"
 #include "game/game.h"
 #include "settings/team_infos.h"
+#include "gui/screen.h"
+#include "frames/start_frame.h"
+#include "frames/game_frame.h"
+#include "frames/pledit_frame.h"
 
 #include "app.h"
-
-namespace App {
-
-static Control* active_frame = NULL;
-static Screen* screen;
-static StartFrame* start_frame;
-static GameFrame* game_frame;
-static PlEditFrame* pledit_frame;
-static bool abort;
 
 static int paint_filter (const SDL_Event* event) {
     return event->type != E_PAINT;
 }
 
-static void init_gui () {
+App App::instance;
+
+App& app = App::get_instance();
+
+App::App () : active_frame(NULL), abort (false) {
+    
+}
+
+void App::init_gui () {
     SDL_SetEventFilter (paint_filter);
 
     screen = Render::create_screen ("nervici");
@@ -44,8 +47,8 @@ static void init_gui () {
     switch_to_start_frame ();
 }
 
-void initialize () {
-    System::init_paths ();
+void App::initialize () {
+    paths.init_paths ();
     settings.load ();
     Mods::find_mods ();
     PlInfos::load ();
@@ -64,7 +67,7 @@ void initialize () {
     init_gui ();
 }
 
-void uninitialize () {
+void App::uninitialize () {
     delete screen;
 
     Audio::music_stop ();
@@ -76,10 +79,9 @@ void uninitialize () {
     TeamInfos::save_and_free ();
     Mods::free_mods ();
     settings.save ();
-    System::free_paths ();
 }
 
-void run () {
+void App::run () {
     SDL_Event event;
 
     while (!abort) {
@@ -99,42 +101,33 @@ void run () {
     }
 }
 
-void quit () {
+void App::quit () {
     SDL_Event event;
     event.type = SDL_QUIT;
     SDL_PushEvent (&event);
 }
 
-static void hide_previous () {
+void App::hide_previous () {
     if (active_frame != NULL)
         active_frame->set_visible (false);
 }
 
-StartFrame* switch_to_start_frame () {
+void App::switch_to_frame (Control* frame) {
     hide_previous ();
-    start_frame->set_visible (true);
-    start_frame->grab_focus ();
-    active_frame = start_frame;
-    return start_frame;
+    frame->set_visible (true);
+    frame->grab_focus ();
+    active_frame = frame;
 }
 
-GameFrame* switch_game_frame () {
-    hide_previous ();
-    game_frame->set_visible (true);
-    game_frame->grab_focus ();
-    active_frame = game_frame;
-    return game_frame;
+void App::switch_to_start_frame () {
+    switch_to_frame (start_frame);
 }
 
-PlEditFrame* switch_to_pledit_frame () {
-    hide_previous ();
-    pledit_frame->set_visible (true);
-    pledit_frame->grab_focus ();
-    active_frame = pledit_frame;
-    return pledit_frame;
+void App::switch_to_game_frame () {
+    switch_to_frame(game_frame);
 }
 
-GameFrame* get_game_frame () {
-    return game_frame;
+void App::switch_to_pledit_frame () {
+    switch_to_frame(pledit_frame);
 }
-}
+

@@ -7,42 +7,43 @@ using namespace std;
 using namespace Glib;
 using namespace Gio;
 
-namespace System {
+System System::instance;
 
-static ustring config_dir;
+System& paths = System::get_instance();
 
-static vector<ustring> data_dirs;
+System::System () : config_dir (NULL) {
+    
+}
 
-void init_paths () {
-    config_dir = get_user_config_dir () + "/nervici/";
-    RefPtr<File> dir = File::create_for_path (config_dir);
+void System::init_paths () {
+    config_dir = new ustring (get_user_config_dir () + "/nervici/");
+    RefPtr<File> dir = File::create_for_path (*config_dir);
     try {
         dir->make_directory_with_parents ();
     } catch (Gio::Error) {
     }
 
-    data_dirs.push_back (get_user_data_dir () + "/nervici/");
+    data_dirs.push_back (new ustring (get_user_data_dir () + "/nervici/"));
 
     const gchar * const *system_data_dirs = g_get_system_data_dirs ();
     for (size_t di = 0; system_data_dirs[di] != NULL; di++) {
-        data_dirs.push_back (ustring (system_data_dirs[di]) + "/nervici/");
+        ustring* str = new ustring(system_data_dirs[di]);
+        str->append("/nervici/");
+        data_dirs.push_back (str);
     }
 }
 
-void free_paths () {
+System::~System () {
+    if (config_dir != NULL) {
+        delete config_dir;
+        config_dir = NULL;
+    }
+    
+    for (size_t di = 0; di < data_dirs.size(); di++) {
+        delete data_dirs[di];
+    }
+    data_dirs.clear();
 }
 
-const ustring& get_config_dir () {
-    return config_dir;
-}
 
-size_t get_data_dirs_count () {
-    return data_dirs.size ();
-}
-
-const ustring& get_data_dir (size_t index) {
-    return data_dirs[index];
-}
-
-}
 

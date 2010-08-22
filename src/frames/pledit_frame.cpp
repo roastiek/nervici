@@ -3,6 +3,7 @@
 #include "engine/audio.h"
 #include "settings/pl_info.h"
 #include "settings/pl_infos.h"
+#include "frames/game_frame.h"
 
 #include "frames/pledit_frame.h"
 
@@ -326,8 +327,8 @@ void PlEditFrame::on_btn_save_clicked (Control* ctl) {
 }
 
 void PlEditFrame::on_btn_back_clicked (Control* ctl) {
-    App::switch_to_start_frame ();
-    App::get_game_frame ()->update_players ();
+    app.switch_to_start_frame ();
+    app.get_game_frame ().update_players ();
 }
 
 void PlEditFrame::on_sa_color_changed (Scale* ctl, int value) {

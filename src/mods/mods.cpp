@@ -35,8 +35,8 @@ Mods::Mods () {
 void Mods::find_mods () {
     vector<ustring> files;
 
-    for (size_t di = 0; di < System::get_data_dirs_count (); di++) {
-        ustring dir = System::get_data_dir (di) + "mods/";
+    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
+        ustring dir = paths.get_data_dir (di) + "mods/";
         scan_mods_dir (dir, files);
     }
 
