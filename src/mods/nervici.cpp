@@ -34,7 +34,7 @@ void next_round () {
 }
 
 void play_music (int type) {
-    Audio::music_play ((MusicType) (type % 2));
+    audio.music_play ((MusicType) (type % 2));
 }
 
 round_tu get_round () {
@@ -54,7 +54,7 @@ void set_timer (timer_ti time) {
 }
 
 void stop_music () {
-    Audio::music_stop ();
+    audio.music_stop ();
 }
 
 void game_wait (timer_ti time) {

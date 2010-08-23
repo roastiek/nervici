@@ -257,8 +257,8 @@ void PlEditFrame::init_control (Control* par) {
     cb_ai->add_item ("zadny");
 
     cb_profil->add_item ("zadny");
-    for (size_t pi = 0; pi < Audio::get_profiles_count (); pi++) {
-        cb_profil->add_item (Audio::get_profile (pi));
+    for (size_t pi = 0; pi < audio.get_profiles_count (); pi++) {
+        cb_profil->add_item (audio.get_profile (pi));
     }
 }
 

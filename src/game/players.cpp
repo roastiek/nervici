@@ -38,11 +38,11 @@ void Players::initialize (const std::vector<const PlInfo*>& infos,
     orders.resize (players.size ());
 
     Render::load_players (infos, tcolors);
-    Audio::load_players (infos);
+    audio.load_players (infos);
 }
 
 void Players::uninitialize () {
-    Audio::free_players ();
+    audio.free_players ();
     Render::free_players ();
 
     for (size_t pi = 0; pi < players.size (); pi++) {

@@ -183,7 +183,7 @@ void Player::live () {
         jumptime = JUMP_REPEAT;
         stat.jump++;
         team.stat.jump++;
-        Audio::play_effect (id, ET_Jump);
+        audio.play_effect (id, ET_Jump);
     }
 
     exact.x += icos[angle] / 2;
@@ -208,20 +208,20 @@ void Player::live () {
             murder.stat.kills++;
             murder.team.stat.kills++;
             mods.face ().on_killed (*this, murder);
-            Audio::play_effect (id, ET_Au);
+            audio.play_effect (id, ET_Au);
             break;
         }
         case DC_self:
             stat.selfs++;
             team.stat.selfs++;
             mods.face ().on_selfdeath (*this);
-            Audio::play_effect (id, ET_Self);
+            audio.play_effect (id, ET_Self);
             break;
         case DC_wall:
             stat.crashes++;
             team.stat.crashes++;
             mods.face ().on_wall (*this);
-            Audio::play_effect (id, ET_Wall);
+            audio.play_effect (id, ET_Wall);
             break;
         case DC_smile:
             smiles[cause.smile].eat (*this);
@@ -244,7 +244,7 @@ void Player::live () {
             stat.crashes++;
             team.stat.crashes++;
             mods.face ().on_wall (*this);
-            Audio::play_effect (id, ET_Wall);
+            audio.play_effect (id, ET_Wall);
             set_state (PS_Death);
             mods.face ().on_death (*this);
         }

@@ -308,7 +308,7 @@ void run () {
         teams.update_score ();
         //Render::update_screen ();
 
-        Audio::music_update ();
+        audio.music_update ();
 
         sleep (speed);
 
@@ -326,7 +326,7 @@ void run () {
         steps++;
     }
 
-    Audio::music_stop ();
+    audio.music_stop ();
 
     if (!abort) {
         Render::draw_end ();
@@ -345,7 +345,7 @@ void set_speed (timer_ti value) {
         speed = base_speed / 2;
     if (speed > base_speed * 2)
         speed = base_speed * 2;
-    Audio::music_set_rate ((base_speed * 1.0) / speed);
+    audio.music_set_rate ((base_speed * 1.0) / speed);
 }
 
 void wait (timer_ti time) {

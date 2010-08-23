@@ -147,7 +147,7 @@ public:
     void eat (Player& pl) {
         SoftSmile::eat (pl);
         mods.face ().on_pozi_smile (pl, level);
-        Audio::play_effect (pl.id, ET_SmilePlus);
+        audio.play_effect (pl.id, ET_SmilePlus);
     }
 };
 
@@ -166,7 +166,7 @@ public:
     void eat (Player& pl) {
         SoftSmile::eat (pl);
         mods.face ().on_nega_smile (pl, level);
-        Audio::play_effect (pl.id, ET_SmileMinus);
+        audio.play_effect (pl.id, ET_SmileMinus);
     }
 };
 
@@ -241,7 +241,7 @@ public:
     void eat (Player& pl) {
         HardSmile::eat (pl);
         mods.face ().on_fleg_smile (pl, level);
-        Audio::play_effect (pl.id, ET_SmileMinus);
+        audio.play_effect (pl.id, ET_SmileMinus);
     }
 };
 
@@ -316,7 +316,7 @@ public:
     void eat (Player& pl) {
         SoftSmile::eat (pl);
         mods.face ().on_iron_smile (pl, level);
-        Audio::play_effect (pl.id, ET_SmilePlus);
+        audio.play_effect (pl.id, ET_SmilePlus);
     }
 };
 
@@ -416,19 +416,19 @@ public:
         switch (face_type) {
         case ST_pozi:
             mods.face ().on_pozi_smile (pl, level);
-            Audio::play_effect (pl.id, ET_SmilePlus);
+            audio.play_effect (pl.id, ET_SmilePlus);
             break;
         case ST_nega:
             mods.face ().on_nega_smile (pl, level);
-            Audio::play_effect (pl.id, ET_SmileMinus);
+            audio.play_effect (pl.id, ET_SmileMinus);
             break;
         case ST_fleg:
             mods.face ().on_fleg_smile (pl, level);
-            Audio::play_effect (pl.id, ET_SmileMinus);
+            audio.play_effect (pl.id, ET_SmileMinus);
             break;
         case ST_iron:
             mods.face ().on_iron_smile (pl, level);
-            Audio::play_effect (pl.id, ET_SmilePlus);
+            audio.play_effect (pl.id, ET_SmilePlus);
             break;
         default:
             break;
@@ -594,7 +594,7 @@ public:
     void eat (Player& pl) {
         Smile::eat (pl);
         mods.face ().on_ham_smile (pl, level);
-        Audio::play_effect (pl.id, ET_SmileMinus);
+        audio.play_effect (pl.id, ET_SmileMinus);
     }
 };
 
@@ -682,7 +682,7 @@ public:
     void eat (Player& pl) {
         Smile::eat (pl);
         mods.face ().on_ham_smile (pl, level);
-        Audio::play_effect (pl.id, ET_SmileMinus);
+        audio.play_effect (pl.id, ET_SmileMinus);
     }
 };
 
@@ -775,7 +775,7 @@ public:
     void eat (Player& pl) {
         Smile::eat (pl);
         mods.face ().on_ham_smile (pl, level);
-        Audio::play_effect (pl.id, ET_SmileMinus);
+        audio.play_effect (pl.id, ET_SmileMinus);
     }
 
     SmileType get_type () const {

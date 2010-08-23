@@ -55,14 +55,14 @@ void App::initialize () {
     team_infos.load ();
 
     if (Render::initialize ()) return;
-    Audio::initialize ();
+    audio.initialize ();
 
     srand (SDL_GetTicks ());
     srandom (SDL_GetTicks ());
     SDL_EnableUNICODE (1);
     SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-    //Audio::music_play (MT_Menu);
+    //audio.music_play (MT_Menu);
 
     init_gui ();
 }
@@ -70,9 +70,9 @@ void App::initialize () {
 void App::uninitialize () {
     delete screen;
 
-    Audio::music_stop ();
+    audio.music_stop ();
 
-    Audio::uninitialize ();
+    audio.uninitialize ();
     Render::uninitialize ();
 
     pl_infos.save ();
@@ -84,7 +84,7 @@ void App::run () {
     SDL_Event event;
 
     while (!abort) {
-        Audio::music_update ();
+        audio.music_update ();
         if (SDL_PollEvent (&event)) {
             switch (event.type) {
             case SDL_QUIT:
