@@ -1,5 +1,5 @@
 #include <SDL.h>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 #include "engine/render.h"

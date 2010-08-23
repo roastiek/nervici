@@ -1,4 +1,4 @@
-#include <stddef.h>
+#include <cstddef>
 
 #include "mods/nervici.h"
 #include "mods/mod_runner_info.h"
@@ -8,7 +8,6 @@
 using namespace Nervici;
 
 #include "mods/mod_interface.h"
-//#include "game/player.h"
 
 static const char * const exts[] = {
     NULL

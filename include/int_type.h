@@ -8,7 +8,7 @@
 #ifndef INT_TYPE_H
 #define	INT_TYPE_H
 
-#include <stdint.h>
+#include <cstdint>
 
 typedef uint8_t plid_tu;
 typedef uint16_t plsize_tu;

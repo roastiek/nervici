@@ -1,10 +1,5 @@
-#include <string.h>
-#include <iostream>
-#include <fstream>
-#include <stdlib.h>
 #include <glibmm/fileutils.h>
 #include <giomm/file.h>
-#include <sstream>
 
 #include "system.h"
 #include "utils.h"
