@@ -166,10 +166,9 @@ void Audio::music_stop () {
     music_loop = false;
 }
 
-const ustring& Audio::get_profile (size_t id) const{
+const ustring& Audio::get_profile (size_t id) const {
     return sound_profiles[id]->name;
 }
-
 
 void Audio::music_play (MusicType type) {
     if (music_is_playing_impl ()) {
@@ -186,6 +185,14 @@ void Audio::music_play (MusicType type) {
     music_play_impl ();
 
     music_loop = true;
+}
+
+void Audio::music_update () {
+    if (music_is_playing_impl ()) {
+        music_update_impl ();
+    } else if (music_loop) {
+        music_play (music_type);
+    }
 }
 
 void Audio::load_music () {
@@ -278,10 +285,8 @@ void Audio::scan_sounds_dir (const ustring& path, vector<char>& data) {
 
                     for (int eti = 0; eti < ET_Count; eti++) {
                         if (str_has_prefix (lower, efect_mask[eti])) {
-                            cout << *pit << '\n';
                             sound_count += load_sound_impl (entry, EffectType (
                                     eti), prof_path + (*pit), data);
-                            cout << sound_count << '\n';
                         }
                     }
 
@@ -350,13 +355,13 @@ private:
 
 protected:
     void initialize_impl ();
-    
+
     void uninitialize_impl ();
-    
+
     void music_play_impl ();
-    
+
     void music_stop_impl ();
-    
+
     bool music_open_impl (const ustring& filename);
 
     void music_close_impl ();
@@ -374,17 +379,20 @@ protected:
 
     bool load_sound_impl (SoundProfile* prof, EffectType effect,
             const Glib::ustring& filename, vector<char>& data) const;
+
+    void music_update_impl ();
+
 public:
     AudioOpenAL ();
 
     void music_update ();
-    
+
     void music_set_rate (float rate);
 
     void load_players (const std::vector<const PlInfo*>& infos);
-    
+
     void free_players ();
-    
+
     void play_effect (plid_tu plid, EffectType effect);
 };
 
@@ -561,24 +569,16 @@ AudioOpenAL::AudioOpenAL () :
 
 }
 
-void AudioOpenAL::music_update () {
+void AudioOpenAL::music_update_impl () {
     int processed;
-    ALenum state;
     ALuint buffer;
 
-    alGetSourcei (music_source, AL_SOURCE_STATE, &state);
-    if (state == AL_PLAYING) {
+    alGetSourcei (music_source, AL_BUFFERS_PROCESSED, &processed);
 
-        alGetSourcei (music_source, AL_BUFFERS_PROCESSED, &processed);
-
-        for (; processed > 0; processed--) {
-            alSourceUnqueueBuffers (music_source, 1, &buffer);
-            if (music_stream (buffer) > 0)
-                alSourceQueueBuffers (music_source, 1, &buffer);
-        }
-    } else if (music_loop) {
-
-        music_play (music_type);
+    for (; processed > 0; processed--) {
+        alSourceUnqueueBuffers (music_source, 1, &buffer);
+        if (music_stream (buffer) > 0)
+            alSourceQueueBuffers (music_source, 1, &buffer);
     }
 }
 

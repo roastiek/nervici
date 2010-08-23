@@ -15,6 +15,12 @@ struct SoundProfile;
 
 class Audio {
 private:
+    bool music_loop;
+
+    MusicType music_type;
+
+    std::vector<MusicFile> music[MT_Count];
+
     void load_setting ();
 
     void save_setting ();
@@ -41,12 +47,6 @@ protected:
         int buffer;
         int bfrs_count;
     } setting;
-
-    bool music_loop;
-
-    MusicType music_type;
-
-    std::vector<MusicFile> music[MT_Count];
 
     std::vector<SoundProfile*> sound_profiles;
 
@@ -81,6 +81,8 @@ protected:
     virtual bool load_sound_impl (SoundProfile* prof, EffectType effect,
             const Glib::ustring& filename, std::vector<char>& data) const = 0;
 
+    virtual void music_update_impl () = 0;
+
 public:
     void initialize ();
 
@@ -96,7 +98,7 @@ public:
 
     void music_stop ();
 
-    virtual void music_update () = 0;
+    void music_update ();
 
     virtual void music_set_rate (float rate) = 0;
 
