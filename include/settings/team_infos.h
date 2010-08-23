@@ -15,26 +15,44 @@
 class TeamInfos {
 private:
 
-    static std::vector<TeamInfo*> infos;
+    std::vector<TeamInfo*> infos;
 
+    static TeamInfos instance;
+    
     TeamInfos ();
+    
+    ~TeamInfos ();
 
 public:
-    static void load ();
+    void load ();
 
-    static void save_and_free ();
+    void save ();
 
-    static size_t count ();
+    size_t count () const;
 
-    static TeamInfo& at (size_t index);
+    const TeamInfo& operator[] (size_t index) const;
+
+    TeamInfo& operator[] (size_t index);
+    
+    static TeamInfos& get_instance ();
 };
 
-inline size_t TeamInfos::count () {
+extern TeamInfos& team_infos;
+
+inline size_t TeamInfos::count () const {
     return infos.size ();
 }
 
-inline TeamInfo& TeamInfos::at (size_t id) {
+inline const TeamInfo& TeamInfos::operator [] (size_t id) const {
     return *infos[id];
+}
+
+inline TeamInfo& TeamInfos::operator [] (size_t id) {
+    return *infos[id];
+}
+
+inline TeamInfos& TeamInfos::get_instance() {
+    return instance;
 }
 
 

@@ -348,8 +348,8 @@ void GameFrame::preapare () {
     cb_mod->set_selected (-1);
 
     const ustring& last_mod = set.read_string ("game", "last_mod", "");
-    for (size_t mi = 0; mi < Mods::count (); mi++) {
-        if (last_mod.compare (Mods::at (mi).name) == 0) {
+    for (size_t mi = 0; mi < mods.count (); mi++) {
+        if (last_mod.compare (mods[mi].name) == 0) {
             cb_mod->set_selected (mi);
             break;
         }
@@ -362,8 +362,8 @@ void GameFrame::preapare () {
         const ustring& name = set.read_string ("game", "player"
                 + to_string<int> (pi), "");
         cb_players[pi]->set_selected (0);
-        for (size_t pli = 0; pli < PlInfos::count (); pli++) {
-            if (name.compare (PlInfos::at (pli).name) == 0) {
+        for (size_t pli = 0; pli < pl_infos.count (); pli++) {
+            if (name.compare (pl_infos[pli].name) == 0) {
                 cb_players[pi]->set_selected (pli + 1);
                 break;
             }
@@ -386,7 +386,7 @@ void GameFrame::btn_start_clicked (Control* ctl) {
     game_info.setting.step = nb_step->get_value ();
 
     vector<int> team_id;
-    team_id.resize (TeamInfos::count (), -1);
+    team_id.resize (team_infos.count (), -1);
 
     game_info.team_infos.clear ();
     game_info.pl_infos.clear ();
@@ -394,13 +394,13 @@ void GameFrame::btn_start_clicked (Control* ctl) {
     for (int pi = 0; pi < 16; pi++) {
         int plid = cb_players[pi]->get_selected () - 1;
         if (plid >= 0) {
-            game_info.pl_infos.push_back (&PlInfos::at (plid));
+            game_info.pl_infos.push_back (&pl_infos[plid]);
             int tid = btn_teams[pi]->get_selected ();
             game_info.pl_teams.push_back (tid);
             if (tid > 0) {
                 if (team_id[tid] == -1) {
                     team_id[tid] = game_info.team_infos.size ();
-                    game_info.team_infos.push_back (&TeamInfos::at (tid));
+                    game_info.team_infos.push_back (&team_infos[tid]);
                 }
             }
         }
@@ -431,7 +431,7 @@ void GameFrame::btn_cancel_clicked (Control* ctl) {
 
 void GameFrame::cb_mob_selected_changed (Combobox* box, int selected) {
     if (selected >= 0)
-        load_mod (Mods::at (selected));
+        load_mod (mods[selected]);
 }
 
 void GameFrame::load_mod (const Mod& mod) {
@@ -495,17 +495,17 @@ void GameFrame::load_mod (const Mod& mod) {
 }
 
 void GameFrame::update_team_colors () {
-    team_colors[1] = trans (TeamInfos::at(1).color);
-    team_colors[2] = trans (TeamInfos::at(2).color);
-    team_colors[3] = trans (TeamInfos::at(3).color);
-    team_colors[4] = trans (TeamInfos::at(4).color);
+    team_colors[1] = trans (team_infos[1].color);
+    team_colors[2] = trans (team_infos[2].color);
+    team_colors[3] = trans (team_infos[3].color);
+    team_colors[4] = trans (team_infos[4].color);
 }
 
 void GameFrame::update_mods () {
     cb_mod->clear ();
 
-    for (size_t mi = 0; mi < Mods::count (); mi++) {
-        const Mod& mod = Mods::at (mi);
+    for (size_t mi = 0; mi < mods.count (); mi++) {
+        const Mod& mod = mods[mi];
         cb_mod->add_item (mod.name);
     }
 }
@@ -516,8 +516,8 @@ void GameFrame::update_players () {
 
         cb_players[ci]->add_item ("(zadny)", 0x808080ff);
 
-        for (size_t pi = 0; pi < PlInfos::count (); pi++) {
-            const PlInfo& info = PlInfos::at (pi);
+        for (size_t pi = 0; pi < pl_infos.count (); pi++) {
+            const PlInfo& info = pl_infos[pi];
             cb_players[ci]->add_item (info.name, trans (info.color));
         }
 
@@ -530,13 +530,13 @@ void GameFrame::update_players () {
 void GameFrame::save_state () {
     Setting& set = settings.game ();
 
-    const ustring& mod_name = Mods::at (cb_mod->get_selected ()).name;
+    const ustring& mod_name = mods[cb_mod->get_selected ()].name;
 
     set.write_string ("game", "last_mod", mod_name);
 
     for (int pi = 0; pi < 16; pi++) {
         int sel = cb_players[pi]->get_selected ();
-        const ustring& name = (sel > 0) ? PlInfos::at (sel - 1).name : "";
+        const ustring& name = (sel > 0) ? pl_infos[sel - 1].name : "";
         set.write_string ("game", "player" + to_string<int> (pi), name);
 
         set.write_int ("game", "team" + to_string<int> (pi),

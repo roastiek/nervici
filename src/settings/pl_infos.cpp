@@ -25,11 +25,23 @@ static PlInfo def_ais[DEFAULT_AI_COUNT] = {PlInfo (0x6600ff, "Bunnie", 0,
         0x66ff00, "Rabbyte", 0, "mucha", 1), PlInfo (0x0099ff, "Mortzsche", 0,
         "mucha", 1)};
 
-vector<PlInfo*> PlInfos::players;
+PlInfos PlInfos::instance;
 
-vector<PlInfo*> PlInfos::ais;
+PlInfos& pl_infos = PlInfos::get_instance ();
 
 PlInfos::PlInfos () {
+}
+
+PlInfos::~PlInfos () {
+    for (size_t pi = 0; pi < players.size (); pi++) {
+        delete players[pi];
+    }
+    players.clear();
+    
+    for (size_t ai = 0; ai < ais.size(); ai++) {
+        delete ais[ai];
+    }
+    ais.clear();
 }
 
 void PlInfos::load_players () {
@@ -106,10 +118,7 @@ void PlInfos::save_players () {
         set.write_int (section, "right", info->keys.right);
         set.write_int (section, "jump", info->keys.jump);
         set.write_int (section, "pitch", info->pitch);
-        
-        delete players[pi];
     }
-    players.clear();
 }
 
 void PlInfos::save_ais () {
@@ -126,13 +135,10 @@ void PlInfos::save_ais () {
         set.write_string (section, "profil", info->profil);
         set.write_int (section, "ai", info->ai.id);
         set.write_int (section, "pitch", info->pitch);
-        
-        delete ais[pi];
     }
-    ais.clear();
 }
 
-void PlInfos::save_and_free () {
+void PlInfos::save () {
     save_players ();
     save_ais ();
 }

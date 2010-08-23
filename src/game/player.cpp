@@ -78,7 +78,7 @@ void Player::timer_func (timer_ti speed) {
         timer += speed;
         if (timer >= 0) {
             timer = 0;
-            Mods::mod->on_pl_timer (*this);
+            mods.face ().on_pl_timer (*this);
         }
     } else
         timer += speed;
@@ -202,25 +202,25 @@ void Player::live () {
         write_body_part (pos, fields, survive);
         switch (cause.cause) {
         case DC_killed: {
-            Player& murder = Players::at (cause.murder);
+            Player& murder = players[cause.murder];
             stat.killed++;
             team.stat.killed++;
             murder.stat.kills++;
             murder.team.stat.kills++;
-            Mods::mod->on_killed (*this, murder);
+            mods.face ().on_killed (*this, murder);
             Audio::play_effect (id, ET_Au);
             break;
         }
         case DC_self:
             stat.selfs++;
             team.stat.selfs++;
-            Mods::mod->on_selfdeath (*this);
+            mods.face ().on_selfdeath (*this);
             Audio::play_effect (id, ET_Self);
             break;
         case DC_wall:
             stat.crashes++;
             team.stat.crashes++;
-            Mods::mod->on_wall (*this);
+            mods.face ().on_wall (*this);
             Audio::play_effect (id, ET_Wall);
             break;
         case DC_smile:
@@ -233,7 +233,7 @@ void Player::live () {
             stat.deaths++;
             team.stat.deaths++;
             set_state (PS_Death);
-            Mods::mod->on_death (*this);
+            mods.face ().on_death (*this);
         } else {
             stat.steps++;
             team.stat.steps++;
@@ -243,10 +243,10 @@ void Player::live () {
         if (!survive) {
             stat.crashes++;
             team.stat.crashes++;
-            Mods::mod->on_wall (*this);
+            mods.face ().on_wall (*this);
             Audio::play_effect (id, ET_Wall);
             set_state (PS_Death);
-            Mods::mod->on_death (*this);
+            mods.face ().on_death (*this);
         }
     }
 }
@@ -254,7 +254,7 @@ void Player::live () {
 void Player::clear_step () {
     if (length == 0) {
         set_state (PS_Erased);
-        Mods::mod->on_cleared (*this);
+        mods.face ().on_cleared (*this);
     } else {
         clear_bottom ();
     }
@@ -429,7 +429,7 @@ void Player::kill () {
         stat.deaths++;
         team.stat.deaths++;
         set_state (PS_Death);
-        Mods::mod->on_death (*this);
+        mods.face ().on_death (*this);
         break;
     default:
         break;
@@ -496,10 +496,6 @@ bool Player::is_live () const {
     return state == PS_Live || state == PS_Start;
 }
 
-plid_tu Player::get_order () const {
-    return order;
-}
-
 void Player::set_state (PlState value) {
     if (value != state) {
         team.dec_state (state);
@@ -516,10 +512,6 @@ bool Player::operator> (const Player& other) const {
 bool Player::operator< (const Player& other) const {
     return stat.score > other.stat.score || (stat.score == other.stat.score
             && order < other.order);
-}
-
-void Player::set_order (plid_tu value) {
-    order = value;
 }
 
 void Player::set_ironize (score_ti value) {

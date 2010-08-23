@@ -16,36 +16,51 @@
 
 class Teams {
 private:
-    static std::vector<Team*> teams;
+    std::vector<Team*> items;
     
-    static std::vector<plid_tu> orders;
+    std::vector<plid_tu> orders;
+    
+    static Teams instance;
     
     Teams ();
     
 public:
-    static void initialize (const std::vector<const TeamInfo*>& infos);
+    void initialize (const std::vector<const TeamInfo*>& infos);
 
-    static void uninitialize ();
+    void uninitialize ();
 
-    static void update_score ();
+    void update_score ();
 
-    static void calc_stats ();
+    void calc_stats ();
 
-    static plid_tu count ();
+    plid_tu count () const;
     
-    static Team& at (plid_tu index);
+    const Team& operator [] (plid_tu index) const;
+
+    Team& operator [] (plid_tu index);
     
-    static void draw_stat ();
+    void draw_stat ();
+    
+    static Teams& get_instance ();
 };
 
-inline plid_tu Teams::count() {
+extern Teams& teams;
+
+inline plid_tu Teams::count() const {
     return orders.size();
 }
 
-inline Team& Teams::at (plid_tu index) {
-    return *teams[index];
+inline const Team& Teams::operator [] (plid_tu index) const {
+    return *items[index];
 }
 
+inline Team& Teams::operator [] (plid_tu index) {
+    return *items[index];
+}
+
+inline Teams& Teams::get_instance () {
+    return instance;
+}
 
 #endif	/* TEAMS_H */
 

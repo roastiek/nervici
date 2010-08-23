@@ -50,9 +50,9 @@ void App::init_gui () {
 void App::initialize () {
     paths.init_paths ();
     settings.load ();
-    Mods::find_mods ();
-    PlInfos::load ();
-    TeamInfos::load ();
+    mods.find_mods ();
+    pl_infos.load ();
+    team_infos.load ();
 
     if (Render::initialize ()) return;
     Audio::initialize ();
@@ -75,9 +75,8 @@ void App::uninitialize () {
     Audio::uninitialize ();
     Render::uninitialize ();
 
-    PlInfos::save_and_free ();
-    TeamInfos::save_and_free ();
-    Mods::free_mods ();
+    pl_infos.save ();
+    team_infos.save ();
     settings.save ();
 }
 

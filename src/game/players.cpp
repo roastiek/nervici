@@ -14,9 +14,9 @@
 
 using namespace std;
 
-vector<Player*> Players::players;
+Players Players::instance;
 
-vector<plid_tu> Players::orders;
+Players& players = Players::get_instance();
 
 Players::Players () {
 
@@ -30,7 +30,7 @@ void Players::initialize (const std::vector<const PlInfo*>& infos,
 
     for (plid_tu pi = 0; pi < infos.size (); pi++) {
         const PlInfo& plnfo = *infos[pi];
-        Team& team = Teams::at (pl_teams[pi]);
+        Team& team = teams[pl_teams[pi]];
         players.push_back (new Player (pi, team, plnfo, max_length));
         tcolors.push_back (team.info.color);
     }

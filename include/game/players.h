@@ -16,45 +16,61 @@
 
 class Players {
 private:
-    static std::vector<Player*> players;
+    std::vector<Player*> players;
 
-    static std::vector<plid_tu> orders;
+    std::vector<plid_tu> orders;
 
+    static Players instance;
+    
     Players ();
 
 public:
-    static void initialize (const std::vector<const PlInfo*>& infos,
+    void initialize (const std::vector<const PlInfo*>& infos,
             const std::vector<plid_tu>& pl_teams, plsize_tu max_length);
 
-    static void uninitialize ();
+    void uninitialize ();
 
-    static plid_tu step (const uint8_t * keys);
+    plid_tu step (const uint8_t * keys);
 
-    static void update_score ();
+    void update_score ();
 
-    static void timer (timer_ti speed);
+    void timer (timer_ti speed);
 
-    static plid_tu live_pls_count ();
+    plid_tu live_pls_count ();
 
-    static void update_bodies ();
+    void update_bodies ();
 
-    static void erase ();
+    void erase ();
 
-    static plid_tu count ();
+    plid_tu count () const;
 
-    static Player& at (plid_tu index);
+    const Player& operator [] (plid_tu index) const;
 
-    static void calc_stats ();
+    Player& operator [] (plid_tu index);
 
-    static void draw_stat ();
+    void calc_stats ();
+
+    void draw_stat ();
+    
+    static Players& get_instance ();
 };
 
-inline plid_tu Players::count () {
+extern Players& players;
+
+inline plid_tu Players::count () const {
     return players.size ();
 }
 
-inline Player& Players::at (plid_tu index) {
+inline const Player& Players::operator [] (plid_tu index) const {
     return *players[index];
+}
+
+inline Player& Players::operator [] (plid_tu index) {
+    return *players[index];
+}
+
+inline Players& Players::get_instance () {
+    return instance;
 }
 
 #endif	/* PLAYERS_H */

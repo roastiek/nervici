@@ -20,16 +20,24 @@ union GetFaceHandle {
     GetFace get_face;
 };
 
-vector<ModRunner*> Mods::mod_runners;
+Mods Mods::instance;
 
-vector<Mod*> Mods::mods;
+Mods& mods = Mods::get_instance();
 
-Module* Mods::mod_module = NULL;
+Mods::Mods (): mod_module (NULL), mod (NULL) {
 
-ModInterface* Mods::mod = NULL;
+}
 
-Mods::Mods () {
+Mods::~Mods () {
+    for (size_t mi = 0; mi < mods.size (); mi++) {
+        delete mods[mi];
+    }
+    mods.clear ();
 
+    for (size_t mi = 0; mi < mod_runners.size (); mi++) {
+        delete mod_runners[mi];
+    }
+    mod_runners.clear ();
 }
 
 void Mods::find_mods () {
@@ -42,17 +50,6 @@ void Mods::find_mods () {
 
     find_mod_runners (files);
     find_scripts (files);
-}
-
-void Mods::free_mods () {
-    for (size_t mi = 0; mi < mods.size (); mi++) {
-        delete mods[mi];
-    }
-    for (size_t mi = 0; mi < mod_runners.size (); mi++) {
-        delete mod_runners[mi];
-    }
-    mods.clear ();
-    mod_runners.clear ();
 }
 
 void Mods::load_mod (size_t mid) {

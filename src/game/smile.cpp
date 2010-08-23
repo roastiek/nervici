@@ -19,7 +19,7 @@ Smile::Smile (SmileType ntype, smileid_tu sid, smilelvl_tu lvl) :
     id (sid), level (lvl), type (ntype), visible (false) {
 }
 
-Smile::~Smile () { 
+Smile::~Smile () {
 }
 
 void Smile::erase () {
@@ -146,7 +146,7 @@ public:
 
     void eat (Player& pl) {
         SoftSmile::eat (pl);
-        Mods::mod->on_pozi_smile (pl, level);
+        mods.face ().on_pozi_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmilePlus);
     }
 };
@@ -165,7 +165,7 @@ public:
 
     void eat (Player& pl) {
         SoftSmile::eat (pl);
-        Mods::mod->on_nega_smile (pl, level);
+        mods.face ().on_nega_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
@@ -180,8 +180,8 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % Players::count ();
-            Player& pl = Players::at (target);
+            plid_tu target = random () % players.count ();
+            Player& pl = players[target];
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 int angle = pl.get_angle ();
@@ -208,8 +208,8 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % Players::count ();
-            Player& pl = Players::at (target);
+            plid_tu target = random () % players.count ();
+            Player& pl = players[target];
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 int angle = pl.get_angle ();
@@ -240,7 +240,7 @@ public:
 
     void eat (Player& pl) {
         HardSmile::eat (pl);
-        Mods::mod->on_fleg_smile (pl, level);
+        mods.face ().on_fleg_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
@@ -255,8 +255,8 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % Players::count ();
-            Player& pl = Players::at (target);
+            plid_tu target = random () % players.count ();
+            Player& pl = players[target];
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 int angle = pl.get_angle ();
@@ -283,8 +283,8 @@ public:
 
     bool found_new_pos () {
         for (int tries = 0; tries < 30; tries++) {
-            plid_tu target = random () % Players::count ();
-            Player& pl = Players::at (target);
+            plid_tu target = random () % players.count ();
+            Player& pl = players[target];
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 int angle = pl.get_angle ();
@@ -315,7 +315,7 @@ public:
 
     void eat (Player& pl) {
         SoftSmile::eat (pl);
-        Mods::mod->on_iron_smile (pl, level);
+        mods.face ().on_iron_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmilePlus);
     }
 };
@@ -415,19 +415,19 @@ public:
         }
         switch (face_type) {
         case ST_pozi:
-            Mods::mod->on_pozi_smile (pl, level);
+            mods.face ().on_pozi_smile (pl, level);
             Audio::play_effect (pl.id, ET_SmilePlus);
             break;
         case ST_nega:
-            Mods::mod->on_nega_smile (pl, level);
+            mods.face ().on_nega_smile (pl, level);
             Audio::play_effect (pl.id, ET_SmileMinus);
             break;
         case ST_fleg:
-            Mods::mod->on_fleg_smile (pl, level);
+            mods.face ().on_fleg_smile (pl, level);
             Audio::play_effect (pl.id, ET_SmileMinus);
             break;
         case ST_iron:
-            Mods::mod->on_iron_smile (pl, level);
+            mods.face ().on_iron_smile (pl, level);
             Audio::play_effect (pl.id, ET_SmilePlus);
             break;
         default:
@@ -446,8 +446,8 @@ public:
 
     bool try_swich_face () {
         bool someone_near = false;
-        for (size_t pi = 0; pi < Players::count (); pi++) {
-            Player& pl = Players::at (pi);
+        for (size_t pi = 0; pi < players.count (); pi++) {
+            Player& pl = players[pi];
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 FPoint dist;
@@ -483,8 +483,8 @@ public:
 
     bool try_swich_face () {
         bool someone_near = false;
-        for (size_t pi = 0; pi < Players::count (); pi++) {
-            Player& pl = Players::at (pi);
+        for (size_t pi = 0; pi < players.count (); pi++) {
+            Player& pl = players[pi];
             if (pl.is_live ()) {
                 const FPoint& pl_pos = pl.get_position ();
                 FPoint dist;
@@ -593,7 +593,7 @@ public:
 
     void eat (Player& pl) {
         Smile::eat (pl);
-        Mods::mod->on_ham_smile (pl, level);
+        mods.face ().on_ham_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
@@ -681,7 +681,7 @@ public:
 
     void eat (Player& pl) {
         Smile::eat (pl);
-        Mods::mod->on_ham_smile (pl, level);
+        mods.face ().on_ham_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 };
@@ -774,7 +774,7 @@ public:
 
     void eat (Player& pl) {
         Smile::eat (pl);
-        Mods::mod->on_ham_smile (pl, level);
+        mods.face ().on_ham_smile (pl, level);
         Audio::play_effect (pl.id, ET_SmileMinus);
     }
 

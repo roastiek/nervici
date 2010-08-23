@@ -33,9 +33,20 @@ const static TeamInfo def_infos[TEAMS_COUNT] = {
         0x8080ff,
         "team 18+"}};
 
-vector<TeamInfo*> TeamInfos::infos;
+TeamInfos TeamInfos::instance;
+
+TeamInfos& team_infos = TeamInfos::get_instance ();
 
 TeamInfos::TeamInfos () {
+}
+
+TeamInfos::~TeamInfos () {
+    for (size_t ti = 1; ti < infos.size (); ti++) {
+        delete infos[ti];
+    }
+
+    infos.clear ();
+
 }
 
 void TeamInfos::load () {
@@ -58,18 +69,15 @@ void TeamInfos::load () {
     }
 }
 
-void TeamInfos::save_and_free () {
+void TeamInfos::save () {
     Setting& set = settings.teams ();
 
     ustring section;
 
-    for (size_t ti = 1; ti < infos.size(); ti++) {
+    for (size_t ti = 1; ti < infos.size (); ti++) {
         section = "team" + to_string<size_t> (ti);
 
         set.write_hex (section, "color", infos[ti]->color);
         set.write_string (section, "name", infos[ti]->name);
-        delete infos[ti];
     }
-    
-    infos.clear();
 }

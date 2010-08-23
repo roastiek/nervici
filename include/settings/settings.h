@@ -20,8 +20,9 @@ private:
 
     Settings ();
 
-public:
     ~Settings ();
+
+public:
 
     void load ();
 
@@ -41,5 +42,30 @@ public:
 };
 
 extern Settings& settings;
+
+inline Setting& Settings::app () {
+    return *settings[0];
+}
+
+inline Setting& Settings::game () {
+    return *settings[1];
+}
+
+inline Setting& Settings::players () {
+    return *settings[2];
+}
+
+inline Setting& Settings::ais () {
+    return *settings[3];
+}
+
+inline Setting& Settings::teams () {
+    return *settings[4];
+}
+
+inline Settings& Settings::get_instance () {
+    return instance;
+}
+
 
 #endif /* SETTINGS_H_ */

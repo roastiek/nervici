@@ -210,7 +210,7 @@ void write_player_head (const Point& pos, const Fields& fields, plid_tu id,
                 case IT_SOFT_SMILE:
                     if (!living)
                         break;
-                    smiles[item.smile.ID].eat (Players::at (id));
+                    smiles[item.smile.ID].eat (players[id]);
                 case IT_FREE:
                     item.type = IT_PLAYER;
                     item.player.ID = id;

@@ -70,25 +70,25 @@ startid_tu world_find_free_start () {
 }
 
 plid_tu live_pls_count () {
-    return Players::live_pls_count ();
+    return players.live_pls_count ();
 }
 
 plid_tu get_players_count () {
-    return Players::count ();
+    return players.count ();
 }
 
 IPlayer& get_player (plid_tu plid) {
-    return Players::at (plid);
+    return players[plid];
 }
 
 IPlayer& get_player (plid_tu plid);
 
 plid_tu get_teams_count () {
-    return Teams::count ();
+    return teams.count ();
 }
 
 ITeam& get_team (plid_tu tid) {
-    return Teams::at (tid);
+    return teams[tid];
 }
 
 startid_tu get_starts_count () {

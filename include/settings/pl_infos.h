@@ -8,54 +8,72 @@
 class PlInfos {
 private:
 
-    static std::vector<PlInfo*> players;
+    std::vector<PlInfo*> players;
 
-    static std::vector<PlInfo*> ais;
+    std::vector<PlInfo*> ais;
 
+    static PlInfos instance;
+    
     PlInfos ();
+    
+    ~PlInfos ();
 
-    static void load_players ();
+    void load_players ();
 
-    static void load_ais ();
+    void load_ais ();
 
-    static void save_players ();
+    void save_players ();
 
-    static void save_ais ();
+    void save_ais ();
 
 public:
-    static void load ();
+    void load ();
 
-    static void save_and_free ();
+    void save ();
 
-    static size_t count ();
+    size_t count () const;
 
-    static size_t players_count ();
+    size_t players_count () const;
 
-    static size_t ais_count ();
+    size_t ais_count () const;
 
-    static PlInfo& at (size_t index);
+    const PlInfo& operator[] (size_t index) const;
 
-    static void add (const PlInfo& info);
+    PlInfo& operator[] (size_t index);
 
-    static void remove (size_t idi);
+    void add (const PlInfo& info);
 
+    void remove (size_t idi);
+    
+    static PlInfos& get_instance ();
 };
 
-inline size_t PlInfos::count () {
+extern PlInfos& pl_infos;
+
+inline size_t PlInfos::count () const {
     return players.size () + ais.size ();
 }
 
-inline size_t PlInfos::players_count () {
+inline size_t PlInfos::players_count () const{
     return players.size ();
 }
 
-inline size_t PlInfos::ais_count () {
+inline size_t PlInfos::ais_count () const {
     return ais.size ();
 }
 
-inline PlInfo & PlInfos::at (size_t index) {
+inline PlInfo & PlInfos::operator [] (size_t index) {
     return (index < players.size ()) ? *players[index] : *ais[index
             - players.size ()];
+}
+
+inline const PlInfo & PlInfos::operator [] (size_t index) const {
+    return (index < players.size ()) ? *players[index] : *ais[index
+            - players.size ()];
+}
+
+inline PlInfos& PlInfos::get_instance() {
+    return instance;
 }
 
 #endif // __PLINFO_H__
