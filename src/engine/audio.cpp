@@ -153,7 +153,7 @@ void Audio::initialize () {
 
 void Audio::uninitialize () {
     free_music ();
-    free_sounds();
+    free_sounds ();
 
     uninitialize_impl ();
 
@@ -166,14 +166,10 @@ void Audio::music_stop () {
     music_loop = false;
 }
 
-size_t Audio::get_profiles_count () {
-
-    return sound_profiles.size ();
-}
-
-const ustring& Audio::get_profile (size_t id) {
+const ustring& Audio::get_profile (size_t id) const{
     return sound_profiles[id]->name;
 }
+
 
 void Audio::music_play (MusicType type) {
     if (music_is_playing_impl ()) {
@@ -326,9 +322,7 @@ const SoundProfile& Audio::get_sprofile (size_t index) const {
     return *sound_profiles[index];
 }
 
-
-
-class AudioImpl: public Audio {
+class AudioOpenAL: public Audio {
 private:
     ALCdevice* device;
 
@@ -341,260 +335,306 @@ private:
     char* music_data;
 
     AudioDecoder* music_decoder;
-    
+
     vector<PlAudio> sounds;
 
-    void init_music () {
-        music_data = new char[setting.buffer];
-        music_buffers = new ALuint[setting.bfrs_count];
+    void init_music ();
 
-        alGenBuffers (setting.bfrs_count, music_buffers);
-        alGenSources (1, &music_source);
+    void uninit_music ();
 
-        alSourcefv (music_source, AL_POSITION, source_pos);
-        alSourcefv (music_source, AL_VELOCITY, source_vel);
-        alSourcef (music_source, AL_GAIN, setting.music / 20.0);
-    }
+    void init_sounds ();
 
-    void uninit_music () {
+    void uninit_sounds ();
 
-        alDeleteBuffers (setting.bfrs_count, music_buffers);
-        alDeleteSources (1, &music_source);
-
-        delete[] music_data;
-        delete[] music_buffers;
-    }
-
-    void init_sounds () {
-
-    }
-
-    void uninit_sounds () {
-        for (size_t pi = 0; pi < sound_profiles.size (); pi++) {
-            SoundProfileImpl& spi = get_sprofile (pi);
-            for (int eti = 0; eti < ET_Count; eti++) {
-                if (spi.buffers[eti].size () > 0) {
-                    alDeleteBuffers (spi.buffers[eti].size (),
-                            spi.buffers[eti].data ());
-                    spi.buffers[eti].clear ();
-                }
-            }
-        }
-    }
-
-    int music_stream (ALuint buffer) {
-        size_t size = music_decoder->read (music_data, setting.buffer);
-        if (size > 0) {
-
-            alBufferData (buffer, music_decoder->get_format (), music_data,
-                    size, music_decoder->get_frequency ());
-        }
-        return size;
-    }
+    int music_stream (ALuint buffer);
 
 protected:
-    void initialize_impl () {
-        device = alcOpenDevice (NULL);
-        context = alcCreateContext (device, NULL);
-        alcMakeContextCurrent (context);
+    void initialize_impl ();
+    
+    void uninitialize_impl ();
+    
+    void music_play_impl ();
+    
+    void music_stop_impl ();
+    
+    bool music_open_impl (const ustring& filename);
 
-        alListenerfv (AL_POSITION, listener_pos);
-        alListenerfv (AL_VELOCITY, listener_vel);
-        alListenerfv (AL_ORIENTATION, listener_ori);
+    void music_close_impl ();
 
-        init_sounds ();
-        init_music ();
-    }
+    bool music_is_playing_impl ();
 
-    void uninitialize_impl () {
-        uninit_music ();
-        uninit_sounds ();
-
-        alcMakeContextCurrent (NULL);
-        alcDestroyContext (context);
-        alcCloseDevice (device);
-    }
-
-    void music_play_impl () {
-        for (int bi = 0; bi < setting.bfrs_count; bi++) {
-            if (music_stream (music_buffers[bi]) <= 0) {
-
-                break;
-            }
-            alSourceQueueBuffers (music_source, 1, &music_buffers[bi]);
-        }
-
-        alSourcePlay (music_source);
-    }
-
-    void music_stop_impl () {
-        int queued;
-        ALuint buffer;
-
-        alSourceStop (music_source);
-        alGetSourcei (music_source, AL_BUFFERS_QUEUED, &queued);
-
-        for (; queued > 0; queued--) {
-            alSourceUnqueueBuffers (music_source, 1, &buffer);
-        }
-    }
-
-    bool music_open_impl (const ustring& filename) {
-        music_decoder = new MplayerDecoder ();
-        if (!music_decoder->open (filename)) {
-            delete music_decoder;
-            music_decoder = NULL;
-            return false;
-        }
-        return true;
-    }
-
-    void music_close_impl () {
-        if (music_decoder != NULL) {
-            delete music_decoder;
-            music_decoder = NULL;
-        }
-    }
-
-    bool music_is_playing_impl () {
-        ALenum state;
-        alGetSourcei (music_source, AL_SOURCE_STATE, &state);
-        return state == AL_PLAYING;
-    }
-
-    double get_sound_length_impl (const ustring& filename) {
-        MplayerDecoder dec;
-        return dec.get_length (filename);
-    }
+    double get_sound_length_impl (const ustring& filename) const;
 
     SoundProfileImpl* create_profile_impl (const ustring& name,
-            const ustring& directory) const {
-        SoundProfileImpl* result = new SoundProfileImpl ();
-        result->name = name;
-        result->directory = directory;
-        return result;
-    }
+            const ustring& directory) const;
 
-    SoundProfileImpl& get_sprofile (size_t index) {
-        return *static_cast<SoundProfileImpl*> (sound_profiles[index]);
-    }
+    SoundProfileImpl& get_sprofile (size_t index);
 
-    const SoundProfileImpl& get_sprofile (size_t index) const {
-        return *static_cast<SoundProfileImpl*> (sound_profiles[index]);
-    }
+    const SoundProfileImpl& get_sprofile (size_t index) const;
 
     bool load_sound_impl (SoundProfile* prof, EffectType effect,
-            const Glib::ustring& filename, vector<char>& data) {
-        MplayerDecoder dec;
-        SoundProfileImpl* entry = static_cast<SoundProfileImpl*> (prof);
-
-        if (dec.open (filename)) {
-            size_t pos = 0;
-            size_t avai = data.size ();
-            size_t read = dec.read (&data.data ()[pos], avai);
-            size_t whole = 0;
-            while (read == avai) {
-                whole += read;
-                size_t new_size = data.size () * 2 + 1;
-                data.resize (new_size);
-                pos += read;
-                avai = data.size () - avai;
-                read = dec.read (&data.data ()[pos], avai);
-            }
-            whole += read;
-
-            ALuint sound_buffer;
-            alGenBuffers (1, &sound_buffer);
-            alBufferData (sound_buffer, dec.get_format (), data.data (), whole,
-                    dec.get_frequency ());
-            entry->buffers[effect].push_back (sound_buffer);
-            return true;
-        }
-        return false;
-    }
-
+            const Glib::ustring& filename, vector<char>& data) const;
 public:
-    AudioImpl () :
-        Audio (), music_data (NULL), music_decoder (NULL) {
+    AudioOpenAL ();
 
-    }
+    void music_update ();
+    
+    void music_set_rate (float rate);
 
-    void music_update () {
-        int processed;
-        ALenum state;
-        ALuint buffer;
-
-        alGetSourcei (music_source, AL_SOURCE_STATE, &state);
-        if (state == AL_PLAYING) {
-
-            alGetSourcei (music_source, AL_BUFFERS_PROCESSED, &processed);
-
-            for (; processed > 0; processed--) {
-                alSourceUnqueueBuffers (music_source, 1, &buffer);
-                if (music_stream (buffer) > 0)
-                    alSourceQueueBuffers (music_source, 1, &buffer);
-            }
-        } else if (music_loop) {
-
-            music_play (music_type);
-        }
-    }
-
-    void music_set_rate (float rate) {
-        alSourcef (music_source, AL_PITCH, rate);
-    }
-
-    void load_players (const std::vector<const PlInfo*>& infos) {
-        sounds.clear ();
-
-        for (size_t si = 0; si < infos.size (); si++) {
-            const PlInfo& info = *infos[si];
-            PlAudio entry;
-            alGenSources (1, &entry.source);
-            alSourcef (entry.source, AL_PITCH, (info.pitch + 5.0) / 10.0);
-            alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
-            alSourcefv (entry.source, AL_VELOCITY, source_vel);
-            alSourcefv (entry.source, AL_POSITION, source_pos);
-            cout << info.profil << '\n';
-            entry.prof = find_profil (info.profil);
-            sounds.push_back (entry);
-        }
-    }
-
-    void free_players () {
-        for (size_t si = 0; si < sounds.size (); si++) {
-
-            alSourceStop (sounds[si].source);
-            alDeleteSources (1, &sounds[si].source);
-        }
-    }
-
-    void play_effect (plid_tu plid, EffectType effect) {
-        ALint play;
-        //SoundProfile *spi;
-        ALuint source;
-
-        if (sounds[plid].prof >= 0) {
-            alGetSourcei (sounds[plid].source, AL_SOURCE_STATE, &play);
-
-            SoundProfileImpl& spi = get_sprofile (sounds[plid].prof);
-            source = sounds[plid].source;
-
-            if (play != AL_PLAYING) {
-                if (spi.buffers[effect].size () > 0) {
-
-                    int index = sounds[plid].r % spi.buffers[effect].size ();
-                    alSourcei (source, AL_BUFFER, spi.buffers[effect][index]);
-
-                }
-                sounds[plid].r++;
-
-                alSourcePlay (source);
-            }
-        }
-    }
+    void load_players (const std::vector<const PlInfo*>& infos);
+    
+    void free_players ();
+    
+    void play_effect (plid_tu plid, EffectType effect);
 };
 
-static AudioImpl instance;
+void AudioOpenAL::init_music () {
+    music_data = new char[setting.buffer];
+    music_buffers = new ALuint[setting.bfrs_count];
+
+    alGenBuffers (setting.bfrs_count, music_buffers);
+    alGenSources (1, &music_source);
+
+    alSourcefv (music_source, AL_POSITION, source_pos);
+    alSourcefv (music_source, AL_VELOCITY, source_vel);
+    alSourcef (music_source, AL_GAIN, setting.music / 20.0);
+}
+
+void AudioOpenAL::uninit_music () {
+
+    alDeleteBuffers (setting.bfrs_count, music_buffers);
+    alDeleteSources (1, &music_source);
+
+    delete[] music_data;
+    delete[] music_buffers;
+}
+
+void AudioOpenAL::init_sounds () {
+
+}
+
+void AudioOpenAL::uninit_sounds () {
+    for (size_t pi = 0; pi < sound_profiles.size (); pi++) {
+        SoundProfileImpl& spi = get_sprofile (pi);
+        for (int eti = 0; eti < ET_Count; eti++) {
+            if (spi.buffers[eti].size () > 0) {
+                alDeleteBuffers (spi.buffers[eti].size (),
+                        spi.buffers[eti].data ());
+                spi.buffers[eti].clear ();
+            }
+        }
+    }
+}
+
+int AudioOpenAL::music_stream (ALuint buffer) {
+    size_t size = music_decoder->read (music_data, setting.buffer);
+    if (size > 0) {
+
+        alBufferData (buffer, music_decoder->get_format (), music_data, size,
+                music_decoder->get_frequency ());
+    }
+    return size;
+}
+
+void AudioOpenAL::initialize_impl () {
+    device = alcOpenDevice (NULL);
+    context = alcCreateContext (device, NULL);
+    alcMakeContextCurrent (context);
+
+    alListenerfv (AL_POSITION, listener_pos);
+    alListenerfv (AL_VELOCITY, listener_vel);
+    alListenerfv (AL_ORIENTATION, listener_ori);
+
+    init_sounds ();
+    init_music ();
+}
+
+void AudioOpenAL::uninitialize_impl () {
+    uninit_music ();
+    uninit_sounds ();
+
+    alcMakeContextCurrent (NULL);
+    alcDestroyContext (context);
+    alcCloseDevice (device);
+}
+
+void AudioOpenAL::music_play_impl () {
+    for (int bi = 0; bi < setting.bfrs_count; bi++) {
+        if (music_stream (music_buffers[bi]) <= 0) {
+
+            break;
+        }
+        alSourceQueueBuffers (music_source, 1, &music_buffers[bi]);
+    }
+
+    alSourcePlay (music_source);
+}
+
+void AudioOpenAL::music_stop_impl () {
+    int queued;
+    ALuint buffer;
+
+    alSourceStop (music_source);
+    alGetSourcei (music_source, AL_BUFFERS_QUEUED, &queued);
+
+    for (; queued > 0; queued--) {
+        alSourceUnqueueBuffers (music_source, 1, &buffer);
+    }
+}
+
+bool AudioOpenAL::music_open_impl (const ustring& filename) {
+    music_decoder = new MplayerDecoder ();
+    if (!music_decoder->open (filename)) {
+        delete music_decoder;
+        music_decoder = NULL;
+        return false;
+    }
+    return true;
+}
+
+void AudioOpenAL::music_close_impl () {
+    if (music_decoder != NULL) {
+        delete music_decoder;
+        music_decoder = NULL;
+    }
+}
+
+bool AudioOpenAL::music_is_playing_impl () {
+    ALenum state;
+    alGetSourcei (music_source, AL_SOURCE_STATE, &state);
+    return state == AL_PLAYING;
+}
+
+double AudioOpenAL::get_sound_length_impl (const ustring& filename) const {
+    MplayerDecoder dec;
+    return dec.get_length (filename);
+}
+
+SoundProfileImpl* AudioOpenAL::create_profile_impl (const ustring& name,
+        const ustring& directory) const {
+    SoundProfileImpl* result = new SoundProfileImpl ();
+    result->name = name;
+    result->directory = directory;
+    return result;
+}
+
+SoundProfileImpl& AudioOpenAL::get_sprofile (size_t index) {
+    return *static_cast<SoundProfileImpl*> (sound_profiles[index]);
+}
+
+const SoundProfileImpl& AudioOpenAL::get_sprofile (size_t index) const {
+    return *static_cast<SoundProfileImpl*> (sound_profiles[index]);
+}
+
+bool AudioOpenAL::load_sound_impl (SoundProfile* prof, EffectType effect,
+        const Glib::ustring& filename, vector<char>& data) const {
+    MplayerDecoder dec;
+    SoundProfileImpl* entry = static_cast<SoundProfileImpl*> (prof);
+
+    if (dec.open (filename)) {
+        size_t pos = 0;
+        size_t avai = data.size ();
+        size_t read = dec.read (&data.data ()[pos], avai);
+        size_t whole = 0;
+        while (read == avai) {
+            whole += read;
+            size_t new_size = data.size () * 2 + 1;
+            data.resize (new_size);
+            pos += read;
+            avai = data.size () - avai;
+            read = dec.read (&data.data ()[pos], avai);
+        }
+        whole += read;
+
+        ALuint sound_buffer;
+        alGenBuffers (1, &sound_buffer);
+        alBufferData (sound_buffer, dec.get_format (), data.data (), whole,
+                dec.get_frequency ());
+        entry->buffers[effect].push_back (sound_buffer);
+        return true;
+    }
+    return false;
+}
+
+AudioOpenAL::AudioOpenAL () :
+    Audio (), music_data (NULL), music_decoder (NULL) {
+
+}
+
+void AudioOpenAL::music_update () {
+    int processed;
+    ALenum state;
+    ALuint buffer;
+
+    alGetSourcei (music_source, AL_SOURCE_STATE, &state);
+    if (state == AL_PLAYING) {
+
+        alGetSourcei (music_source, AL_BUFFERS_PROCESSED, &processed);
+
+        for (; processed > 0; processed--) {
+            alSourceUnqueueBuffers (music_source, 1, &buffer);
+            if (music_stream (buffer) > 0)
+                alSourceQueueBuffers (music_source, 1, &buffer);
+        }
+    } else if (music_loop) {
+
+        music_play (music_type);
+    }
+}
+
+void AudioOpenAL::music_set_rate (float rate) {
+    alSourcef (music_source, AL_PITCH, rate);
+}
+
+void AudioOpenAL::load_players (const std::vector<const PlInfo*>& infos) {
+    sounds.clear ();
+
+    for (size_t si = 0; si < infos.size (); si++) {
+        const PlInfo& info = *infos[si];
+        PlAudio entry;
+        alGenSources (1, &entry.source);
+        alSourcef (entry.source, AL_PITCH, (info.pitch + 5.0) / 10.0);
+        alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
+        alSourcefv (entry.source, AL_VELOCITY, source_vel);
+        alSourcefv (entry.source, AL_POSITION, source_pos);
+        cout << info.profil << '\n';
+        entry.prof = find_profil (info.profil);
+        sounds.push_back (entry);
+    }
+}
+
+void AudioOpenAL::free_players () {
+    for (size_t si = 0; si < sounds.size (); si++) {
+
+        alSourceStop (sounds[si].source);
+        alDeleteSources (1, &sounds[si].source);
+    }
+}
+
+void AudioOpenAL::play_effect (plid_tu plid, EffectType effect) {
+    ALint play;
+    ALuint source;
+
+    if (sounds[plid].prof >= 0) {
+        alGetSourcei (sounds[plid].source, AL_SOURCE_STATE, &play);
+
+        SoundProfileImpl& spi = get_sprofile (sounds[plid].prof);
+        source = sounds[plid].source;
+
+        if (play != AL_PLAYING) {
+            if (spi.buffers[effect].size () > 0) {
+
+                int index = sounds[plid].r % spi.buffers[effect].size ();
+                alSourcei (source, AL_BUFFER, spi.buffers[effect][index]);
+
+            }
+            sounds[plid].r++;
+
+            alSourcePlay (source);
+        }
+    }
+}
+
+static AudioOpenAL instance;
 
 Audio& audio = instance;

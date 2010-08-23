@@ -68,7 +68,8 @@ protected:
 
     virtual bool music_is_playing_impl () = 0;
 
-    virtual double get_sound_length_impl (const Glib::ustring& filename) = 0;
+    virtual double
+            get_sound_length_impl (const Glib::ustring& filename) const = 0;
 
     virtual SoundProfile* create_profile_impl (const Glib::ustring& name,
             const Glib::ustring& directory) const = 0;
@@ -78,7 +79,7 @@ protected:
     virtual const SoundProfile& get_sprofile (size_t index) const;
 
     virtual bool load_sound_impl (SoundProfile* prof, EffectType effect,
-            const Glib::ustring& filename, std::vector<char>& data) = 0;
+            const Glib::ustring& filename, std::vector<char>& data) const = 0;
 
 public:
     void initialize ();
@@ -99,11 +100,15 @@ public:
 
     virtual void music_set_rate (float rate) = 0;
 
-    size_t get_profiles_count ();
+    size_t get_profiles_count () const;
 
-    const Glib::ustring& get_profile (size_t id);
+    const Glib::ustring& get_profile (size_t id) const;
 };
 
 extern Audio& audio;
+
+inline size_t Audio::get_profiles_count () const {
+    return sound_profiles.size ();
+}
 
 #endif // __AUDIO_H__
