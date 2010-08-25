@@ -90,6 +90,9 @@ void draw_player_stat (plid_tu id, plid_tu order, const PlInfo& info,
 
 void draw_team_stat (plid_tu id, plid_tu order, const TeamInfo& info,
         const Statistic& stat);
+
+void draw_fake_face (const Point& pos);
+
 }
 
 #endif

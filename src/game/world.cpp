@@ -162,12 +162,12 @@ bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
                         return false;
                     } else {
                         if (item.player.order <= head) {
-                            if (head - item.player.order > 5) {
+                            if (head - item.player.order > 8) {
                                 cause.cause = DC_self;
                                 return false;
                             }
                         } else {
-                            if (0x10000 + head - item.player.order > 5) {
+                            if (0x10000 + head - item.player.order > 8) {
                                 cause.cause = DC_self;
                                 return false;
                             }

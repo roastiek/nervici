@@ -51,6 +51,7 @@ set (NERVICI_SOURCES
     src/frames/pledit_frame.cpp
     src/app.cpp
     src/main.cpp 
+    src/ais/gen0.cpp
 )
 
 add_executable (nervici ${NERVICI_SOURCES})

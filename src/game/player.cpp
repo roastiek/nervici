@@ -19,9 +19,6 @@
 
 #include "game/player.h"
 
-#define JUMP_LENGTH 24
-#define JUMP_REPEAT 80
-
 using namespace std;
 using namespace Glib;
 
@@ -58,10 +55,14 @@ Player::Player (plid_tu ID, Team& nteam, const PlInfo& ninfo, int max_len) :
     state = PS_Erased;
     team.inc_state (state);
     ironize_lvl = 0;
+
+    ai = (info.type == PT_AI) ? new AIGen0 (id) : NULL;
 }
 
 Player::~Player () {
     delete[] body;
+    if (ai != NULL)
+        delete ai;
 }
 
 void Player::erase () {
@@ -90,7 +91,7 @@ void Player::clear_bottom () {
     updates.push_back (body[bottom_index]);
 
     bottom++;
-    bottom %= 0xffff;
+    bottom %= 0x10000;
     bottom_index++;
     bottom_index %= size;
     length--;
@@ -151,7 +152,7 @@ void Player::add_part (const Point& part) {
             head_index++;
             head_index %= size;
             head++;
-            head &= 0xffff;
+            head %= 0x10000;
             length++;
         } else
             cerr << "error: not enough bodysize\n";
@@ -161,7 +162,7 @@ void Player::add_part (const Point& part) {
             head_index++;
             head_index %= size;
             head++;
-            head &= 0xffff;
+            head %= 0x10000;
             length++;
         } else
             cerr << "error: not enough maxlength\n";
@@ -188,10 +189,6 @@ void Player::live () {
 
     exact.x += icos[angle] / 2;
     exact.y += isin[angle] / 2;
-
-    if (jumptime > 0) {
-        jumptime--;
-    }
 
     pos.x = exact.x - 1;
     pos.y = exact.y - 1;
@@ -249,6 +246,10 @@ void Player::live () {
             mods.face ().on_death (*this);
         }
     }
+
+    if (jumptime > 0) {
+        jumptime--;
+    }
 }
 
 void Player::clear_step () {
@@ -286,6 +287,11 @@ int Player::step (const uint8_t *keys) {
             keyst = KS_Right;
         } else {
             keyst = KS_None;
+        }
+    } else {
+        if (is_live ()) {
+            ai->calc (exact, angle, jumptime, head);
+            keyst = ai->get_next_step ();
         }
     }
 

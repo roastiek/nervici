@@ -306,7 +306,7 @@ void run () {
         players.update_bodies ();
         players.update_score ();
         teams.update_score ();
-        //Render::update_screen ();
+        Render::update_screen ();
 
         audio.music_update ();
 

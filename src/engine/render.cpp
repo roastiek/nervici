@@ -79,6 +79,8 @@ static SDLPango_Context* end_context;
 static SDLPango_Context* status_context;
 static SDLPango_Context* stat_context;
 
+static SDL_Surface* fake_face;
+
 static StatisticScreen stat_screen;
 static SDL_Surface* stat_columns[STC_count];
 static int stat_column_sub[STC_count];
@@ -518,6 +520,10 @@ bool initialize () {
     init_stat_screen ();
     init_stat_columns ();
 
+    fake_face = SDL_CreateRGBSurface (SDL_HWSURFACE, 3,
+            3, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
+    SDL_FillRect(fake_face, NULL, 0x800000);
+    
     return false;
 }
 
@@ -1126,6 +1132,17 @@ void draw_team_stat (plid_tu id, plid_tu order, const TeamInfo& info,
         const Statistic& stat) {
     draw_stat (stat_screen.teams_in.y + 2 + order * 24, info.name, info.color,
             stat, team_images[id]);
+}
+
+void draw_fake_face (const Point& pos) {
+    static SDL_Rect dest;
+    
+    dest.x = pos.x + gs_outer.playerground.x;
+    dest.y = pos.y + gs_outer.playerground.y;
+    
+    SDL_BlitSurface (fake_face, NULL, primary, &dest);
+    
+    //SDL_UpdateRects(primary, 1, &dest);
 }
 
 }

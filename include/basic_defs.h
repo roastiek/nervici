@@ -14,5 +14,8 @@
 #define TEAMS_COUNT 5
 //#define AIS_COUNT 16
 
+#define JUMP_LENGTH 24
+#define JUMP_REPEAT 80
+
 #endif	/* BASIC_DEFS_H */
 
