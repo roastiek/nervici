@@ -12,6 +12,7 @@
 
 #include "int_type.h"
 #include "fpoint.h"
+#include "point.h"
 #include "game/key_state.h"
 #include "game/fields.h"
 
@@ -47,12 +48,16 @@ private:
     size_t barier; 
     
     bool can_jump;
+    
+    Point target;
 
     size_t make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
-            plsize_tu head, size_t distance, KeySt def, size_t max);
+            plsize_tu head, size_t distance, KeySt def, size_t max, double& dist);
 
     bool will_survive (const FPoint& pos, int jumptime, plsize_tu head);
 
+    double target_distance (const FPoint& pos);
+    
 public:
     AIGen0 (plid_tu id);
 

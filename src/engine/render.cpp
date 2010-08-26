@@ -1142,7 +1142,7 @@ void draw_fake_face (const Point& pos) {
     
     SDL_BlitSurface (fake_face, NULL, primary, &dest);
     
-    //SDL_UpdateRects(primary, 1, &dest);
+    SDL_UpdateRects(primary, 1, &dest);
 }
 
 }
