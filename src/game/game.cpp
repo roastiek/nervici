@@ -80,6 +80,8 @@ void sleep (timer_ti pause) {
     timer_ti delta = sdl_time - SDL_GetTicks ();
     if (delta > 0) {
         SDL_Delay (delta);
+    } else {
+        cout << "no sleep " << delta << "\n";
     }
 }
 
@@ -306,7 +308,7 @@ void run () {
         players.update_bodies ();
         players.update_score ();
         teams.update_score ();
-        Render::update_screen ();
+        //Render::update_screen ();
 
         audio.music_update ();
 

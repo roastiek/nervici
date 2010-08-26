@@ -81,7 +81,7 @@ private:
         set_semafor (SEMAFOR_RED_1 | SEMAFOR_RED_2 | SEMAFOR_RED_3);
         game_wait (WAIT_TIME);
 
-        play_music (0);
+      //  play_music (0);
         for (int pi = 0; pi < get_players_count (); pi++) {
             get_player (pi).start ();
         }

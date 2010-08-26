@@ -242,6 +242,9 @@ void Player::live () {
             team.stat.crashes++;
             mods.face ().on_wall (*this);
             audio.play_effect (id, ET_Wall);
+            
+            stat.deaths++;
+            team.stat.deaths++;
             set_state (PS_Death);
             mods.face ().on_death (*this);
         }
