@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <limits>
 
 #include "main.h"
 #include "basic_defs.h"
@@ -37,199 +38,362 @@ inline Index& Index::operator ++ (int) {
 AIGen0::AIGen0 (plid_tu nid) :
     id (nid) {
     plan.resize (MAX_STEPS, KS_None);
-    target.x = random () % World::get_width ();
-    target.y = random () % World::get_height ();
+    target = random_target();
 }
 
 KeySt AIGen0::get_next_step () {
     return plan[0];
 }
 
-void AIGen0::calc (const FPoint& pos, int angle, int jump_time, plsize_tu head) {
-    //cout << "id: " << int(id) << '\n';
-    barier = 0;
-    if (target_distance (pos) < 5) {
-        target.x = random () % World::get_width ();
-        target.y = random () % World::get_height ();
+void AIGen0::calc (const FPoint& pos, int angle, int jumptime, plsize_tu head) {
+    if (target_distance (pos) < 10) {
+        target = random_target();
     }
-    //Render::draw_fake_face(target);
-
-    double dist = target_distance (pos);
-    size_t len = make_plan (pos, angle, jump_time, head, 0, KS_None, 0, dist);
-    if ((len <= 4 && plan[0] == KS_None) || len == 0) {
-        plan[0] = KS_Jump;
-    }
-    /*cout.precision(10);
-    cout << dist << " " << int (plan[0]) <<'\n';*/
+    //cout << "plan\n";
+    Render::draw_fake_face (target);
+    shortes = numeric_limits<double>::max ();
+    make_shortes_plan (pos, angle, jumptime, head, 0);
+    //cout << shortes << '\n';
 }
 
-size_t AIGen0::make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
-        plsize_tu head, size_t distance, KeySt def, size_t max, double& dist) {
+void AIGen0::make_shortes_plan (const FPoint& prev_pos, int prev_angle,
+        int jumptime, plsize_tu head, size_t distance) {
+
     FPoint pos;
-    size_t dis_none;
-    size_t dis_left;
-    size_t dis_right;
-    double target_none;
-    double target_left;
-    double target_right;
+    int angle;
+    Result res_none;
+    Result res_left;
+    Result res_right;
+    Result res_jump;
+    int next_jump;
+
+    next_jump = (jumptime == 0) ? 0 : jumptime - 1;
+
+    angle = prev_angle;
+    pos.x = prev_pos.x + icos[angle] / 2;
+    pos.y = prev_pos.y + isin[angle] / 2;
+    res_none.target = target_distance (pos);
+    if (will_survive (pos, jumptime, head)) {
+        clear_barier(0);
+        res_none = make_plan (pos, angle, next_jump, (head + 1), distance
+                + 1, KS_None, distance + 1);
+    } else {
+        res_none.dist = distance;
+    }
+
+    angle = (prev_angle + angles - 1) % angles;
+    pos.x = prev_pos.x + icos[angle] / 2;
+    pos.y = prev_pos.y + isin[angle] / 2;
+    res_left.target = target_distance (pos);
+    if (will_survive (pos, jumptime, head)) {
+        clear_barier(0);
+        res_left = make_plan (pos, angle, next_jump, (head + 1), distance
+                + 1, KS_Left, distance + 2);
+    } else {
+        res_left.dist = distance;
+    }
+
+    angle = (prev_angle + 1) % angles;
+    pos.x = prev_pos.x + icos[angle] / 2;
+    pos.y = prev_pos.y + isin[angle] / 2;
+    res_right.target = target_distance (pos);
+    if (will_survive (pos, jumptime, head)) {
+        clear_barier(0);
+        res_right = make_plan (pos, angle, next_jump, (head + 1),
+                distance + 1, KS_Right, distance + 2);
+    } else {
+        res_right.dist = distance;
+    }
+
+    if (jumptime == 0) {
+        jumptime = JUMP_REPEAT;
+        next_jump = jumptime - 1;
+        angle = prev_angle;
+        pos.x = prev_pos.x + icos[angle] / 2;
+        pos.y = prev_pos.y + isin[angle] / 2;
+        res_jump.target = target_distance (pos);
+        if (will_survive (pos, jumptime, head)) {
+            clear_barier(0);
+            res_jump = make_plan (pos, angle, next_jump, (head + 1),
+                    distance + 1, KS_None, distance + 1);
+        } else {
+            res_jump.dist = distance;
+        }
+        res_jump.target *= 1.1;
+    } else {
+        res_jump = res_none;
+    }
+
+    //cout << res_left.dist << " " << res_none.dist << " " << res_right.dist << " " << res_jump.dist << '\n';
+    if (res_none >= res_left && res_none >= res_right && res_none >= res_jump) {
+        plan[distance] = KS_None;
+    } else if (res_left >= res_none && res_left >= res_right && res_left
+            >= res_jump) {
+        plan[distance] = KS_Left;
+    } else if (res_right >= res_none && res_right >= res_left && res_right
+            >= res_jump) {
+        plan[distance] = KS_Right;
+    } else {
+        plan[distance] = KS_Jump;
+    }
+}
+
+Result AIGen0::make_short_plan (const FPoint& prev_pos, int prev_angle,
+        int jumptime, plsize_tu head, size_t distance, KeySt def) {
+
+    FPoint pos;
+    int angle;
+    Result res_none;
+    Result res_left;
+    Result res_right;
+    Result res_jump;
+    int next_jump;
+    double target_dist;
+
+    next_jump = (jumptime == 0) ? 0 : jumptime - 1;
+
+    if (def == KS_None) {
+        angle = prev_angle;
+        pos.x = prev_pos.x + icos[angle] / 2;
+        pos.y = prev_pos.y + isin[angle] / 2;
+        target_dist = target_distance (pos);
+        if (will_survive (pos, jumptime, head)) {
+            if (distance < 1) {
+                res_none = make_short_plan (pos, angle, next_jump, (head + 1),
+                        distance + 1, KS_None);
+            } else {
+                clear_barier (0);
+                res_none = make_plan (pos, angle, next_jump, (head + 1),
+                        distance + 1, KS_None, distance + 1);
+            }
+            res_none.target = (target_dist < res_none.target) ? target_dist
+                    : res_none.target;
+        } else {
+            res_none.dist = distance;
+            res_none.target = target_dist;
+        }
+    } else {
+        res_none.dist = distance;
+        res_none.target = numeric_limits<double>::max ();
+    }
+
+    if (def == KS_Left) {
+        angle = (prev_angle + angles - 1) % angles;
+        pos.x = prev_pos.x + icos[angle] / 2;
+        pos.y = prev_pos.y + isin[angle] / 2;
+        target_dist = target_distance (pos);
+        if (will_survive (pos, jumptime, head)) {
+            if (distance < 1) {
+                res_left = make_short_plan (pos, angle, next_jump, (head + 1),
+                        distance + 1, KS_Left);
+            } else {
+                clear_barier (0);
+                res_left = make_plan (pos, angle, next_jump, (head + 1),
+                        distance + 1, KS_None, distance + 1);
+            }
+            res_left.target = (target_dist < res_left.target) ? target_dist
+                    : res_left.target;
+        } else {
+            res_left.dist = distance;
+            res_left.target = target_dist;
+        }
+    } else {
+        res_left.dist = distance;
+        res_left.target = numeric_limits<double>::max ();
+    }
+
+    if (def == KS_Right) {
+        angle = (prev_angle + 1) % angles;
+        pos.x = prev_pos.x + icos[angle] / 2;
+        pos.y = prev_pos.y + isin[angle] / 2;
+        target_dist = target_distance (pos);
+        if (will_survive (pos, jumptime, head)) {
+            if (distance < 1) {
+                res_right = make_short_plan (pos, angle, next_jump, (head + 1),
+                        distance + 1, KS_Right);
+            } else {
+                clear_barier (0);
+                res_right = make_plan (pos, angle, next_jump, (head + 1),
+                        distance + 1, KS_None, distance + 1);
+            }
+            res_right.target = (target_dist < res_right.target) ? target_dist
+                    : res_right.target;
+        } else {
+            res_right.dist = distance;
+            res_right.target = target_dist;
+        }
+    } else {
+        res_right.dist = distance;
+        res_right.target = numeric_limits<double>::max ();
+    }
+
+    if (jumptime == 0) {
+        jumptime = JUMP_REPEAT - 1;
+        next_jump = jumptime - 1;
+        angle = prev_angle;
+        pos.x = prev_pos.x + icos[angle] / 2;
+        pos.y = prev_pos.y + isin[angle] / 2;
+        target_dist = target_distance (pos);
+        if (will_survive (pos, jumptime, head)) {
+            if (distance < 2) {
+                res_jump = make_short_plan (pos, angle, next_jump, (head + 1),
+                        distance + 1, KS_None);
+            } else {
+                clear_barier (0);
+                res_jump = make_plan (pos, angle, next_jump, (head + 1),
+                        distance + 1, KS_None, distance + 1);
+            }
+            res_jump.target = (target_dist < res_jump.target) ? target_dist
+                    : res_jump.target;
+        } else {
+            res_jump.dist = distance;
+            res_jump.target = target_dist;
+        }
+        res_jump.target *= 1.1;
+    } else {
+        res_jump.dist = distance;
+        res_jump.target = numeric_limits<double>::max ();
+    }
+
+    if (res_none >= res_left && res_none >= res_right && res_none >= res_jump) {
+        return res_none;
+    } else if (res_left >= res_none && res_left >= res_right && res_left
+            >= res_jump) {
+        return res_left;
+    } else if (res_right >= res_none && res_right >= res_left && res_right
+            >= res_jump) {
+        return res_right;
+    } else {
+        return res_jump;
+    }
+}
+
+Result AIGen0::make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
+        plsize_tu head, size_t distance, KeySt def, size_t max) {
+    FPoint pos;
+    Result res_none;
+    Result res_left;
+    Result res_right;
     int next_jump;
     int angle = prev_angle;
+    double target_dist;
 
     if (distance == MAX_STEPS) {
-        return MAX_STEPS;
+        return Result (MAX_STEPS, numeric_limits<double>::max ());
     }
 
-    barier++;
-    if (distance > 4 && barier > 5000) {
-        return distance;
+    barier[distance / 20]++;
+    if (barier[distance / 20] > 40) {
+        //clear_barier ((distance / 20) + 1);
+        return Result (distance, numeric_limits<double>::max ());
     }
 
-    next_jump = (jumptime > 0) ? jumptime - 1 : 0;
+    next_jump = (jumptime > 1) ? jumptime - 1 : 0;
 
     if (def == KS_Left && distance <= max) {
         angle = (prev_angle + angles - 1) % angles;
         pos.x = prev_pos.x + icos[angle] / 2;
         pos.y = prev_pos.y + isin[angle] / 2;
-        target_left = target_distance (pos);
-        dist = (dist <= target_left) ? dist : target_left;
+        target_dist = target_distance (pos);
         if (will_survive (pos, jumptime, head)) {
-            dis_left = make_plan (pos, angle, next_jump, (head + 1), distance
-                    + 1, KS_Left, max, target_left);
+            res_left = make_plan (pos, angle, next_jump, head + 1,
+                    distance + 1, KS_Left, max);
 
-            dist = (dist <= target_left) ? dist : target_left;
-            plan[distance] = KS_Left;
-            return dis_left;
+            res_left.target = (target_dist < res_left.target) ? target_dist
+                    : res_left.target;
+            return res_left;
         }
-        return distance;
+        return Result (distance, target_dist);
     }
 
     if (def == KS_Right && distance <= max) {
         angle = (prev_angle + 1) % angles;
         pos.x = prev_pos.x + icos[angle] / 2;
         pos.y = prev_pos.y + isin[angle] / 2;
-        target_right = target_distance (pos);
-        dist = (dist <= target_right) ? dist : target_right;
+        target_dist = target_distance (pos);
         if (will_survive (pos, jumptime, head)) {
-            dis_right = make_plan (pos, angle, next_jump, (head + 1), distance
-                    + 1, KS_Right, max, target_right);
+            res_right = make_plan (pos, angle, next_jump, head + 1, distance
+                    + 1, KS_Right, max);
 
-            dist = (dist <= target_right) ? dist : target_right;
-            plan[distance] = KS_Right;
-            return dis_right;
+            res_right.target = (target_dist < res_right.target) ? target_dist
+                    : res_right.target;
+            return res_right;
         }
-        return distance;
+        return Result (distance, target_dist);
     }
 
     pos.x = prev_pos.x + icos[angle] / 2;
     pos.y = prev_pos.y + isin[angle] / 2;
-    target_none = target_distance (pos);
+    target_dist = target_distance (pos);
     if (will_survive (pos, jumptime, head)) {
-        dis_none = make_plan (pos, angle, next_jump, (head + 1), distance + 1,
-                KS_None, distance + 1, target_none);
-        if (distance > 0) {
-            if (dis_none == MAX_STEPS) {
-                plan[distance] = KS_None;
-                dist = (dist <= target_none) ? dist : target_none;
-                return MAX_STEPS;
-            }
+        res_none = make_plan (pos, angle, next_jump, head + 1, distance + 1,
+                KS_None, distance + 1);
 
-            size_t delta = dis_none - distance;
-            if (delta < 4 || (delta > 36 && delta < 44) || (delta > 76 && delta
-                    < 80)) {
-                dist = (dist <= target_none) ? dist : target_none;
-                return dis_none;
-            }
-            if (delta > 80) {
-                dis_none = distance + 80;
-            }
+        res_none.target = (target_dist < res_none.target) ? target_dist
+                : res_none.target;
+
+        if (res_none.dist == MAX_STEPS) {
+            return res_none;
+        }
+
+        size_t delta = res_none.dist - distance;
+        if (delta < 4 || (delta > 36 && delta < 44) || (delta > 76 && delta
+                < 80)) {
+            return res_none;
+        }
+        if (delta > 80) {
+            res_none.dist = distance + 80;
         }
     } else {
-        dis_none = distance;
+        res_none.dist = distance;
+        res_none.target = target_dist;
     }
 
     angle = (prev_angle + angles - 1) % angles;
     pos.x = prev_pos.x + icos[angle] / 2;
     pos.y = prev_pos.y + isin[angle] / 2;
-    target_left = target_distance (pos);
+    target_dist = target_distance (pos);
     if (will_survive (pos, jumptime, head)) {
-        dis_left = make_plan (pos, angle, next_jump, (head + 1), distance + 1,
-                KS_Left, (distance > 0) ? dis_none : distance + 1, target_left);
+        res_left = make_plan (pos, angle, next_jump, head + 1, distance + 1,
+                KS_Left, res_none.dist);
 
-        if (dis_left == MAX_STEPS && distance > 0) {
-            plan[distance] = KS_Left;
-            dist = (dist <= target_left) ? dist : target_left;
-            return MAX_STEPS;
+        res_left.target = (target_dist < res_left.target) ? target_dist
+                : res_left.target;
+
+        if (res_left.dist == MAX_STEPS) {
+            return res_left;
         }
     } else {
-        dis_left = distance;
+        res_left.dist = distance;
+        res_left.target = target_dist;
     }
 
     angle = (prev_angle + 1) % angles;
     pos.x = prev_pos.x + icos[angle] / 2;
     pos.y = prev_pos.y + isin[angle] / 2;
-    target_right = target_distance (pos);
+    target_dist = target_distance (pos);
     if (will_survive (pos, jumptime, head)) {
-        dis_right = make_plan (pos, angle, next_jump, (head + 1), distance + 1,
-                KS_Right, (distance > 0) ? dis_none : distance + 1, target_right);
+        res_right = make_plan (pos, angle, next_jump, head + 1, distance + 1,
+                KS_Right, res_none.dist);
 
-        if (dis_right == MAX_STEPS && distance > 0) {
-            plan[distance] = KS_Right;
-            dist = (dist <= target_right) ? dist : target_right;
-            return MAX_STEPS;
+        res_right.target = (target_dist < res_right.target) ? target_dist
+                : res_right.target;
+
+        if (res_right.dist == MAX_STEPS) {
+            return res_right;
         }
     } else {
-        dis_right = distance;
+        res_right.dist = distance;
+        res_right.target = target_dist;
     }
 
-    /*if (jumptime == 0) {
-     jumptime = JUMP_REPEAT;
-     next_jump = jumptime - 1;
-     angle = prev_angle;
-     pos.x = prev_pos.x + icos[angle] / 2;
-     pos.y = prev_pos.y + isin[angle] / 2;
-     if (will_survive (pos, jumptime, head)) {
-     dis_jump = make_plan (pos, angle, next_jump, (head + 1), distance
-     + 1, KS_None, distance + 1);
-
-     if (dis_jump == MAX_STEPS) {
-     plan[distance] = KS_Jump;
-     return MAX_STEPS;
-     }
-
-     } else {
-     dis_jump = distance;
-     }
-     }*/
-
-    /* if (distance == 0) {
-     cout << distance << " : " << dis_none << " < " << dis_left << " > "
-     << dis_right << '\n';
-     }*/
-
-    if (distance > 0) {
-        if (dis_none >= dis_left && dis_none >= dis_right) {
-            plan[distance] = KS_None;
-            dist = (dist <= target_none) ? dist : target_none;
-        } else if (dis_left >= dis_none && dis_left >= dis_right) {
-            plan[distance] = KS_Left;
-            dist = (dist <= target_left) ? dist : target_left;
-        } else {
-            plan[distance] = KS_Right;
-            dist = (dist <= target_right) ? dist : target_right;
-        }
+    if (res_none >= res_left && res_none >= res_right) {
+        return res_none;
+    } else if (res_left >= res_none && res_left >= res_right) {
+        return res_left;
     } else {
-        if (target_none <= target_left && target_none <= target_right) {
-            plan[distance] = KS_None;
-            dist = (dist <= target_none) ? dist : target_none;
-        } else if (target_left <= target_none && target_left <= target_right) {
-            plan[distance] = KS_Left;
-            dist = (dist <= target_left) ? dist : target_left;
-        } else {
-            plan[distance] = KS_Right;
-            dist = (dist <= target_right) ? dist : target_right;
-        }
+        return res_right;
     }
-    return dis_none;
 }
 
 bool AIGen0::will_survive (const FPoint& pos, int jumptime, plsize_tu head) {
@@ -250,5 +414,19 @@ bool AIGen0::will_survive (const FPoint& pos, int jumptime, plsize_tu head) {
 double AIGen0::target_distance (const FPoint& pos) {
     double delta_x = pos.x - target.x;
     double delta_y = pos.y - target.y;
-    return sqrt (delta_x * delta_x + delta_y * delta_y);
+    double res = sqrt (delta_x * delta_x + delta_y * delta_y);
+    return (res > 5) ? res : 5;
+}
+
+void AIGen0::clear_barier (int from) {
+    for (int bi = from; bi < 8; bi++) {
+        barier[bi] = 0;
+    }
+}
+
+Point AIGen0::random_target () {
+    Point result;
+    result.x = 10 + random () % (World::get_width () - 20);
+    result.y = 10 + random () % (World::get_height () - 20);
+    return result;
 }

@@ -23,7 +23,7 @@ struct OneStep {
     KeySt desicion;
 };
 
-#define MAX_STEPS 256
+#define MAX_STEPS 80
 
 struct Index {
 private:
@@ -37,6 +37,33 @@ public:
     Index& operator++ (int);
 };
 
+struct Result {
+    size_t dist;
+
+    double target;
+
+    Result (size_t d, double t) :
+        dist (d), target (t) {
+
+    }
+    
+    Result () {
+        
+    }
+    
+    /*inline bool operator > (const Result& other) {
+        return (dist > other.dist || (dist == other.dist && target < other.target));
+    }*/
+
+    inline bool operator >= (const Result& other) {
+        return (dist > other.dist || (dist == other.dist && target <= other.target));
+    }
+
+    /*inline bool operator < (const Result& other) {
+        return (dist < other.dist || (dist == other.dist && target < other.target));
+    }*/
+};
+
 class AIGen0 {
 private:
     const plid_tu id;
@@ -44,24 +71,36 @@ private:
     Fields fields;
 
     std::vector<KeySt> plan;
-    
-    size_t barier; 
-    
-    bool can_jump;
-    
-    Point target;
 
-    size_t make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
-            plsize_tu head, size_t distance, KeySt def, size_t max, double& dist);
+    size_t barier[8];
+
+    bool can_jump;
+
+    Point target;
+    
+    double shortes;
+
+    void make_shortes_plan (const FPoint& prev_pos, int prev_angle,
+            int jumptime, plsize_tu head, size_t distance);
+
+    Result make_short_plan (const FPoint& prev_pos, int prev_angle,
+            int jumptime, plsize_tu head, size_t distance, KeySt def);
+
+    Result make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
+            plsize_tu head, size_t distance, KeySt def, size_t max);
 
     bool will_survive (const FPoint& pos, int jumptime, plsize_tu head);
 
     double target_distance (const FPoint& pos);
+
+    void clear_barier (int from);
+    
+    Point random_target ();
     
 public:
     AIGen0 (plid_tu id);
 
-    void calc (const FPoint& pos, int angle, int jump_time, plsize_tu head);
+    void calc (const FPoint& pos, int angle, int jumptime, plsize_tu head);
 
     KeySt get_next_step ();
 };
