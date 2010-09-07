@@ -23,7 +23,7 @@ struct OneStep {
     KeySt desicion;
 };
 
-#define MAX_STEPS 80
+#define MAX_STEPS 160
 
 struct Index {
 private:
@@ -95,7 +95,7 @@ private:
 
     void clear_barier (int from);
     
-    Point random_target ();
+    void random_target ();
     
 public:
     AIGen0 (plid_tu id);
