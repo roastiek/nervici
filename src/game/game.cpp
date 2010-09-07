@@ -295,14 +295,16 @@ void run () {
 
         mods.face ().before_step ();
         players.step (keys);
-        World::check_starts ();
-        mods.face ().after_step ();
-
-        mods.face ().before_step ();
-        players.step (keys);
         smiles.step ();
         World::check_starts ();
         mods.face ().after_step ();
+
+        //off
+        /*mods.face ().before_step ();
+        players.step (keys);
+        smiles.step ();
+        World::check_starts ();
+        mods.face ().after_step ();*/
 
         World::render_changed_items ();
         players.update_bodies ();

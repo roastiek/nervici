@@ -242,7 +242,7 @@ void Player::live () {
             team.stat.crashes++;
             mods.face ().on_wall (*this);
             audio.play_effect (id, ET_Wall);
-            
+
             stat.deaths++;
             team.stat.deaths++;
             set_state (PS_Death);
@@ -298,18 +298,20 @@ int Player::step (const uint8_t *keys) {
         }
     }
 
-    switch (state) {
-    case PS_Live:
-        live ();
-        break;
-    case PS_Clear:
-        clear_step ();
-        break;
-    case PS_Undeath:
-        try_revive ();
-        break;
-    default:
-        break;
+    for (int ri = 0; ri < 2; ri++) {
+        switch (state) {
+        case PS_Live:
+            live ();
+            break;
+        case PS_Clear:
+            clear_step ();
+            break;
+        case PS_Undeath:
+            try_revive ();
+            break;
+        default:
+            break;
+        }
     }
     return state == PS_Live;
 }
