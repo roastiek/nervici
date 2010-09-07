@@ -8,6 +8,8 @@
 #include <iostream>
 #include <cmath>
 #include <limits>
+#include <glibmm/threadpool.h>
+#include <glibmm/thread.h>
 
 #include "main.h"
 #include "basic_defs.h"
@@ -19,6 +21,9 @@
 #include "ais/gen0.h"
 
 using namespace std;
+using namespace Glib;
+
+static ThreadPool* pool = NULL; 
 
 Index::Index (size_t v) :
     value (v % MAX_STEPS) {
@@ -40,21 +45,30 @@ AIGen0::AIGen0 (plid_tu nid) :
     plan.resize (MAX_STEPS, KS_None);
     target.x = 10 + random () % (World::get_width () - 20);
     target.y = 10 + random () % (World::get_height () - 20);
+    
+    if (pool == NULL) {
+        pool = new ThreadPool ();
+    }
+    
+    ready = true;
+    plan[0] = KS_None;
 }
 
 KeySt AIGen0::get_next_step () {
+    while (!ready) {
+        Thread::yield();
+    }
     return plan[0];
 }
 
 void AIGen0::calc (const FPoint& pos, int angle, int jumptime, plsize_tu head) {
-    if (target_distance (pos) < 10) {
-        random_target ();
-    }
-    //cout << "plan\n";
-    //Render::draw_fake_face (target);
-    shortes = numeric_limits<double>::max ();
-    make_shortes_plan (pos, angle, jumptime, head, 0);
-    //cout << shortes << '\n';
+    calc_pos = pos;
+    calc_angle = angle;
+    calc_jumptime = jumptime;
+    calc_head = head;
+    ready = false;
+    
+    pool->push(sigc::mem_fun<void, AIGen0> (this, &AIGen0::work));
 }
 
 void AIGen0::make_shortes_plan (const FPoint& prev_pos, int prev_angle,
@@ -456,4 +470,17 @@ void AIGen0::random_target () {
     } else {
         target.y = 10 + random () % (World::get_height () - 20);
     }
+}
+
+void AIGen0::work () {
+    if (target_distance (calc_pos) < 10) {
+        random_target ();
+    }
+    
+    //cout << "plan\n";
+    //Render::draw_fake_face (target);
+    shortes = numeric_limits<double>::max ();
+    make_shortes_plan (calc_pos, calc_angle, calc_jumptime, calc_head, 0);
+    ready = true;
+    //cout << shortes << '\n';
 }

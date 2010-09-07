@@ -80,6 +80,16 @@ private:
     
     double shortes;
 
+    bool ready;
+    
+    FPoint calc_pos;
+    
+    int calc_angle;
+    
+    int calc_jumptime;
+    
+    plsize_tu calc_head;
+    
     void make_shortes_plan (const FPoint& prev_pos, int prev_angle,
             int jumptime, plsize_tu head, size_t distance);
 
@@ -96,6 +106,8 @@ private:
     void clear_barier (int from);
     
     void random_target ();
+    
+    void work ();
     
 public:
     AIGen0 (plid_tu id);

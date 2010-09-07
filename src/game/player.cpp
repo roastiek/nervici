@@ -293,7 +293,6 @@ int Player::step (const uint8_t *keys) {
         }
     } else {
         if (is_live ()) {
-            ai->calc (exact, angle, jumptime, head);
             keyst = ai->get_next_step ();
         }
     }
@@ -313,7 +312,12 @@ int Player::step (const uint8_t *keys) {
             break;
         }
     }
-    return state == PS_Live;
+    
+    if (info.type == PT_AI && is_live()) {
+        ai->calc (exact, angle, jumptime, head);
+    }
+    
+    return is_live ();
 }
 
 void Player::give_start (startid_tu start) {

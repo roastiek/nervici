@@ -13,6 +13,7 @@ find_package (PkgConfig REQUIRED)
 find_package (SDL_gfx REQUIRED)
 
 pkg_check_modules (GLIBMM REQUIRED glibmm-2.4)
+pkg_check_modules (GTHREAD REQUIRED gthread-2.0)
 pkg_check_modules (GIOMM REQUIRED giomm-2.4)
 pkg_check_modules (SDLPango REQUIRED SDL_Pango)
 
@@ -31,6 +32,7 @@ include_directories (SYSTEM
     ${SDLGFX_INCLUDE_DIR}
     ${OPENAL_INCLUDE_DIR} 
     ${GLIBMM_INCLUDE_DIRS} 
+    ${GTHREAD_INCLUDE_DIRS} 
     ${GIOMM_INCLUDE_DIRS} 
     ${SDLPango_INCLUDE_DIRS} 
 cd)

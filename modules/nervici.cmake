@@ -62,6 +62,7 @@ target_link_libraries (nervici
     ${SDLGFX_LIBRARY} 
     ${OPENAL_LIBRARY} 
     ${GLIBMM_LIBRARIES}
+    ${GTHREAD_LIBRARIES}
     ${GIOMM_LIBRARIES}
     ${SDLPango_LIBRARIES}
     m

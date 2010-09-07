@@ -1,6 +1,7 @@
 #include <cmath>
 #include <glibmm/init.h>
 #include <giomm/init.h>
+#include <glibmm/thread.h>
 #include <SDL.h>
 
 #include "app.h"
@@ -19,7 +20,7 @@ float isin[angles];
 
 //proc neni cisarsky rez jako zakusek
 
-static void calc_angles () {
+static void calc_angles () { 
     for (int a = 0; a < angles; a++) {
         icos[a] = floor (cos (M_PI * 2 * a / angles) * DIGITS) / DIGITS;
         isin[a] = floor (sin (M_PI * 2 * a / angles) * DIGITS) / DIGITS;
@@ -28,6 +29,7 @@ static void calc_angles () {
 
 int main (int argc, char *argv[]) {
     Glib::init ();
+    Glib::thread_init();
     Gio::init ();
     if (SDL_Init (0))
         return 1;
