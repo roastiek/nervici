@@ -149,6 +149,10 @@ public:
         mods.face ().on_pozi_smile (pl, level);
         audio.play_effect (pl.id, ET_SmilePlus);
     }
+
+    bool is_good (Player& pl) {
+        return mods.face ().is_pozi_smile_good (level, pl);
+    }
 };
 
 class NegaSmileLvl1: public SoftSmile {
@@ -167,6 +171,10 @@ public:
         SoftSmile::eat (pl);
         mods.face ().on_nega_smile (pl, level);
         audio.play_effect (pl.id, ET_SmileMinus);
+    }
+
+    bool is_good (Player& pl) {
+        return mods.face ().is_nega_smile_good (level, pl);
     }
 };
 
@@ -243,6 +251,10 @@ public:
         mods.face ().on_fleg_smile (pl, level);
         audio.play_effect (pl.id, ET_SmileMinus);
     }
+
+    bool is_good (Player& pl) {
+        return mods.face ().is_fleg_smile_good (level, pl);
+    }
 };
 
 class FlegSmileLvl2: public FlegSmileLvl1 {
@@ -317,6 +329,10 @@ public:
         SoftSmile::eat (pl);
         mods.face ().on_iron_smile (pl, level);
         audio.play_effect (pl.id, ET_SmilePlus);
+    }
+
+    bool is_good (Player& pl) {
+        return mods.face ().is_iron_smile_good (level, pl);
     }
 };
 
@@ -432,6 +448,21 @@ public:
             break;
         default:
             break;
+        }
+    }
+
+    bool is_good (Player& pl) {
+        switch (face_type) {
+        case ST_pozi:
+            return mods.face ().is_pozi_smile_good (level, pl);
+        case ST_nega:
+            return mods.face ().is_nega_smile_good (level, pl);
+        case ST_fleg:
+            return mods.face ().is_fleg_smile_good (level, pl);
+        case ST_iron:
+            return mods.face ().is_iron_smile_good (level, pl);
+        default:
+            return false;
         }
     }
 };
@@ -596,6 +627,10 @@ public:
         mods.face ().on_ham_smile (pl, level);
         audio.play_effect (pl.id, ET_SmileMinus);
     }
+
+    bool is_good (Player& pl) {
+        return mods.face ().is_ham_smile_good (level, pl);
+    }
 };
 
 class DestSmile: public Smile {
@@ -683,6 +718,10 @@ public:
         Smile::eat (pl);
         mods.face ().on_ham_smile (pl, level);
         audio.play_effect (pl.id, ET_SmileMinus);
+    }
+
+    bool is_good (Player& pl) {
+        return mods.face ().is_ham_smile_good (level, pl);
     }
 };
 
@@ -778,8 +817,8 @@ public:
         audio.play_effect (pl.id, ET_SmileMinus);
     }
 
-    SmileType get_type () const {
-        return ST_ham;
+    bool is_good (Player& pl) {
+        return mods.face ().is_ham_smile_good (level, pl);
     }
 };
 

@@ -53,3 +53,25 @@ void ModInterface::on_wall (IPlayer& player) {
 
 void ModInterface::unload_script () {
 }
+
+bool ModInterface::is_pozi_smile_good(int lvl, IPlayer& player) {
+    return true;
+}
+
+bool ModInterface::is_nega_smile_good(int lvl, IPlayer& player) {
+    return false;
+}
+
+bool ModInterface::is_fleg_smile_good(int lvl, IPlayer& player) {
+    return false;
+}
+
+bool ModInterface::is_iron_smile_good(int lvl, IPlayer& player) {
+    return false;
+}
+
+bool ModInterface::is_ham_smile_good(int lvl, IPlayer& player) {
+    return false;
+}
+
+

@@ -438,14 +438,14 @@ Result AIGen0::make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
 
 bool AIGen0::will_survive (const FPoint& pos, int jumptime, plsize_tu head) {
     Point ipos;
-    DeathCause cause;
+    //DeathCause cause;
 
     ipos.x = pos.x - 1;
     ipos.y = pos.y - 1;
     fields.calc (pos);
     //Render::draw_fake_face(ipos);
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
-        return World::will_survive (ipos, fields, id, head, cause);
+        return World::good_for_ai(ipos, fields, id, head);
     } else {
         return World::simple_will_survive (ipos, fields);
     }

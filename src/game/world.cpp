@@ -190,6 +190,49 @@ bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
     return true;
 }
 
+bool good_for_ai (const Point& pos, const Fields& fields, plid_tu id,
+        plsize_tu head) {
+    bool result = true;
+
+    for (wsize_tu x = 0; x < 3 && result; x++) {
+        for (wsize_tu y = 0; y < 3 && result; y++) {
+            if (fields[x][y] != 0) {
+                WorldItem& item = get_item (pos.x + x, pos.y + y);
+                switch (item.type) {
+                case IT_FREE:
+                    break;
+                case IT_SOFT_SMILE:
+                case IT_HARD_SMILE:
+                    result &= smiles[item.smile.ID].is_good (players[id]);
+                    break;
+                case IT_PLAYER:
+                    result &= (item.player.ID == id) && ((item.player.order
+                            <= head) ? (head - item.player.order <= 8)
+                            : (0x10000 + head - item.player.order <= 8));
+
+                    /*if (item.player.ID != id) {
+                        result = false;
+                    } else {
+                        if (item.player.order <= head) {
+                            if (head - item.player.order > 8) {
+                                result = false;
+                            }
+                        } else {
+                            if (0x10000 + head - item.player.order > 8) {
+                                result = false;
+                            }
+                        }
+                    }*/
+                    break;
+                default:
+                    result = false;
+                }
+            }
+        }
+    }
+    return result;
+}
+
 static void queue_changed_item (wsize_tu x, wsize_tu y) {
     Point pos = {
         x,

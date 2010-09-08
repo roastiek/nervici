@@ -52,6 +52,16 @@ public:
     virtual void on_cleared (IPlayer& player);
     
     virtual void on_pl_timer (IPlayer& player);
+    
+    virtual bool is_pozi_smile_good (int lvl, IPlayer& player);
+    
+    virtual bool is_nega_smile_good (int lvl, IPlayer& player);
+
+    virtual bool is_fleg_smile_good (int lvl, IPlayer& player);
+
+    virtual bool is_iron_smile_good (int lvl, IPlayer& player);
+
+    virtual bool is_ham_smile_good (int lvl, IPlayer& player);
 };
 
 #endif // __MODS_H__

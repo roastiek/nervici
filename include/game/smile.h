@@ -35,6 +35,8 @@ public:
     virtual void eat (Player& pl);
 
     virtual void erase ();
+    
+    virtual bool is_good (Player& pl) = 0;
 };
 
 class SmileFactory {
