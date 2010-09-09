@@ -60,6 +60,7 @@ AIGen0::AIGen0 (Player& pl) :
 }
 
 KeySt AIGen0::get_next_step () {
+    abort = true;
     while (!ready) {
         Thread::yield ();
     }
@@ -72,6 +73,7 @@ void AIGen0::calc (const FPoint& pos, int angle, int jumptime, plsize_tu head) {
     calc_jumptime = jumptime;
     calc_head = head;
     ready = false;
+    abort = false;
 
     pool->push (sigc::mem_fun<void, AIGen0> (this, &AIGen0::work));
 }
@@ -311,7 +313,8 @@ Result AIGen0::make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
     }
 }
 
-bool AIGen0::will_survive (const FPoint& pos, int jumptime, plsize_tu head) {
+inline bool AIGen0::will_survive (const FPoint& pos, int jumptime,
+        plsize_tu head) {
     Point ipos;
 
     ipos.x = pos.x - 1;
@@ -324,11 +327,11 @@ bool AIGen0::will_survive (const FPoint& pos, int jumptime, plsize_tu head) {
     }
 }
 
-double AIGen0::target_distance (const FPoint& pos) {
+inline double AIGen0::target_distance (const FPoint& pos) {
     double delta_x = pos.x - target.x;
     double delta_y = pos.y - target.y;
-    double res = sqrt (delta_x * delta_x + delta_y * delta_y);
-    return (res > 5) ? res : 5;
+    double res = delta_x * delta_x + delta_y * delta_y;
+    return (res > 25) ? res : 25;
 }
 
 void AIGen0::clear_barier (int from) {
@@ -338,17 +341,49 @@ void AIGen0::clear_barier (int from) {
 }
 
 void AIGen0::work () {
-   /* if (target_distance (calc_pos) < 10) {
-        random_target ();
-    }*/
-    check_target();
+    check_target ();
 
-    //cout << "plan\n";
     //Render::draw_fake_face (target);
-    shortes = numeric_limits<double>::max ();
-    make_shortes_plan (calc_pos, calc_angle, calc_jumptime, calc_head, 0);
+    //make_shortes_plan (calc_pos, calc_angle, calc_jumptime, calc_head, 0);
+    Result res_none;
+    Result res_left;
+    Result res_right;
+    Result test;
+
+    res_none = test_plan (player.get_position (), player.get_angle (),
+            calc_jumptime, calc_head, KS_None, 0);
+
+    res_left = test_plan (player.get_position (), player.get_angle (),
+            calc_jumptime, calc_head, KS_Left, 10);
+
+    res_right = test_plan (player.get_position (), player.get_angle (),
+            calc_jumptime, calc_head, KS_Right, 10);
+
+    test = test_plan (player.get_position (), player.get_angle (),
+            calc_jumptime, calc_head, KS_Left, 40);
+    res_left = (res_left >= test) ? res_left : test;
+
+    test = test_plan (player.get_position (), player.get_angle (),
+            calc_jumptime, calc_head, KS_Right, 40);
+    res_right = (res_right >= test) ? res_right : test;
+
+    test = test_plan (player.get_position (), player.get_angle (),
+            calc_jumptime, calc_head, KS_Left, 80);
+    res_left = (res_left >= test) ? res_left : test;
+
+    test = test_plan (player.get_position (), player.get_angle (),
+            calc_jumptime, calc_head, KS_Right, 80);
+    res_right = (res_right >= test) ? res_right : test;
+
+    if (res_none >= res_left && res_none >= res_right) {
+        plan = (res_none.jump_dist != 0) ? KS_None : KS_Jump;
+    } else if (res_left >= res_none && res_left >= res_right) {
+        plan = (res_left.jump_dist != 0) ? KS_Left : KS_Jump;
+    } else {
+        plan = (res_right.jump_dist != 0) ? KS_Right : KS_Jump;
+    }
+
     ready = true;
-    //cout << shortes << '\n';
 }
 
 void AIGen0::check_target () {
@@ -408,12 +443,68 @@ smileid_tu AIGen0::find_closest_smile () {
         if (smile.is_visible () && smile.is_good (player)) {
             delta_x = smile.position ().x + 10 - player.get_position ().x;
             delta_y = smile.position ().y + 10 - player.get_position ().y;
-            dist = sqrt (delta_x * delta_x - delta_y * delta_y);
+            dist = delta_x * delta_x + delta_y * delta_y;
             if (dist < best_dist) {
                 best_dist = dist;
                 result = si;
             }
         }
     }
+    return result;
+}
+
+Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptime,
+        plsize_tu head, KeySt def, size_t distance) {
+
+    FPoint pos = prev_pos;
+    FPoint jump_pos;
+    int jump_angle;
+    Result result;
+
+    result.dist = 0;
+    result.target = numeric_limits<double>::max ();
+    result.jump_dist = MAX_STEPS;
+
+    for (size_t di = 0; di < MAX_STEPS && !abort; di++) {
+        if (jumptime > 0)
+            jumptime--;
+
+        jump_pos.x = pos.x + icos[angle] / 2;
+        jump_pos.y = pos.y + icos[angle] / 2;
+        jump_angle = angle;
+        if (di <= distance) {
+            switch (def) {
+            case KS_Left:
+                angle = (angle + angles - 1) % angles;
+                break;
+            case KS_Right:
+                angle = (angle + 1) % angles;
+                break;
+            default:
+                break;
+            }
+        }
+        pos.x += icos[angle] / 2;
+        pos.y += isin[angle] / 2;
+        if (!will_survive (pos, jumptime, head)) {
+            if (jumptime == 0 && di <= 10 && di % 2 == 0) {
+                jumptime = JUMP_REPEAT;
+                if (!will_survive (jump_pos, jumptime, head)) {
+                    return result;
+                }
+                pos = jump_pos;
+                angle = jump_angle;
+                result.jump_dist = di;
+            } else {
+                return result;
+            }
+        }
+        result.min_target (target_distance (pos));
+        if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
+            result.dist++;
+        }
+        head++;
+    }
+
     return result;
 }

@@ -176,6 +176,10 @@ void Player::live () {
 
     check_length ();
 
+    if (jumptime > 0) {
+        jumptime--;
+    }
+
     if (keyst == KS_Left)
         angle = (angle + angles - 1) % angles;
     if (keyst == KS_Right)
@@ -248,10 +252,6 @@ void Player::live () {
             set_state (PS_Death);
             mods.face ().on_death (*this);
         }
-    }
-
-    if (jumptime > 0) {
-        jumptime--;
     }
 }
 

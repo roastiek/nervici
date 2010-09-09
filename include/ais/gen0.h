@@ -43,13 +43,19 @@ struct Result {
 
     double target;
 
+    size_t jump_dist;
+    
     Result (size_t d, double t) :
-        dist (d), target (t) {
+        dist (d), target (t), jump_dist (MAX_STEPS) {
 
     }
     
     Result () {
         
+    }
+    
+    inline void min_target (double value) {
+        target = (target <= value) ? target : value; 
     }
     
     /*inline bool operator > (const Result& other) {
@@ -82,6 +88,8 @@ private:
     double shortes;
 
     bool ready;
+    
+    bool abort;
     
     FPoint calc_pos;
     
@@ -118,6 +126,9 @@ private:
     void random_target ();
     
     smileid_tu find_closest_smile ();
+    
+    Result test_plan (const FPoint& prev_pos, int angle, int jumptime,
+            plsize_tu head, KeySt def, size_t distance);
     
 public:
     AIGen0 (Player& player);
