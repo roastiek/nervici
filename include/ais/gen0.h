@@ -105,12 +105,6 @@ private:
     
     int target_tries;
     
-    void make_shortes_plan (const FPoint& prev_pos, int prev_angle,
-            int jumptime, plsize_tu head, size_t distance);
-
-    Result make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
-            plsize_tu head, size_t distance, KeySt def, size_t max);
-
     bool will_survive (const FPoint& pos, int jumptime, plsize_tu head);
 
     double target_distance (const FPoint& pos);

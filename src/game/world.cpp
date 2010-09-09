@@ -73,15 +73,15 @@ void uninitialize () {
 
 void clear () {
     for (wsize_tu y = 1; y < height - 1; y++) {
-        items[0][y].type = IT_STONE;
+        items[0][y].type = IT_stone;
         for (wsize_tu x = 1; x < width - 1; x++) {
-            items[x][y].type = IT_FREE;
+            items[x][y].type = IT_free;
         }
-        items[width - 1][y].type = IT_STONE;
+        items[width - 1][y].type = IT_stone;
     }
     for (wsize_tu x = 0; x < width; x++) {
-        items[x][0].type = IT_STONE;
-        items[x][height - 1].type = IT_STONE;
+        items[x][0].type = IT_stone;
+        items[x][height - 1].type = IT_stone;
     }
 }
 
@@ -90,7 +90,7 @@ void check_starts () {
     wsize_tu fx, fy;
 
     for (startid_tu s = 0; s < starts.size (); s++) {
-        state = IT_FREE;
+        state = IT_free;
         for (wsize_tu y = 0; y < 3; y++) {
             fy = y + starts[s].pos.y;
             for (wsize_tu x = 0; x < 3; x++) {
@@ -98,7 +98,7 @@ void check_starts () {
                 state |= items[fx][fy].type;
             }
         }
-        starts[s].ready = state == IT_FREE;
+        starts[s].ready = state == IT_free;
     }
 }
 
@@ -152,10 +152,10 @@ bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
             if (fields[x][y] != 0) {
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
-                case IT_FREE:
-                case IT_SOFT_SMILE:
+                case IT_free:
+                case IT_soft_smile:
                     break;
-                case IT_PLAYER:
+                case IT_player:
                     if (item.player.ID != id) {
                         cause.cause = DC_killed;
                         cause.murder = item.player.ID;
@@ -175,7 +175,7 @@ bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
                     }
                     break;
 
-                case IT_HARD_SMILE:
+                case IT_hard_smile:
                     cause.cause = DC_smile;
                     cause.smile = item.smile.ID;
                     return false;
@@ -190,47 +190,40 @@ bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
     return true;
 }
 
-bool good_for_ai (const Point& pos, const Fields& fields, plid_tu id,
-        plsize_tu head) {
+bool good_for_ai (const Point& pos, plid_tu id, plsize_tu head) {
     bool result = true;
 
-    for (wsize_tu x = 0; x < 3 && result; x++) {
-        for (wsize_tu y = 0; y < 3 && result; y++) {
-            if (fields[x][y] != 0) {
-                WorldItem& item = get_item (pos.x + x, pos.y + y);
-                switch (item.type) {
-                case IT_FREE:
-                    break;
-                case IT_SOFT_SMILE:
-                case IT_HARD_SMILE:
-                    result &= smiles[item.smile.ID].is_good (players[id]);
-                    break;
-                case IT_PLAYER:
-                    result &= (item.player.ID == id) && ((item.player.order
-                            <= head) ? (head - item.player.order <= 8)
-                            : (0x10000 + head - item.player.order <= 8));
+    for (wsize_tu x = 0; x < 3 && result; x += 2) {
+        for (wsize_tu y = 0; y < 3 && result; y += 2) {
+            //if (fields[x][y] != 0) {
+            WorldItem& item = get_item (pos.x + x, pos.y + y);
+            switch (item.type) {
+            case IT_free:
+                break;
+            case IT_soft_smile:
+            case IT_hard_smile:
+                result &= smiles[item.smile.ID].is_good (players[id]);
+                break;
+            case IT_player:
+                result &= (item.player.ID == id)
+                        && ((item.player.order <= head) ? (head
+                                - item.player.order <= 8) : (0x10000 + head
+                                - item.player.order <= 8));
 
-                    /*if (item.player.ID != id) {
-                        result = false;
-                    } else {
-                        if (item.player.order <= head) {
-                            if (head - item.player.order > 8) {
-                                result = false;
-                            }
-                        } else {
-                            if (0x10000 + head - item.player.order > 8) {
-                                result = false;
-                            }
-                        }
-                    }*/
-                    break;
-                default:
-                    result = false;
-                }
+                break;
+            default:
+                result = false;
+                break;
             }
+            //}
         }
     }
     return result;
+}
+
+bool simple_good_for_ai (const Point& pos) {
+    return pos.x >= 1 && pos.y >= 1 && pos.x + 3 < width && pos.y + 3
+            < height;
 }
 
 static void queue_changed_item (wsize_tu x, wsize_tu y) {
@@ -250,21 +243,23 @@ void write_player_head (const Point& pos, const Fields& fields, plid_tu id,
             if (fields[x][y] != 0) {
                 WorldItem& item = get_item (pos.x + x, pos.y + y);
                 switch (item.type) {
-                case IT_SOFT_SMILE:
+                case IT_soft_smile:
                     if (!living)
                         break;
                     smiles[item.smile.ID].eat (players[id]);
-                case IT_FREE:
-                    item.type = IT_PLAYER;
+                case IT_free:
+                    item.type = IT_player;
                     item.player.ID = id;
                     item.player.body = fields[x][y];
                     item.player.order = head;
                     break;
-                case IT_PLAYER:
+                case IT_player:
                     if (item.player.ID == id && item.player.body < fields[x][y]) {
                         item.player.body = fields[x][y];
                         item.player.order = head;
                     }
+                    break;
+                default:
                     break;
                 }
                 queue_changed_item (pos.x + x, pos.y + y);
@@ -279,11 +274,13 @@ void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
         for (wsize_tu y = 0; y < 3; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
             switch (item.type) {
-            case IT_PLAYER:
+            case IT_player:
                 if (item.player.ID == id && item.player.order == bottom) {
-                    item.type = IT_FREE;
+                    item.type = IT_free;
                     queue_changed_item (pos.x + x, pos.y + y);
                 }
+                break;
+            default:
                 break;
             }
         }
@@ -319,7 +316,7 @@ void write_soft_smile (smileid_tu sid, const Point& pos) {
     for (int x = 0; x < 20; x++) {
         for (int y = 0; y < 20; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
-            item.type = IT_SOFT_SMILE;
+            item.type = IT_soft_smile;
             item.smile.ID = sid;
         }
     }
@@ -329,7 +326,7 @@ void write_hard_smile (smileid_tu sid, const Point& pos) {
     for (int x = 0; x < 20; x++) {
         for (int y = 0; y < 20; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
-            item.type = IT_HARD_SMILE;
+            item.type = IT_hard_smile;
             item.smile.ID = sid;
         }
     }
@@ -339,7 +336,7 @@ void erase_smile (const Point& pos) {
     for (int x = 0; x < 20; x++) {
         for (int y = 0; y < 20; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
-            item.type = IT_FREE;
+            item.type = IT_free;
         }
     }
 }
@@ -353,8 +350,8 @@ bool test_smile (smileid_tu sid, const Point& pos) {
     for (int x = 0; x < 20 && result; x++) {
         for (int y = 0; y < 20 && result; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
-            result &= (item.type == IT_FREE) || ((item.type == IT_SOFT_SMILE
-                    || item.type == IT_HARD_SMILE) && item.smile.ID == sid);
+            result &= (item.type == IT_free) || ((item.type == IT_soft_smile
+                    || item.type == IT_hard_smile) && item.smile.ID == sid);
         }
     }
     return result;
@@ -365,9 +362,9 @@ bool test_dest_smile (smileid_tu sid, const Point& pos) {
     for (int x = 0; x < 20 && result; x++) {
         for (int y = 0; y < 20 && result; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
-            result &= (item.type == IT_FREE) || (item.type == IT_PLAYER)
-                    || ((item.type == IT_SOFT_SMILE || item.type
-                            == IT_HARD_SMILE) && item.smile.ID == sid);
+            result &= (item.type == IT_free) || (item.type == IT_player)
+                    || ((item.type == IT_soft_smile || item.type
+                            == IT_hard_smile) && item.smile.ID == sid);
         }
     }
     return result;

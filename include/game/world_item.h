@@ -10,12 +10,16 @@
 
 #include "int_type.h"
 
-#define IT_FREE         0
+/*#define IT_FREE         0
 #define IT_PLAYER       1
 #define IT_STONE        3
 #define IT_WALL         4
 #define IT_SOFT_SMILE   5
-#define IT_HARD_SMILE   6
+#define IT_HARD_SMILE   6*/
+
+enum ItemType {
+    IT_free, IT_player, IT_stone, IT_wall, IT_soft_smile, IT_hard_smile
+};
 
 struct WIPlayer {
     plid_tu ID;
@@ -28,7 +32,7 @@ struct WISmile {
 };
 
 struct WorldItem {
-    uint8_t type;
+    ItemType type;
     bool changed;
 
     union {

@@ -32,6 +32,10 @@ static timer_ti speed;
 static timer_ti timer;
 static Uint32 sdl_time;
 
+static size_t sl_count = 0;
+static size_t nosl_count = 0;
+static size_t nosmlsl_count = 0;
+
 void initialize (const GameInfo& info) {
     cout << __func__ << '\n';
 
@@ -79,9 +83,13 @@ void sleep (timer_ti pause) {
     sdl_time += pause;
     timer_ti delta = sdl_time - SDL_GetTicks ();
     if (delta > 0) {
+        sl_count++;
         SDL_Delay (delta);
+    } else if (delta < - pause){
+        sdl_time = SDL_GetTicks () - pause;
+        nosmlsl_count++;
     } else {
-        cout << "no sleep " << delta << "\n";
+        nosl_count++;
     }
 }
 
@@ -339,6 +347,8 @@ void run () {
     if (!abort) {
         run_statistic ();
     }
+    
+    cout << sl_count << " " << nosl_count << " " << nosmlsl_count << '\n';
 
     mods.face ().on_game_end ();
 }

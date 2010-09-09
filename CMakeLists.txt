@@ -21,6 +21,7 @@ pkg_check_modules (SDLPango REQUIRED SDL_Pango)
 set (CMAKE_CXX_FLAGS "-O2 -std=c++0x")
 #set (CMAKE_C_FLAGS_DEBUG "-Wall -O0 -pedantic -g3 -gdwarf-2")
 set (CMAKE_CXX_FLAGS_DEBUG "-Wall -O0 -pedantic -g3 -gdwarf-2")
+set (CMAKE_CXX_FLAGS_PROFILE "-pg")
 
 set (DATA_DIR "share/nervici")
 

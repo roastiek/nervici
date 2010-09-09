@@ -611,16 +611,18 @@ void draw_world_items_queue (const vector<Point>& queue) {
             drawdest.y = pos.y + gs_outer.playerground.y;
 
             switch (item.type) {
-            case IT_FREE:
-            case IT_WALL:
-            case IT_STONE:
+            case IT_free:
+            case IT_wall:
+            case IT_stone:
                 SDL_BlitSurface (background, &drawdest, primary, &drawdest);
                 break;
-            case IT_PLAYER:
+            case IT_player:
                 SDL_BlitSurface (background, &drawdest, primary, &drawdest);
                 drawsrc.x = item.player.body;
                 SDL_BlitSurface (pl_images[item.player.ID].face, &drawsrc,
                         primary, &drawdest);
+                break;
+            default:
                 break;
             }
             item.changed = false;

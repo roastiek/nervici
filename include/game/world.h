@@ -43,7 +43,9 @@ bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
 void write_player_head (const Point& pos, const Fields& fields, plid_tu id,
         plsize_tu head, bool living);
 
-bool good_for_ai (const Point& pos, const Fields& fields, plid_tu id, plsize_tu head);
+bool good_for_ai (const Point& pos, plid_tu id, plsize_tu head);
+
+bool simple_good_for_ai (const Point& pos);
 
 void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom);
 
