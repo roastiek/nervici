@@ -36,7 +36,11 @@ public:
 
     virtual void erase ();
     
-    virtual bool is_good (Player& pl) = 0;
+    virtual bool is_good (Player& pl) const = 0;
+    
+    bool is_visible () const;
+    
+    const Point& position () const;
 };
 
 class SmileFactory {
@@ -44,6 +48,14 @@ public:
     static Smile* create (smileid_tu sid, smileid_tu order, smileid_tu count,
             SmileType stype, smilelvl_tu lvl);
 };
+
+inline bool Smile::is_visible() const {
+    return visible;
+}
+
+inline const Point& Smile::position() const {
+    return pos;
+}
 
 #endif	/* SMILE_H */
 

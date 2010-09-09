@@ -15,6 +15,7 @@
 #include "point.h"
 #include "game/key_state.h"
 #include "game/fields.h"
+#include "fakes/player.h"
 
 struct OneStep {
     FPoint pos;
@@ -66,11 +67,11 @@ struct Result {
 
 class AIGen0 {
 private:
-    const plid_tu id;
+    Player& player;
 
     Fields fields;
 
-    std::vector<KeySt> plan;
+    KeySt plan;
 
     size_t barier[8];
 
@@ -90,11 +91,14 @@ private:
     
     plsize_tu calc_head;
     
+    smileid_tu smile_target;
+    
+    double best_target_dist;
+    
+    int target_tries;
+    
     void make_shortes_plan (const FPoint& prev_pos, int prev_angle,
             int jumptime, plsize_tu head, size_t distance);
-
-    Result make_short_plan (const FPoint& prev_pos, int prev_angle,
-            int jumptime, plsize_tu head, size_t distance, KeySt def);
 
     Result make_plan (const FPoint& prev_pos, int prev_angle, int jumptime,
             plsize_tu head, size_t distance, KeySt def, size_t max);
@@ -105,12 +109,18 @@ private:
 
     void clear_barier (int from);
     
-    void random_target ();
-    
     void work ();
     
+    void check_target ();
+    
+    void next_target ();
+
+    void random_target ();
+    
+    smileid_tu find_closest_smile ();
+    
 public:
-    AIGen0 (plid_tu id);
+    AIGen0 (Player& player);
 
     void calc (const FPoint& pos, int angle, int jumptime, plsize_tu head);
 

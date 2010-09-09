@@ -56,7 +56,7 @@ Player::Player (plid_tu ID, Team& nteam, const PlInfo& ninfo, int max_len) :
     team.inc_state (state);
     ironize_lvl = 0;
 
-    ai = (info.type == PT_AI) ? new AIGen0 (id) : NULL;
+    ai = (info.type == PT_AI) ? new AIGen0 (*this) : NULL;
 }
 
 Player::~Player () {

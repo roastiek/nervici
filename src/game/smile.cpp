@@ -150,7 +150,7 @@ public:
         audio.play_effect (pl.id, ET_SmilePlus);
     }
 
-    bool is_good (Player& pl) {
+    bool is_good (Player& pl) const {
         return mods.face ().is_pozi_smile_good (level, pl);
     }
 };
@@ -173,7 +173,7 @@ public:
         audio.play_effect (pl.id, ET_SmileMinus);
     }
 
-    bool is_good (Player& pl) {
+    bool is_good (Player& pl) const {
         return mods.face ().is_nega_smile_good (level, pl);
     }
 };
@@ -252,7 +252,7 @@ public:
         audio.play_effect (pl.id, ET_SmileMinus);
     }
 
-    bool is_good (Player& pl) {
+    bool is_good (Player& pl) const {
         return mods.face ().is_fleg_smile_good (level, pl);
     }
 };
@@ -331,7 +331,7 @@ public:
         audio.play_effect (pl.id, ET_SmilePlus);
     }
 
-    bool is_good (Player& pl) {
+    bool is_good (Player& pl) const {
         return mods.face ().is_iron_smile_good (level, pl);
     }
 };
@@ -451,7 +451,7 @@ public:
         }
     }
 
-    bool is_good (Player& pl) {
+    bool is_good (Player& pl) const {
         switch (face_type) {
         case ST_pozi:
             return mods.face ().is_pozi_smile_good (level, pl);
@@ -628,7 +628,7 @@ public:
         audio.play_effect (pl.id, ET_SmileMinus);
     }
 
-    bool is_good (Player& pl) {
+    bool is_good (Player& pl) const {
         return mods.face ().is_ham_smile_good (level, pl);
     }
 };
@@ -720,7 +720,7 @@ public:
         audio.play_effect (pl.id, ET_SmileMinus);
     }
 
-    bool is_good (Player& pl) {
+    bool is_good (Player& pl) const {
         return mods.face ().is_ham_smile_good (level, pl);
     }
 };
@@ -817,7 +817,7 @@ public:
         audio.play_effect (pl.id, ET_SmileMinus);
     }
 
-    bool is_good (Player& pl) {
+    bool is_good (Player& pl) const {
         return mods.face ().is_ham_smile_good (level, pl);
     }
 };
