@@ -605,7 +605,7 @@ void draw_world_items_queue (const vector<Point>& queue) {
 
     for (size_t i = 0; i < queue.size (); i++) {
         const Point& pos = queue[i];
-        WorldItem& item = World::get_item (pos);
+        WorldItem& item = world.get_item (pos);
         if (item.changed) {
             drawdest.x = pos.x + gs_outer.playerground.x;
             drawdest.y = pos.y + gs_outer.playerground.y;

@@ -74,9 +74,9 @@ inline bool AIGen0::will_survive (const FPoint& pos, int jumptime,
     ipos.x = pos.x - 1;
     ipos.y = pos.y - 1;
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
-        return World::good_for_ai (ipos, player.id, head);
+        return world.good_for_ai (ipos, player.id, head);
     } else {
-        return World::simple_good_for_ai (ipos);
+        return world.simple_good_for_ai (ipos);
     }
 }
 
@@ -172,8 +172,8 @@ void AIGen0::check_target () {
 }
 
 void AIGen0::random_target () {
-    target.x = 10 + random () % (World::get_width () - 20);
-    target.y = 10 + random () % (World::get_height () - 20);
+    target.x = 10 + random () % (world.get_width () - 20);
+    target.y = 10 + random () % (world.get_height () - 20);
 }
 
 smileid_tu AIGen0::find_closest_smile () {

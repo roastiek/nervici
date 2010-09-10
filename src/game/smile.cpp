@@ -44,14 +44,14 @@ public:
 
     void step () {
         if (delay <= 10 && visible) {
-            World::erase_smile (pos);
+            world.erase_smile (pos);
             Render::clear_smile (pos);
             Render::update_smile (pos);
             visible = false;
         }
         if (step_length - delay <= 1 && !visible) {
             if (found_new_pos ()) {
-                World::write_soft_smile (id, pos);
+                world.write_soft_smile (id, pos);
                 Render::draw_smile (id, pos);
                 Render::update_smile (pos);
                 visible = true;
@@ -67,9 +67,9 @@ public:
 
     virtual bool found_new_pos () {
         for (int tries = 0; tries < 10; tries++) {
-            pos.x = random () % (World::get_width () - 20);
-            pos.y = random () % (World::get_height () - 20);
-            if (World::test_smile (id, pos)) {
+            pos.x = random () % (world.get_width () - 20);
+            pos.y = random () % (world.get_height () - 20);
+            if (world.test_smile (id, pos)) {
                 return true;
             }
         }
@@ -77,7 +77,7 @@ public:
     }
 
     void eat (Player& pl) {
-        World::erase_smile (pos);
+        world.erase_smile (pos);
         Render::clear_smile (pos);
         Render::update_smile (pos);
         visible = false;
@@ -98,14 +98,14 @@ public:
 
     void step () {
         if (delay <= 10 && visible) {
-            World::erase_smile (pos);
+            world.erase_smile (pos);
             Render::clear_smile (pos);
             Render::update_smile (pos);
             visible = false;
         }
         if (step_length - delay <= 1 && !visible) {
             if (found_new_pos ()) {
-                World::write_hard_smile (id, pos);
+                world.write_hard_smile (id, pos);
                 Render::draw_smile (id, pos);
                 Render::update_smile (pos);
                 visible = true;
@@ -121,9 +121,9 @@ public:
 
     virtual bool found_new_pos () {
         for (int tries = 0; tries < 10; tries++) {
-            pos.x = random () % (World::get_width () - 20);
-            pos.y = random () % (World::get_height () - 20);
-            if (World::test_smile (id, pos)) {
+            pos.x = random () % (world.get_width () - 20);
+            pos.y = random () % (world.get_height () - 20);
+            if (world.test_smile (id, pos)) {
                 return true;
             }
         }
@@ -138,8 +138,8 @@ public:
     PoziSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
             smilelvl_tu lvl) :
         SoftSmile (ST_pozi, sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width ()
-                + World::get_height () * World::get_height ());
+        int world_diagonal = sqrt (world.get_width () * world.get_width ()
+                + world.get_height () * world.get_height ());
         step_length = world_diagonal * (4 - level) / 2;
         delay = world_diagonal * (4 - level) * order / 2 / count;
     }
@@ -161,8 +161,8 @@ public:
     NegaSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count,
             smilelvl_tu lvl) :
         SoftSmile (ST_nega, sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width ()
-                + World::get_height () * World::get_height ());
+        int world_diagonal = sqrt (world.get_width () * world.get_width ()
+                + world.get_height () * world.get_height ());
         step_length = world_diagonal * (4 - level) / 4;
         delay = world_diagonal * (4 - level) * order / 4 / count;
     }
@@ -197,7 +197,7 @@ public:
                 pos.x = pl_pos.x + icos[angle] * (100 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (100 + random () % 20) - 10;
 
-                if (World::test_smile (id, pos)) {
+                if (world.test_smile (id, pos)) {
                     return true;
                 }
             }
@@ -225,7 +225,7 @@ public:
                 pos.x = pl_pos.x + icos[angle] * (60 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (60 + random () % 20) - 10;
 
-                if (World::test_smile (id, pos)) {
+                if (world.test_smile (id, pos)) {
                     return true;
                 }
             }
@@ -240,8 +240,8 @@ public:
     FlegSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count,
             smilelvl_tu lvl) :
         HardSmile (ST_fleg, sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width ()
-                + World::get_height () * World::get_height ());
+        int world_diagonal = sqrt (world.get_width () * world.get_width ()
+                + world.get_height () * world.get_height ());
         step_length = world_diagonal * (4 - level);
         delay = world_diagonal * (4 - level) * order / count;
     }
@@ -276,7 +276,7 @@ public:
                 pos.x = pl_pos.x + icos[angle] * (140 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (140 + random () % 20) - 10;
 
-                if (World::test_smile (id, pos)) {
+                if (world.test_smile (id, pos)) {
                     return true;
                 }
             }
@@ -304,7 +304,7 @@ public:
                 pos.x = pl_pos.x + icos[angle] * (100 + random () % 20) - 10;
                 pos.y = pl_pos.y + isin[angle] * (100 + random () % 20) - 10;
 
-                if (World::test_smile (id, pos)) {
+                if (world.test_smile (id, pos)) {
                     return true;
                 }
             }
@@ -319,8 +319,8 @@ public:
     IronSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
             smilelvl_tu lvl) :
         SoftSmile (ST_iron, sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width ()
-                + World::get_height () * World::get_height ());
+        int world_diagonal = sqrt (world.get_width () * world.get_width ()
+                + world.get_height () * world.get_height ());
         step_length = world_diagonal * (4 - level) / 2;
         delay = world_diagonal * (4 - level) * order / 2 / count;
     }
@@ -349,8 +349,8 @@ public:
     ChamSmileLvl1 (smileid_tu sid, smileid_tu order, smileid_tu count,
             smilelvl_tu lvl) :
         Smile (ST_cham, sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width ()
-                + World::get_height () * World::get_height ());
+        int world_diagonal = sqrt (world.get_width () * world.get_width ()
+                + world.get_height () * world.get_height ());
         step_length = world_diagonal * (4 - level) / 2;
         delay = world_diagonal * (4 - level) * order / 2 / count;
         face_type = ST_pozi;
@@ -358,18 +358,18 @@ public:
 
     void step () {
         if (delay <= 10 && visible) {
-            World::erase_smile (pos);
+            world.erase_smile (pos);
             Render::clear_smile (pos);
             Render::update_smile (pos);
             visible = false;
         }
         if (step_length - delay <= 1 && !visible) {
             for (int tries = 0; tries < 10; tries++) {
-                pos.x = random () % (World::get_width () - 20);
-                pos.y = random () % (World::get_height () - 20);
-                if (World::test_smile (id, pos)) {
+                pos.x = random () % (world.get_width () - 20);
+                pos.y = random () % (world.get_height () - 20);
+                if (world.test_smile (id, pos)) {
                     face_type = ST_pozi;
-                    World::write_soft_smile (id, pos);
+                    world.write_soft_smile (id, pos);
                     Render::draw_smile (id, pos, face_type);
                     Render::update_smile (pos);
                     visible = true;
@@ -379,17 +379,17 @@ public:
         }
         if (delay > 0 && visible) {
             if (try_swich_face ()) {
-                World::erase_smile (pos);
+                world.erase_smile (pos);
                 face_type = SmileType ((face_type + 1 + random () % 3) % 4);
 
                 switch (face_type) {
                 case ST_pozi:
                 case ST_nega:
                 case ST_iron:
-                    World::write_soft_smile (id, pos);
+                    world.write_soft_smile (id, pos);
                     break;
                 default:
-                    World::write_hard_smile (id, pos);
+                    world.write_hard_smile (id, pos);
                     break;
                 }
                 Render::draw_smile (id, pos, face_type);
@@ -421,7 +421,7 @@ public:
         case ST_pozi:
         case ST_nega:
         case ST_iron:
-            World::erase_smile (pos);
+            world.erase_smile (pos);
             Render::clear_smile (pos);
             Render::update_smile (pos);
             visible = false;
@@ -554,8 +554,8 @@ public:
     HamiSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
             smilelvl_tu lvl) :
         Smile (ST_ham, sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width ()
-                + World::get_height () * World::get_height ());
+        int world_diagonal = sqrt (world.get_width () * world.get_width ()
+                + world.get_height () * world.get_height ());
         step_length = world_diagonal * (4 - level);
         delay = world_diagonal * (4 - level) * order / count;
         ani = 0;
@@ -572,12 +572,12 @@ public:
             test.y = ftest.y;
 
             if (test.x != pos.x || test.y != pos.y) {
-                if (World::test_smile (id, test)) {
-                    World::erase_smile (pos);
+                if (world.test_smile (id, test)) {
+                    world.erase_smile (pos);
                     Render::clear_smile (pos);
                     pos = test;
                     exact = ftest;
-                    World::write_hard_smile (id, pos);
+                    world.write_hard_smile (id, pos);
                 } else {
                     angle = random () % ANGLES;
                 }
@@ -591,17 +591,17 @@ public:
         }
 
         if (delay <= (random () % 20) && visible) {
-            World::erase_smile (pos);
+            world.erase_smile (pos);
             Render::clear_smile (pos);
             Render::update_smile (pos);
             visible = false;
         }
         if (delay <= 0 && !visible) {
             for (int tries = 0; tries < 10; tries++) {
-                pos.x = random () % (World::get_width () - 20);
-                pos.y = random () % (World::get_height () - 20);
-                if (World::test_smile (id, pos)) {
-                    World::write_hard_smile (id, pos);
+                pos.x = random () % (world.get_width () - 20);
+                pos.y = random () % (world.get_height () - 20);
+                if (world.test_smile (id, pos)) {
+                    world.write_hard_smile (id, pos);
                     Render::draw_smile (id, pos);
                     Render::update_smile (pos);
 
@@ -646,8 +646,8 @@ public:
     DestSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
             smilelvl_tu lvl) :
         Smile (ST_ham, sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width ()
-                + World::get_height () * World::get_height ());
+        int world_diagonal = sqrt (world.get_width () * world.get_width ()
+                + world.get_height () * world.get_height ());
         step_length = world_diagonal * (4 - level);
         delay = world_diagonal * (4 - level) * order / count;
         ani = 0;
@@ -664,12 +664,12 @@ public:
             test.y = ftest.y;
 
             if (test.x != pos.x || test.y != pos.y) {
-                if (World::test_dest_smile (id, test)) {
-                    World::erase_smile (pos);
+                if (world.test_dest_smile (id, test)) {
+                    world.erase_smile (pos);
                     Render::clear_smile (pos);
                     pos = test;
                     exact = ftest;
-                    World::write_hard_smile (id, pos);
+                    world.write_hard_smile (id, pos);
                 } else {
                     angle = random () % ANGLES;
                 }
@@ -683,17 +683,17 @@ public:
         }
 
         if (delay <= (random () % 20) && visible) {
-            World::erase_smile (pos);
+            world.erase_smile (pos);
             Render::clear_smile (pos);
             Render::update_smile (pos);
             visible = false;
         }
         if (delay <= 0 && !visible) {
             for (int tries = 0; tries < 10; tries++) {
-                pos.x = random () % (World::get_width () - 20);
-                pos.y = random () % (World::get_height () - 20);
-                if (World::test_smile (id, pos)) {
-                    World::write_hard_smile (id, pos);
+                pos.x = random () % (world.get_width () - 20);
+                pos.y = random () % (world.get_height () - 20);
+                if (world.test_smile (id, pos)) {
+                    world.write_hard_smile (id, pos);
                     Render::draw_smile (id, pos);
                     Render::update_smile (pos);
 
@@ -738,8 +738,8 @@ public:
     TermSmile (smileid_tu sid, smileid_tu order, smileid_tu count,
             smilelvl_tu lvl) :
         Smile (ST_ham, sid, lvl) {
-        int world_diagonal = sqrt (World::get_width () * World::get_width ()
-                + World::get_height () * World::get_height ());
+        int world_diagonal = sqrt (world.get_width () * world.get_width ()
+                + world.get_height () * world.get_height ());
         step_length = world_diagonal * (4 - level);
         delay = world_diagonal * (4 - level) * order / count;
         ani = 0;
@@ -761,12 +761,12 @@ public:
             test.y = ftest.y;
 
             if (test.x != pos.x || test.y != pos.y) {
-                if (World::test_dest_smile (id, test)) {
-                    World::erase_smile (pos);
+                if (world.test_dest_smile (id, test)) {
+                    world.erase_smile (pos);
                     Render::clear_smile (pos);
                     pos = test;
                     exact = ftest;
-                    World::write_hard_smile (id, pos);
+                    world.write_hard_smile (id, pos);
                 } else {
                     angle = random () % ANGLES;
                 }
@@ -780,17 +780,17 @@ public:
         }
 
         if (delay <= (random () % 20) && visible) {
-            World::erase_smile (pos);
+            world.erase_smile (pos);
             Render::clear_smile (pos);
             Render::update_smile (pos);
             visible = false;
         }
         if (delay <= 0 && !visible) {
             for (int tries = 0; tries < 10; tries++) {
-                pos.x = random () % (World::get_width () - 20);
-                pos.y = random () % (World::get_height () - 20);
-                if (World::test_smile (id, pos)) {
-                    World::write_hard_smile (id, pos);
+                pos.x = random () % (world.get_width () - 20);
+                pos.y = random () % (world.get_height () - 20);
+                if (world.test_smile (id, pos)) {
+                    world.write_hard_smile (id, pos);
                     Render::draw_smile (id, pos);
                     Render::update_smile (pos);
 

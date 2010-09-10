@@ -4,32 +4,51 @@
 #include "int_type.h"
 #include "fakes/game_info.h"
 
-namespace Game {
-void initialize (const GameInfo & info);
+class Game {
+protected:
 
-void run ();
+    round_tu round;
 
-void uninitialize ();
+    timer_ti speed;
 
-void clear_playerground ();
+public:
 
-void clear_status ();
+    virtual void initialize (const GameInfo & info) = 0;
 
-void end_game ();
+    virtual void run () = 0;
 
-timer_ti get_speed ();
+    virtual void uninitialize () = 0;
 
-void next_round ();
+    virtual void clear_playerground () = 0;
 
-round_tu get_round ();
+    virtual void clear_status () = 0;
 
-void set_speed (timer_ti value);
+    virtual void end_game () = 0;
 
-void set_timer (timer_ti value);
+    virtual void next_round () = 0;
 
-void wait (timer_ti time);
+    virtual void set_speed (timer_ti value) = 0;
 
-void wait_for_space ();
+    virtual void set_timer (timer_ti value) = 0;
+
+    virtual void wait (timer_ti time) = 0;
+
+    virtual void wait_for_space () = 0;
+
+    timer_ti get_speed () const;
+
+    round_tu get_round () const;
+};
+
+extern Game& game;
+
+inline timer_ti Game::get_speed () const {
+    return speed;
 }
+
+inline round_tu Game::get_round () const {
+    return round;
+}
+
 
 #endif

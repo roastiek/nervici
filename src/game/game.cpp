@@ -21,22 +21,75 @@
 
 using namespace std;
 
-namespace Game {
+class GameImpl: public Game {
+private:
+    GameSetting set;
 
-static GameSetting set;
-static SmileSetting smile_set;
-static round_tu round;
-static bool end;
-static bool abort;
-static timer_ti speed;
-static timer_ti timer;
-static Uint32 sdl_time;
+    SmileSetting smile_set;
 
-static size_t sl_count = 0;
-static size_t nosl_count = 0;
-static size_t nosmlsl_count = 0;
+    bool end;
 
-void initialize (const GameInfo& info) {
+    bool abort;
+
+    timer_ti timer;
+
+    Uint32 sdl_time;
+
+    size_t sl_count;
+
+    size_t nosl_count;
+
+    size_t nosmlsl_count;
+
+    static GameImpl instance;
+
+    GameImpl ();
+
+    void sleep (timer_ti pause);
+
+    void run_statistic ();
+
+public:
+
+    void initialize (const GameInfo & info);
+
+    void run ();
+
+    void uninitialize ();
+
+    void clear_playerground ();
+
+    void clear_status ();
+
+    void end_game ();
+
+    timer_ti get_speed ();
+
+    void next_round ();
+
+    round_tu get_round ();
+
+    void set_speed (timer_ti value);
+
+    void set_timer (timer_ti value);
+
+    void wait (timer_ti time);
+
+    void wait_for_space ();
+
+    static GameImpl& get_instance ();
+};
+
+GameImpl GameImpl::instance;
+
+Game& game = GameImpl::get_instance ();
+
+GameImpl::GameImpl () :
+    sl_count (0), nosl_count (0), nosmlsl_count (0) {
+
+}
+
+void GameImpl::initialize (const GameInfo& info) {
     cout << __func__ << '\n';
 
     set = info.setting;
@@ -44,7 +97,7 @@ void initialize (const GameInfo& info) {
     smile_set = info.smiles;
 
     Render::draw_game_screen ();
-    World::initialize ();
+    world.initialize ();
     teams.initialize (info.team_infos);
     players.initialize (info.pl_infos, info.pl_teams, info.setting.max_length);
     smiles.initialize (info);
@@ -62,7 +115,7 @@ void initialize (const GameInfo& info) {
     mods.load_mod (0);
 }
 
-void uninitialize () {
+void GameImpl::uninitialize () {
     cout << __func__ << '\n';
 
     mods.unload_mod ();
@@ -70,16 +123,10 @@ void uninitialize () {
     smiles.uninitialize ();
     players.uninitialize ();
     teams.uninitialize ();
-    World::uninitialize ();
+    world.uninitialize ();
 }
 
-void sleep (timer_ti pause) {
-    /*time.tv_nsec += 1000 * 1000 * pause;
-     if (time.tv_nsec >= 1000 * 1000 * 1000) {
-     time.tv_sec++;
-     time.tv_nsec -= 1000 * 1000 * 1000;
-     }
-     clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &time, NULL);*/
+void GameImpl::sleep (timer_ti pause) {
     sdl_time += pause;
     timer_ti delta = sdl_time - SDL_GetTicks ();
     if (delta > 0) {
@@ -155,7 +202,7 @@ static int compare_team (const Team& te1, const Team& te2, StatColumn col) {
     }
 }
 
-static void run_statistic () {
+void GameImpl::run_statistic () {
     Render::reset_columns_sub ();
     Render::draw_stat_screen ();
     SDL_Event event;
@@ -267,7 +314,7 @@ static void run_statistic () {
     }
 }
 
-void run () {
+void GameImpl::run () {
     SDL_Event event;
     size_t steps = 0;
     uint8_t *keys;
@@ -305,19 +352,19 @@ void run () {
         players.finish_step_preparation ();
         players.step (keys);
         smiles.step ();
-        World::check_starts ();
+        world.check_starts ();
         mods.face ().after_step ();
 
         //off
         /*mods.face ().before_step ();
          players.step (keys);
          smiles.step ();
-         World::check_starts ();
+         world.check_starts ();
          mods.face ().after_step ();*/
 
         steps += speed;
         if (steps > 10) {
-            World::render_changed_items ();
+            world.render_changed_items ();
             players.update_bodies ();
             players.update_score ();
             teams.update_score ();
@@ -358,7 +405,7 @@ void run () {
     mods.face ().on_game_end ();
 }
 
-void set_speed (timer_ti value) {
+void GameImpl::set_speed (timer_ti value) {
     speed = value;
     if (speed < base_speed / 2)
         speed = base_speed / 2;
@@ -367,11 +414,11 @@ void set_speed (timer_ti value) {
     audio.music_set_rate ((base_speed * 1.0) / speed);
 }
 
-void wait (timer_ti time) {
+void GameImpl::wait (timer_ti time) {
     SDL_Event event;
     int rest = time;
 
-    World::render_changed_items ();
+    world.render_changed_items ();
     players.update_bodies ();
     players.update_score ();
     teams.update_score ();
@@ -395,10 +442,10 @@ void wait (timer_ti time) {
     }
 }
 
-void wait_for_space () {
+void GameImpl::wait_for_space () {
     SDL_Event event;
 
-    World::render_changed_items ();
+    world.render_changed_items ();
     players.update_bodies ();
     players.update_score ();
     teams.update_score ();
@@ -426,32 +473,31 @@ void wait_for_space () {
     }
 }
 
-void next_round () {
+void GameImpl::next_round () {
     round++;
     Render::draw_round (round);
 }
 
-void clear_playerground () {
-    World::clear ();
+void GameImpl::clear_playerground () {
+    world.clear ();
     Render::clear_playerground ();
     players.erase ();
     smiles.erase ();
 }
 
-void end_game () {
+void GameImpl::end_game () {
     end = true;
 }
 
-timer_ti get_speed () {
-    return speed;
-}
-
-round_tu get_round () {
-    return round;
-}
-
-void set_timer (timer_ti value) {
+void GameImpl::set_timer (timer_ti value) {
     timer = value;
     Render::draw_timer (timer);
 }
+
+void GameImpl::clear_status () {
+
+}
+
+inline GameImpl& GameImpl::get_instance () {
+    return instance;
 }

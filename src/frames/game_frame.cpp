@@ -419,9 +419,9 @@ void GameFrame::btn_start_clicked (Control* ctl) {
         }
     }
 
-    Game::initialize (game_info);
-    Game::run ();
-    Game::uninitialize ();
+    game.initialize (game_info);
+    game.run ();
+    game.uninitialize ();
     get_parent ()->invalidate ();
 }
 

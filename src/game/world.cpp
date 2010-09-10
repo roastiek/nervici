@@ -16,8 +16,6 @@
 
 using namespace std;
 
-namespace World {
-
 /*
  * World items are stored in World::__items, but accessed through World::items,
  * which should work as index
@@ -25,16 +23,15 @@ namespace World {
  * but this solution need only one big allocation and the space will be contineous
  */
 
-static wsize_tu width;
-static wsize_tu height;
-static WorldItem** items;
-static WorldItem* __items;
-static vector<Start> starts;
-static vector<Point> items_queue;
+World World::instance;
 
-//#define pos_(X,Y) (width * Y + X)
+World& world = World::get_instance ();
 
-void initialize () {
+World::World () {
+
+}
+
+void World::initialize () {
     int x;
 
     width = Render::get_playerground_width ();
@@ -65,13 +62,13 @@ void initialize () {
 
 }
 
-void uninitialize () {
+void World::uninitialize () {
     delete[] items;
     delete[] __items;
     starts.clear ();
 }
 
-void clear () {
+void World::clear () {
     for (wsize_tu y = 1; y < height - 1; y++) {
         items[0][y].type = IT_stone;
         for (wsize_tu x = 1; x < width - 1; x++) {
@@ -85,7 +82,7 @@ void clear () {
     }
 }
 
-void check_starts () {
+void World::check_starts () {
     int state;
     wsize_tu fx, fy;
 
@@ -102,7 +99,7 @@ void check_starts () {
     }
 }
 
-const Start* get_start (startid_tu stid) {
+const Start* World::get_start (startid_tu stid) {
     Start* result = &starts[stid];
     if (result->ready) {
         result->ready = false;
@@ -111,7 +108,7 @@ const Start* get_start (startid_tu stid) {
         return NULL;
 }
 
-startid_tu find_free_start () {
+startid_tu World::find_free_start () {
     startid_tu result;
     startid_tu avai = 0;
 
@@ -131,7 +128,7 @@ startid_tu find_free_start () {
 /*
  * the cycles are not needed I think now
  */
-bool simple_will_survive (const Point& pos, const Fields& fields) {
+bool World::simple_will_survive (const Point& pos, const Fields& fields) {
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
             if (fields[x][y] != 0) {
@@ -144,7 +141,7 @@ bool simple_will_survive (const Point& pos, const Fields& fields) {
     return true;
 }
 
-bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
+bool World::will_survive (const Point& pos, const Fields& fields, plid_tu id,
         plsize_tu head, DeathCause& cause) {
 
     for (wsize_tu x = 0; x < 3; x++) {
@@ -190,7 +187,7 @@ bool will_survive (const Point& pos, const Fields& fields, plid_tu id,
     return true;
 }
 
-bool good_for_ai (const Point& pos, plid_tu id, plsize_tu head) {
+bool World::good_for_ai (const Point& pos, plid_tu id, plsize_tu head) {
     bool result = true;
 
     for (wsize_tu x = 0; x < 3 && result; x += 2) {
@@ -221,22 +218,21 @@ bool good_for_ai (const Point& pos, plid_tu id, plsize_tu head) {
     return result;
 }
 
-bool simple_good_for_ai (const Point& pos) {
-    return pos.x >= 1 && pos.y >= 1 && pos.x + 3 < width && pos.y + 3
-            < height;
+bool World::simple_good_for_ai (const Point& pos) {
+    return pos.x >= 1 && pos.y >= 1 && pos.x + 3 < width && pos.y + 3 < height;
 }
 
-static void queue_changed_item (wsize_tu x, wsize_tu y) {
+void World::queue_changed_item (wsize_tu x, wsize_tu y) {
     Point pos = {
         x,
         y};
 
     items_queue.push_back (pos);
-    World::get_item (x, y).changed = true;
+    get_item (x, y).changed = true;
 }
 
-void write_player_head (const Point& pos, const Fields& fields, plid_tu id,
-        plsize_tu head, bool living) {
+void World::write_player_head (const Point& pos, const Fields& fields,
+        plid_tu id, plsize_tu head, bool living) {
 
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -268,7 +264,8 @@ void write_player_head (const Point& pos, const Fields& fields, plid_tu id,
     }
 }
 
-void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
+void World::rewrite_player_bottom (const Point& pos, plid_tu id,
+        plsize_tu bottom) {
 
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -287,32 +284,16 @@ void rewrite_player_bottom (const Point& pos, plid_tu id, plsize_tu bottom) {
     }
 }
 
-wsize_tu get_width () {
-    return width;
-}
-
-wsize_tu get_height () {
-    return height;
-}
-
-WorldItem & get_item (wsize_tu x, wsize_tu y) {
-    return items[x][y];
-}
-
-WorldItem & get_item (const Point & pos) {
-    return items[pos.x][pos.y];
-}
-
-startid_tu get_starts_count () {
+startid_tu World::get_starts_count () const {
     return starts.size ();
 }
 
-void render_changed_items () {
+void World::render_changed_items () {
     Render::draw_world_items_queue (items_queue);
     items_queue.clear ();
 }
 
-void write_soft_smile (smileid_tu sid, const Point& pos) {
+void World::write_soft_smile (smileid_tu sid, const Point& pos) {
     for (int x = 0; x < 20; x++) {
         for (int y = 0; y < 20; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
@@ -322,7 +303,7 @@ void write_soft_smile (smileid_tu sid, const Point& pos) {
     }
 }
 
-void write_hard_smile (smileid_tu sid, const Point& pos) {
+void World::write_hard_smile (smileid_tu sid, const Point& pos) {
     for (int x = 0; x < 20; x++) {
         for (int y = 0; y < 20; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
@@ -332,7 +313,7 @@ void write_hard_smile (smileid_tu sid, const Point& pos) {
     }
 }
 
-void erase_smile (const Point& pos) {
+void World::erase_smile (const Point& pos) {
     for (int x = 0; x < 20; x++) {
         for (int y = 0; y < 20; y++) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
@@ -341,7 +322,7 @@ void erase_smile (const Point& pos) {
     }
 }
 
-bool test_smile (smileid_tu sid, const Point& pos) {
+bool World::test_smile (smileid_tu sid, const Point& pos) {
     bool result = true;
     if (pos.x < 1 || pos.y < 1 || pos.x + 20 >= width - 1 || pos.y + 20
             >= height - 1)
@@ -357,7 +338,7 @@ bool test_smile (smileid_tu sid, const Point& pos) {
     return result;
 }
 
-bool test_dest_smile (smileid_tu sid, const Point& pos) {
+bool World::test_dest_smile (smileid_tu sid, const Point& pos) {
     bool result = true;
     for (int x = 0; x < 20 && result; x++) {
         for (int y = 0; y < 20 && result; y++) {
@@ -368,7 +349,5 @@ bool test_dest_smile (smileid_tu sid, const Point& pos) {
         }
     }
     return result;
-}
-
 }
 

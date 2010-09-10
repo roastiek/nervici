@@ -24,7 +24,7 @@ using namespace Glib;
 
 void Player::write_body_part (const Point& pos, const Fields& fields,
         bool living) {
-    World::write_player_head (pos, fields, id, head, living);
+    world.write_player_head (pos, fields, id, head, living);
     add_part (pos);
     updates.push_back (pos);
 }
@@ -86,7 +86,7 @@ void Player::timer_func (timer_ti speed) {
 }
 
 void Player::clear_bottom () {
-    World::rewrite_player_bottom (body[bottom_index], id, bottom);
+    world.rewrite_player_bottom (body[bottom_index], id, bottom);
 
     updates.push_back (body[bottom_index]);
 
@@ -199,7 +199,7 @@ void Player::live () {
     fields.calc (exact);
 
     if (jumptime <= JUMP_REPEAT - JUMP_LENGTH) {
-        survive = World::will_survive (pos, fields, id, head, cause);
+        survive = world.will_survive (pos, fields, id, head, cause);
         write_body_part (pos, fields, survive);
         switch (cause.cause) {
         case DC_killed: {
@@ -240,7 +240,7 @@ void Player::live () {
             team.stat.steps++;
         }
     } else {
-        survive = World::simple_will_survive (pos, fields);
+        survive = world.simple_will_survive (pos, fields);
         if (!survive) {
             stat.crashes++;
             team.stat.crashes++;
@@ -272,7 +272,7 @@ void Player::try_revive () {
     pos.y = exact.y - 1;
     fields.calc (exact);
 
-    bool survive = World::will_survive (pos, fields, id, head, cause);
+    bool survive = world.will_survive (pos, fields, id, head, cause);
     if (survive) {
         set_state (PS_Live);
     }
@@ -331,7 +331,7 @@ void Player::give_start (startid_tu start) {
     Point pos;
 
     if (start >= 0) {
-        st = World::get_start (start);
+        st = world.get_start (start);
         if (st != NULL) {
             cout << "give pl start " << (int) id << ' ' << (int) st->angle
                     << '\n';
@@ -383,7 +383,7 @@ void Player::fast_clear () {
             clear_bottom ();
         }
         set_state (PS_Erased);
-        World::check_starts ();
+        world.check_starts ();
         break;
     default:
         break;
@@ -396,7 +396,7 @@ void Player::cut_at_length (plsize_tu nlength) {
     while (length > 0) {
         clear_bottom ();
     }
-    World::check_starts ();
+    world.check_starts ();
 }
 
 void Player::dec_max_length (plsize_tu delta) {
