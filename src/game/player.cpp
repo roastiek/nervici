@@ -31,7 +31,7 @@ void Player::write_body_part (const Point& pos, const Fields& fields,
 
 void Player::update_body () {
     for (size_t ui = 0; ui < updates.size (); ui++) {
-        Render::update_player (updates[ui]);
+        render.update_player (updates[ui]);
     }
     updates.clear ();
 }
@@ -486,7 +486,7 @@ bool Player::is_human () const {
 }
 
 void Player::update_score () {
-    Render::draw_player_score (id, order, stat.score, state, ironize_lvl > 0);
+    render.draw_player_score (id, order, stat.score, state, ironize_lvl > 0);
 }
 
 score_ti Player::get_score () const {
@@ -575,6 +575,6 @@ void Player::calc_stats () {
 }
 
 void Player::draw_stat () {
-    Render::draw_player_stat (id, order, info, stat);
+    render.draw_player_stat (id, order, info, stat);
 }
 

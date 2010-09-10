@@ -96,7 +96,7 @@ void GameImpl::initialize (const GameInfo& info) {
     set_speed (info.setting.speed);
     smile_set = info.smiles;
 
-    Render::draw_game_screen ();
+    render.draw_game_screen ();
     world.initialize ();
     teams.initialize (info.team_infos);
     players.initialize (info.pl_infos, info.pl_teams, info.setting.max_length);
@@ -107,8 +107,8 @@ void GameImpl::initialize (const GameInfo& info) {
     round = 1;
     timer = 0;
 
-    Render::draw_semafor (SEMAFOR_OFF);
-    Render::draw_round (round);
+    render.draw_semafor (SEMAFOR_OFF);
+    render.draw_round (round);
 
     clear_playerground ();
 
@@ -162,22 +162,22 @@ static int compare_stat (const Statistic& st1, const Statistic& st2,
     case STC_jumps:
         return st1.jump - st2.jump;
     case STC_pozi:
-        sub = Render::get_column_sub (col);
+        sub = render.get_column_sub (col);
         return st1.smiles[ST_pozi][sub] - st2.smiles[ST_pozi][sub];
     case STC_nega:
-        sub = Render::get_column_sub (col);
+        sub = render.get_column_sub (col);
         return st1.smiles[ST_nega][sub] - st2.smiles[ST_nega][sub];
     case STC_fleg:
-        sub = Render::get_column_sub (col);
+        sub = render.get_column_sub (col);
         return st1.smiles[ST_fleg][sub] - st2.smiles[ST_fleg][sub];
     case STC_iron:
-        sub = Render::get_column_sub (col);
+        sub = render.get_column_sub (col);
         return st1.smiles[ST_iron][sub] - st2.smiles[ST_iron][sub];
     case STC_cham:
-        sub = Render::get_column_sub (col);
+        sub = render.get_column_sub (col);
         return st1.smiles[ST_cham][sub] - st2.smiles[ST_cham][sub];
     case STC_ham:
-        sub = Render::get_column_sub (col);
+        sub = render.get_column_sub (col);
         return st1.smiles[ST_ham][sub] - st2.smiles[ST_ham][sub];
     default:
         return 0;
@@ -203,8 +203,8 @@ static int compare_team (const Team& te1, const Team& te2, StatColumn col) {
 }
 
 void GameImpl::run_statistic () {
-    Render::reset_columns_sub ();
-    Render::draw_stat_screen ();
+    render.reset_columns_sub ();
+    render.draw_stat_screen ();
     SDL_Event event;
 
     StatColumn order_col = STC_score;
@@ -235,12 +235,12 @@ void GameImpl::run_statistic () {
                     break;
                 }
             case SDL_MOUSEBUTTONDOWN: {
-                StatColumn col = Render::get_column_from_pos (event.button.x,
+                StatColumn col = render.get_column_from_pos (event.button.x,
                         event.button.y);
                 if (col != STC_count) {
                     switch (event.button.button) {
                     case SDL_BUTTON_RIGHT:
-                        Render::cycle_column_sub (col);
+                        render.cycle_column_sub (col);
                         order_col = STC_count;
                     case SDL_BUTTON_LEFT:
                         if (order_col != col) {
@@ -324,8 +324,8 @@ void GameImpl::run () {
     //clock_gettime (CLOCK_REALTIME, &time);
     sdl_time = SDL_GetTicks ();
     players.update_score ();
-    Render::draw_timer (timer);
-    Render::draw_status ("status");
+    render.draw_timer (timer);
+    render.draw_status ("status");
     mods.face ().on_game_start (set, smile_set);
 
     while (!end && !abort) {
@@ -370,7 +370,7 @@ void GameImpl::run () {
             teams.update_score ();
             steps = 0;
         }
-        //Render::update_screen ();
+        //render.update_screen ();
 
         audio.music_update ();
 
@@ -378,7 +378,7 @@ void GameImpl::run () {
 
         bool sub_zero = timer < 0;
         timer += speed;
-        Render::draw_timer (timer);
+        render.draw_timer (timer);
 
         if (sub_zero) {
             if (timer >= 0) {
@@ -393,7 +393,7 @@ void GameImpl::run () {
     audio.music_stop ();
 
     if (!abort) {
-        Render::draw_end ();
+        render.draw_end ();
         wait_for_space ();
     }
     if (!abort) {
@@ -475,12 +475,12 @@ void GameImpl::wait_for_space () {
 
 void GameImpl::next_round () {
     round++;
-    Render::draw_round (round);
+    render.draw_round (round);
 }
 
 void GameImpl::clear_playerground () {
     world.clear ();
-    Render::clear_playerground ();
+    render.clear_playerground ();
     players.erase ();
     smiles.erase ();
 }
@@ -491,7 +491,7 @@ void GameImpl::end_game () {
 
 void GameImpl::set_timer (timer_ti value) {
     timer = value;
-    Render::draw_timer (timer);
+    render.draw_timer (timer);
 }
 
 void GameImpl::clear_status () {

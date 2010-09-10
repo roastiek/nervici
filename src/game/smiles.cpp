@@ -29,11 +29,11 @@ void Smiles::initialize (const GameInfo& info) {
         }
     }
 
-    Render::load_smiles (info.smiles);
+    render.load_smiles (info.smiles);
 }
 
 void Smiles::uninitialize () {
-    Render::free_smiles ();
+    render.free_smiles ();
 
     for (size_t si = 0; si < smiles.size (); si++) {
         delete smiles[si];

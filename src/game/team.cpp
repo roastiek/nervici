@@ -40,7 +40,7 @@ void Team::update_score () {
         state = PS_Death;
     }
 
-    Render::draw_team_score (id, order, stat.score, state);
+    render.draw_team_score (id, order, stat.score, state);
 }
 
 bool Team::operator > (const Team& other) const {
@@ -61,7 +61,7 @@ void Team::calc_stats () {
 }
 
 void Team::draw_stat () {
-    Render::draw_team_stat (id, order, info, stat);
+    render.draw_team_stat (id, order, info, stat);
 }
 
 const ustring& Team::get_name () const {

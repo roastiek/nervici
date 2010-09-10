@@ -45,15 +45,15 @@ public:
     void step () {
         if (delay <= 10 && visible) {
             world.erase_smile (pos);
-            Render::clear_smile (pos);
-            Render::update_smile (pos);
+            render.clear_smile (pos);
+            render.update_smile (pos);
             visible = false;
         }
         if (step_length - delay <= 1 && !visible) {
             if (found_new_pos ()) {
                 world.write_soft_smile (id, pos);
-                Render::draw_smile (id, pos);
-                Render::update_smile (pos);
+                render.draw_smile (id, pos);
+                render.update_smile (pos);
                 visible = true;
             }
         }
@@ -78,8 +78,8 @@ public:
 
     void eat (Player& pl) {
         world.erase_smile (pos);
-        Render::clear_smile (pos);
-        Render::update_smile (pos);
+        render.clear_smile (pos);
+        render.update_smile (pos);
         visible = false;
         Smile::eat (pl);
     }
@@ -99,15 +99,15 @@ public:
     void step () {
         if (delay <= 10 && visible) {
             world.erase_smile (pos);
-            Render::clear_smile (pos);
-            Render::update_smile (pos);
+            render.clear_smile (pos);
+            render.update_smile (pos);
             visible = false;
         }
         if (step_length - delay <= 1 && !visible) {
             if (found_new_pos ()) {
                 world.write_hard_smile (id, pos);
-                Render::draw_smile (id, pos);
-                Render::update_smile (pos);
+                render.draw_smile (id, pos);
+                render.update_smile (pos);
                 visible = true;
             }
         }
@@ -359,8 +359,8 @@ public:
     void step () {
         if (delay <= 10 && visible) {
             world.erase_smile (pos);
-            Render::clear_smile (pos);
-            Render::update_smile (pos);
+            render.clear_smile (pos);
+            render.update_smile (pos);
             visible = false;
         }
         if (step_length - delay <= 1 && !visible) {
@@ -370,8 +370,8 @@ public:
                 if (world.test_smile (id, pos)) {
                     face_type = ST_pozi;
                     world.write_soft_smile (id, pos);
-                    Render::draw_smile (id, pos, face_type);
-                    Render::update_smile (pos);
+                    render.draw_smile (id, pos, face_type);
+                    render.update_smile (pos);
                     visible = true;
                     break;
                 }
@@ -392,8 +392,8 @@ public:
                     world.write_hard_smile (id, pos);
                     break;
                 }
-                Render::draw_smile (id, pos, face_type);
-                Render::update_smile (pos);
+                render.draw_smile (id, pos, face_type);
+                render.update_smile (pos);
             }
         }
 
@@ -422,8 +422,8 @@ public:
         case ST_nega:
         case ST_iron:
             world.erase_smile (pos);
-            Render::clear_smile (pos);
-            Render::update_smile (pos);
+            render.clear_smile (pos);
+            render.update_smile (pos);
             visible = false;
             break;
         default:
@@ -574,7 +574,7 @@ public:
             if (test.x != pos.x || test.y != pos.y) {
                 if (world.test_smile (id, test)) {
                     world.erase_smile (pos);
-                    Render::clear_smile (pos);
+                    render.clear_smile (pos);
                     pos = test;
                     exact = ftest;
                     world.write_hard_smile (id, pos);
@@ -584,16 +584,16 @@ public:
             } else {
                 exact = ftest;
             }
-            Render::draw_smile (id, pos, ani / 20);
-            Render::update_smile (pos);
+            render.draw_smile (id, pos, ani / 20);
+            render.update_smile (pos);
             ani++;
             ani %= 40;
         }
 
         if (delay <= (random () % 20) && visible) {
             world.erase_smile (pos);
-            Render::clear_smile (pos);
-            Render::update_smile (pos);
+            render.clear_smile (pos);
+            render.update_smile (pos);
             visible = false;
         }
         if (delay <= 0 && !visible) {
@@ -602,8 +602,8 @@ public:
                 pos.y = random () % (world.get_height () - 20);
                 if (world.test_smile (id, pos)) {
                     world.write_hard_smile (id, pos);
-                    Render::draw_smile (id, pos);
-                    Render::update_smile (pos);
+                    render.draw_smile (id, pos);
+                    render.update_smile (pos);
 
                     exact.x = pos.x;
                     exact.y = pos.y;
@@ -666,7 +666,7 @@ public:
             if (test.x != pos.x || test.y != pos.y) {
                 if (world.test_dest_smile (id, test)) {
                     world.erase_smile (pos);
-                    Render::clear_smile (pos);
+                    render.clear_smile (pos);
                     pos = test;
                     exact = ftest;
                     world.write_hard_smile (id, pos);
@@ -676,16 +676,16 @@ public:
             } else {
                 exact = ftest;
             }
-            Render::draw_smile (id, pos, ani / 20);
-            Render::update_smile (pos);
+            render.draw_smile (id, pos, ani / 20);
+            render.update_smile (pos);
             ani++;
             ani %= 40;
         }
 
         if (delay <= (random () % 20) && visible) {
             world.erase_smile (pos);
-            Render::clear_smile (pos);
-            Render::update_smile (pos);
+            render.clear_smile (pos);
+            render.update_smile (pos);
             visible = false;
         }
         if (delay <= 0 && !visible) {
@@ -694,8 +694,8 @@ public:
                 pos.y = random () % (world.get_height () - 20);
                 if (world.test_smile (id, pos)) {
                     world.write_hard_smile (id, pos);
-                    Render::draw_smile (id, pos);
-                    Render::update_smile (pos);
+                    render.draw_smile (id, pos);
+                    render.update_smile (pos);
 
                     exact.x = pos.x;
                     exact.y = pos.y;
@@ -763,7 +763,7 @@ public:
             if (test.x != pos.x || test.y != pos.y) {
                 if (world.test_dest_smile (id, test)) {
                     world.erase_smile (pos);
-                    Render::clear_smile (pos);
+                    render.clear_smile (pos);
                     pos = test;
                     exact = ftest;
                     world.write_hard_smile (id, pos);
@@ -773,16 +773,16 @@ public:
             } else {
                 exact = ftest;
             }
-            Render::draw_smile (id, pos, ani / 20);
-            Render::update_smile (pos);
+            render.draw_smile (id, pos, ani / 20);
+            render.update_smile (pos);
             ani++;
             ani %= 40;
         }
 
         if (delay <= (random () % 20) && visible) {
             world.erase_smile (pos);
-            Render::clear_smile (pos);
-            Render::update_smile (pos);
+            render.clear_smile (pos);
+            render.update_smile (pos);
             visible = false;
         }
         if (delay <= 0 && !visible) {
@@ -791,8 +791,8 @@ public:
                 pos.y = random () % (world.get_height () - 20);
                 if (world.test_smile (id, pos)) {
                     world.write_hard_smile (id, pos);
-                    Render::draw_smile (id, pos);
-                    Render::update_smile (pos);
+                    render.draw_smile (id, pos);
+                    render.update_smile (pos);
 
                     exact.x = pos.x;
                     exact.y = pos.y;

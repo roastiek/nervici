@@ -31,7 +31,7 @@ App::App () : active_frame(NULL), abort (false) {
 void App::init_gui () {
     SDL_SetEventFilter (paint_filter);
 
-    screen = Render::create_screen ("nervici");
+    screen = render.create_screen ("nervici");
     screen->show_all ();
 
     start_frame = StartFrame::create_frame (screen);
@@ -54,7 +54,7 @@ void App::initialize () {
     pl_infos.load ();
     team_infos.load ();
 
-    if (Render::initialize ()) return;
+    if (render.initialize ()) return;
     audio.initialize ();
 
     srand (SDL_GetTicks ());
@@ -73,7 +73,7 @@ void App::uninitialize () {
     audio.music_stop ();
 
     audio.uninitialize ();
-    Render::uninitialize ();
+    render.uninitialize ();
 
     pl_infos.save ();
     team_infos.save ();

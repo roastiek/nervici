@@ -18,7 +18,7 @@ void clear_playerground () {
 }
 
 void set_status (const char* text) {
-    Render::draw_status (text);
+    render.draw_status (text);
 }
 
 void end_game () {
@@ -42,7 +42,7 @@ round_tu get_round () {
 }
 
 void set_semafor (int state) {
-    Render::draw_semafor (state);
+    render.draw_semafor (state);
 }
 
 void set_speed (timer_ti speed) {

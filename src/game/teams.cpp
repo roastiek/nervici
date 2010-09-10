@@ -25,11 +25,11 @@ void Teams::initialize (const std::vector<const TeamInfo*>& infos) {
 
     items.push_back (new Team (orders.size (), team_infos[0]));
 
-    Render::load_teams (infos);
+    render.load_teams (infos);
 }
 
 void Teams::uninitialize () {
-    Render::free_teams ();
+    render.free_teams ();
 
     for (size_t ti = 0; ti < items.size (); ti++) {
         delete items[ti];

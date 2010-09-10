@@ -34,8 +34,8 @@ World::World () {
 void World::initialize () {
     int x;
 
-    width = Render::get_playerground_width ();
-    height = Render::get_playerground_height ();
+    width = render.get_playerground_width ();
+    height = render.get_playerground_height ();
 
     __items = new WorldItem[width * height];
     items = new WorldItem*[width];
@@ -289,7 +289,7 @@ startid_tu World::get_starts_count () const {
 }
 
 void World::render_changed_items () {
-    Render::draw_world_items_queue (items_queue);
+    render.draw_world_items_queue (items_queue);
     items_queue.clear ();
 }
 

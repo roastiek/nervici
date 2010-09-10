@@ -22,93 +22,244 @@
 using namespace Glib;
 using namespace std;
 
-namespace Render {
-
-struct PlayerSurfaces {
-    SDL_Surface *face;
-    SDL_Surface *numbers;
-};
-
-struct GameScreen {
-    SDL_Rect score;
-    SDL_Rect team;
-    SDL_Rect round;
-    SDL_Rect semafor;
-    SDL_Rect status;
-    SDL_Rect timer;
-    SDL_Rect statustext;
-    SDL_Rect playerground;
-};
-
-struct StatisticScreen {
-    SDL_Rect columns[STC_count];
-    SDL_Rect players_in;
-    SDL_Rect players_out;
-    SDL_Rect teams_in;
-    SDL_Rect teams_out;
-    SDL_Rect header;
-};
-
-struct ScreenSet {
-    int width;
-    int height;
-    bool fullscreen;
-};
-
 #define SC_BACKGROUND    0x00442204
 #define SC_MEDROUND      0x00663306
 #define SC_HIGHGROUND    0x00884408
 #define SC_TEXT          0x00ffd5d5
 #define SC_ACTIVETEXT    0x00d5d5ff
 
-static SDL_Surface* primary = NULL;
-static SDL_Surface* background = NULL;
-static SDL_Surface* merge = NULL;
-static SDL_Rect blit;
-static SDL_Rect dest;
-static SDL_Rect fill_rect;
-static vector<PlayerSurfaces> pl_images;
-static vector<SDL_Surface*> images;
-static vector<SDL_Surface*> team_images;
-static GameScreen gs_inner, gs_outer;
-static ScreenSet setting;
-static SmileImages smile_images;
-static vector<SDL_Surface*> smile_faces;
-static SDLPango_Context* round_context;
-static SDLPango_Context* end_context;
-static SDLPango_Context* status_context;
-static SDLPango_Context* stat_context;
-
-static SDL_Surface* fake_face;
-
-static StatisticScreen stat_screen;
-static SDL_Surface* stat_columns[STC_count];
-static int stat_column_sub[STC_count];
 //pojd me do hymen
 
-static const char * const section = "screen";
-static const char * const st_width = "width";
-static const char * const st_height = "height";
-static const char * const st_fullscreen = "fullscreen";
+class SDLRender: public Render {
+private:
+    struct PlayerSurfaces {
+        SDL_Surface *face;
+        SDL_Surface *numbers;
+    };
 
-static void inner_area (const SDL_Rect& outer, SDL_Rect& inner) {
+    SDL_Surface* primary;
+
+    SDL_Surface* background;
+
+    SDL_Surface* merge;
+
+    SDL_Rect dest;
+
+    SDL_Rect fill_rect;
+
+    SDLPango_Context* round_context;
+
+    SDLPango_Context* end_context;
+
+    SDLPango_Context* status_context;
+
+    SDLPango_Context* stat_context;
+
+    SDL_Surface* fake_face;
+
+    vector<PlayerSurfaces> pl_images;
+
+    vector<SDL_Surface*> images;
+
+    vector<SDL_Surface*> team_images;
+
+    struct GameScreen {
+        SDL_Rect score;
+        SDL_Rect team;
+        SDL_Rect round;
+        SDL_Rect semafor;
+        SDL_Rect status;
+        SDL_Rect timer;
+        SDL_Rect statustext;
+        SDL_Rect playerground;
+    } gs_inner, gs_outer;
+
+    struct StatisticScreen {
+        SDL_Rect columns[STC_count];
+        SDL_Rect players_in;
+        SDL_Rect players_out;
+        SDL_Rect teams_in;
+        SDL_Rect teams_out;
+        SDL_Rect header;
+    } stat_screen;
+
+    struct ScreenSet {
+        int width;
+        int height;
+        bool fullscreen;
+    } setting;
+
+    SmileImages smile_images;
+
+    vector<SDL_Surface*> smile_faces;
+
+    SDL_Surface* stat_columns[STC_count];
+
+    int stat_column_sub[STC_count];
+
+    static SDLRender instance;
+
+    static const ustring section;
+    
+    static const ustring st_width;
+    
+    static const ustring st_height;
+    
+    static const ustring st_fullscreen;
+
+    SDLRender ();
+
+    void load_screen_setting ();
+
+    void save_screen_setting ();
+
+    void init_fonts ();
+
+    void init_game_screen ();
+
+    void init_stat_screen ();
+
+    void draw_score_numbers (score_ti score, SDL_Surface* numbers, int x_pos,
+            int y_pos, int digit);
+
+    void draw_score (int y, SDL_Surface *numbers, int score, PlState state,
+            bool ironized);
+
+    SDL_Surface* create_numbers (Uint32 color, Uint32 team);
+
+    SDL_Surface* create_player_face (Uint32 color);
+
+    SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl);
+
+    SDL_Surface* create_cham_face (smilelvl_tu lvl);
+
+    SDL_Surface* create_ham_face (smilelvl_tu lvl);
+
+    void init_stat_columns ();
+
+    void free_stat_columns ();
+
+    void draw_stat (int y, const ustring& name, uint32_t color,
+            const Statistic& stat, SDL_Surface* numbers);
+
+public:
+    bool initialize ();
+
+    void uninitialize ();
+
+    void load_players (const std::vector<const PlInfo*>& infos,
+            const std::vector<uint32_t>& tcolors);
+
+    void free_players ();
+
+    void load_teams (const std::vector<const TeamInfo*>& infos);
+
+    void free_teams ();
+
+    void load_smiles (const SmileSetting& info);
+
+    void free_smiles ();
+
+    void draw_game_screen ();
+
+    void draw_stat_screen ();
+
+    void draw_semafor (int state);
+
+    void draw_world_items_queue (const std::vector<Point>& queue);
+
+    void draw_player_score (plid_tu plid, plid_tu order, score_ti score,
+            PlState state, bool ironized);
+
+    void draw_team_score (plid_tu tid, plid_tu order, score_ti score,
+            PlState state);
+
+    void draw_round (round_tu round);
+
+    void draw_end ();
+
+    void
+    draw_smile (smileid_tu sid, const Point& pos, int phase = 0);
+
+    void draw_timer (timer_ti time);
+
+    void draw_status (const Glib::ustring& text);
+
+    void clear_playerground ();
+
+    void clear_smile (const Point& pos);
+
+    void update_player (const Point& pos);
+
+    void update_screen ();
+
+    void update_smile (const Point& pos);
+
+    wsize_tu get_playerground_width () const;
+
+    wsize_tu get_playerground_height () const;
+
+    Screen* create_screen (const Glib::ustring& name);
+
+    int get_width () const;
+
+    int get_height () const;
+
+    void reset_columns_sub ();
+
+    int get_column_sub (StatColumn col);
+
+    void cycle_column_sub (StatColumn col);
+
+    StatColumn get_column_from_pos (int x, int y);
+
+    void draw_player_stat (plid_tu id, plid_tu order, const PlInfo& info,
+            const Statistic& stat);
+
+    void draw_team_stat (plid_tu id, plid_tu order, const TeamInfo& info,
+            const Statistic& stat);
+
+    void draw_fake_face (const Point& pos);
+
+    static SDLRender& get_instance ();
+};
+
+SDLRender SDLRender::instance;
+
+const ustring SDLRender::section = "screen";
+
+const ustring SDLRender::st_width = "width";
+
+const ustring SDLRender::st_height = "height";
+
+const ustring SDLRender::st_fullscreen = "fullscreen";
+
+
+Render& render = SDLRender::get_instance ();
+
+static inline void inner_area (const SDL_Rect& outer, SDL_Rect& inner) {
     inner.x = outer.x + 1;
     inner.y = outer.y + 1;
     inner.w = outer.w - 2;
     inner.h = outer.h - 2;
 }
 
-static Uint32 get_pixel (const SDL_Surface* face, int x, int y) {
+static inline Uint32 get_pixel (const SDL_Surface* face, int x, int y) {
     Uint32 *row = (Uint32*) ((Uint8*) face->pixels + y * face->pitch);
     return row[x];
 }
 
-static void put_pixel (SDL_Surface* face, int x, int y, Uint32 p) {
+static inline void put_pixel (SDL_Surface* face, int x, int y, Uint32 p) {
     Uint32 *row = (Uint32*) ((Uint8*) face->pixels + y * face->pitch);
     row[x] = p;
 }
 
-static void load_screen_setting () {
+SDLRender::SDLRender () :
+    primary (NULL), background (NULL), merge (NULL) {
+
+}
+
+void SDLRender::load_screen_setting () {
     Setting& set = settings.app ();
 
     setting.width = set.read_int (section, st_width, 1024);
@@ -116,7 +267,7 @@ static void load_screen_setting () {
     setting.fullscreen = set.read_int (section, st_fullscreen, 0);
 }
 
-static void save_screen_setting () {
+void SDLRender::save_screen_setting () {
     Setting& set = settings.app ();
 
     set.write_int (section, st_width, setting.width);
@@ -124,7 +275,7 @@ static void save_screen_setting () {
     set.write_int (section, st_fullscreen, setting.fullscreen);
 }
 
-static void init_game_screen () {
+void SDLRender::init_game_screen () {
 #define inner 6
 #define outer 7
 
@@ -171,7 +322,7 @@ static void init_game_screen () {
     inner_area (gs_outer.playerground, gs_inner.playerground);
 }
 
-static void init_stat_screen () {
+void SDLRender::init_stat_screen () {
     stat_screen.players_out.x = outer;
     stat_screen.players_out.y = outer;
     stat_screen.players_out.w = setting.width - 2 * outer;
@@ -213,7 +364,7 @@ static void init_stat_screen () {
     }
 }
 
-static SDL_Surface* create_player_face (Uint32 color) {
+SDL_Surface* SDLRender::create_player_face (Uint32 color) {
     SDL_Surface* result;
     result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00,
             0xff0000, 0xff000000);
@@ -236,7 +387,7 @@ static SDL_Surface* create_player_face (Uint32 color) {
     return result;
 }
 
-static SDL_Surface* create_numbers (Uint32 color, Uint32 team) {
+SDL_Surface* SDLRender::create_numbers (Uint32 color, Uint32 team) {
     int x, y;
     Uint32 p;
 
@@ -290,9 +441,9 @@ static SDL_Surface* create_numbers (Uint32 color, Uint32 team) {
     return result;
 }
 
-static void draw_score_numbers (score_ti score, SDL_Surface* numbers,
+void SDLRender::draw_score_numbers (score_ti score, SDL_Surface* numbers,
         int x_pos, int y_pos, int digit) {
-    static SDL_Rect src, dest;
+    static SDL_Rect src;
     int c;
 
     dest.y = y_pos;
@@ -343,11 +494,11 @@ static void draw_score_numbers (score_ti score, SDL_Surface* numbers,
     }
 }
 
-static void draw_score (int y, SDL_Surface *numbers, int score, PlState state,
-        bool ironized) {
+void SDLRender::draw_score (int y, SDL_Surface *numbers, int score,
+        PlState state, bool ironized) {
 #define xoff 4
 #define yoff 4
-    static SDL_Rect src, dest;
+    static SDL_Rect src;
     int cl;
 
     src.x = images[IMT_Numbers]->w;
@@ -378,7 +529,7 @@ static void draw_score (int y, SDL_Surface *numbers, int score, PlState state,
             numbers->h);
 }
 
-static void init_fonts () {
+void SDLRender::init_fonts () {
     SDLPango_Matrix color;
 
     round_context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
@@ -431,7 +582,7 @@ static void init_fonts () {
             0xff00, 0xff0000, 0xff000000);
 }
 
-static void init_stat_columns () {
+void SDLRender::init_stat_columns () {
     static const char * const names[] = {
         "menno",
         "score",
@@ -445,7 +596,7 @@ static void init_stat_columns () {
     }
 
     SDL_Surface* text;
-    SDL_Rect src, dest;
+    SDL_Rect src;
 
     for (int sti = STC_name; sti < STC_deaths; sti++) {
         SDLPango_SetMarkup (status_context, names[sti], -1);
@@ -475,13 +626,13 @@ static void init_stat_columns () {
     }
 }
 
-static void free_stat_columns () {
+void SDLRender::free_stat_columns () {
     for (int sti = STC_name; sti < STC_count; sti++) {
         SDL_FreeSurface (stat_columns[sti]);
     }
 }
 
-bool initialize () {
+bool SDLRender::initialize () {
     cout << __func__ << '\n';
     int flag;
     load_screen_setting ();
@@ -520,14 +671,14 @@ bool initialize () {
     init_stat_screen ();
     init_stat_columns ();
 
-    fake_face = SDL_CreateRGBSurface (SDL_HWSURFACE, 3,
-            3, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
-    SDL_FillRect(fake_face, NULL, 0x800000);
-    
+    fake_face = SDL_CreateRGBSurface (SDL_HWSURFACE, 3, 3, 32, 0xff, 0xff00,
+            0xff0000, 0x00000000);
+    SDL_FillRect (fake_face, NULL, 0x800000);
+
     return false;
 }
 
-void uninitialize () {
+void SDLRender::uninitialize () {
     free_stat_columns ();
     Loader::free_smile_faces (smile_images);
     Loader::free_game_images (images);
@@ -548,8 +699,8 @@ void uninitialize () {
     save_screen_setting ();
 }
 
-void load_players (const std::vector<const PlInfo*>& infos, const vector<uint32_t
-       >& tcolors) {
+void SDLRender::load_players (const std::vector<const PlInfo*>& infos,
+        const vector<uint32_t>& tcolors) {
     pl_images.resize (infos.size ());
 
     for (size_t pi = 0; pi < infos.size (); pi++) {
@@ -560,7 +711,7 @@ void load_players (const std::vector<const PlInfo*>& infos, const vector<uint32_
 
 }
 
-void free_players () {
+void SDLRender::free_players () {
     for (size_t p = 0; p < pl_images.size (); p++) {
         SDL_FreeSurface (pl_images[p].face);
         SDL_FreeSurface (pl_images[p].numbers);
@@ -568,7 +719,7 @@ void free_players () {
     pl_images.clear ();
 }
 
-void load_teams (const vector<const TeamInfo*>& infos) {
+void SDLRender::load_teams (const vector<const TeamInfo*>& infos) {
     team_images.resize (infos.size ());
 
     for (size_t ti = 0; ti < infos.size (); ti++) {
@@ -576,7 +727,7 @@ void load_teams (const vector<const TeamInfo*>& infos) {
     }
 }
 
-void free_teams () {
+void SDLRender::free_teams () {
     for (size_t ti = 0; ti < team_images.size (); ti++) {
         SDL_FreeSurface (team_images[ti]);
     }
@@ -584,14 +735,14 @@ void free_teams () {
     team_images.clear ();
 }
 
-void clear_playerground () {
-    blit.x = gs_outer.playerground.x;
-    blit.y = gs_outer.playerground.y;
-    SDL_BlitSurface (background, &gs_outer.playerground, primary, &blit);
-    SDL_UpdateRects (primary, 1, &blit);
+void SDLRender::clear_playerground () {
+    dest.x = gs_outer.playerground.x;
+    dest.y = gs_outer.playerground.y;
+    SDL_BlitSurface (background, &gs_outer.playerground, primary, &dest);
+    SDL_UpdateRects (primary, 1, &dest);
 }
 
-void draw_world_items_queue (const vector<Point>& queue) {
+void SDLRender::draw_world_items_queue (const vector<Point>& queue) {
     static SDL_Rect drawsrc = {
         0,
         0,
@@ -630,12 +781,12 @@ void draw_world_items_queue (const vector<Point>& queue) {
     }
 }
 
-void update_player (const Point& pos) {
+void SDLRender::update_player (const Point& pos) {
     SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x, pos.y
             + gs_outer.playerground.y, 3, 3);
 }
 
-void draw_game_screen () {
+void SDLRender::draw_game_screen () {
     SDL_FillRect (background, NULL, SC_BACKGROUND);
     SDL_FillRect (background, &gs_outer.score, SC_HIGHGROUND);
     SDL_FillRect (background, &gs_outer.team, SC_HIGHGROUND);
@@ -655,7 +806,7 @@ void draw_game_screen () {
     SDL_Flip (primary);
 }
 
-void draw_stat_screen () {
+void SDLRender::draw_stat_screen () {
     SDL_FillRect (background, NULL, SC_BACKGROUND);
     SDL_FillRect (background, &stat_screen.players_out, SC_HIGHGROUND);
     SDL_FillRect (background, &stat_screen.teams_out, SC_HIGHGROUND);
@@ -667,7 +818,6 @@ void draw_stat_screen () {
 
     SDL_BlitSurface (background, NULL, primary, NULL);
 
-    SDL_Rect dest;
     SDL_Rect src;
 
     src.x = 0;
@@ -684,11 +834,11 @@ void draw_stat_screen () {
     SDL_Flip (primary);
 }
 
-void update_screen () {
+void SDLRender::update_screen () {
     SDL_Flip (primary);
 }
 
-void draw_semafor (int state) {
+void SDLRender::draw_semafor (int state) {
     static SDL_Rect src = {
         0,
         0,
@@ -712,9 +862,9 @@ void draw_semafor (int state) {
     SDL_UpdateRects (primary, 1, &gs_inner.semafor);
 }
 
-void draw_round (round_tu round) {
+void SDLRender::draw_round (round_tu round) {
     static char tt[] = "kolo:   ";
-    SDL_Rect dest = gs_inner.round;
+    dest = gs_inner.round;
     SDL_Surface *text;
 
     SDL_BlitSurface (background, &dest, primary, &dest);
@@ -742,8 +892,8 @@ void draw_round (round_tu round) {
     SDL_UpdateRects (primary, 1, &dest);
 }
 
-void draw_end () {
-    SDL_Rect dest = gs_outer.playerground;
+void SDLRender::draw_end () {
+    dest = gs_outer.playerground;
     SDL_Surface *text;
 
     SDLPango_SetMarkup (end_context, "The Konec", -1);
@@ -757,28 +907,29 @@ void draw_end () {
     SDL_UpdateRects (primary, 1, &dest);
 }
 
-void draw_player_score (plid_tu plid, plid_tu order, score_ti score,
+void SDLRender::draw_player_score (plid_tu plid, plid_tu order, score_ti score,
         PlState state, bool ironized) {
     SDL_Surface *numbers = pl_images[plid].numbers;
     draw_score (gs_outer.score.y + order * numbers->h, numbers, score, state,
             ironized);
 }
 
-void draw_team_score (plid_tu tid, plid_tu order, score_ti score, PlState state) {
+void SDLRender::draw_team_score (plid_tu tid, plid_tu order, score_ti score,
+        PlState state) {
     SDL_Surface *numbers = team_images[tid];
     draw_score (gs_outer.team.y + order * numbers->h, numbers, score, state,
             false);
 }
 
-wsize_tu get_playerground_width () {
+wsize_tu SDLRender::get_playerground_width () const {
     return gs_outer.playerground.w;
 }
 
-wsize_tu get_playerground_height () {
+wsize_tu SDLRender::get_playerground_height () const {
     return gs_outer.playerground.h;
 }
 
-Screen* create_screen (const ustring& name) {
+Screen* SDLRender::create_screen (const ustring& name) {
 
     class RenderScreen: public Screen {
     public:
@@ -799,17 +950,16 @@ Screen* create_screen (const ustring& name) {
     return result;
 }
 
-int get_width () {
+int SDLRender::get_width () const {
     return primary->w;
 }
 
-int get_height () {
+int SDLRender::get_height () const {
     return primary->h;
 }
 
-static SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl) {
+SDL_Surface* SDLRender::create_smile_face (SmileType type, smilelvl_tu lvl) {
     SDL_Surface* result;
-    SDL_Rect dest;
 
     dest.x = 0;
     dest.y = 0;
@@ -828,9 +978,8 @@ static SDL_Surface* create_smile_face (SmileType type, smilelvl_tu lvl) {
     return result;
 }
 
-static SDL_Surface* create_cham_face (smilelvl_tu lvl) {
+SDL_Surface* SDLRender::create_cham_face (smilelvl_tu lvl) {
     SDL_Surface* result;
-    SDL_Rect dest;
 
     dest.x = 0;
     dest.y = 0;
@@ -854,9 +1003,8 @@ static SDL_Surface* create_cham_face (smilelvl_tu lvl) {
     return result;
 }
 
-static SDL_Surface* create_ham_face (smilelvl_tu lvl) {
+SDL_Surface* SDLRender::create_ham_face (smilelvl_tu lvl) {
     SDL_Surface* result;
-    SDL_Rect dest;
 
     dest.x = 0;
     dest.y = 0;
@@ -875,7 +1023,7 @@ static SDL_Surface* create_ham_face (smilelvl_tu lvl) {
     return result;
 }
 
-void load_smiles (const SmileSetting& info) {
+void SDLRender::load_smiles (const SmileSetting& info) {
     for (int sti = ST_pozi; sti < ST_cham; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.counts[sti][li]; ci++) {
@@ -900,14 +1048,14 @@ void load_smiles (const SmileSetting& info) {
     }
 }
 
-void free_smiles () {
+void SDLRender::free_smiles () {
     for (size_t si = 0; si < smile_faces.size (); si++) {
         SDL_FreeSurface (smile_faces[si]);
     }
     smile_faces.clear ();
 }
 
-void draw_smile (smileid_tu sid, const Point& pos, int phase) {
+void SDLRender::draw_smile (smileid_tu sid, const Point& pos, int phase) {
     static SDL_Rect src = {
         0,
         0,
@@ -926,7 +1074,7 @@ void draw_smile (smileid_tu sid, const Point& pos, int phase) {
     SDL_BlitSurface (smile_faces[sid], &src, primary, &dest);
 }
 
-void clear_smile (const Point& pos) {
+void SDLRender::clear_smile (const Point& pos) {
     static SDL_Rect dest = {
         0,
         0,
@@ -939,12 +1087,12 @@ void clear_smile (const Point& pos) {
     SDL_BlitSurface (background, &dest, primary, &dest);
 }
 
-void update_smile (const Point& pos) {
+void SDLRender::update_smile (const Point& pos) {
     SDL_UpdateRect (primary, pos.x + gs_outer.playerground.x - 1, pos.y
             + gs_outer.playerground.y - 1, 22, 22);
 }
 
-void draw_timer (timer_ti time) {
+void SDLRender::draw_timer (timer_ti time) {
     SDL_Rect dest;
     SDL_Rect src;
     SDL_Surface* face = images[IMT_Timer];
@@ -986,7 +1134,7 @@ void draw_timer (timer_ti time) {
 
 }
 
-void draw_status (const ustring& text) {
+void SDLRender::draw_status (const ustring& text) {
     SDL_BlitSurface (background, &gs_outer.statustext, primary,
             &gs_outer.statustext);
 
@@ -1012,17 +1160,17 @@ void draw_status (const ustring& text) {
     SDL_FreeSurface (face);
 }
 
-void reset_columns_sub () {
+void SDLRender::reset_columns_sub () {
     for (int sti = 0; sti < STC_count; sti++) {
         stat_column_sub[sti] = 0;
     }
 }
 
-int get_column_sub (StatColumn col) {
+int SDLRender::get_column_sub (StatColumn col) {
     return stat_column_sub[col];
 }
 
-void cycle_column_sub (StatColumn col) {
+void SDLRender::cycle_column_sub (StatColumn col) {
     stat_column_sub[col]++;
     stat_column_sub[col] %= 4;
 
@@ -1038,7 +1186,7 @@ void cycle_column_sub (StatColumn col) {
 
 }
 
-StatColumn get_column_from_pos (int x, int y) {
+StatColumn SDLRender::get_column_from_pos (int x, int y) {
     for (int sti = 0; sti < STC_count; sti++) {
         const SDL_Rect& area = stat_screen.columns[sti];
 
@@ -1050,7 +1198,7 @@ StatColumn get_column_from_pos (int x, int y) {
     return STC_count;
 }
 
-static void draw_stat (int y, const ustring& name, uint32_t color,
+void SDLRender::draw_stat (int y, const ustring& name, uint32_t color,
         const Statistic& stat, SDL_Surface* numbers) {
     SDLPango_Matrix mcolor;
 
@@ -1123,28 +1271,30 @@ static void draw_stat (int y, const ustring& name, uint32_t color,
             stat_screen.header.h);
 }
 
-void draw_player_stat (plid_tu id, plid_tu order, const PlInfo& info,
-        const Statistic& stat) {
+void SDLRender::draw_player_stat (plid_tu id, plid_tu order,
+        const PlInfo& info, const Statistic& stat) {
 
     draw_stat (stat_screen.header.y + (order + 1) * 24, info.name, info.color,
             stat, pl_images[id].numbers);
 }
 
-void draw_team_stat (plid_tu id, plid_tu order, const TeamInfo& info,
-        const Statistic& stat) {
+void SDLRender::draw_team_stat (plid_tu id, plid_tu order,
+        const TeamInfo& info, const Statistic& stat) {
     draw_stat (stat_screen.teams_in.y + 2 + order * 24, info.name, info.color,
             stat, team_images[id]);
 }
 
-void draw_fake_face (const Point& pos) {
+void SDLRender::draw_fake_face (const Point& pos) {
     static SDL_Rect dest;
-    
+
     dest.x = pos.x + gs_outer.playerground.x;
     dest.y = pos.y + gs_outer.playerground.y;
-    
+
     SDL_BlitSurface (fake_face, NULL, primary, &dest);
-    
-    SDL_UpdateRects(primary, 1, &dest);
+
+    SDL_UpdateRects (primary, 1, &dest);
 }
 
+inline SDLRender& SDLRender::get_instance () {
+    return instance;
 }

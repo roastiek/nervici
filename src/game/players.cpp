@@ -37,13 +37,13 @@ void Players::initialize (const std::vector<const PlInfo*>& infos,
 
     orders.resize (players.size ());
 
-    Render::load_players (infos, tcolors);
+    render.load_players (infos, tcolors);
     audio.load_players (infos);
 }
 
 void Players::uninitialize () {
     audio.free_players ();
-    Render::free_players ();
+    render.free_players ();
 
     for (size_t pi = 0; pi < players.size (); pi++) {
         delete players[pi];

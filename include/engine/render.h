@@ -15,84 +15,88 @@
 #include "fakes/statistic.h"
 #include "fakes/glibmm_decl.h"
 
-namespace Render {
-bool initialize ();
+class Render {
 
-void uninitialize ();
+public:
+    virtual bool initialize () = 0;
 
-void load_players (const std::vector<const PlInfo*>& infos, const std::vector<
-        uint32_t>& tcolors);
+    virtual void uninitialize () = 0;
 
-void free_players ();
+    virtual void load_players (const std::vector<const PlInfo*>& infos,
+            const std::vector<uint32_t>& tcolors) = 0;
 
-void load_teams (const std::vector<const TeamInfo*>& infos);
+    virtual void free_players () = 0;
 
-void free_teams ();
+    virtual void load_teams (const std::vector<const TeamInfo*>& infos) = 0;
 
-void load_smiles (const SmileSetting& info);
+    virtual void free_teams () = 0;
 
-void free_smiles ();
+    virtual void load_smiles (const SmileSetting& info) = 0;
 
-void draw_game_screen ();
+    virtual void free_smiles () = 0;
 
-void draw_stat_screen ();
+    virtual void draw_game_screen () = 0;
 
-void draw_semafor (int state);
+    virtual void draw_stat_screen () = 0;
 
-void draw_world_items_queue (const std::vector<Point>& queue);
+    virtual void draw_semafor (int state) = 0;
 
-void draw_player_score (plid_tu plid, plid_tu order, score_ti score,
-        PlState state, bool ironized);
+    virtual void draw_world_items_queue (const std::vector<Point>& queue) = 0;
 
-void
-draw_team_score (plid_tu tid, plid_tu order, score_ti score, PlState state);
+    virtual void draw_player_score (plid_tu plid, plid_tu order,
+            score_ti score, PlState state, bool ironized) = 0;
 
-void draw_round (round_tu round);
+    virtual void draw_team_score (plid_tu tid, plid_tu order, score_ti score,
+            PlState state) = 0;
 
-void draw_end ();
+    virtual void draw_round (round_tu round) = 0;
 
-void draw_smile (smileid_tu sid, const Point& pos, int phase = 0);
+    virtual void draw_end () = 0;
 
-void draw_timer (timer_ti time);
+    virtual void
+            draw_smile (smileid_tu sid, const Point& pos, int phase = 0) = 0;
 
-void draw_status (const Glib::ustring& text);
+    virtual void draw_timer (timer_ti time) = 0;
 
-void clear_playerground ();
+    virtual void draw_status (const Glib::ustring& text) = 0;
 
-void clear_smile (const Point& pos);
+    virtual void clear_playerground () = 0;
 
-void update_player (const Point& pos);
+    virtual void clear_smile (const Point& pos) = 0;
 
-void update_screen ();
+    virtual void update_player (const Point& pos) = 0;
 
-void update_smile (const Point& pos);
+    virtual void update_screen () = 0;
 
-wsize_tu get_playerground_width ();
+    virtual void update_smile (const Point& pos) = 0;
 
-wsize_tu get_playerground_height ();
+    virtual wsize_tu get_playerground_width () const = 0;
 
-Screen* create_screen (const Glib::ustring& name);
+    virtual wsize_tu get_playerground_height () const = 0;
 
-int get_width ();
+    virtual Screen* create_screen (const Glib::ustring& name) = 0;
 
-int get_height ();
+    virtual int get_width () const = 0;
 
-void reset_columns_sub ();
+    virtual int get_height () const = 0;
 
-int get_column_sub (StatColumn col);
+    virtual void reset_columns_sub () = 0;
 
-void cycle_column_sub (StatColumn col);
+    virtual int get_column_sub (StatColumn col) = 0;
 
-StatColumn get_column_from_pos (int x, int y);
+    virtual void cycle_column_sub (StatColumn col) = 0;
 
-void draw_player_stat (plid_tu id, plid_tu order, const PlInfo& info,
-        const Statistic& stat);
+    virtual StatColumn get_column_from_pos (int x, int y) = 0;
 
-void draw_team_stat (plid_tu id, plid_tu order, const TeamInfo& info,
-        const Statistic& stat);
+    virtual void draw_player_stat (plid_tu id, plid_tu order,
+            const PlInfo& info, const Statistic& stat) = 0;
 
-void draw_fake_face (const Point& pos);
+    virtual void draw_team_stat (plid_tu id, plid_tu order,
+            const TeamInfo& info, const Statistic& stat) = 0;
 
-}
+    virtual void draw_fake_face (const Point& pos) = 0;
+};
+
+extern Render& render;
 
 #endif
