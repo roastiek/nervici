@@ -320,7 +320,7 @@ int Player::step (const uint8_t *keys) {
     }
     
     if (info.type == PT_AI && is_live()) {
-        ai->calc (exact, angle, jumptime, head);
+        ai->calc (jumptime, head);
     }
     
     return is_live ();

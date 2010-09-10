@@ -26,24 +26,11 @@
 using namespace std;
 using namespace Glib;
 
-#define MAX_TARGET_TRIES 80
+#define MAX_TARGET_TRIES 40
+#define MAX_STEPS 160
+
 
 static ThreadPool* pool = NULL;
-
-Index::Index (size_t v) :
-    value (v % MAX_STEPS) {
-
-}
-
-inline Index::operator size_t () const {
-    return value;
-}
-
-inline Index& Index::operator ++ (int) {
-    value++;
-    value %= MAX_STEPS;
-    return *this;
-}
 
 AIGen0::AIGen0 (Player& pl) :
     player (pl) {
@@ -71,9 +58,7 @@ void AIGen0::finish () {
     abort = true;
 }
 
-void AIGen0::calc (const FPoint& pos, int angle, int jumptime, plsize_tu head) {
-    calc_pos = pos;
-    calc_angle = angle;
+void AIGen0::calc (int jumptime, plsize_tu head) {
     calc_jumptime = jumptime;
     calc_head = head;
     ready = false;
@@ -102,16 +87,9 @@ inline double AIGen0::target_distance (const FPoint& pos) {
     return (res > 25) ? res : 25;
 }
 
-void AIGen0::clear_barier (int from) {
-    for (int bi = from; bi < 8; bi++) {
-        barier[bi] = 0;
-    }
-}
-
 void AIGen0::work () {
     check_target ();
 
-    //make_shortes_plan (calc_pos, calc_angle, calc_jumptime, calc_head, 0);
     Result res_none;
     Result res_left;
     Result res_right;
@@ -220,7 +198,7 @@ smileid_tu AIGen0::find_closest_smile () {
     return result;
 }
 
-Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptime,
+AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptime,
         plsize_tu head, KeySt def, size_t distance) {
 
     FPoint pos = prev_pos;
@@ -349,4 +327,21 @@ Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptime,
     }
 
     return result;
+}
+
+inline AIGen0::Result::Result(size_t d, double t) :
+    dist (d), target (t), jump_dist (MAX_STEPS) {
+
+}
+
+inline AIGen0::Result::Result () {
+    
+}
+
+inline void AIGen0::Result::min_target (double value) {
+    target = (target <= value) ? target : value; 
+}
+
+inline bool AIGen0::Result::operator >= (const Result& other) const {
+    return (dist > other.dist || (dist == other.dist && target <= other.target));
 }
