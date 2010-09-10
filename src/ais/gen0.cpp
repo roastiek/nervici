@@ -222,10 +222,10 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptim
         if (di <= distance && !jump_now) {
             switch (def) {
             case KS_Left:
-                jump_angle[di + 1] = (jump_angle[di] + angles - 1) % angles;
+                jump_angle[di + 1] = (jump_angle[di] + ANGLES - 1) % ANGLES;
                 break;
             case KS_Right:
-                jump_angle[di + 1] = (jump_angle[di] + 1) % angles;
+                jump_angle[di + 1] = (jump_angle[di] + 1) % ANGLES;
                 break;
             default:
                 jump_angle[di + 1] = jump_angle[di];
@@ -278,10 +278,10 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptim
 
         switch (def) {
         case KS_Left:
-            angle = (angle + angles - 1) % angles;
+            angle = (angle + ANGLES - 1) % ANGLES;
             break;
         case KS_Right:
-            angle = (angle + 1) % angles;
+            angle = (angle + 1) % ANGLES;
             break;
         default:
             break;

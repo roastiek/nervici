@@ -9,7 +9,7 @@
 #define	BASIC_DEFS_H
 
 #define DIGITS 1000
-#define angles 160
+#define ANGLES 160
 #define base_speed 12
 #define TEAMS_COUNT 5
 //#define AIS_COUNT 16

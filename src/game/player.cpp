@@ -181,9 +181,9 @@ void Player::live () {
     }
 
     if (keyst == KS_Left)
-        angle = (angle + angles - 1) % angles;
+        angle = (angle + ANGLES - 1) % ANGLES;
     if (keyst == KS_Right)
-        angle = (angle + 1) % angles;
+        angle = (angle + 1) % ANGLES;
     if (jumptime == 0 && keyst == KS_Jump) {
         jumptime = JUMP_REPEAT;
         stat.jump++;

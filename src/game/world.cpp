@@ -54,7 +54,7 @@ void initialize () {
     x = (width >= height) ? height : width;
     x /= 2;
     for (startid_tu s = 0; s < starts.size (); s++) {
-        starts[s].angle = s * angles / starts.size ();
+        starts[s].angle = s * ANGLES / starts.size ();
         starts[s].pos.x = floor (
                 (width / 2 - (x * icos[starts[s].angle] * 0.8)) * DIGITS)
                 / DIGITS;

@@ -1,6 +1,7 @@
 #include "app.h"
 #include "utils.h"
 #include "engine/audio.h"
+#include "engine/sound_profile.h"
 #include "settings/pl_info.h"
 #include "settings/pl_infos.h"
 #include "frames/game_frame.h"
@@ -258,7 +259,7 @@ void PlEditFrame::init_control (Control* par) {
 
     cb_profil->add_item ("zadny");
     for (size_t pi = 0; pi < audio.get_profiles_count (); pi++) {
-        cb_profil->add_item (audio.get_profile (pi));
+        cb_profil->add_item (audio.get_profile (pi).name);
     }
 }
 

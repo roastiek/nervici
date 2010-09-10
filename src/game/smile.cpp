@@ -579,7 +579,7 @@ public:
                     exact = ftest;
                     World::write_hard_smile (id, pos);
                 } else {
-                    angle = random () % angles;
+                    angle = random () % ANGLES;
                 }
             } else {
                 exact = ftest;
@@ -607,7 +607,7 @@ public:
 
                     exact.x = pos.x;
                     exact.y = pos.y;
-                    angle = random () % angles;
+                    angle = random () % ANGLES;
 
                     visible = true;
                     break;
@@ -671,7 +671,7 @@ public:
                     exact = ftest;
                     World::write_hard_smile (id, pos);
                 } else {
-                    angle = random () % angles;
+                    angle = random () % ANGLES;
                 }
             } else {
                 exact = ftest;
@@ -699,7 +699,7 @@ public:
 
                     exact.x = pos.x;
                     exact.y = pos.y;
-                    angle = random () % angles;
+                    angle = random () % ANGLES;
 
                     visible = true;
                     break;
@@ -749,8 +749,8 @@ public:
 
         if (visible) {
             if (random () % 20 == 0) {
-                angle += angles + random () % 41 - 20;
-                angle %= angles;
+                angle += ANGLES + random () % 41 - 20;
+                angle %= ANGLES;
             }
 
             FPoint ftest = exact;
@@ -768,7 +768,7 @@ public:
                     exact = ftest;
                     World::write_hard_smile (id, pos);
                 } else {
-                    angle = random () % angles;
+                    angle = random () % ANGLES;
                 }
             } else {
                 exact = ftest;
@@ -796,7 +796,7 @@ public:
 
                     exact.x = pos.x;
                     exact.y = pos.y;
-                    angle = random () % angles;
+                    angle = random () % ANGLES;
 
                     visible = true;
                     break;
