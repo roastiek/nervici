@@ -30,6 +30,8 @@ public:
 
     void uninitialize ();
 
+    void finish_step_preparation ();
+    
     plid_tu step (const uint8_t * keys);
 
     void update_score ();

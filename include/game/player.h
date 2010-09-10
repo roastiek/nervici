@@ -108,6 +108,9 @@ public:
      * Update player's timer and posiblly call on_pl_timer event
      */
     void timer_func (timer_ti speed);
+    
+    
+    void finish_step_preparation ();
     /*
      * make one player step, depending on state
      * do only something in PS_Live or PS_Clear states

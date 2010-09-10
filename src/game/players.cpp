@@ -52,6 +52,12 @@ void Players::uninitialize () {
     players.clear ();
 }
 
+void Players::finish_step_preparation () {
+    for (plid_tu pi = 0; pi < players.size (); pi++) {
+        players[pi]->finish_step_preparation ();
+    }
+}
+
 plid_tu Players::step (const uint8_t * keys) {
     plid_tu result = 0;
 

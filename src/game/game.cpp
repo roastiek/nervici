@@ -85,7 +85,7 @@ void sleep (timer_ti pause) {
     if (delta > 0) {
         sl_count++;
         SDL_Delay (delta);
-    } else if (delta < - pause){
+    } else if (delta < -pause) {
         sdl_time = SDL_GetTicks () - pause;
         nosmlsl_count++;
     } else {
@@ -302,6 +302,7 @@ void run () {
         keys = SDL_GetKeyState (NULL);
 
         mods.face ().before_step ();
+        players.finish_step_preparation ();
         players.step (keys);
         smiles.step ();
         World::check_starts ();
@@ -309,15 +310,19 @@ void run () {
 
         //off
         /*mods.face ().before_step ();
-        players.step (keys);
-        smiles.step ();
-        World::check_starts ();
-        mods.face ().after_step ();*/
+         players.step (keys);
+         smiles.step ();
+         World::check_starts ();
+         mods.face ().after_step ();*/
 
-        World::render_changed_items ();
-        players.update_bodies ();
-        players.update_score ();
-        teams.update_score ();
+        steps += speed;
+        if (steps > 10) {
+            World::render_changed_items ();
+            players.update_bodies ();
+            players.update_score ();
+            teams.update_score ();
+            steps = 0;
+        }
         //Render::update_screen ();
 
         audio.music_update ();
@@ -335,7 +340,7 @@ void run () {
             }
         }
         players.timer (speed);
-        steps++;
+        //steps++;
     }
 
     audio.music_stop ();
@@ -347,7 +352,7 @@ void run () {
     if (!abort) {
         run_statistic ();
     }
-    
+
     cout << sl_count << " " << nosl_count << " " << nosmlsl_count << '\n';
 
     mods.face ().on_game_end ();

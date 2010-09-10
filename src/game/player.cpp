@@ -278,6 +278,12 @@ void Player::try_revive () {
     }
 }
 
+void Player::finish_step_preparation () {
+    if (ai != NULL) {
+        ai->finish();
+    }
+}
+
 int Player::step (const uint8_t *keys) {
     if (info.type == PT_Human) {
         if (jumptime == 0 && keys[info.keys.jump]) {

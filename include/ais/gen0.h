@@ -87,9 +87,9 @@ private:
     
     double shortes;
 
-    bool ready;
+    volatile bool ready;
     
-    bool abort;
+    volatile bool abort;
     
     FPoint calc_pos;
     
@@ -129,6 +129,8 @@ public:
 
     void calc (const FPoint& pos, int angle, int jumptime, plsize_tu head);
 
+    void finish ();
+    
     KeySt get_next_step ();
 };
 
