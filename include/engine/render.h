@@ -14,6 +14,7 @@
 #include "fakes/smile_setting.h"
 #include "fakes/statistic.h"
 #include "fakes/glibmm_decl.h"
+#include "smile_set_images.h"
 
 class Render {
 
@@ -95,6 +96,11 @@ public:
             const TeamInfo& info, const Statistic& stat) = 0;
 
     virtual void draw_fake_face (const Point& pos) = 0;
+
+    virtual void load_smile_setting_images (SmileSettingImages& images) = 0;
+
+    virtual void free_smile_setting_images (SmileSettingImages& images) = 0;
+
 };
 
 extern Render& render;

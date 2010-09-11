@@ -2,7 +2,7 @@
 
 #include "app.h"
 #include "utils.h"
-#include "engine/loader.h"
+#include "engine/render.h"
 #include "settings/team_info.h"
 #include "settings/team_infos.h"
 #include "settings/setting.h"
@@ -202,11 +202,11 @@ GameFrame::GameFrame () :
             game_info.smiles.counts[sti][li] = 0;
         }
     }
-    Loader::load_smile_setting_images (smile_images);
+    render.load_smile_setting_images (smile_images);
 }
 
 GameFrame::~GameFrame () {
-    Loader::free_smile_setting_images (smile_images);
+    render.free_smile_setting_images (smile_images);
 }
 
 #define trans(color) ((color & 0xff) << 24 | (color & 0xff00) << 8 | (color & 0xff0000) >> 8 | 0xff)

@@ -11,7 +11,6 @@ set (NERVICI_SOURCES
     src/settings/team_infos.cpp
     src/engine/mplayer_decoder.cpp
     src/engine/audio.cpp
-    src/engine/loader.cpp
     src/engine/render.cpp 
     src/game/statistic.cpp
     src/game/smile.cpp 
