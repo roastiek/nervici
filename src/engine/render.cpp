@@ -5,20 +5,18 @@
 #include <glibmm/fileutils.h>
 
 #include "point.h"
+#include "system.h"
+#include "utils.h"
 #include "engine/stat_column.h"
-#include "engine/image_type.h"
+#include "gui/implementor.h"
 #include "gui/screen.h"
 #include "settings/pl_info.h"
 #include "settings/team_info.h"
 #include "settings/setting.h"
 #include "settings/settings.h"
-#include "game/world_item.h"
 #include "game/world.h"
 #include "game/statistic.h"
 #include "game/smile_setting.h"
-#include "system.h"
-#include "gui/implementor.h"
-#include "utils.h"
 
 #include "engine/render.h"
 
@@ -40,11 +38,13 @@ private:
         SDL_Surface *numbers;
     };
 
+    enum ImageType {
+        IMT_Numbers, IMT_Timer, IMT_Semafor, IMT_Heart, IMT_Stats, IMT_Count
+    };
+
     SDL_Surface* primary;
 
     SDL_Surface* background;
-
-    SDL_Surface* merge;
 
     SDL_Rect dest;
 
@@ -131,17 +131,25 @@ private:
 
     void save_screen_setting ();
 
+    void load_game_images ();
+
+    void free_game_images ();
+
+    void load_smile_faces ();
+
+    void free_smile_faces ();
+
     void init_fonts ();
+
+    void free_fonts ();
 
     void init_game_screen ();
 
     void init_stat_screen ();
 
-    void draw_score_numbers (score_ti score, SDL_Surface* numbers, int x_pos,
-            int y_pos, int digit);
+    void init_stat_columns ();
 
-    void draw_score (int y, SDL_Surface *numbers, int score, PlState state,
-            bool ironized);
+    void free_stat_columns ();
 
     SDL_Surface* create_numbers (Uint32 color, Uint32 team);
 
@@ -153,20 +161,14 @@ private:
 
     SDL_Surface* create_ham_face (smilelvl_tu lvl);
 
-    void init_stat_columns ();
+    void draw_score_numbers (score_ti score, SDL_Surface* numbers, int x_pos,
+            int y_pos, int digit);
 
-    void free_stat_columns ();
+    void draw_score (int y, SDL_Surface *numbers, int score, PlState state,
+            bool ironized);
 
     void draw_stat (int y, const ustring& name, uint32_t color,
             const Statistic& stat, SDL_Surface* numbers);
-
-    void load_game_images ();
-
-    void free_game_images ();
-
-    void load_smile_faces ();
-
-    void free_smile_faces ();
 
 public:
     bool initialize ();
@@ -185,6 +187,10 @@ public:
     void load_smiles (const SmileSetting& info);
 
     void free_smiles ();
+
+    void load_smile_setting_images (SmileSettingImages& images);
+
+    void free_smile_setting_images (SmileSettingImages& images);
 
     void draw_game_screen ();
 
@@ -221,6 +227,14 @@ public:
 
     void update_smile (const Point& pos);
 
+    void draw_player_stat (plid_tu id, plid_tu order, const PlInfo& info,
+            const Statistic& stat);
+
+    void draw_team_stat (plid_tu id, plid_tu order, const TeamInfo& info,
+            const Statistic& stat);
+
+    void draw_fake_face (const Point& pos);
+
     wsize_tu get_playerground_width () const;
 
     wsize_tu get_playerground_height () const;
@@ -238,18 +252,6 @@ public:
     void cycle_column_sub (StatColumn col);
 
     StatColumn get_column_from_pos (int x, int y);
-
-    void draw_player_stat (plid_tu id, plid_tu order, const PlInfo& info,
-            const Statistic& stat);
-
-    void draw_team_stat (plid_tu id, plid_tu order, const TeamInfo& info,
-            const Statistic& stat);
-
-    void draw_fake_face (const Point& pos);
-
-    void load_smile_setting_images (SmileSettingImages& images);
-
-    void free_smile_setting_images (SmileSettingImages& images);
 
     static SDLRender& get_instance ();
 };
@@ -308,7 +310,7 @@ static inline void put_pixel (SDL_Surface* face, int x, int y, Uint32 p) {
 }
 
 SDLRender::SDLRender () :
-    primary (NULL), background (NULL), merge (NULL) {
+    primary (NULL), background (NULL) {
 
 }
 
@@ -417,171 +419,6 @@ void SDLRender::init_stat_screen () {
     }
 }
 
-SDL_Surface* SDLRender::create_player_face (Uint32 color) {
-    SDL_Surface* result;
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00,
-            0xff0000, 0xff000000);
-    if (result != NULL) {
-        fill_rect.x = 0;
-        fill_rect.y = 0;
-        fill_rect.w = 256;
-        fill_rect.h = 1;
-
-        SDL_FillRect (result, &fill_rect, color);
-
-        SDL_LockSurface (result);
-        int x;
-        for (x = 0; x < 256; x++) {
-            Uint32 *pix = (Uint32*) result->pixels;
-            pix[x] |= x * 0x1000000;
-        }
-        SDL_UnlockSurface (result);
-    }
-    return result;
-}
-
-SDL_Surface* SDLRender::create_numbers (Uint32 color, Uint32 team) {
-    int x, y;
-    Uint32 p;
-
-    SDL_Surface *result = SDL_CreateRGBSurface (SDL_HWSURFACE,
-            images[IMT_Numbers]->w + 80, images[IMT_Numbers]->h, 32, 0xff,
-            0xff00, 0xff0000, 0);
-    SDL_Surface *temp = SDL_CreateRGBSurface (SDL_HWSURFACE,
-            images[IMT_Numbers]->w + 80, images[IMT_Numbers]->h, 32, 0xff,
-            0xff00, 0xff0000, 0xff000000);
-
-    SDL_LockSurface (temp);
-    SDL_LockSurface (images[IMT_Heart]);
-    for (y = 0; y < 20; y++) {
-        for (x = 0; x < 20; x++) {
-            p = get_pixel (images[IMT_Heart], x + 80, y) & 0xff000000;
-            put_pixel (temp, x + images[IMT_Numbers]->w, y, p | team);
-            put_pixel (temp, x + images[IMT_Numbers]->w + 20, y, p | team);
-            put_pixel (temp, x + images[IMT_Numbers]->w + 40, y, p | team);
-            put_pixel (temp, x + images[IMT_Numbers]->w + 60, y, p | team);
-        }
-    }
-    SDL_UnlockSurface (images[IMT_Heart]);
-    SDL_UnlockSurface (temp);
-
-    SDL_BlitSurface (temp, NULL, result, NULL);
-
-    SDL_FillRect (temp, NULL, 0xff000000);
-
-    SDL_LockSurface (temp);
-    SDL_LockSurface (images[IMT_Numbers]);
-    for (y = 0; y < images[IMT_Numbers]->h; y++) {
-        for (x = 0; x < images[IMT_Numbers]->w; x++) {
-            p = get_pixel (images[IMT_Numbers], x, y) & 0xff000000;
-            put_pixel (temp, x, y, p | color);
-        }
-    }
-    SDL_UnlockSurface (images[IMT_Numbers]);
-    SDL_LockSurface (images[IMT_Heart]);
-    for (y = 0; y < 20; y++) {
-        for (x = 0; x < 80; x++) {
-            p = get_pixel (images[IMT_Heart], x, y) & 0xff000000;
-            put_pixel (temp, x + images[IMT_Numbers]->w, y, p | color);
-        }
-    }
-    SDL_UnlockSurface (images[IMT_Heart]);
-    SDL_UnlockSurface (temp);
-
-    SDL_BlitSurface (temp, NULL, result, NULL);
-    SDL_FreeSurface (temp);
-
-    return result;
-}
-
-void SDLRender::draw_score_numbers (score_ti score, SDL_Surface* numbers,
-        int x_pos, int y_pos, int digit) {
-    static SDL_Rect src;
-    int c;
-
-    dest.y = y_pos;
-
-    int max = 10;
-    int min = -1;
-    for (int ci = 0; ci < digit - 1; ci++) {
-        max *= 10;
-        min *= 10;
-    }
-
-    int cl = images[IMT_Numbers]->w / 12;
-    src.y = 0;
-    src.w = cl;
-    src.h = images[IMT_Numbers]->h;
-    if (score >= 0) {
-        while (score >= max)
-            score /= 10;
-        for (c = 1; c < digit && (score > 0 || c == 1); c++) {
-            src.x = cl * (score % 10);
-            dest.x = x_pos + cl * (digit - c);
-            SDL_BlitSurface (numbers, &src, primary, &dest);
-            score /= 10;
-        }
-        for (; c <= digit; c++) {
-            src.x = cl * 11;
-            dest.x = x_pos + cl * (digit - c);
-            SDL_BlitSurface (numbers, &src, primary, &dest);
-        }
-    } else {
-        while (score <= min)
-            score /= 10;
-        for (c = 1; c <= digit && score < 0; c++) {
-            src.x = cl * ((-score) % 10);
-            dest.x = x_pos + cl * (digit - c);
-            SDL_BlitSurface (numbers, &src, primary, &dest);
-            score /= 10;
-        }
-        src.x = cl * 10;
-        dest.x = x_pos + cl * (digit - c);
-        SDL_BlitSurface (numbers, &src, primary, &dest);
-        c++;
-        for (; c <= digit; c++) {
-            src.x = cl * 11;
-            dest.x = x_pos + cl * (digit - c);
-            SDL_BlitSurface (numbers, &src, primary, &dest);
-        }
-    }
-}
-
-void SDLRender::draw_score (int y, SDL_Surface *numbers, int score,
-        PlState state, bool ironized) {
-#define xoff 4
-#define yoff 4
-    static SDL_Rect src;
-    int cl;
-
-    src.x = images[IMT_Numbers]->w;
-    src.y = 0;
-    src.h = 20;
-    src.w = 20;
-
-    switch (state) {
-    case PS_Live:
-        src.x += (ironized) ? 20 : 0;
-        break;
-    case PS_Clear:
-        src.x += 40;
-        break;
-    default:
-        src.x += 60;
-        break;
-    }
-
-    dest.x = gs_outer.score.x + xoff;
-    dest.y = y + yoff;
-    SDL_BlitSurface (numbers, &src, primary, &dest);
-
-    cl = images[IMT_Numbers]->w / 12;
-    draw_score_numbers (score, numbers, gs_outer.score.x + gs_outer.score.w - 8
-            * cl - xoff, y + yoff, 8);
-    SDL_UpdateRect (primary, gs_outer.score.x, dest.y, gs_outer.score.w,
-            numbers->h);
-}
-
 void SDLRender::init_fonts () {
     SDLPango_Matrix color;
 
@@ -633,6 +470,13 @@ void SDLRender::init_fonts () {
     stat_context = SDLPango_CreateContext_GivenFontDesc ("Sans 20px");
     SDLPango_SetSurfaceCreateArgs (stat_context, SDL_HWSURFACE, 32, 0xff,
             0xff00, 0xff0000, 0xff000000);
+}
+
+void SDLRender::free_fonts () {
+    SDLPango_FreeContext (round_context);
+    SDLPango_FreeContext (end_context);
+    SDLPango_FreeContext (status_context);
+    SDLPango_FreeContext (stat_context);
 }
 
 void SDLRender::init_stat_columns () {
@@ -821,7 +665,7 @@ void SDLRender::load_smile_faces () {
         ustring path;
 
         for (int sti = ST_pozi; sti < ST_cham; sti++) {
-            size_t prefix_len = eyes_masks[sti].length();
+            size_t prefix_len = eyes_masks[sti].length ();
             ustring prefix;
 
             for (size_t i = 0; i < images.size (); i++) {
@@ -836,7 +680,7 @@ void SDLRender::load_smile_faces () {
                 }
             }
 
-            prefix_len = mouth_masks[sti].length();
+            prefix_len = mouth_masks[sti].length ();
             for (size_t i = 0; i < images.size (); i++) {
                 prefix = images[i].substr (0, prefix_len).lowercase ();
 
@@ -851,7 +695,7 @@ void SDLRender::load_smile_faces () {
         }
 
         for (int hi = 0; hi < 3; hi++) {
-            size_t prefix_len = ham_masks[hi].length();
+            size_t prefix_len = ham_masks[hi].length ();
             ustring prefix;
 
             for (size_t i = 0; i < images.size (); i++) {
@@ -895,6 +739,39 @@ void SDLRender::free_smile_faces () {
         SDL_FreeSurface (smile_images.backs[bi]);
     }
 }
+
+void SDLRender::load_smiles (const SmileSetting& info) {
+    for (int sti = ST_pozi; sti < ST_cham; sti++) {
+        for (int li = 0; li < 3; li++) {
+            for (int ci = 0; ci < info.counts[sti][li]; ci++) {
+                SDL_Surface* face = create_smile_face (SmileType (sti), li);
+                smile_faces.push_back (face);
+            }
+        }
+    }
+
+    for (int li = 0; li < 3; li++) {
+        for (int ci = 0; ci < info.counts[ST_cham][li]; ci++) {
+            SDL_Surface* face = create_cham_face (li);
+            smile_faces.push_back (face);
+        }
+    }
+
+    for (int li = 0; li < 3; li++) {
+        for (int ci = 0; ci < info.counts[ST_ham][li]; ci++) {
+            SDL_Surface* face = create_ham_face (li);
+            smile_faces.push_back (face);
+        }
+    }
+}
+
+void SDLRender::free_smiles () {
+    for (size_t si = 0; si < smile_faces.size (); si++) {
+        SDL_FreeSurface (smile_faces[si]);
+    }
+    smile_faces.clear ();
+}
+
 bool SDLRender::initialize () {
     cout << __func__ << '\n';
     int flag;
@@ -913,8 +790,6 @@ bool SDLRender::initialize () {
 
     background = SDL_CreateRGBSurface (SDL_HWSURFACE, setting.width,
             setting.height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
-    merge = SDL_CreateRGBSurface (SDL_HWSURFACE, 1, 1, 32, 0xff, 0xff00,
-            0xff0000, 0x00000000);
 
     fill_rect.x = 0;
     fill_rect.y = 0;
@@ -945,13 +820,8 @@ void SDLRender::uninitialize () {
     free_stat_columns ();
     free_smile_faces ();
     free_game_images ();
-    SDLPango_FreeContext (round_context);
-    SDLPango_FreeContext (end_context);
-    SDLPango_FreeContext (status_context);
-    SDLPango_FreeContext (stat_context);
+    free_fonts ();
 
-    if (merge != NULL)
-        SDL_FreeSurface (merge);
     if (background != NULL)
         SDL_FreeSurface (background);
     if (primary != NULL)
@@ -996,6 +866,236 @@ void SDLRender::free_teams () {
     }
 
     team_images.clear ();
+}
+
+SDL_Surface* SDLRender::create_player_face (Uint32 color) {
+    SDL_Surface* result;
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00,
+            0xff0000, 0xff000000);
+    if (result != NULL) {
+        fill_rect.x = 0;
+        fill_rect.y = 0;
+        fill_rect.w = 256;
+        fill_rect.h = 1;
+
+        SDL_FillRect (result, &fill_rect, color);
+
+        SDL_LockSurface (result);
+        int x;
+        for (x = 0; x < 256; x++) {
+            Uint32 *pix = (Uint32*) result->pixels;
+            pix[x] |= x * 0x1000000;
+        }
+        SDL_UnlockSurface (result);
+    }
+    return result;
+}
+
+SDL_Surface* SDLRender::create_numbers (Uint32 color, Uint32 team) {
+    int x, y;
+    Uint32 p;
+
+    SDL_Surface *result = SDL_CreateRGBSurface (SDL_HWSURFACE,
+            images[IMT_Numbers]->w + 80, images[IMT_Numbers]->h, 32, 0xff,
+            0xff00, 0xff0000, 0);
+    SDL_Surface *temp = SDL_CreateRGBSurface (SDL_HWSURFACE,
+            images[IMT_Numbers]->w + 80, images[IMT_Numbers]->h, 32, 0xff,
+            0xff00, 0xff0000, 0xff000000);
+
+    SDL_LockSurface (temp);
+    SDL_LockSurface (images[IMT_Heart]);
+    for (y = 0; y < 20; y++) {
+        for (x = 0; x < 20; x++) {
+            p = get_pixel (images[IMT_Heart], x + 80, y) & 0xff000000;
+            put_pixel (temp, x + images[IMT_Numbers]->w, y, p | team);
+            put_pixel (temp, x + images[IMT_Numbers]->w + 20, y, p | team);
+            put_pixel (temp, x + images[IMT_Numbers]->w + 40, y, p | team);
+            put_pixel (temp, x + images[IMT_Numbers]->w + 60, y, p | team);
+        }
+    }
+    SDL_UnlockSurface (images[IMT_Heart]);
+    SDL_UnlockSurface (temp);
+
+    SDL_BlitSurface (temp, NULL, result, NULL);
+
+    SDL_FillRect (temp, NULL, 0xff000000);
+
+    SDL_LockSurface (temp);
+    SDL_LockSurface (images[IMT_Numbers]);
+    for (y = 0; y < images[IMT_Numbers]->h; y++) {
+        for (x = 0; x < images[IMT_Numbers]->w; x++) {
+            p = get_pixel (images[IMT_Numbers], x, y) & 0xff000000;
+            put_pixel (temp, x, y, p | color);
+        }
+    }
+    SDL_UnlockSurface (images[IMT_Numbers]);
+    SDL_LockSurface (images[IMT_Heart]);
+    for (y = 0; y < 20; y++) {
+        for (x = 0; x < 80; x++) {
+            p = get_pixel (images[IMT_Heart], x, y) & 0xff000000;
+            put_pixel (temp, x + images[IMT_Numbers]->w, y, p | color);
+        }
+    }
+    SDL_UnlockSurface (images[IMT_Heart]);
+    SDL_UnlockSurface (temp);
+
+    SDL_BlitSurface (temp, NULL, result, NULL);
+    SDL_FreeSurface (temp);
+
+    return result;
+}
+
+SDL_Surface* SDLRender::create_smile_face (SmileType type, smilelvl_tu lvl) {
+    SDL_Surface* result;
+
+    dest.x = 0;
+    dest.y = 0;
+
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 20, 20, 32, 0xff, 0xff00,
+            0xff0000, 0x000000);
+
+    SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
+    int eyes = random () % smile_images.eyes[type].size ();
+    int mouth = random () % smile_images.mouths[type].size ();
+
+    SDL_BlitSurface (smile_images.eyes[type][eyes], NULL, result, &dest);
+    dest.y = 10;
+    SDL_BlitSurface (smile_images.mouths[type][mouth], NULL, result, &dest);
+
+    return result;
+}
+
+SDL_Surface* SDLRender::create_cham_face (smilelvl_tu lvl) {
+    SDL_Surface* result;
+
+    dest.x = 0;
+    dest.y = 0;
+
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 80, 20, 32, 0xff, 0xff00,
+            0xff0000, 0x000000);
+
+    for (int sti = 0; sti < ST_cham; sti++) {
+        dest.y = 0;
+        SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
+
+        int eyes = random () % smile_images.eyes[sti].size ();
+        int mouth = random () % smile_images.mouths[sti].size ();
+
+        SDL_BlitSurface (smile_images.eyes[sti][eyes], NULL, result, &dest);
+        dest.y = 10;
+        SDL_BlitSurface (smile_images.mouths[sti][mouth], NULL, result, &dest);
+        dest.x += 20;
+    }
+
+    return result;
+}
+
+SDL_Surface* SDLRender::create_ham_face (smilelvl_tu lvl) {
+    SDL_Surface* result;
+
+    dest.x = 0;
+    dest.y = 0;
+
+    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00,
+            0xff0000, 0x000000);
+
+    SDL_BlitSurface (smile_images.backs[3 + lvl], NULL, result, &dest);
+    dest.x = 20;
+    SDL_BlitSurface (smile_images.backs[3 + lvl], NULL, result, &dest);
+    int eyes = random () % smile_images.hams[lvl].size ();
+
+    dest.x = 0;
+    SDL_BlitSurface (smile_images.hams[lvl][eyes], NULL, result, &dest);
+
+    return result;
+}
+
+void SDLRender::draw_score_numbers (score_ti score, SDL_Surface* numbers,
+        int x_pos, int y_pos, int digit) {
+    static SDL_Rect src;
+    int c;
+
+    dest.y = y_pos;
+
+    int max = 10;
+    int min = -1;
+    for (int ci = 0; ci < digit - 1; ci++) {
+        max *= 10;
+        min *= 10;
+    }
+
+    int cl = images[IMT_Numbers]->w / 12;
+    src.y = 0;
+    src.w = cl;
+    src.h = images[IMT_Numbers]->h;
+    if (score >= 0) {
+        while (score >= max)
+            score /= 10;
+        for (c = 1; c < digit && (score > 0 || c == 1); c++) {
+            src.x = cl * (score % 10);
+            dest.x = x_pos + cl * (digit - c);
+            SDL_BlitSurface (numbers, &src, primary, &dest);
+            score /= 10;
+        }
+        for (; c <= digit; c++) {
+            src.x = cl * 11;
+            dest.x = x_pos + cl * (digit - c);
+            SDL_BlitSurface (numbers, &src, primary, &dest);
+        }
+    } else {
+        while (score <= min)
+            score /= 10;
+        for (c = 1; c <= digit && score < 0; c++) {
+            src.x = cl * ((-score) % 10);
+            dest.x = x_pos + cl * (digit - c);
+            SDL_BlitSurface (numbers, &src, primary, &dest);
+            score /= 10;
+        }
+        src.x = cl * 10;
+        dest.x = x_pos + cl * (digit - c);
+        SDL_BlitSurface (numbers, &src, primary, &dest);
+        c++;
+        for (; c <= digit; c++) {
+            src.x = cl * 11;
+            dest.x = x_pos + cl * (digit - c);
+            SDL_BlitSurface (numbers, &src, primary, &dest);
+        }
+    }
+}
+
+void SDLRender::draw_score (int y, SDL_Surface *numbers, int score,
+        PlState state, bool ironized) {
+#define xoff 4
+#define yoff 4
+    static SDL_Rect src;
+    int cl;
+
+    src.x = images[IMT_Numbers]->w;
+    src.y = 0;
+    src.h = 20;
+    src.w = 20;
+
+    switch (state) {
+    case PS_Live:
+        src.x += (ironized) ? 20 : 0;
+        break;
+    case PS_Clear:
+        src.x += 40;
+        break;
+    default:
+        src.x += 60;
+        break;
+    }
+
+    dest.x = gs_outer.score.x + xoff;
+    dest.y = y + yoff;
+    SDL_BlitSurface (numbers, &src, primary, &dest);
+
+    cl = images[IMT_Numbers]->w / 12;
+    draw_score_numbers (score, numbers, gs_outer.score.x + gs_outer.score.w - 8
+            * cl - xoff, y + yoff, 8);
+    SDL_UpdateRect (primary, gs_outer.score.x, dest.y, gs_outer.score.w,
+            numbers->h);
 }
 
 void SDLRender::clear_playerground () {
@@ -1184,140 +1284,6 @@ void SDLRender::draw_team_score (plid_tu tid, plid_tu order, score_ti score,
             false);
 }
 
-wsize_tu SDLRender::get_playerground_width () const {
-    return gs_outer.playerground.w;
-}
-
-wsize_tu SDLRender::get_playerground_height () const {
-    return gs_outer.playerground.h;
-}
-
-Screen* SDLRender::create_screen (const ustring& name) {
-
-    class RenderScreen: public Screen {
-    public:
-
-        void set_primary (SDL_Surface* value) {
-            primary = value;
-        }
-
-        void init () {
-            init_control (NULL);
-        }
-    };
-
-    RenderScreen* result = new RenderScreen ();
-    result->set_name (name);
-    result->set_primary (primary);
-    result->init ();
-    return result;
-}
-
-int SDLRender::get_width () const {
-    return primary->w;
-}
-
-int SDLRender::get_height () const {
-    return primary->h;
-}
-
-SDL_Surface* SDLRender::create_smile_face (SmileType type, smilelvl_tu lvl) {
-    SDL_Surface* result;
-
-    dest.x = 0;
-    dest.y = 0;
-
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 20, 20, 32, 0xff, 0xff00,
-            0xff0000, 0x000000);
-
-    SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
-    int eyes = random () % smile_images.eyes[type].size ();
-    int mouth = random () % smile_images.mouths[type].size ();
-
-    SDL_BlitSurface (smile_images.eyes[type][eyes], NULL, result, &dest);
-    dest.y = 10;
-    SDL_BlitSurface (smile_images.mouths[type][mouth], NULL, result, &dest);
-
-    return result;
-}
-
-SDL_Surface* SDLRender::create_cham_face (smilelvl_tu lvl) {
-    SDL_Surface* result;
-
-    dest.x = 0;
-    dest.y = 0;
-
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 80, 20, 32, 0xff, 0xff00,
-            0xff0000, 0x000000);
-
-    for (int sti = 0; sti < ST_cham; sti++) {
-        dest.y = 0;
-        SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
-
-        int eyes = random () % smile_images.eyes[sti].size ();
-        int mouth = random () % smile_images.mouths[sti].size ();
-
-        SDL_BlitSurface (smile_images.eyes[sti][eyes], NULL, result, &dest);
-        dest.y = 10;
-        SDL_BlitSurface (smile_images.mouths[sti][mouth], NULL, result, &dest);
-        dest.x += 20;
-    }
-
-    return result;
-}
-
-SDL_Surface* SDLRender::create_ham_face (smilelvl_tu lvl) {
-    SDL_Surface* result;
-
-    dest.x = 0;
-    dest.y = 0;
-
-    result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00,
-            0xff0000, 0x000000);
-
-    SDL_BlitSurface (smile_images.backs[3 + lvl], NULL, result, &dest);
-    dest.x = 20;
-    SDL_BlitSurface (smile_images.backs[3 + lvl], NULL, result, &dest);
-    int eyes = random () % smile_images.hams[lvl].size ();
-
-    dest.x = 0;
-    SDL_BlitSurface (smile_images.hams[lvl][eyes], NULL, result, &dest);
-
-    return result;
-}
-
-void SDLRender::load_smiles (const SmileSetting& info) {
-    for (int sti = ST_pozi; sti < ST_cham; sti++) {
-        for (int li = 0; li < 3; li++) {
-            for (int ci = 0; ci < info.counts[sti][li]; ci++) {
-                SDL_Surface* face = create_smile_face (SmileType (sti), li);
-                smile_faces.push_back (face);
-            }
-        }
-    }
-
-    for (int li = 0; li < 3; li++) {
-        for (int ci = 0; ci < info.counts[ST_cham][li]; ci++) {
-            SDL_Surface* face = create_cham_face (li);
-            smile_faces.push_back (face);
-        }
-    }
-
-    for (int li = 0; li < 3; li++) {
-        for (int ci = 0; ci < info.counts[ST_ham][li]; ci++) {
-            SDL_Surface* face = create_ham_face (li);
-            smile_faces.push_back (face);
-        }
-    }
-}
-
-void SDLRender::free_smiles () {
-    for (size_t si = 0; si < smile_faces.size (); si++) {
-        SDL_FreeSurface (smile_faces[si]);
-    }
-    smile_faces.clear ();
-}
-
 void SDLRender::draw_smile (smileid_tu sid, const Point& pos, int phase) {
     static SDL_Rect src = {
         0,
@@ -1423,44 +1389,6 @@ void SDLRender::draw_status (const ustring& text) {
     SDL_FreeSurface (face);
 }
 
-void SDLRender::reset_columns_sub () {
-    for (int sti = 0; sti < STC_count; sti++) {
-        stat_column_sub[sti] = 0;
-    }
-}
-
-int SDLRender::get_column_sub (StatColumn col) {
-    return stat_column_sub[col];
-}
-
-void SDLRender::cycle_column_sub (StatColumn col) {
-    stat_column_sub[col]++;
-    stat_column_sub[col] %= 4;
-
-    SDL_Rect dest = stat_screen.columns[col];
-    SDL_Rect src;
-    src.x = 0;
-    src.w = stat_screen.columns[col].w;
-    src.y = 22 * stat_column_sub[col];
-    src.h = 22;
-
-    SDL_BlitSurface (stat_columns[col], &src, primary, &dest);
-    SDL_UpdateRect (primary, dest.x, dest.y, dest.w, dest.h);
-
-}
-
-StatColumn SDLRender::get_column_from_pos (int x, int y) {
-    for (int sti = 0; sti < STC_count; sti++) {
-        const SDL_Rect& area = stat_screen.columns[sti];
-
-        if (x >= area.x && y >= area.y && x < area.x + area.w && y < area.y
-                + area.h)
-            return StatColumn (sti);
-    }
-
-    return STC_count;
-}
-
 void SDLRender::draw_stat (int y, const ustring& name, uint32_t color,
         const Statistic& stat, SDL_Surface* numbers) {
     SDLPango_Matrix mcolor;
@@ -1556,6 +1484,81 @@ void SDLRender::draw_fake_face (const Point& pos) {
     SDL_BlitSurface (fake_face, NULL, primary, &dest);
 
     SDL_UpdateRects (primary, 1, &dest);
+}
+
+wsize_tu SDLRender::get_playerground_width () const {
+    return gs_outer.playerground.w;
+}
+
+wsize_tu SDLRender::get_playerground_height () const {
+    return gs_outer.playerground.h;
+}
+
+Screen* SDLRender::create_screen (const ustring& name) {
+
+    class SDLRenderScreen: public Screen {
+    public:
+
+        void set_primary (SDL_Surface* value) {
+            primary = value;
+        }
+
+        void init () {
+            init_control (NULL);
+        }
+    };
+
+    SDLRenderScreen* result = new SDLRenderScreen ();
+    result->set_name (name);
+    result->set_primary (primary);
+    result->init ();
+    return result;
+}
+
+int SDLRender::get_width () const {
+    return primary->w;
+}
+
+int SDLRender::get_height () const {
+    return primary->h;
+}
+
+void SDLRender::reset_columns_sub () {
+    for (int sti = 0; sti < STC_count; sti++) {
+        stat_column_sub[sti] = 0;
+    }
+}
+
+int SDLRender::get_column_sub (StatColumn col) {
+    return stat_column_sub[col];
+}
+
+void SDLRender::cycle_column_sub (StatColumn col) {
+    stat_column_sub[col]++;
+    stat_column_sub[col] %= 4;
+
+    SDL_Rect dest = stat_screen.columns[col];
+    SDL_Rect src;
+    src.x = 0;
+    src.w = stat_screen.columns[col].w;
+    src.y = 22 * stat_column_sub[col];
+    src.h = 22;
+
+    SDL_BlitSurface (stat_columns[col], &src, primary, &dest);
+    SDL_UpdateRect (primary, dest.x, dest.y, dest.w, dest.h);
+
+}
+
+StatColumn SDLRender::get_column_from_pos (int x, int y) {
+    for (int sti = 0; sti < STC_count; sti++) {
+        const SDL_Rect& area = stat_screen.columns[sti];
+
+        if (x >= area.x && y >= area.y && x < area.x + area.w && y < area.y
+                + area.h)
+            return StatColumn (sti);
+    }
+
+    return STC_count;
 }
 
 inline SDLRender& SDLRender::get_instance () {
