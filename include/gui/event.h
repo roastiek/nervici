@@ -8,7 +8,7 @@
 #ifndef LISTENER_H
 #define	LISTENER_H
 
-#include <SDL_events.h>
+//#include <SDL_events.h>
 
 class Listener;
 

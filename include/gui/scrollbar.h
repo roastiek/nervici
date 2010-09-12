@@ -46,11 +46,11 @@ protected:
 
     void paint ();
 
-    void process_mouse_button_event (SDL_MouseButtonEvent event);
+    void process_mouse_button_event (const SDL_MouseButtonEvent& event);
 
-    void process_mouse_move_event (SDL_MouseMotionEvent event);
+    void process_mouse_move_event (const SDL_MouseMotionEvent& event);
 
-    bool process_key_pressed_event (SDL_KeyboardEvent event);
+    bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
     virtual void on_value_changed (int value);
 

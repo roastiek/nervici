@@ -1,3 +1,5 @@
+#include <SDL_events.h>
+
 #include "utils.h"
 
 #include "gui/key_graber.h"
@@ -8,7 +10,7 @@ KeyGraber::KeyGraber (const ControlParameters& parms) :
 Button (parms), key (-1) {
 }
 
-bool KeyGraber::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool KeyGraber::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
         if (event.keysym.sym != SDLK_SPACE && event.keysym.sym != SDLK_ESCAPE) {
             set_key (event.keysym.sym);

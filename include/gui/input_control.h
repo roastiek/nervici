@@ -14,9 +14,9 @@ class InputControl : public Control {
 private:
 
     struct {
-        Uint32 background;
-        Uint32 text;
-        Uint32 foreground;
+        uint32_t background;
+        uint32_t text;
+        uint32_t foreground;
     } colors;
 
 protected:
@@ -27,17 +27,17 @@ protected:
 
 public:
 
-    virtual void set_input_background (Uint32 value);
+    virtual void set_input_background (uint32_t value);
 
-    virtual void set_input_text (Uint32 value);
+    virtual void set_input_text (uint32_t value);
 
-    virtual void set_input_foreground (Uint32 value);
+    virtual void set_input_foreground (uint32_t value);
 
-    virtual Uint32 get_input_background () const;
+    virtual uint32_t get_input_background () const;
 
-    virtual Uint32 get_input_text () const;
+    virtual uint32_t get_input_text () const;
 
-    virtual Uint32 get_input_foreground () const;
+    virtual uint32_t get_input_foreground () const;
 
 };
 

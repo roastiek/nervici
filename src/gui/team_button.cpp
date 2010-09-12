@@ -15,10 +15,10 @@ void TeamButton::init_control (Control* par) {
 }
 
 void TeamButton::paint () {
-    Uint32 color = (get_selected () > 0) ? (*colors)[get_selected ()] : get_background ();
-    fill_backgound (color);
+    uint32_t color = (get_selected () > 0) ? (*colors)[get_selected ()] : get_background ();
+    canvas->fill_backgound (color);
     if (get_selected () > 0) {
-        draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center, VA_center, to_string<int> (get_selected ()));
+        canvas->draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center, VA_center, to_string<int> (get_selected ()));
     }
 }
 

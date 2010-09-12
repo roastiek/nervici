@@ -1,3 +1,5 @@
+#include <SDL_events.h>
+
 #include "gui/scale.h"
 
 using namespace Glib;
@@ -18,7 +20,7 @@ void Scale::init_control (Control* par) {
 }
 
 void Scale::paint () {
-    fill_backgound (get_background ());
+    canvas->fill_backgound (get_background ());
 
     int steps = get_max () - get_min ();
     int sw = get_screen_width ();
@@ -27,22 +29,22 @@ void Scale::paint () {
     int scale_w = get_width () - slider_w - 2;
 
     for (int si = 0; si <= steps; si++) {
-        draw_vline (slider_w / 2 + 1 + si * scale_w / steps, 0, get_height (), get_foreground ());
+        canvas->draw_vline (slider_w / 2 + 1 + si * scale_w / steps, 0, get_height (), get_foreground ());
     }
 
     int hh = 4 * 1024 / sw;
     int hb = hh * 3;
 
-    draw_box (0, (get_height () - hb) / 2, get_width (), hb, get_background ());
+    canvas->draw_box (0, (get_height () - hb) / 2, get_width (), hb, get_background ());
 
-    draw_rectangle (slider_w / 2 + 1, (get_height () - hh) / 2, scale_w + 1, hh, get_foreground ());
+    canvas->draw_rectangle (slider_w / 2 + 1, (get_height () - hh) / 2, scale_w + 1, hh, get_foreground ());
 
-    draw_box ((get_value () - get_min ()) * scale_w / steps + 1, (get_height () - slider_h) / 2, slider_w, slider_h, C_FILL);
+    canvas->draw_box ((get_value () - get_min ()) * scale_w / steps + 1, (get_height () - slider_h) / 2, slider_w, slider_h, C_FILL);
     int color = (is_focused ()) ? C_FOC_FOREGROUND : C_FOREGROUND;
-    draw_rectangle ((get_value () - get_min ()) * scale_w / steps + 1, (get_height () - slider_h) / 2, slider_w, slider_h, color);
+    canvas->draw_rectangle ((get_value () - get_min ()) * scale_w / steps + 1, (get_height () - slider_h) / 2, slider_w, slider_h, color);
 }
 
-bool Scale::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool Scale::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
         if ((event.keysym.mod & KMOD_ALT) != 0) return false;
         if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
@@ -70,7 +72,7 @@ bool Scale::process_key_pressed_event (SDL_KeyboardEvent event) {
     return Control::process_key_pressed_event (event);
 }
 
-void Scale::process_mouse_button_event (SDL_MouseButtonEvent event) {
+void Scale::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
     if (event.state == SDL_PRESSED) {
         switch (event.button) {
         case SDL_BUTTON_LEFT:

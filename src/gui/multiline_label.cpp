@@ -12,8 +12,8 @@ void MultilineLabel::init_control (Control* par) {
 }
 
 void MultilineLabel::paint () {
-    fill_backgound (get_background ());
-    draw_wrapped_text (1, 1, get_width () - 2, get_height () - 2, get_text ());
+    canvas->fill_backgound (get_background ());
+    canvas->draw_wrapped_text (1, 1, get_width () - 2, get_height () - 2, get_text ());
 }
 
 void MultilineLabel::set_text (const ustring& value) {

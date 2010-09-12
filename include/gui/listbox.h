@@ -26,9 +26,9 @@ struct ListboxParameters : public ControlParameters {
 struct ListItem {
 public:
     Glib::ustring text;
-    Uint32 color;
+    uint32_t color;
 
-    ListItem (const Glib::ustring& txt = "", Uint32 cl = C_INPUT_TEXT);
+    ListItem (const Glib::ustring& txt = "", uint32_t cl = C_INPUT_TEXT);
 };
 
 class Listbox : public InputControl {
@@ -54,24 +54,24 @@ protected:
 
     virtual void paint ();
 
-    void process_mouse_move_event (SDL_MouseMotionEvent event);
+    void process_mouse_move_event (const SDL_MouseMotionEvent& event);
 
-    bool process_key_pressed_event (SDL_KeyboardEvent event);
+    bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
 public:
     virtual void clear ();
 
-    virtual void add_item (const Glib::ustring& text, Uint32 color = C_INPUT_TEXT);
+    virtual void add_item (const Glib::ustring& text, uint32_t color = C_INPUT_TEXT);
 
     virtual const ListItem& get_item (int index);
 
     virtual int get_items_count () const;
 
-    virtual void update_item (int index, const Glib::ustring& text, Uint32 color = C_INPUT_TEXT);
+    virtual void update_item (int index, const Glib::ustring& text, uint32_t color = C_INPUT_TEXT);
 
     virtual void remove_item (int index);
 
-    virtual void insert_item (int index, const Glib::ustring& text, Uint32 color = C_INPUT_TEXT);
+    virtual void insert_item (int index, const Glib::ustring& text, uint32_t color = C_INPUT_TEXT);
 
     virtual void set_selected (int value);
 

@@ -1,3 +1,5 @@
+#include <SDL_events.h>
+
 #include "gui/listbox.h"
 
 using namespace Glib;
@@ -7,7 +9,7 @@ ListboxParameters::ListboxParameters (float nx, float ny, float nw, float nh, fl
 ControlParameters (nx, ny, nw, nh, nf), min_height (nmh), item_height (nih) {
 }
 
-ListItem::ListItem (const ustring& txt, Uint32 cl) :
+ListItem::ListItem (const ustring& txt, uint32_t cl) :
 text (txt),
 color (cl) {
 }
@@ -61,7 +63,7 @@ void Listbox::select_down () {
 
 void Listbox::paint () {
 
-    draw_box (0, 0, get_width (), get_height (), get_input_background ());
+    canvas->draw_box (0, 0, get_width (), get_height (), get_input_background ());
 
     int ih = get_item_height ();
     int y_offset = 0;
@@ -69,16 +71,16 @@ void Listbox::paint () {
 
     for (size_t i = 0; i < items.size (); i++, y_offset += ih) {
         if (int(i) == get_selected ()) {
-            draw_box (0, y_offset, iw, ih, C_FILL);
-            draw_rectangle (0, y_offset, iw, ih, get_foreground ());
+            canvas->draw_box (0, y_offset, iw, ih, C_FILL);
+            canvas->draw_rectangle (0, y_offset, iw, ih, get_foreground ());
         }
         set_font_color (items[i].color);
 
-        draw_text (1, y_offset, iw - 2, ih, HA_left, VA_center, items[i].text);
+        canvas->draw_text (1, y_offset, iw - 2, ih, HA_left, VA_center, items[i].text);
     }
 }
 
-void Listbox::process_mouse_move_event (SDL_MouseMotionEvent event) {
+void Listbox::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
     int ih = get_item_height ();
     int iw = get_width () - 2;
     int index;
@@ -95,7 +97,7 @@ void Listbox::process_mouse_move_event (SDL_MouseMotionEvent event) {
     Control::process_mouse_move_event (event);
 }
 
-bool Listbox::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool Listbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
         if ((event.keysym.mod & KMOD_ALT) != 0) return false;
         if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
@@ -128,7 +130,7 @@ void Listbox::clear () {
     invalidate ();
 }
 
-void Listbox::add_item (const ustring& text, Uint32 color) {
+void Listbox::add_item (const ustring& text, uint32_t color) {
     items.push_back (ListItem (text, color));
 
     int h = items.size () * get_item_height ();
@@ -146,7 +148,7 @@ int Listbox::get_items_count () const {
     return items.size ();
 }
 
-void Listbox::update_item (int index, const ustring& text, Uint32 color) {
+void Listbox::update_item (int index, const ustring& text, uint32_t color) {
     items[index].text = text;
     items[index].color = color;
     invalidate ();
@@ -162,7 +164,7 @@ void Listbox::remove_item (int index) {
     invalidate ();
 }
 
-void Listbox::insert_item (int index, const ustring& text, Uint32 color) {
+void Listbox::insert_item (int index, const ustring& text, uint32_t color) {
     items.insert (items.begin () + index, ListItem (text, color));
     if (get_selected () >= index) {
         set_selected (get_selected () + 1);

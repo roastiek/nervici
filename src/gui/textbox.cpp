@@ -1,3 +1,4 @@
+#include <SDL_events.h>
 
 #include "gui/textbox.h"
 
@@ -20,22 +21,22 @@ Textbox* TextboxFactory::create (Control* par, const ControlParameters& parms,
 }
 
 void Textbox::paint () {
-    fill_backgound (get_input_background ());
-    draw_frame (get_input_foreground ());
+    canvas->fill_backgound (get_input_background ());
+    canvas->draw_frame (get_input_foreground ());
 
-    draw_text (2, 2, get_width () - 4, get_height () - 4, x_offset, VA_center, get_text ());
+    canvas->draw_text (2, 2, get_width () - 4, get_height () - 4, x_offset, VA_center, get_text ());
 
     draw_inner_frame (get_input_background ());
 
     //text.at
 
     if (is_focused ()) {
-        draw_vline (cursor_x + 2, 2, get_height () - 4, C_TEXT_CURSOR);
+        canvas->draw_vline (cursor_x + 2, 2, get_height () - 4, C_TEXT_CURSOR);
     }
 }
 
-void Textbox::draw_inner_frame (Uint32 color) {
-    draw_rectangle (1, 1, get_width () - 2, get_height () - 2, color);
+void Textbox::draw_inner_frame (uint32_t color) {
+    canvas->draw_rectangle (1, 1, get_width () - 2, get_height () - 2, color);
 }
 
 void Textbox::move_cursor_left (int distance) {
@@ -69,7 +70,7 @@ void Textbox::set_cursor (int value) {
     if (cursor > int(tx.length ())) cursor = tx.length ();
 
     ustring part = tx.substr (0, cursor);
-    int w = get_text_width (part);
+    int w = canvas->get_text_width (part);
 
     if (w - x_offset > get_width () - 5) {
         x_offset = w - (get_width () - 5);
@@ -84,7 +85,7 @@ void Textbox::set_cursor (int value) {
     invalidate ();
 }
 
-bool Textbox::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool Textbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
         if ((event.keysym.mod & KMOD_ALT) != 0) return false;
         if ((event.keysym.mod & KMOD_CTRL) != 0) return false;

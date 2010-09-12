@@ -1,3 +1,5 @@
+#include <SDL_events.h>
+
 #include "gui/button.h"
 
 using namespace Glib;
@@ -15,7 +17,7 @@ Button* ButtonFactory::create (Control* par, const ustring& text,
     return result;
 }
 
-bool Button::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool Button::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
         if ((event.keysym.mod & KMOD_ALT) != 0) return false;
         if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
@@ -36,8 +38,8 @@ bool Button::process_key_pressed_event (SDL_KeyboardEvent event) {
 }
 
 void Button::paint () {
-    fill_backgound (get_background ());
-    draw_text (0, 0, get_width (), get_height (), HA_center, VA_center, get_text ());
+    canvas->fill_backgound (get_background ());
+    canvas->draw_text (0, 0, get_width (), get_height (), HA_center, VA_center, get_text ());
 }
 
 void Button::on_focus_gained () {

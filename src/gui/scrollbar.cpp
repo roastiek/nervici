@@ -1,3 +1,5 @@
+#include <SDL_events.h>
+
 #include "gui/scrollbar.h"
 
 using namespace Glib;
@@ -35,9 +37,9 @@ Scrollbar* ScrollbarFactory::create (Control* par,
 }
 
 void Scrollbar::paint () {
-    Uint32 foreground = C_FOREGROUND;
-    Uint32 background = C_BACKGROUND;
-    Uint32 filler = C_FILL;
+    uint32_t foreground = C_FOREGROUND;
+    uint32_t background = C_BACKGROUND;
+    uint32_t filler = C_FILL;
 
     int h = get_height ();
     int w = get_width ();
@@ -48,14 +50,14 @@ void Scrollbar::paint () {
     int y_offset = w;
     y_offset += (max != min) ? rest * value / (max - min) : 0;
 
-    draw_box (1, 1, w - 2, h - 2, background);
-    draw_rectangle (0, y_offset, w, bar, foreground);
-    draw_box (1, y_offset + 1, w - 2, bar - 2, filler);
+    canvas->draw_box (1, 1, w - 2, h - 2, background);
+    canvas->draw_rectangle (0, y_offset, w, bar, foreground);
+    canvas->draw_box (1, y_offset + 1, w - 2, bar - 2, filler);
     
-    draw_aaline (4, w - 4, w / 2, 4, foreground);
-    draw_aaline (w - 5, w - 4, w / 2, 4, foreground);
-    draw_aaline (4, h - w + 4, w / 2, h - 4, foreground);
-    draw_aaline (w - 5, h - w + 4, w / 2, h - 4, foreground);
+    canvas->draw_aaline (4, w - 4, w / 2, 4, foreground);
+    canvas->draw_aaline (w - 5, w - 4, w / 2, 4, foreground);
+    canvas->draw_aaline (4, h - w + 4, w / 2, h - 4, foreground);
+    canvas->draw_aaline (w - 5, h - w + 4, w / 2, h - 4, foreground);
     // draw_frame (border);
 }
 
@@ -67,7 +69,7 @@ void Scrollbar::scroll_dec (int distance) {
     set_value (value - distance);
 }
 
-bool Scrollbar::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool Scrollbar::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
         if ((event.keysym.mod & KMOD_ALT) != 0) return false;
         if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
@@ -95,7 +97,7 @@ bool Scrollbar::process_key_pressed_event (SDL_KeyboardEvent event) {
     return Control::process_key_pressed_event (event);
 }
 
-void Scrollbar::process_mouse_button_event (SDL_MouseButtonEvent event) {
+void Scrollbar::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
     if (event.state == SDL_PRESSED) {
         if (event.button == SDL_BUTTON_LEFT) {
             int w = get_width ();
@@ -134,7 +136,7 @@ void Scrollbar::process_mouse_button_event (SDL_MouseButtonEvent event) {
     Control::process_mouse_button_event (event);
 }
 
-void Scrollbar::process_mouse_move_event (SDL_MouseMotionEvent event) {
+void Scrollbar::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
     if ((event.state & SDL_BUTTON_LMASK) != 0) {
         if (drag_start_y != -1) {
             int h = get_height ();

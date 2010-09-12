@@ -12,8 +12,8 @@ void Label::init_control (Control* par) {
 }
 
 void Label::paint () {
-    fill_backgound (get_background ());
-    draw_text (0, 0, get_width (), get_height (), HA_left, VA_center, get_text ());
+    canvas->fill_backgound (get_background ());
+    canvas->draw_text (0, 0, get_width (), get_height (), HA_left, VA_center, get_text ());
 }
 
 bool Label::is_focusable () const {

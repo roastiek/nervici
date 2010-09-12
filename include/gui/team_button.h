@@ -11,7 +11,7 @@
 #include "basic_defs.h"
 #include "control.h"
 
-typedef Uint32 TeamColors[TEAMS_COUNT];
+typedef uint32_t TeamColors[TEAMS_COUNT];
 
 class TeamButton : public Control {
 private:

@@ -56,7 +56,7 @@ void Screen::on_update (int x, int y, int w, int h) {
     SDL_UpdateRects (primary, 1, &dest);
 }
 
-void Screen::process_event (SDL_Event& event) {
+void Screen::process_event (const SDL_Event& event) {
     Control* under_cursor;
     Control* par;
 

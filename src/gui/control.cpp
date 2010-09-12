@@ -1,3 +1,5 @@
+#include <SDL.h>
+
 #include "utils.h"
 
 #include "gui/control.h"
@@ -6,14 +8,26 @@ using namespace Glib;
 
 ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
         float nf) :
-x (nx), y (ny), w (nw), h (nh), font_size (nf) {
+    x (nx), y (ny), w (nw), h (nh), font_size (nf) {
 }
 
-SDL_Surface *make_surface (int width, int height);
+//SDL_Surface *make_surface (int width, int height);
 
-ustring make_font (const ustring& name, int size) {
-    return name + " " + to_string<int>(size);
+inline ustring make_font (const ustring& name, int size) {
+    return name + " " + to_string<int> (size);
 }
+
+struct KeyEvent {
+    SDL_KeyboardEvent& event;
+
+    KeyEvent (SDL_KeyboardEvent& ev) :
+        event (ev) {
+    }
+    
+    operator SDL_KeyboardEvent& ()  {
+        return event;
+    }
+};
 
 Control::Control (const ControlParameters& pp) :
 parent (NULL),
@@ -22,13 +36,13 @@ focused_child (NULL),
 next (NULL),
 x (0),
 y (0),
-canvas (Canvas::create_canvas()),
-colors ({0, 0, 0}),
+colors ( {  0, 0, 0}),
 valid (true),
 enabled (true),
 focused (false),
 visible (false),
-parms (pp) {
+parms (pp),
+canvas (Canvas::create_canvas()) {
 }
 
 Control::~Control () {
@@ -57,7 +71,8 @@ void Control::reinitialize () {
     set_font_size (p.font_size * sw / STANDARD_WIDTH);
 }
 
-Control* ControlFactory::create (Control* par, const ControlParameters& parms, const ustring& name) {
+Control* ControlFactory::create (Control* par, const ControlParameters& parms,
+        const ustring& name) {
     Control* result = new Control (parms);
     result->set_name (name);
     result->init_control (par);
@@ -102,13 +117,14 @@ void Control::blit (Canvas *dest) {
 }
 
 void Control::update_children (Control* child, int x, int y, int w, int h) {
-    if (child == NULL) return;
+    if (child == NULL)
+        return;
     update_children (child->next, x, y, w, h);
 
-    if (child->get_x () >= x + w
-            && child->get_x () + child->get_width () <= x
-            && child->get_y () >= y + h
-            && child->get_y () + child->get_height () <= y) return;
+    if (child->get_x () >= x + w && child->get_x () + child->get_width () <= x
+            && child->get_y () >= y + h && child->get_y ()
+            + child->get_height () <= y)
+        return;
 
     if (child->is_visible ()) {
         child->update (x, y, w, h);
@@ -128,7 +144,7 @@ void Control::update (int x, int y, int w, int h) {
 
     update_children (children, x - get_x (), y - get_y (), w, h);
     if (get_frame () != 0)
-        draw_frame (get_frame ());
+        canvas->draw_frame (get_frame ());
     on_update (x, y, w, h);
 }
 
@@ -157,9 +173,9 @@ Control* Control::get_child_at_pos (int x, int y) {
     for (; item != NULL; item = item->next) {
         Control* child = item;
         if (child->is_visible ()) {
-            if (child->get_x () <= x && child->get_y () <= y
-                    && child->get_x () + child->get_width () >= x
-                    && child->get_y () + child->get_height () >= y) {
+            if (child->get_x () <= x && child->get_y () <= y && child->get_x ()
+                    + child->get_width () >= x && child->get_y ()
+                    + child->get_height () >= y) {
                 return child;
             }
         }
@@ -172,10 +188,11 @@ Control* Control::control_at_pos (int x, int y) {
     for (; item != NULL; item = item->next) {
         Control* child = item;
         if (child->is_visible ()) {
-            if (child->get_x () <= x && child->get_y () <= y
-                    && child->get_x () + child->get_width () >= x
-                    && child->get_y () + child->get_height () >= y) {
-                return child->control_at_pos (x - child->get_x (), y - child->get_y ());
+            if (child->get_x () <= x && child->get_y () <= y && child->get_x ()
+                    + child->get_width () >= x && child->get_y ()
+                    + child->get_height () >= y) {
+                return child->control_at_pos (x - child->get_x (), y
+                        - child->get_y ());
             }
         }
     }
@@ -186,10 +203,13 @@ Control* Control::control_at_pos (int x, int y) {
  * call grab_focus on childrens in reserved order, but stop before focused_child
  */
 bool Control::switch_focus (Control* item) {
-    if (item == NULL) return false;
-    if (item == focused_child) return false;
+    if (item == NULL)
+        return false;
+    if (item == focused_child)
+        return false;
 
-    if (switch_focus (item->next)) return true;
+    if (switch_focus (item->next))
+        return true;
 
     return item->grab_focus ();
 }
@@ -230,7 +250,8 @@ bool Control::grab_focus () {
             }
             return true;
         } else if (focused_child == NULL) {
-            if (child_grab_focus (children)) return true;
+            if (child_grab_focus (children))
+                return true;
         }
     }
     return false;
@@ -240,9 +261,11 @@ bool Control::grab_focus () {
  * call grab_focus on childrens in reserved order
  */
 bool Control::child_grab_focus (Control* child) {
-    if (child == NULL) return false;
+    if (child == NULL)
+        return false;
 
-    if (child_grab_focus (child->next)) return true;
+    if (child_grab_focus (child->next))
+        return true;
 
     return child->grab_focus ();
 }
@@ -265,6 +288,7 @@ bool Control::process_key_pressed_event (SDL_KeyboardEvent event) {
                 return true;
         }
     }
+    
     return on_key_pressed (event);
 }
 
@@ -292,24 +316,6 @@ void Control::process_mouse_move_event (SDL_MouseMotionEvent event) {
     } else {
         on_mouse_move (event);
     }
-}
-
-void Control::draw_text (int x, int y, int w, int h, HorizontalAling ha, VerticalAling va,
-        const ustring& text) {
-    canvas->draw_text (x, y, w, h, ha, va, text);
-}
-
-void Control::draw_text (int x, int y, int w, int h, int x_shift, 
-        VerticalAling va, const ustring& text) {
-    canvas->draw_text (x, y, w, h, x_shift, va, text);
-}
-
-void Control::draw_wrapped_text (int x, int y, int w, int h, const ustring& text) {
-    canvas->draw_wrapped_text (x, y, w, h, text);
-}
-
-int Control::get_text_width (const ustring& text) {
-    return canvas->get_text_width (text);
 }
 
 void Control::show_all () {
@@ -343,87 +349,15 @@ void Control::hide_popup () {
     SDL_PushEvent (&event);
 }
 
-void Control::draw_frame (Uint32 color) {
-    draw_rectangle (0, 0, get_width (), get_height (), color);
-}
-
-void Control::fill_backgound (Uint32 color) {
-    draw_box (0, 0, get_width (), get_height (), color);
-}
-
-void Control::draw_point (int x, int y, Uint32 color) {
-    canvas->draw_point (x, y, color);
-}
-
-void Control::draw_hline (int x, int y, int w, Uint32 color) {
-    canvas->draw_hline (x, y, w, color);
-}
-
-void Control::draw_vline (int x, int y, int h, Uint32 color) {
-    canvas->draw_vline (x, y, h, color);
-}
-
-void Control::draw_rectangle (int x, int y, int w, int h, Uint32 color) {
-    canvas->draw_rectangle (x, y, w, h, color);
-}
-
-void Control::draw_box (int x, int y, int w, int h, Uint32 color) {
-    canvas->draw_box (x, y, w, h, color);
-}
-
-void Control::draw_line (int x1, int y1, int x2, int y2, Uint32 color) {
-    canvas->draw_line (x1, y1, x2, y2, color);
-}
-
-void Control::draw_aaline (int x1, int y1, int x2, int y2, Uint32 color) {
-    canvas->draw_aaline (x1, y1, x2, y2, color);
-}
-
-void Control::draw_circle (int x, int y, int r, Uint32 color) {
-    canvas->draw_circle (x, y, r, color);
-}
-
-void Control::draw_arc (int x, int y, int r, int start, int end, Uint32 color) {
-    canvas->draw_arc (x, y, r, start, end, color);
-}
-
-void Control::draw_filled_circle (int x, int y, int r, Uint32 color) {
-    canvas->draw_filled_circle (x, y, r, color);
-}
-
-void Control::draw_aacircle (int x, int y, int r, Uint32 color) {
-    canvas->draw_aacircle (x, y, r, color);
-}
-
-void Control::draw_trigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-    canvas->draw_trigon (x1, y1, x2, y2, x3, y3, color);
-}
-
-void Control::draw_filled_trigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-    canvas->draw_filled_trigon (x1, y1, x2, y2, x3, y3, color);
-}
-
-void Control::draw_aatrigon (int x1, int y1, int x2, int y2, int x3, int y3, Uint32 color) {
-    canvas->draw_aatrigon (x1, y1, x2, y2, x3, y3, color);
-}
-
-void Control::draw_image (int x, int y, Canvas* image) {
-    canvas->draw_image (x, y, image);
-}
-
-void Control::draw_image (int x, int y, Canvas* image, int src_x, int src_y, int src_w, int src_h) {
-    canvas->draw_image (x, y, image, src_x, src_y, src_w, src_h);
-}
-
 void Control::on_clicked () {
     call.clicked (this);
 }
 
-void Control::on_mouse_button (SDL_MouseButtonEvent event) {
+void Control::on_mouse_button (const SDL_MouseButtonEvent& event) {
     call.mouse_button (this, event);
 }
 
-void Control::on_mouse_move (SDL_MouseMotionEvent event) {
+void Control::on_mouse_move (const SDL_MouseMotionEvent& event) {
     call.mouse_move (this, event);
 }
 
@@ -435,7 +369,7 @@ void Control::on_mouse_leave () {
     call.mouse_leave (this);
 }
 
-bool Control::on_key_pressed (SDL_KeyboardEvent event) {
+bool Control::on_key_pressed (const SDL_KeyboardEvent& event) {
     return call.key_pressed (this, event);
 }
 
@@ -464,14 +398,14 @@ void Control::on_height_changed (int value) {
 }
 
 void Control::paint () {
-    fill_backgound (get_background ());
+    canvas->fill_backgound (get_background ());
 }
 
 void Control::on_update (int x, int y, int w, int h) {
 }
 
 /*void Control::on_update_child (Control* child) {
-}*/
+ }*/
 
 void Control::register_on_clicked (const OnClicked& handler) {
     call.clicked = handler;
@@ -573,7 +507,7 @@ void Control::set_width (int value) {
 }
 
 void Control::set_height (int value) {
-    if (value != canvas->get_height()) {
+    if (value != canvas->get_height ()) {
         canvas->set_height (value);
         on_height_changed (value);
         invalidate ();

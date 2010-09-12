@@ -1,3 +1,5 @@
+#include <SDL_events.h>
+
 #include "gui/combobox.h"
 
 using namespace Glib;
@@ -56,13 +58,13 @@ void Combobox::select_down () {
 }
 
 void Combobox::paint () {
-    fill_backgound (get_input_background ());
+    canvas->fill_backgound (get_input_background ());
     set_font_color (get_input_text ());
     //draw_frame (C_FOREGROUND);
 
     if (get_selected () >= 0) {
         set_font_color (get_item (get_selected ()).color);
-        draw_text (2, 2, get_width () - 4, get_height () - 4, HA_left,
+        canvas->draw_text (2, 2, get_width () - 4, get_height () - 4, HA_left,
                 VA_center, get_item (get_selected ()).text);
     }
 }
@@ -117,7 +119,7 @@ void Combobox::clear () {
     invalidate ();
 }
 
-void Combobox::add_item (const ustring& text, Uint32 color) {
+void Combobox::add_item (const ustring& text, uint32_t color) {
     list->add_item (text, color);
 }
 
@@ -129,7 +131,7 @@ int Combobox::get_items_count () const {
     return list->get_items_count ();
 }
 
-void Combobox::update_item (int index, const ustring& text, Uint32 color) {
+void Combobox::update_item (int index, const ustring& text, uint32_t color) {
     list->update_item (index, text, color);
     if (index == get_selected ()) {
         invalidate ();
@@ -145,7 +147,7 @@ void Combobox::remove_item (int index) {
     }
 }
 
-void Combobox::insert_item (int index, const ustring& text, Uint32 color) {
+void Combobox::insert_item (int index, const ustring& text, uint32_t color) {
     list->insert_item (index, text, color);
     if (get_selected () >= index) {
         set_selected (get_selected () + 1);

@@ -19,7 +19,7 @@ private:
 protected:
     KeyGraber (const ControlParameters& parms);
 
-    bool process_key_pressed_event (SDL_KeyboardEvent event);
+    bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
 public:
 

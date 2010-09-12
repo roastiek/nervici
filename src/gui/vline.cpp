@@ -13,9 +13,9 @@ void VLine::init_control (Control* par) {
 }
 
 void VLine::paint () {
-    fill_backgound (get_background ());
+    canvas->fill_backgound (get_background ());
     int x = get_width () / 2;
-    draw_line (x, 0, x, get_height (), get_foreground ());
+    canvas->draw_line (x, 0, x, get_height (), get_foreground ());
 }
 
 VLine* VLineFactory::create (Control* parent, const ControlParameters& parms,

@@ -24,7 +24,7 @@ protected:
 
     void on_focus_lost ();
 
-    bool process_key_pressed_event (SDL_KeyboardEvent event);
+    bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
 public:
 

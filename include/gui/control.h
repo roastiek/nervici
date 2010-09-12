@@ -16,6 +16,7 @@
 #include "defaults.h"
 #include "event.h"
 #include "canvas.h"
+#include "fakes/sdl_decl.h"
 
 struct ControlParameters {
     float x;
@@ -30,8 +31,8 @@ class Control {
 public:
 
     typedef Event0<Control*> OnClicked;
-    typedef Event1<Control*, SDL_MouseButtonEvent> OnMouseButton;
-    typedef Event1<Control*, SDL_MouseMotionEvent> OnMouseMove;
+    typedef Event1<Control*, const SDL_MouseButtonEvent&> OnMouseButton;
+    typedef Event1<Control*, const SDL_MouseMotionEvent&> OnMouseMove;
     typedef Event0<Control*> OnFocusGained;
     typedef Event0<Control*> OnFocusLost;
     typedef Event0<Control*> OnMouseEnter;
@@ -44,7 +45,7 @@ public:
     struct OnKeyPressed {
     private:
         Listener* listener;
-        bool (Listener::*callback)(Control*, SDL_KeyboardEvent);
+        bool (Listener::*callback)(Control*, const SDL_KeyboardEvent&);
     public:
 
         OnKeyPressed () :
@@ -53,12 +54,12 @@ public:
         }
 
         template <class T >
-        OnKeyPressed (T* list, void (T::*call) (Control*, SDL_KeyboardEvent)) {
+        OnKeyPressed (T* list, void (T::*call) (Control*, const SDL_KeyboardEvent&)) {
             listener = reinterpret_cast<Listener*> (list);
             callback = reinterpret_cast<void (Listener::*) (Control*)> (call);
         }
 
-        bool operator() (Control* ctl, SDL_KeyboardEvent p1) {
+        bool operator() (Control* ctl, const SDL_KeyboardEvent& p1) {
             if (listener != NULL && callback != NULL) {
                 return (listener->*callback) (ctl, p1);
             }
@@ -74,13 +75,12 @@ private:
 
     int x;
     int y;
-    Canvas* canvas;
     Glib::ustring name;
 
     struct {
-        Uint32 background;
-        Uint32 foreground;
-        Uint32 frame;
+        uint32_t background;
+        uint32_t foreground;
+        uint32_t frame;
     } colors;
 
     bool valid;
@@ -120,6 +120,8 @@ private:
     bool child_grab_focus (Control* child);
 
 protected:
+    Canvas* canvas;
+
     Control (const ControlParameters& parms);
 
     virtual void init_control (Control* par);
@@ -138,67 +140,17 @@ protected:
 
     virtual Control* control_at_pos (int x, int);
 
-    virtual void draw_frame (Uint32 color);
-
-    virtual void fill_backgound (Uint32 color);
-
-    virtual void draw_point (int x, int y, Uint32 color);
-
-    virtual void draw_hline (int x, int y, int w, Uint32 color);
-
-    virtual void draw_vline (int x, int y, int h, Uint32 color);
-
-    virtual void draw_rectangle (int x, int y, int w, int h, Uint32 color);
-
-    virtual void draw_box (int x, int y, int w, int h, Uint32 color);
-
-    virtual void draw_line (int x1, int y1, int x2, int y2, Uint32 color);
-
-    virtual void draw_aaline (int x1, int y1, int x2, int y2, Uint32 color);
-
-    virtual void draw_circle (int x, int y, int r, Uint32 color);
-
-    virtual void draw_arc (int x, int y, int r, int start, int end, Uint32 color);
-
-    virtual void draw_filled_circle (int x, int y, int r, Uint32 color);
-
-    virtual void draw_aacircle (int x, int y, int r, Uint32 color);
-
-    virtual void draw_trigon (int x1, int y1, int x2, int y2,
-            int x3, int y3, Uint32 color);
-
-    virtual void draw_filled_trigon (int x1, int y1, int x2, int y2,
-            int x3, int y3, Uint32 color);
-
-    virtual void draw_aatrigon (int x1, int y1, int x2, int y2,
-            int x3, int y3, Uint32 color);
-
-    virtual void draw_text (int x, int y, int w, int h, HorizontalAling ha,
-            VerticalAling va, const Glib::ustring& text);
-
-    virtual void draw_text (int x, int y, int w, int h, int x_shift,
-            VerticalAling va, const Glib::ustring& text);
-
-    virtual void draw_wrapped_text (int x, int y, int w, int h, const Glib::ustring& text);
-
-    virtual int get_text_width (const Glib::ustring& text);
-
-    virtual void draw_image (int x, int y, Canvas* image);
-
-    virtual void draw_image (int x, int y, Canvas* image,
-            int src_x, int src_y, int src_w, int src_h);
-
     virtual void on_clicked ();
 
-    virtual void on_mouse_button (SDL_MouseButtonEvent event);
+    virtual void on_mouse_button (const SDL_MouseButtonEvent& event);
 
-    virtual void on_mouse_move (SDL_MouseMotionEvent event);
+    virtual void on_mouse_move (const SDL_MouseMotionEvent& event);
 
     virtual void on_mouse_enter ();
 
     virtual void on_mouse_leave ();
 
-    virtual bool on_key_pressed (SDL_KeyboardEvent event);
+    virtual bool on_key_pressed (const SDL_KeyboardEvent& event);
 
     virtual void on_focus_gained ();
 
@@ -269,11 +221,11 @@ public:
 
     virtual void set_visible (bool value);
 
-    virtual void set_foreground (Uint32 value);
+    virtual void set_foreground (uint32_t value);
 
-    virtual void set_background (Uint32 value);
+    virtual void set_background (uint32_t value);
 
-    virtual void set_frame (Uint32 value);
+    virtual void set_frame (uint32_t value);
 
     virtual void set_width (int value);
 
@@ -289,7 +241,7 @@ public:
 
     virtual void set_font (const Glib::ustring& font);
 
-    virtual void set_font_color (Uint32 value);
+    virtual void set_font_color (uint32_t value);
 
     virtual void set_font_size (int value);
 
@@ -313,11 +265,11 @@ public:
 
     virtual bool is_focused () const;
 
-    virtual Uint32 get_foreground () const;
+    virtual uint32_t get_foreground () const;
 
-    virtual Uint32 get_background () const;
+    virtual uint32_t get_background () const;
 
-    virtual Uint32 get_frame () const;
+    virtual uint32_t get_frame () const;
 
     virtual const Glib::ustring& get_name () const;
 

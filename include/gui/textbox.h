@@ -31,9 +31,9 @@ private:
 protected:
     Textbox (const ControlParameters& parms);
 
-    void draw_inner_frame (Uint32 color);
+    void draw_inner_frame (uint32_t color);
 
-    bool process_key_pressed_event (SDL_KeyboardEvent event);
+    bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
     void paint ();
 

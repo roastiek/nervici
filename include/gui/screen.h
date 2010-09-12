@@ -11,6 +11,7 @@
 //#include <SDL.h>
 
 #include "control.h"
+#include "fakes/sdl_decl.h"
 
 /*#ifndef SDL_Surface
 struct SDL_Surface;
@@ -51,7 +52,7 @@ protected:
 public:
     ~Screen ();
 
-    void process_event (SDL_Event& event);
+    void process_event (const SDL_Event& event);
 
     bool is_focusable ();
 };

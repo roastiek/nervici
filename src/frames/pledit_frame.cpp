@@ -1,3 +1,5 @@
+#include <SDL_keysym.h>
+
 #include "app.h"
 #include "utils.h"
 #include "engine/audio.h"
