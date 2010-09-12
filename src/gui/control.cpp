@@ -23,8 +23,8 @@ struct KeyEvent {
     KeyEvent (SDL_KeyboardEvent& ev) :
         event (ev) {
     }
-    
-    operator SDL_KeyboardEvent& ()  {
+
+    operator SDL_KeyboardEvent& () {
         return event;
     }
 };
@@ -270,7 +270,7 @@ bool Control::child_grab_focus (Control* child) {
     return child->grab_focus ();
 }
 
-bool Control::process_key_pressed_event (SDL_KeyboardEvent event) {
+bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (focused_child != NULL) {
         if (focused_child->is_visible () && focused_child->is_enabled ()) {
             if (focused_child->process_key_pressed_event (event)) {
@@ -288,30 +288,32 @@ bool Control::process_key_pressed_event (SDL_KeyboardEvent event) {
                 return true;
         }
     }
-    
+
     return on_key_pressed (event);
 }
 
-void Control::process_mouse_button_event (SDL_MouseButtonEvent event) {
+void Control::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
     Control* child = get_child_at_pos (event.x, event.y);
     if (child != NULL) {
         if (child->is_enabled ()) {
-            event.x -= child->get_x ();
-            event.y -= child->get_y ();
-            child->process_mouse_button_event (event);
+            SDL_MouseButtonEvent next = event;
+            next.x -= child->get_x ();
+            next.y -= child->get_y ();
+            child->process_mouse_button_event (next);
         }
     } else {
         on_mouse_button (event);
     }
 }
 
-void Control::process_mouse_move_event (SDL_MouseMotionEvent event) {
+void Control::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
     Control* child = get_child_at_pos (event.x, event.y);
     if (child != NULL) {
         if (child->is_enabled ()) {
-            event.x -= child->get_x ();
-            event.y -= child->get_y ();
-            child->process_mouse_move_event (event);
+            SDL_MouseMotionEvent next = event;
+            next.x -= child->get_x ();
+            next.y -= child->get_y ();
+            child->process_mouse_move_event (next);
         }
     } else {
         on_mouse_move (event);

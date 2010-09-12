@@ -8,20 +8,9 @@
 #ifndef _DEFAULTS_H
 #define	_DEFAULTS_H
 
-/*#include <SDL.h>
-#include <SDL_Pango.h>*/
-
-//using namespace std;
-
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
-/*#define _MAKE_FNT_NAME(family, size)   family " " #size
-#define FORM_FONT _MAKE_FNT_NAME ("Sans", 12 * 1024 / SCREEN_WIDTH)*/
-
-//extern bool labort;
-
-//#define FRAME_WIDHT 2
 #define C_SCREEN_BACKGROUND 0x000000ff
 #define C_BACKGROUND        0x201008ff
 #define C_FOREGROUND        0xff8040ff

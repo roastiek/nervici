@@ -45,18 +45,18 @@ public:
     struct OnKeyPressed {
     private:
         Listener* listener;
-        bool (Listener::*callback)(Control*, const SDL_KeyboardEvent&);
+        bool (Listener::*callback) (Control*, const SDL_KeyboardEvent&);
     public:
 
         OnKeyPressed () :
-        listener (NULL),
-        callback (NULL) {
+            listener (NULL), callback (NULL) {
         }
 
-        template <class T >
-        OnKeyPressed (T* list, void (T::*call) (Control*, const SDL_KeyboardEvent&)) {
+        template<class T>
+        OnKeyPressed (T* list, void(T::*call) (Control*,
+                const SDL_KeyboardEvent&)) {
             listener = reinterpret_cast<Listener*> (list);
-            callback = reinterpret_cast<void (Listener::*) (Control*)> (call);
+            callback = reinterpret_cast<void(Listener::*) (Control*)> (call);
         }
 
         bool operator() (Control* ctl, const SDL_KeyboardEvent& p1) {
@@ -164,11 +164,11 @@ protected:
 
     virtual void on_height_changed (int value);
 
-    virtual bool process_key_pressed_event (SDL_KeyboardEvent event);
+    virtual bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
-    virtual void process_mouse_button_event (SDL_MouseButtonEvent event);
+    virtual void process_mouse_button_event (const SDL_MouseButtonEvent& event);
 
-    virtual void process_mouse_move_event (SDL_MouseMotionEvent event);
+    virtual void process_mouse_move_event (const SDL_MouseMotionEvent& event);
 
     virtual void paint ();
 
@@ -281,7 +281,8 @@ public:
 
 class ControlFactory {
 public:
-    static Control* create (Control* par, const ControlParameters& parms, const Glib::ustring& = "control");
+    static Control* create (Control* par, const ControlParameters& parms,
+            const Glib::ustring& = "control");
 };
 
 #endif	/* CONTROL_H */
