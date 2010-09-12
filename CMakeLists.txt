@@ -36,7 +36,7 @@ include_directories (SYSTEM
     ${GTHREAD_INCLUDE_DIRS} 
     ${GIOMM_INCLUDE_DIRS} 
     ${SDLPango_INCLUDE_DIRS} 
-cd)
+)
 
 include (nervici)
 include (images)

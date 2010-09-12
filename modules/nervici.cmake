@@ -24,8 +24,8 @@ set (NERVICI_SOURCES
     src/game/teams.cpp 
     src/mods/nervici.cpp 
     src/mods/mod_cervici.cpp
-    src/gui/implementor.cpp 
     src/gui/canvas.cpp 
+    src/gui/sdlcanvas.cpp 
     src/gui/control.cpp 
     src/gui/input_control.cpp 
     src/gui/button.cpp  

@@ -8,7 +8,7 @@
 #include "system.h"
 #include "utils.h"
 #include "engine/stat_column.h"
-#include "gui/implementor.h"
+#include "gui/sdlcanvas.h"
 #include "gui/screen.h"
 #include "settings/pl_info.h"
 #include "settings/team_info.h"
@@ -607,16 +607,16 @@ void SDLRender::load_smile_setting_images (SmileSettingImages& images) {
         dest_area.x = 0;
         dest_area.y = 0;
 
-        class LoaderCanvas: public Canvas {
+        /*class LoaderCanvas: public Canvas {
         public:
 
             SDL_Surface* get_surface () {
                 return impl->surface;
             }
-        };
+        };*/
 
         for (int si = 0; si < SMILE_SETTING_COUNT; si++) {
-            LoaderCanvas* lc = new LoaderCanvas ();
+            SDLCanvas* lc = new SDLCanvas ();
 
             lc->set_width (20);
             lc->set_height (40);

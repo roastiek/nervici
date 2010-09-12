@@ -1,4 +1,4 @@
-#include "gui/implementor.h"
+#include "gui/sdlcanvas.h"
 
 #include "gui/screen.h"
 
@@ -50,7 +50,9 @@ void Screen::on_update (int x, int y, int w, int h) {
     dest.w = w;
     dest.h = h;
 
-    SDL_BlitSurface (canvas->impl->surface, &dest, primary, &dest);
+    SDLCanvas* sdlcanvas = dynamic_cast<SDLCanvas*>(canvas);
+    
+    SDL_BlitSurface (sdlcanvas->get_surface (), &dest, primary, &dest);
     SDL_UpdateRects (primary, 1, &dest);
 }
 
