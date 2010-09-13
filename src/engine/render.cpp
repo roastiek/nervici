@@ -8,8 +8,8 @@
 #include "system.h"
 #include "utils.h"
 #include "engine/stat_column.h"
-#include "gui/sdlcanvas.h"
-#include "gui/screen.h"
+#include "gui/sdl_canvas.h"
+#include "gui/sdl_screen.h"
 #include "settings/pl_info.h"
 #include "settings/team_info.h"
 #include "settings/setting.h"
@@ -608,12 +608,12 @@ void SDLRender::load_smile_setting_images (SmileSettingImages& images) {
         dest_area.y = 0;
 
         /*class LoaderCanvas: public Canvas {
-        public:
+         public:
 
-            SDL_Surface* get_surface () {
-                return impl->surface;
-            }
-        };*/
+         SDL_Surface* get_surface () {
+         return impl->surface;
+         }
+         };*/
 
         for (int si = 0; si < SMILE_SETTING_COUNT; si++) {
             SDLCanvas* lc = new SDLCanvas ();
@@ -1495,23 +1495,9 @@ wsize_tu SDLRender::get_playerground_height () const {
 }
 
 Screen* SDLRender::create_screen (const ustring& name) {
-
-    class SDLRenderScreen: public Screen {
-    public:
-
-        void set_primary (SDL_Surface* value) {
-            primary = value;
-        }
-
-        void init () {
-            init_control (NULL);
-        }
-    };
-
-    SDLRenderScreen* result = new SDLRenderScreen ();
+    SDLScreen* result = new SDLScreen (primary);
     result->set_name (name);
-    result->set_primary (primary);
-    result->init ();
+    result->init_control (NULL);
     return result;
 }
 

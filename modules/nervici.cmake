@@ -25,11 +25,12 @@ set (NERVICI_SOURCES
     src/mods/nervici.cpp 
     src/mods/mod_cervici.cpp
     src/gui/canvas.cpp 
-    src/gui/sdlcanvas.cpp 
+    src/gui/sdl_canvas.cpp 
     src/gui/control.cpp 
     src/gui/input_control.cpp 
     src/gui/button.cpp  
     src/gui/screen.cpp 
+    src/gui/sdl_screen.cpp 
     src/gui/scrollbar.cpp 
     src/gui/view.cpp 
     src/gui/scrollport.cpp 

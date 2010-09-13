@@ -1,4 +1,4 @@
-#include "gui/sdlcanvas.h"
+#include "gui/sdl_canvas.h"
 
 #include "gui/canvas.h"
 

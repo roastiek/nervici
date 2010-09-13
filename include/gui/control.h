@@ -140,30 +140,6 @@ protected:
 
     virtual Control* control_at_pos (int x, int);
 
-    virtual void on_clicked ();
-
-    virtual void on_mouse_button (const SDL_MouseButtonEvent& event);
-
-    virtual void on_mouse_move (const SDL_MouseMotionEvent& event);
-
-    virtual void on_mouse_enter ();
-
-    virtual void on_mouse_leave ();
-
-    virtual bool on_key_pressed (const SDL_KeyboardEvent& event);
-
-    virtual void on_focus_gained ();
-
-    virtual void on_focus_lost ();
-
-    virtual void on_x_changed (int value);
-
-    virtual void on_y_changed (int value);
-
-    virtual void on_width_changed (int value);
-
-    virtual void on_height_changed (int value);
-
     virtual bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
     virtual void process_mouse_button_event (const SDL_MouseButtonEvent& event);
@@ -216,6 +192,30 @@ public:
     virtual void register_on_width_changed (const OnXChanged& handler);
 
     virtual void register_on_height_changed (const OnXChanged& handler);
+
+    virtual void on_clicked ();
+
+    virtual void on_mouse_button (const SDL_MouseButtonEvent& event);
+
+    virtual void on_mouse_move (const SDL_MouseMotionEvent& event);
+
+    virtual void on_mouse_enter ();
+
+    virtual void on_mouse_leave ();
+
+    virtual bool on_key_pressed (const SDL_KeyboardEvent& event);
+
+    virtual void on_focus_gained ();
+
+    virtual void on_focus_lost ();
+
+    virtual void on_x_changed (int value);
+
+    virtual void on_y_changed (int value);
+
+    virtual void on_width_changed (int value);
+
+    virtual void on_height_changed (int value);
 
     virtual void set_parent (Control* value);
 
@@ -272,8 +272,6 @@ public:
     virtual uint32_t get_frame () const;
 
     virtual const Glib::ustring& get_name () const;
-
-    friend class Screen;
 
     friend class ControlFactory;
 

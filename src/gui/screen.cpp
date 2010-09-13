@@ -1,31 +1,17 @@
-#include "gui/sdlcanvas.h"
+#include "gui/sdl_canvas.h"
 
 #include "gui/screen.h"
 
-ControlParameters Screen::parms = ControlParameters (
-        0, 0, 0, 0, 10
-        );
+ControlParameters Screen::parms = ControlParameters (0, 0, 0, 0, 10);
 
 Screen::Screen () :
-Control (parms),
-be_clicked (NULL),
-mouse_target (NULL),
-popup (NULL),
-popup_owner (NULL),
-primary (NULL) {
+    Control (parms), be_clicked (NULL), mouse_target (NULL), popup (NULL),
+            popup_owner (NULL) {
 }
 
 Screen::~Screen () {
     remove_popup (false);
 }
-
-/*Screen* ScreenFactory::create (SDL_Surface* face, const ustring& name) {
-    Screen* result = new Screen ();
-    result->set_name (name);
-    result->primary = face;
-    result->init_control (NULL);
-    return result;
-}*/
 
 void Screen::init_control (Control* par) {
     set_background (C_SCREEN_BACKGROUND);
@@ -35,34 +21,13 @@ void Screen::init_control (Control* par) {
     reinitialize ();
 }
 
-void Screen::reinitialize () {
-    set_x (0);
-    set_y (0);
-    set_width (primary->w);
-    set_height (primary->h);
-}
-
-void Screen::on_update (int x, int y, int w, int h) {
-    SDL_Rect dest;
-
-    dest.x = x;
-    dest.y = y;
-    dest.w = w;
-    dest.h = h;
-
-    SDLCanvas* sdlcanvas = dynamic_cast<SDLCanvas*>(canvas);
-    
-    SDL_BlitSurface (sdlcanvas->get_surface (), &dest, primary, &dest);
-    SDL_UpdateRects (primary, 1, &dest);
-}
-
 void Screen::process_event (const SDL_Event& event) {
     Control* under_cursor;
     Control* par;
 
     switch (event.type) {
     case SDL_KEYDOWN:
-        process_key_pressed_event (event.key);
+        on_key_pressed (event.key);
         break;
 
     case SDL_MOUSEBUTTONDOWN:
@@ -117,8 +82,7 @@ void Screen::process_event (const SDL_Event& event) {
         }
         break;
 
-    case E_PAINT:
-    {
+    case E_PAINT: {
         SDL_Rect* area = static_cast<SDL_Rect*> (event.user.data1);
 
         update (area->x, area->y, area->w, area->h);
@@ -129,7 +93,8 @@ void Screen::process_event (const SDL_Event& event) {
 
     case E_SHOW_POPUP:
         remove_popup (false);
-        add_popup (static_cast<Control*> (event.user.data1), static_cast<Control*> (event.user.data2));
+        add_popup (static_cast<Control*> (event.user.data1),
+                static_cast<Control*> (event.user.data2));
         break;
 
     case E_HIDE_POPUP:
@@ -181,14 +146,6 @@ void Screen::remove_popup (bool restore_focus) {
 void Screen::poput_lost_focus (Control* ctl) {
     remove_popup (true);
     ctl->register_on_focus_lost (OnFocusLost ());
-}
-
-int Screen::get_screen_width () const {
-    return primary->w;
-}
-
-int Screen::get_screen_height () const {
-    return primary->h;
 }
 
 bool Screen::is_focusable () {

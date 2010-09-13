@@ -12,7 +12,7 @@
 
 #include "utils.h"
 
-#include "gui/sdlcanvas.h"
+#include "gui/sdl_canvas.h"
 
 using namespace Glib;
 
@@ -28,16 +28,16 @@ SDLCanvas::SDLCanvas () :
 
 SDLCanvas::~SDLCanvas () {
     if (surface != NULL) {
-        SDL_FreeSurface (surface);
+        SDL_FreeSurface ( surface);
         surface = NULL;
     }
-    SDLPango_FreeContext (pango_context);
+    SDLPango_FreeContext ( pango_context);
 }
 
 void SDLCanvas::set_width (int value) {
     if (width != value) {
         if (surface != NULL) {
-            SDL_FreeSurface (surface);
+            SDL_FreeSurface ( surface);
             surface = NULL;
         }
 
@@ -52,7 +52,7 @@ void SDLCanvas::set_width (int value) {
 void SDLCanvas::set_height (int value) {
     if (height != value) {
         if (surface != NULL) {
-            SDL_FreeSurface (surface);
+            SDL_FreeSurface ( surface);
             surface = NULL;
         }
 
@@ -65,7 +65,7 @@ void SDLCanvas::set_height (int value) {
 }
 
 void SDLCanvas::set_font (const ustring& value) {
-    SDLPango_FreeContext (pango_context);
+    SDLPango_FreeContext ( pango_context);
     font.name = value;
     ustring desc = value + " " + to_string<int> (font.size) + "px";
     pango_context = SDLPango_CreateContext_GivenFontDesc (desc.c_str ());
@@ -86,7 +86,7 @@ void SDLCanvas::set_font_color (Uint32 value) {
 }
 
 void SDLCanvas::set_font_size (int value) {
-    SDLPango_FreeContext (pango_context);
+    SDLPango_FreeContext ( pango_context);
     font.size = value;
     ustring desc = font.name + " " + to_string<int> (value) + "px";
     pango_context = SDLPango_CreateContext_GivenFontDesc (desc.c_str ());
@@ -302,5 +302,4 @@ int SDLCanvas::get_text_width (const ustring& text) {
     SDLPango_SetMarkup (pango_context, text.c_str (), -1);
     return SDLPango_GetLayoutWidth (pango_context);
 }
-
 

@@ -11,8 +11,6 @@ ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
     x (nx), y (ny), w (nw), h (nh), font_size (nf) {
 }
 
-//SDL_Surface *make_surface (int width, int height);
-
 inline ustring make_font (const ustring& name, int size) {
     return name + " " + to_string<int> (size);
 }
@@ -289,7 +287,7 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
         }
     }
 
-    return on_key_pressed (event);
+    return false;
 }
 
 void Control::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
@@ -299,10 +297,8 @@ void Control::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
             SDL_MouseButtonEvent next = event;
             next.x -= child->get_x ();
             next.y -= child->get_y ();
-            child->process_mouse_button_event (next);
+            child->on_mouse_button (next);
         }
-    } else {
-        on_mouse_button (event);
     }
 }
 
@@ -313,10 +309,8 @@ void Control::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
             SDL_MouseMotionEvent next = event;
             next.x -= child->get_x ();
             next.y -= child->get_y ();
-            child->process_mouse_move_event (next);
+            child->on_mouse_move (next);
         }
-    } else {
-        on_mouse_move (event);
     }
 }
 
@@ -357,10 +351,12 @@ void Control::on_clicked () {
 
 void Control::on_mouse_button (const SDL_MouseButtonEvent& event) {
     call.mouse_button (this, event);
+    process_mouse_button_event (event);
 }
 
 void Control::on_mouse_move (const SDL_MouseMotionEvent& event) {
     call.mouse_move (this, event);
+    process_mouse_move_event (event);
 }
 
 void Control::on_mouse_enter () {
@@ -372,7 +368,10 @@ void Control::on_mouse_leave () {
 }
 
 bool Control::on_key_pressed (const SDL_KeyboardEvent& event) {
-    return call.key_pressed (this, event);
+    if (!call.key_pressed (this, event)) {
+        return process_key_pressed_event (event);
+    }
+    return true;
 }
 
 void Control::on_focus_gained () {
@@ -405,9 +404,6 @@ void Control::paint () {
 
 void Control::on_update (int x, int y, int w, int h) {
 }
-
-/*void Control::on_update_child (Control* child) {
- }*/
 
 void Control::register_on_clicked (const OnClicked& handler) {
     call.clicked = handler;
