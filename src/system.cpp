@@ -9,10 +9,11 @@ using namespace Gio;
 
 System System::instance;
 
-System& paths = System::get_instance();
+System& paths = System::get_instance ();
 
-System::System () : config_dir (NULL) {
-    
+System::System () :
+    config_dir (NULL) {
+
 }
 
 void System::init_paths () {
@@ -27,8 +28,8 @@ void System::init_paths () {
 
     const gchar * const *system_data_dirs = g_get_system_data_dirs ();
     for (size_t di = 0; system_data_dirs[di] != NULL; di++) {
-        ustring* str = new ustring(system_data_dirs[di]);
-        str->append("/nervici/");
+        ustring* str = new ustring (system_data_dirs[di]);
+        str->append ("/nervici/");
         data_dirs.push_back (str);
     }
 }
@@ -38,12 +39,10 @@ System::~System () {
         delete config_dir;
         config_dir = NULL;
     }
-    
-    for (size_t di = 0; di < data_dirs.size(); di++) {
+
+    for (size_t di = 0; di < data_dirs.size (); di++) {
         delete data_dirs[di];
     }
-    data_dirs.clear();
+    data_dirs.clear ();
 }
-
-
 

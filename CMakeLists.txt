@@ -11,6 +11,7 @@ find_package (SDL_image REQUIRED)
 find_package (OpenAL REQUIRED)
 find_package (PkgConfig REQUIRED)
 find_package (SDL_gfx REQUIRED)
+find_package (Gettext REQUIRED)
 
 pkg_check_modules (GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules (GTHREAD REQUIRED gthread-2.0)
@@ -42,4 +43,6 @@ include (nervici)
 include (images)
 include (sounds)
 include (music)
+
+add_subdirectory (po)
 

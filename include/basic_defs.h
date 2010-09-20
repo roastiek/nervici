@@ -6,6 +6,11 @@
  */
 
 #ifndef BASIC_DEFS_H
+
+#include <libintl.h>
+
+#define _(str) gettext(str)
+
 #define	BASIC_DEFS_H
 
 #define DIGITS 1000
