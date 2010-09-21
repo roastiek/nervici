@@ -25,17 +25,23 @@ foreach (LOCALE ${SUPPORTED_LOCALES})
     add_custom_target (update-mo-${LOCALE} 
         DEPENDS ${MO_FILE})
 
-    set (MO_FILES ${MO_FILES} ${MO_FILE})
+    list (APPEND MO_FILES ${MO_FILE})
 endforeach (LOCALE)
 
 add_custom_target (update-mo ALL DEPENDS ${MO_FILES})
 
 set (POT_FILE ${CMAKE_CURRENT_BINARY_DIR}/nervici.pot)
 
+set (POT_SOURCES) 
+
+foreach (SOURCE ${NERVICI_SOURCES}) 
+    list (APPEND POT_SOURCES ../${SOURCE})
+endforeach (SOURCE)
+
 add_custom_command (
     OUTPUT ${POT_FILE}
     COMMAND /usr/bin/xgettext 
-    ARGS --directory=${CMAKE_CURRENT_SOURCE_DIR}/..
+    ARGS --directory=${CMAKE_CURRENT_SOURCE_DIR}
          --output=${POT_FILE}
          --keyword=_    
          --flag=_:1:pass-c-format
@@ -43,7 +49,8 @@ add_custom_command (
          --copyright-holder=bobo
          --package-name=nervici
          --package-version=1.0
-         ${NERVICI_SOURCES} 
+         ${POT_SOURCES}
+    DEPENDS ${POT_SOURCES} 
     VERBATIM
 )
 
@@ -65,7 +72,7 @@ foreach (LOCALE ${SUPPORTED_LOCALES})
             ${POT_FILE}
     )
     
-    set (PO_TARGETS ${PO_TARGETS} ${PO_TARGET})
+    list (APPEND PO_TARGETS ${PO_TARGET})
 endforeach (LOCALE)
 
 add_custom_target (update-po DEPENDS ${POT_FILE})

@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <iostream>
 
 #include "system.h"
 #include "engine/render.h"
@@ -22,10 +23,11 @@ static int paint_filter (const SDL_Event* event) {
 
 App App::instance;
 
-App& app = App::get_instance();
+App& app = App::get_instance ();
 
-App::App () : active_frame(NULL), abort (false) {
-    
+App::App () :
+    active_frame (NULL), abort (false) {
+
 }
 
 void App::init_gui () {
@@ -49,12 +51,19 @@ void App::init_gui () {
 
 void App::initialize () {
     paths.init_paths ();
+
+    bindtextdomain ("nervici", (paths.get_data_dir () + "locale/").c_str ());
+    textdomain ("nervici");
+    
+    cout << _("cosii") << '\n';
+
     settings.load ();
     mods.find_mods ();
     pl_infos.load ();
     team_infos.load ();
 
-    if (render.initialize ()) return;
+    if (render.initialize ())
+        return;
     audio.initialize ();
 
     srand (SDL_GetTicks ());
@@ -123,10 +132,10 @@ void App::switch_to_start_frame () {
 }
 
 void App::switch_to_game_frame () {
-    switch_to_frame(game_frame);
+    switch_to_frame (game_frame);
 }
 
 void App::switch_to_pledit_frame () {
-    switch_to_frame(pledit_frame);
+    switch_to_frame (pledit_frame);
 }
 

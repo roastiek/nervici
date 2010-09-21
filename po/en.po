@@ -1,14 +1,14 @@
 # English translations for PACKAGE package.
-# Copyright (C) 2010 THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2010 bobo
 # This file is distributed under the same license as the PACKAGE package.
 # bobo <bobo@localhost>, 2010.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: nervici 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-20 16:10+0200\n"
-"PO-Revision-Date: 2010-09-20 16:22+0200\n"
+"POT-Creation-Date: 2010-09-21 17:57+0200\n"
+"PO-Revision-Date: 2010-09-21 17:59+0200\n"
 "Last-Translator: bobo <bobo@localhost>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/main.cpp:45
-msgid "cosi"
-msgstr "cosi"
+#: ../src/app.cpp:58
+msgid "cosii"
+msgstr "cosii"

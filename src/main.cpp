@@ -41,9 +41,6 @@ int main (int argc, char *argv[]) {
 
     calc_angles ();
 
-    textdomain ("nervici");
-    cout << _("cosi") << '\n';
-
     app.initialize ();
     app.run ();
     app.uninitialize ();
