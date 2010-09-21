@@ -76,13 +76,13 @@ private:
     static const ustring efect_mask[ET_Count];
 
     static const ustring section;
-    
+
     static const ustring st_sound;
-    
+
     static const ustring st_music;
-    
+
     static const ustring st_buffer;
-    
+
     static const ustring st_bfrCount;
 
     AudioOpenAL ();
@@ -364,10 +364,12 @@ void AudioOpenAL::load_music () {
     alSourcefv (music_source, AL_VELOCITY, source_vel);
     alSourcef (music_source, AL_GAIN, setting.music / 20.0);
 
-    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
-        for (mt = 0; mt < MT_Count; mt++) {
+    for (mt = 0; mt < MT_Count; mt++) {
+        dir_name = paths.get_data_dir () + "music/" + suffixs[mt];
+        scan_music_dir (dir_name, music[mt], MusicType (mt));
 
-            dir_name = paths.get_data_dir (di) + "music/" + suffixs[mt];
+        if (paths.check_user_dir ()) {
+            dir_name = paths.get_user_data_dir () + "music/" + suffixs[mt];
             scan_music_dir (dir_name, music[mt], MusicType (mt));
         }
     }
@@ -475,10 +477,15 @@ void AudioOpenAL::scan_sounds_dir (const ustring& path, vector<char>& data) {
 
 void AudioOpenAL::load_sounds () {
     vector<char> data;
+    ustring dir;
+
     data.resize (0xffff);
 
-    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
-        ustring dir = paths.get_data_dir (di) + "sounds/";
+    dir = paths.get_data_dir () + "sounds/";
+    scan_sounds_dir (dir, data);
+
+    if (paths.check_user_dir ()) {
+        dir = paths.get_user_data_dir () + "sounds/";
         scan_sounds_dir (dir, data);
     }
 }

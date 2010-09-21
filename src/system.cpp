@@ -1,5 +1,6 @@
 #include <vector>
 #include <giomm/file.h>
+#include <glibmm/miscutils.h>
 
 #include "system.h"
 
@@ -23,15 +24,15 @@ void System::init_paths () {
         dir->make_directory_with_parents ();
     } catch (Gio::Error) {
     }
+    
+    bool found;
+    
+    string ddir = getenv ("NERVICI_DIR", found);
+    data_dir = new ustring (((found) ? ddir : get_current_dir()) + "/");
 
-    data_dirs.push_back (new ustring (get_user_data_dir () + "/nervici/"));
-
-    const gchar * const *system_data_dirs = g_get_system_data_dirs ();
-    for (size_t di = 0; system_data_dirs[di] != NULL; di++) {
-        ustring* str = new ustring (system_data_dirs[di]);
-        str->append ("/nervici/");
-        data_dirs.push_back (str);
-    }
+    user_data_dir = new ustring (Glib::get_user_data_dir () + "/nervici/");
+    
+    different_data_dirs = data_dir->compare(*user_data_dir) != 0;
 }
 
 System::~System () {
@@ -40,9 +41,14 @@ System::~System () {
         config_dir = NULL;
     }
 
-    for (size_t di = 0; di < data_dirs.size (); di++) {
-        delete data_dirs[di];
+    if (data_dir != NULL) {
+        delete data_dir;
+        data_dir = NULL;
     }
-    data_dirs.clear ();
+    
+    if (user_data_dir != NULL) {
+        delete user_data_dir;
+        user_data_dir = NULL;
+    }
 }
 

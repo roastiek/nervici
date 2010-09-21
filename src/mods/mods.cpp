@@ -22,9 +22,10 @@ union GetFaceHandle {
 
 Mods Mods::instance;
 
-Mods& mods = Mods::get_instance();
+Mods& mods = Mods::get_instance ();
 
-Mods::Mods (): mod_module (NULL), mod (NULL) {
+Mods::Mods () :
+    mod_module (NULL), mod (NULL) {
 
 }
 
@@ -42,9 +43,13 @@ Mods::~Mods () {
 
 void Mods::find_mods () {
     vector<ustring> files;
+    ustring dir;
 
-    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
-        ustring dir = paths.get_data_dir (di) + "mods/";
+    dir = paths.get_data_dir () + "mods/";
+    scan_mods_dir (dir, files);
+
+    if (paths.check_user_dir ()) {
+        dir = paths.get_user_data_dir () + "mods/";
         scan_mods_dir (dir, files);
     }
 

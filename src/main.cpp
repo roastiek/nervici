@@ -31,10 +31,10 @@ static void calc_angles () {
 }
 
 int main (int argc, char *argv[]) {
-    setlocale (LC_ALL, "");
+    setlocale (LC_ALL, ""); 
 
     Glib::init ();
-    Glib::thread_init ();
+    Glib::thread_init (); 
     Gio::init ();
     if (SDL_Init (0))
         return 1;

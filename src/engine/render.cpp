@@ -119,6 +119,8 @@ private:
 
     static const ustring game_images[];
 
+    static const Point game_images_size[];
+
     static const ustring eyes_masks[ST_cham];
 
     static const ustring mouth_masks[ST_cham];
@@ -131,11 +133,11 @@ private:
 
     void save_screen_setting ();
 
-    void load_game_images ();
+    void load_game_images (const ustring& dir);
 
     void free_game_images ();
 
-    void load_smile_faces ();
+    void load_smile_faces (const ustring& dir);
 
     void free_smile_faces ();
 
@@ -150,6 +152,9 @@ private:
     void init_stat_columns ();
 
     void free_stat_columns ();
+
+    bool load_smile_setting_images_in_dir (const ustring& dir,
+            SmileSettingImages& images);
 
     SDL_Surface* create_numbers (Uint32 color, Uint32 team);
 
@@ -272,6 +277,17 @@ const ustring SDLRender::game_images[] = {
     "semafor.png",
     "heart.png",
     "statistic.png"};
+
+const Point SDLRender::game_images_size[] = {
+    {
+        42,
+        36},
+    {
+        100,
+        20},
+    {
+        264,
+        88}};
 
 const ustring SDLRender::eyes_masks[ST_cham] = {
     "pozieyes",
@@ -529,17 +545,21 @@ void SDLRender::free_stat_columns () {
     }
 }
 
-void SDLRender::load_game_images () {
+void SDLRender::load_game_images (const ustring& dir) {
     ustring filename;
 
     images.resize (IMT_Count, NULL);
 
-    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
-        for (int i = IMT_Semafor; i < IMT_Count; i++) {
-            if (images[i] == NULL) {
-                filename = paths.get_data_dir (di) + "images/" + game_images[i
-                        - IMT_Semafor];
-                images[i] = IMG_Load (filename.c_str ());
+    for (int i = IMT_Semafor; i < IMT_Count; i++) {
+        if (images[i] == NULL) {
+            filename = dir + "images/" + game_images[i - IMT_Semafor];
+            images[i] = IMG_Load (filename.c_str ());
+            if (images[i] != NULL) {
+                const Point& size = game_images_size[i - IMT_Semafor];
+                if (images[i]->w != size.x || images[i]->h != size.y) {
+                    SDL_FreeSurface (images[i]);
+                    images[i] = NULL;
+                }
             }
         }
     }
@@ -562,7 +582,9 @@ void SDLRender::load_game_images () {
             0xff0000, 0xff000000);
 
     SDLPango_SetText (context, "0123456789- ", -1);
-    images[IMT_Numbers] = SDLPango_CreateSurfaceDraw (context);
+    if (images[IMT_Numbers] == NULL) {
+        images[IMT_Numbers] = SDLPango_CreateSurfaceDraw (context);
+    }
 
     font_color.m[0][0] = 0xd5;
     font_color.m[1][0] = 0xd5;
@@ -576,7 +598,9 @@ void SDLRender::load_game_images () {
 
     SDLPango_SetText (context, "0123456789:", -1);
     SDLPango_SetDefaultColor (context, &font_color);
-    images[IMT_Timer] = SDLPango_CreateSurfaceDraw (context);
+    if (images[IMT_Timer] == NULL) {
+        images[IMT_Timer] = SDLPango_CreateSurfaceDraw (context);
+    }
 
     SDLPango_FreeContext (context);
 }
@@ -589,45 +613,51 @@ void SDLRender::free_game_images () {
     images.clear ();
 }
 
-void SDLRender::load_smile_setting_images (SmileSettingImages& images) {
-    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
-        ustring filename = paths.get_data_dir (di) + "images/" + smile_setting;
+bool SDLRender::load_smile_setting_images_in_dir (const ustring& dir,
+        SmileSettingImages& images) {
+    ustring filename = dir + "images/" + smile_setting;
 
-        SDL_Surface* smiles = IMG_Load (filename.c_str ());
-        if (smiles == NULL)
-            continue;
+    SDL_Surface* smiles = IMG_Load (filename.c_str ());
+    if (smiles == NULL)
+        return false;
 
-        SDL_Rect src_area;
-        SDL_Rect dest_area;
-
-        src_area.x = 0;
-        src_area.y = 0;
-        src_area.w = 20;
-        src_area.h = 40;
-        dest_area.x = 0;
-        dest_area.y = 0;
-
-        /*class LoaderCanvas: public Canvas {
-         public:
-
-         SDL_Surface* get_surface () {
-         return impl->surface;
-         }
-         };*/
-
-        for (int si = 0; si < SMILE_SETTING_COUNT; si++) {
-            SDLCanvas* lc = new SDLCanvas ();
-
-            lc->set_width (20);
-            lc->set_height (40);
-            SDL_BlitSurface (smiles, &src_area, lc->get_surface (), &dest_area);
-            images[si] = lc;
-            src_area.x += src_area.w;
-        }
-
+    if (smiles->w != SMILE_SETTING_COUNT * 20 || smiles->h != 40) {
         SDL_FreeSurface (smiles);
-        break;
+        return false;
     }
+
+    SDL_Rect src_area;
+    SDL_Rect dest_area;
+
+    src_area.x = 0;
+    src_area.y = 0;
+    src_area.w = 20;
+    src_area.h = 40;
+    dest_area.x = 0;
+    dest_area.y = 0;
+
+    for (int si = 0; si < SMILE_SETTING_COUNT; si++) {
+        SDLCanvas* lc = new SDLCanvas ();
+
+        lc->set_width (20);
+        lc->set_height (40);
+        SDL_BlitSurface (smiles, &src_area, lc->get_surface (), &dest_area);
+        images[si] = lc;
+        src_area.x += src_area.w;
+    }
+
+    SDL_FreeSurface (smiles);
+    return true;
+}
+
+void SDLRender::load_smile_setting_images (SmileSettingImages& images) {
+    if (paths.check_user_dir ()) {
+        if (load_smile_setting_images_in_dir (paths.get_user_data_dir (),
+                images)) {
+            return;
+        }
+    }
+    load_smile_setting_images_in_dir (paths.get_data_dir (), images);
 }
 
 void SDLRender::free_smile_setting_images (SmileSettingImages& images) {
@@ -637,36 +667,35 @@ void SDLRender::free_smile_setting_images (SmileSettingImages& images) {
     }
 }
 
-void SDLRender::load_smile_faces () {
-    cout << __func__ << '\n';
+void SDLRender::load_smile_faces (const ustring& dir) {
+    ustring smiles_dir = dir + "images/smiles/";
+    vector<ustring> images;
 
-    for (size_t di = 0; di < paths.get_data_dirs_count (); di++) {
-        ustring smiles_dir = paths.get_data_dir (di) + "images/smiles/";
-        vector<ustring> images;
+    try {
+        Dir dir (smiles_dir);
 
-        try {
-            Dir dir (smiles_dir);
+        for (DirIterator it = dir.begin (); it != dir.end (); it++) {
+            if ((*it)[0] == '.')
+                continue;
 
-            for (DirIterator it = dir.begin (); it != dir.end (); it++) {
-                if ((*it)[0] == '.')
-                    continue;
-
-                size_t len = (*it).length ();
-                if (len < 4)
-                    continue;
-                ustring suffix =
-                        ustring ((*it).substr (len - 4, 4)).lowercase ();
-                if (suffix.compare (".png") != 0)
-                    continue;
-                images.push_back (*it);
-            }
-        } catch (FileError) {
+            size_t len = (*it).length ();
+            if (len < 4)
+                continue;
+            ustring suffix = ustring ((*it).substr (len - 4, 4)).lowercase ();
+            if (suffix.compare (".png") != 0)
+                continue;
+            images.push_back (*it);
         }
-        ustring path;
+    } catch (FileError) {
+    }
+    ustring path;
 
-        for (int sti = ST_pozi; sti < ST_cham; sti++) {
-            size_t prefix_len = eyes_masks[sti].length ();
-            ustring prefix;
+    ustring prefix;
+    size_t prefix_len;
+
+    for (int sti = ST_pozi; sti < ST_cham; sti++) {
+        if (smile_images.eyes[sti].empty ()) {
+            prefix_len = eyes_masks[sti].length ();
 
             for (size_t i = 0; i < images.size (); i++) {
                 prefix = images[i].substr (0, prefix_len).lowercase ();
@@ -675,11 +704,17 @@ void SDLRender::load_smile_faces () {
                     path = smiles_dir + images[i];
                     SDL_Surface* eyes = IMG_Load (path.c_str ());
                     if (eyes != NULL) {
-                        smile_images.eyes[sti].push_back (eyes);
+                        if (eyes->w == 20 && eyes->h == 10) {
+                            smile_images.eyes[sti].push_back (eyes);
+                        } else {
+                            SDL_FreeSurface (eyes);
+                        }
                     }
                 }
             }
+        }
 
+        if (smile_images.mouths[sti].empty ()) {
             prefix_len = mouth_masks[sti].length ();
             for (size_t i = 0; i < images.size (); i++) {
                 prefix = images[i].substr (0, prefix_len).lowercase ();
@@ -688,15 +723,20 @@ void SDLRender::load_smile_faces () {
                     path = smiles_dir + images[i];
                     SDL_Surface* mouth = IMG_Load (path.c_str ());
                     if (mouth != NULL) {
-                        smile_images.mouths[sti].push_back (mouth);
+                        if (mouth->w == 20 && mouth->h == 10) {
+                            smile_images.mouths[sti].push_back (mouth);
+                        } else {
+                            SDL_FreeSurface (mouth);
+                        }
                     }
                 }
             }
         }
+    }
 
-        for (int hi = 0; hi < 3; hi++) {
-            size_t prefix_len = ham_masks[hi].length ();
-            ustring prefix;
+    for (int hi = 0; hi < 3; hi++) {
+        if (smile_images.hams[hi].empty ()) {
+            prefix_len = ham_masks[hi].length ();
 
             for (size_t i = 0; i < images.size (); i++) {
                 prefix = images[i].substr (0, prefix_len).lowercase ();
@@ -705,16 +745,25 @@ void SDLRender::load_smile_faces () {
                     path = smiles_dir + images[i];
                     SDL_Surface* ham = IMG_Load (path.c_str ());
                     if (ham != NULL) {
-                        smile_images.hams[hi].push_back (ham);
+                        if (ham->w == 40 && ham->h == 20) {
+                            smile_images.hams[hi].push_back (ham);
+                        } else {
+                            SDL_FreeSurface (ham);
+                        }
                     }
                 }
             }
         }
+    }
 
-        for (int bi = 0; bi < 6; bi++) {
-            if (smile_images.backs[bi] == NULL) {
-                path = smiles_dir + "smile" + to_string<int> (bi + 1) + ".png";
-                smile_images.backs[bi] = IMG_Load (path.c_str ());
+    for (int bi = 0; bi < 6; bi++) {
+        if (smile_images.backs[bi] == NULL) {
+            path = smiles_dir + "smile" + to_string<int> (bi + 1) + ".png";
+            smile_images.backs[bi] = IMG_Load (path.c_str ());
+            if (smile_images.backs[bi]->w != 20 || smile_images.backs[bi]->h
+                    != 20) {
+                SDL_FreeSurface (smile_images.backs[bi]);
+                smile_images.backs[bi] = NULL;
             }
         }
     }
@@ -803,8 +852,13 @@ bool SDLRender::initialize () {
     SDL_FillRect (background, &fill_rect, 0x0);
 
     init_fonts ();
-    load_game_images ();
-    load_smile_faces ();
+    if (paths.check_user_dir ()) {
+        load_game_images (paths.get_user_data_dir ());
+        load_smile_faces (paths.get_user_data_dir ());
+    }
+    load_game_images (paths.get_data_dir ());
+    load_smile_faces (paths.get_data_dir ());
+
     init_game_screen ();
     init_stat_screen ();
     init_stat_columns ();

@@ -71,4 +71,11 @@ endforeach (LOCALE)
 add_custom_target (update-po DEPENDS ${POT_FILE})
 add_dependencies (update-po ${PO_TARGETS})
 
+foreach (LOCALE ${SUPPORTED_LOCALES})
+    set (MO_FILE ${CMAKE_CURRENT_BINARY_DIR}/${LOCALE}.mo)
+
+    install (FILES ${MO_FILE}
+        DESTINATION ${DATA_DIR}/locale/${LOCALE}/LC_MESSAGES
+        RENAME nervici.mo)
+endforeach (LOCALE)
 
