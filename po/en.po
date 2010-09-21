@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nervici 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-21 17:57+0200\n"
+"POT-Creation-Date: 2010-09-22 00:00+0200\n"
 "PO-Revision-Date: 2010-09-21 17:59+0200\n"
 "Last-Translator: bobo <bobo@localhost>\n"
 "Language-Team: English\n"
@@ -16,6 +16,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/app.cpp:58
-msgid "cosii"
-msgstr "cosii"
+#: src/engine/render.cpp:547
+msgid "name"
+msgstr ""
+
+#: src/engine/render.cpp:548
+msgid "score"
+msgstr ""
+
+#: src/engine/render.cpp:549
+msgid "length"
+msgstr ""
+
+#~ msgid "cosii"
+#~ msgstr "cosii"

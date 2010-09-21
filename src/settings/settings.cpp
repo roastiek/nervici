@@ -5,6 +5,7 @@
  *      Author: bobo
  */
 
+#include "logger.h"
 #include "settings/setting.h"
 #include "settings/settings.h"
 
@@ -21,6 +22,7 @@ Settings::Settings () {
 }
 
 Settings::~Settings () {
+    logger.fineln ("freeing settings");
     for (size_t si = 0; si < settings.size (); si++) {
         delete settings[si];
     }
@@ -28,12 +30,14 @@ Settings::~Settings () {
 }
 
 void Settings::load () {
+    logger.fineln ("loading settings");
     for (size_t si = 0; si < settings.size (); si++) {
         settings[si]->load ();
     }
 }
 
 void Settings::save () {
+    logger.fineln ("saving settings");
     for (size_t si = 0; si < settings.size (); si++) {
         settings[si]->save ();
     }

@@ -9,7 +9,8 @@
 
 #include <libintl.h>
 
-#define _(str) gettext(str)
+#define _(str) (gettext(str))
+#define N_(str) (str)
 
 #define	BASIC_DEFS_H
 

@@ -1,9 +1,10 @@
 #include <glibmm/ustring.h>
 
 #include "basic_defs.h"
+#include "utils.h"
+#include "logger.h"
 #include "settings/setting.h"
 #include "settings/settings.h"
-#include "utils.h"
 #include "settings/team_info.h"
 
 #include "settings/team_infos.h"
@@ -41,6 +42,7 @@ TeamInfos::TeamInfos () {
 }
 
 TeamInfos::~TeamInfos () {
+    logger.fineln ("freeing teams setting");
     for (size_t ti = 1; ti < infos.size (); ti++) {
         delete infos[ti];
     }
@@ -50,6 +52,8 @@ TeamInfos::~TeamInfos () {
 }
 
 void TeamInfos::load () {
+    logger.fineln ("loading teams setting");
+
     Setting& set = settings.teams ();
 
     ustring section;
@@ -70,6 +74,8 @@ void TeamInfos::load () {
 }
 
 void TeamInfos::save () {
+    logger.fineln ("saving teams setting");
+
     Setting& set = settings.teams ();
 
     ustring section;

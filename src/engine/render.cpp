@@ -1,12 +1,13 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_Pango.h>
-#include <iostream>
 #include <glibmm/fileutils.h>
 
 #include "point.h"
 #include "system.h"
 #include "utils.h"
+#include "logger.h"
+#include "basic_defs.h"
 #include "engine/stat_column.h"
 #include "gui/sdl_canvas.h"
 #include "gui/sdl_screen.h"
@@ -57,8 +58,6 @@ private:
     SDLPango_Context* status_context;
 
     SDLPango_Context* stat_context;
-
-    SDL_Surface* fake_face;
 
     vector<PlayerSurfaces> pl_images;
 
@@ -133,15 +132,15 @@ private:
 
     void save_screen_setting ();
 
-    void load_game_images (const ustring& dir);
+    bool load_game_images (const ustring& dir);
 
     void free_game_images ();
 
-    void load_smile_faces (const ustring& dir);
+    bool load_smile_faces (const ustring& dir);
 
     void free_smile_faces ();
 
-    void init_fonts ();
+    bool init_fonts ();
 
     void free_fonts ();
 
@@ -149,7 +148,7 @@ private:
 
     void init_stat_screen ();
 
-    void init_stat_columns ();
+    bool init_stat_columns ();
 
     void free_stat_columns ();
 
@@ -180,20 +179,20 @@ public:
 
     void uninitialize ();
 
-    void load_players (const std::vector<const PlInfo*>& infos,
+    bool load_players (const std::vector<const PlInfo*>& infos,
             const std::vector<uint32_t>& tcolors);
 
     void free_players ();
 
-    void load_teams (const std::vector<const TeamInfo*>& infos);
+    bool load_teams (const std::vector<const TeamInfo*>& infos);
 
     void free_teams ();
 
-    void load_smiles (const SmileSetting& info);
+    bool load_smiles (const SmileSetting& info);
 
     void free_smiles ();
 
-    void load_smile_setting_images (SmileSettingImages& images);
+    bool load_smile_setting_images (SmileSettingImages& images);
 
     void free_smile_setting_images (SmileSettingImages& images);
 
@@ -326,11 +325,16 @@ static inline void put_pixel (SDL_Surface* face, int x, int y, Uint32 p) {
 }
 
 SDLRender::SDLRender () :
-    primary (NULL), background (NULL) {
+    primary (NULL), background (NULL), round_context (NULL),
+            end_context (NULL), status_context (NULL), stat_context (NULL) {
 
+    for (int sti = STC_name; sti < STC_count; sti++) {
+        stat_columns[sti] = NULL;
+    }
 }
 
 void SDLRender::load_screen_setting () {
+    logger.fineln ("loading screen setting");
     Setting& set = settings.app ();
 
     setting.width = set.read_int (section, st_width, 1024);
@@ -339,6 +343,7 @@ void SDLRender::load_screen_setting () {
 }
 
 void SDLRender::save_screen_setting () {
+    logger.fineln ("saving screen setting");
     Setting& set = settings.app ();
 
     set.write_int (section, st_width, setting.width);
@@ -349,6 +354,7 @@ void SDLRender::save_screen_setting () {
 void SDLRender::init_game_screen () {
 #define inner 6
 #define outer 7
+    logger.fineln ("initialize game screen dimensions");
 
     gs_outer.semafor.w = 146;
     gs_outer.semafor.x = setting.width - gs_outer.semafor.w - outer;
@@ -394,6 +400,8 @@ void SDLRender::init_game_screen () {
 }
 
 void SDLRender::init_stat_screen () {
+    logger.fineln ("initialize statistic screen dimensions");
+
     stat_screen.players_out.x = outer;
     stat_screen.players_out.y = outer;
     stat_screen.players_out.w = setting.width - 2 * outer;
@@ -435,10 +443,17 @@ void SDLRender::init_stat_screen () {
     }
 }
 
-void SDLRender::init_fonts () {
+bool SDLRender::init_fonts () {
+    logger.fineln ("initialize fonts");
+
     SDLPango_Matrix color;
 
     round_context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
+    if (round_context == NULL) {
+        logger.errln ("could not create font \"mono 20 px\"");
+        return false;
+    }
+
     SDLPango_SetSurfaceCreateArgs (round_context, SDL_HWSURFACE, 32, 0xff,
             0xff00, 0xff0000, 0xff000000);
 
@@ -454,6 +469,11 @@ void SDLRender::init_fonts () {
     SDLPango_SetDefaultColor (round_context, &color);
 
     status_context = SDLPango_CreateContext_GivenFontDesc ("Sans 20px");
+    if (status_context == NULL) {
+        logger.errln ("could not create font \"Sans 20 px\"");
+        return false;
+    }
+
     SDLPango_SetSurfaceCreateArgs (status_context, SDL_HWSURFACE, 32, 0xff,
             0xff00, 0xff0000, 0xff000000);
 
@@ -469,6 +489,11 @@ void SDLRender::init_fonts () {
     SDLPango_SetDefaultColor (status_context, &color);
 
     end_context = SDLPango_CreateContext_GivenFontDesc ("Sans 100px");
+    if (end_context == NULL) {
+        logger.errln ("could not create font \"Sans 100 px\"");
+        return false;
+    }
+
     SDLPango_SetSurfaceCreateArgs (end_context, SDL_HWSURFACE, 32, 0xff,
             0xff00, 0xff0000, 0xff000000);
 
@@ -484,36 +509,67 @@ void SDLRender::init_fonts () {
     SDLPango_SetDefaultColor (end_context, &color);
 
     stat_context = SDLPango_CreateContext_GivenFontDesc ("Sans 20px");
+    if (stat_context == NULL) {
+        logger.errln ("could not create font \"Sans 20 px\"");
+        return false;
+    }
+
     SDLPango_SetSurfaceCreateArgs (stat_context, SDL_HWSURFACE, 32, 0xff,
             0xff00, 0xff0000, 0xff000000);
+
+    return true;
 }
 
 void SDLRender::free_fonts () {
-    SDLPango_FreeContext (round_context);
-    SDLPango_FreeContext (end_context);
-    SDLPango_FreeContext (status_context);
-    SDLPango_FreeContext (stat_context);
+    logger.fineln ("freeing fonts");
+    if (round_context != NULL) {
+        SDLPango_FreeContext (round_context);
+        round_context = NULL;
+    }
+    if (end_context != NULL) {
+        SDLPango_FreeContext (end_context);
+        end_context = NULL;
+    }
+    if (status_context != NULL) {
+        SDLPango_FreeContext (status_context);
+        status_context = NULL;
+    }
+    if (stat_context != NULL) {
+        SDLPango_FreeContext (stat_context);
+        stat_context = NULL;
+    }
 }
 
-void SDLRender::init_stat_columns () {
-    static const char * const names[] = {
-        "menno",
-        "score",
-        "delka"};
+bool SDLRender::init_stat_columns () {
+    logger.fineln ("initialze statistic columns captions");
 
-    for (int sti = STC_name; sti < STC_count; sti++) {
+    static const char * const names[] = {
+        N_("name"),
+        N_("score"),
+        N_("length")};
+
+    for (int sti = 0; sti < STC_count; sti++) {
         stat_columns[sti] = SDL_CreateRGBSurface (SDL_HWSURFACE,
                 stat_screen.columns[sti].w, stat_screen.columns[sti].h * 4, 32,
                 0xff, 0xff00, 0xff0000, 0x00000000);
+        if (stat_columns[sti] == NULL) {
+            logger.fineln ("could not create surface");
+            return false;
+        }
         SDL_FillRect (stat_columns[sti], NULL, 0);
     }
 
     SDL_Surface* text;
     SDL_Rect src;
 
-    for (int sti = STC_name; sti < STC_deaths; sti++) {
-        SDLPango_SetMarkup (status_context, names[sti], -1);
+    for (int sti = 0; sti < STC_deaths; sti++) {
+        SDLPango_SetMarkup (status_context, gettext (names[sti]), -1);
         text = SDLPango_CreateSurfaceDraw (status_context);
+        if (text == NULL) {
+            logger.fineln ("could not render text");
+            continue;
+        }
+
         src.x = 0;
         src.w = (text->w <= stat_screen.columns[sti].w - 4) ? text->w
                 : (stat_screen.columns[sti].w - 4);
@@ -537,15 +593,23 @@ void SDLRender::init_stat_columns () {
         SDL_BlitSurface (images[IMT_Stats], &src, stat_columns[sti], &dest);
         src.x += 22;
     }
+    return true;
 }
 
 void SDLRender::free_stat_columns () {
+    logger.fineln ("freeing statistic columns captions");
     for (int sti = STC_name; sti < STC_count; sti++) {
-        SDL_FreeSurface (stat_columns[sti]);
+        if (stat_columns[sti] != NULL) {
+            SDL_FreeSurface (stat_columns[sti]);
+            stat_columns[sti] = NULL;
+        }
     }
 }
 
-void SDLRender::load_game_images (const ustring& dir) {
+bool SDLRender::load_game_images (const ustring& dir) {
+    logger.fineln ("loading images in %s", dir.c_str ());
+    bool result = true;
+
     ustring filename;
 
     images.resize (IMT_Count, NULL);
@@ -557,11 +621,16 @@ void SDLRender::load_game_images (const ustring& dir) {
             if (images[i] != NULL) {
                 const Point& size = game_images_size[i - IMT_Semafor];
                 if (images[i]->w != size.x || images[i]->h != size.y) {
+                    logger.warnln ("image %s has wrong size, skipping",
+                            filename.c_str ());
                     SDL_FreeSurface (images[i]);
                     images[i] = NULL;
                 }
+            } else {
+                logger.fineln ("could not load %s image", filename.c_str ());
             }
         }
+        result &= images[i] != NULL;
     }
 
     SDLPango_Context* context;
@@ -577,35 +646,42 @@ void SDLRender::load_game_images (const ustring& dir) {
     font_color.m[3][1] = 0xff;
 
     context = SDLPango_CreateContext_GivenFontDesc ("mono 20px");
-    SDLPango_SetDefaultColor (context, &font_color);
-    SDLPango_SetSurfaceCreateArgs (context, SDL_SWSURFACE, 32, 0xff, 0xff00,
-            0xff0000, 0xff000000);
+    if (context != NULL) {
+        SDLPango_SetDefaultColor (context, &font_color);
+        SDLPango_SetSurfaceCreateArgs (context, SDL_SWSURFACE, 32, 0xff,
+                0xff00, 0xff0000, 0xff000000);
 
-    SDLPango_SetText (context, "0123456789- ", -1);
-    if (images[IMT_Numbers] == NULL) {
-        images[IMT_Numbers] = SDLPango_CreateSurfaceDraw (context);
+        SDLPango_SetText (context, "0123456789- ", -1);
+        if (images[IMT_Numbers] == NULL) {
+            images[IMT_Numbers] = SDLPango_CreateSurfaceDraw (context);
+        }
+
+        font_color.m[0][0] = 0xd5;
+        font_color.m[1][0] = 0xd5;
+        font_color.m[2][0] = 0xff;
+        font_color.m[3][0] = 0;
+
+        font_color.m[0][1] = 0xd5;
+        font_color.m[1][1] = 0xd5;
+        font_color.m[2][1] = 0xff;
+        font_color.m[3][1] = 0xff;
+
+        SDLPango_SetText (context, "0123456789:", -1);
+        SDLPango_SetDefaultColor (context, &font_color);
+        if (images[IMT_Timer] == NULL) {
+            images[IMT_Timer] = SDLPango_CreateSurfaceDraw (context);
+        }
+
+        SDLPango_FreeContext (context);
     }
+    result &= images[IMT_Numbers] != NULL;
+    result &= images[IMT_Timer] != NULL;
 
-    font_color.m[0][0] = 0xd5;
-    font_color.m[1][0] = 0xd5;
-    font_color.m[2][0] = 0xff;
-    font_color.m[3][0] = 0;
-
-    font_color.m[0][1] = 0xd5;
-    font_color.m[1][1] = 0xd5;
-    font_color.m[2][1] = 0xff;
-    font_color.m[3][1] = 0xff;
-
-    SDLPango_SetText (context, "0123456789:", -1);
-    SDLPango_SetDefaultColor (context, &font_color);
-    if (images[IMT_Timer] == NULL) {
-        images[IMT_Timer] = SDLPango_CreateSurfaceDraw (context);
-    }
-
-    SDLPango_FreeContext (context);
+    return result;
 }
 
 void SDLRender::free_game_images () {
+    logger.fineln ("freeing images");
     for (size_t si = 0; si < images.size (); si++) {
         SDL_FreeSurface (images[si]);
     }
@@ -617,11 +693,14 @@ bool SDLRender::load_smile_setting_images_in_dir (const ustring& dir,
         SmileSettingImages& images) {
     ustring filename = dir + "images/" + smile_setting;
 
+    logger.fineln ("loading %s", filename.c_str ());
+
     SDL_Surface* smiles = IMG_Load (filename.c_str ());
     if (smiles == NULL)
         return false;
 
     if (smiles->w != SMILE_SETTING_COUNT * 20 || smiles->h != 40) {
+        logger.warnln ("%s has wrong size, skipping", filename.c_str ());
         SDL_FreeSurface (smiles);
         return false;
     }
@@ -650,26 +729,31 @@ bool SDLRender::load_smile_setting_images_in_dir (const ustring& dir,
     return true;
 }
 
-void SDLRender::load_smile_setting_images (SmileSettingImages& images) {
+bool SDLRender::load_smile_setting_images (SmileSettingImages& images) {
+    logger.fineln ("loading smile setting images");
     if (paths.check_user_dir ()) {
         if (load_smile_setting_images_in_dir (paths.get_user_data_dir (),
                 images)) {
-            return;
+            return true;
         }
     }
-    load_smile_setting_images_in_dir (paths.get_data_dir (), images);
+    return load_smile_setting_images_in_dir (paths.get_data_dir (), images);
 }
 
 void SDLRender::free_smile_setting_images (SmileSettingImages& images) {
+    logger.fineln ("freeing smile setting images");
     for (int si = 0; si < SMILE_SETTING_COUNT; si++) {
         delete images[si];
         images[si] = NULL;
     }
 }
 
-void SDLRender::load_smile_faces (const ustring& dir) {
+bool SDLRender::load_smile_faces (const ustring& dir) {
+    logger.fineln ("loading smiles in %s", dir.c_str ());
+
     ustring smiles_dir = dir + "images/smiles/";
     vector<ustring> images;
+    bool result = true;
 
     try {
         Dir dir (smiles_dir);
@@ -707,12 +791,14 @@ void SDLRender::load_smile_faces (const ustring& dir) {
                         if (eyes->w == 20 && eyes->h == 10) {
                             smile_images.eyes[sti].push_back (eyes);
                         } else {
+                            logger.warnln ("%s has wrong size", path.c_str ());
                             SDL_FreeSurface (eyes);
                         }
                     }
                 }
             }
         }
+        result &= !smile_images.eyes[sti].empty ();
 
         if (smile_images.mouths[sti].empty ()) {
             prefix_len = mouth_masks[sti].length ();
@@ -726,12 +812,14 @@ void SDLRender::load_smile_faces (const ustring& dir) {
                         if (mouth->w == 20 && mouth->h == 10) {
                             smile_images.mouths[sti].push_back (mouth);
                         } else {
+                            logger.warnln ("%s has wrong size", path.c_str ());
                             SDL_FreeSurface (mouth);
                         }
                     }
                 }
             }
         }
+        result &= !smile_images.mouths[sti].empty ();
     }
 
     for (int hi = 0; hi < 3; hi++) {
@@ -748,28 +836,37 @@ void SDLRender::load_smile_faces (const ustring& dir) {
                         if (ham->w == 40 && ham->h == 20) {
                             smile_images.hams[hi].push_back (ham);
                         } else {
+                            logger.warnln ("%s has wrong size", path.c_str ());
                             SDL_FreeSurface (ham);
                         }
                     }
                 }
             }
         }
+        result &= !smile_images.hams[hi].empty ();
     }
 
     for (int bi = 0; bi < 6; bi++) {
         if (smile_images.backs[bi] == NULL) {
             path = smiles_dir + "smile" + to_string<int> (bi + 1) + ".png";
             smile_images.backs[bi] = IMG_Load (path.c_str ());
-            if (smile_images.backs[bi]->w != 20 || smile_images.backs[bi]->h
-                    != 20) {
-                SDL_FreeSurface (smile_images.backs[bi]);
-                smile_images.backs[bi] = NULL;
+            if (smile_images.backs[bi] != NULL) {
+                if (smile_images.backs[bi]->w != 20
+                        || smile_images.backs[bi]->h != 20) {
+                    logger.warnln ("%s has wrong size", path.c_str ());
+                    SDL_FreeSurface (smile_images.backs[bi]);
+                    smile_images.backs[bi] = NULL;
+                }
             }
         }
+        result &= smile_images.backs[bi] != NULL;
     }
+
+    return result;
 }
 
 void SDLRender::free_smile_faces () {
+    logger.fineln ("freeing smile images");
     for (int sti = ST_pozi; sti < ST_count; sti++) {
         for (size_t i = 0; i < smile_images.eyes[sti].size (); i++) {
             SDL_FreeSurface (smile_images.eyes[sti][i]);
@@ -785,15 +882,22 @@ void SDLRender::free_smile_faces () {
     }
 
     for (int bi = 0; bi < 6; bi++) {
-        SDL_FreeSurface (smile_images.backs[bi]);
+        if (smile_images.backs[bi] != NULL) {
+            SDL_FreeSurface (smile_images.backs[bi]);
+            smile_images.backs[bi] = NULL;
+        }
     }
 }
 
-void SDLRender::load_smiles (const SmileSetting& info) {
+bool SDLRender::load_smiles (const SmileSetting& info) {
     for (int sti = ST_pozi; sti < ST_cham; sti++) {
         for (int li = 0; li < 3; li++) {
             for (int ci = 0; ci < info.counts[sti][li]; ci++) {
                 SDL_Surface* face = create_smile_face (SmileType (sti), li);
+                if (face == NULL) {
+                    logger.errln ("could not create smile face");
+                    return false;
+                }
                 smile_faces.push_back (face);
             }
         }
@@ -802,6 +906,10 @@ void SDLRender::load_smiles (const SmileSetting& info) {
     for (int li = 0; li < 3; li++) {
         for (int ci = 0; ci < info.counts[ST_cham][li]; ci++) {
             SDL_Surface* face = create_cham_face (li);
+            if (face == NULL) {
+                logger.errln ("could not create smile face");
+                return false;
+            }
             smile_faces.push_back (face);
         }
     }
@@ -809,12 +917,18 @@ void SDLRender::load_smiles (const SmileSetting& info) {
     for (int li = 0; li < 3; li++) {
         for (int ci = 0; ci < info.counts[ST_ham][li]; ci++) {
             SDL_Surface* face = create_ham_face (li);
+            if (face == NULL) {
+                logger.errln ("could not create smile face");
+                return false;
+            }
             smile_faces.push_back (face);
         }
     }
+    return true;
 }
 
 void SDLRender::free_smiles () {
+    logger.fineln ("freeing smile images");
     for (size_t si = 0; si < smile_faces.size (); si++) {
         SDL_FreeSurface (smile_faces[si]);
     }
@@ -822,23 +936,34 @@ void SDLRender::free_smiles () {
 }
 
 bool SDLRender::initialize () {
-    cout << __func__ << '\n';
+    logger.fineln ("initialize SDL render");
+
     int flag;
     load_screen_setting ();
 
-    if (SDL_InitSubSystem (SDL_INIT_VIDEO))
+    if (SDL_InitSubSystem (SDL_INIT_VIDEO)) {
+        logger.errln ("could not initialize SDL video");
         return false;
+    }
 
     flag = SDL_HWSURFACE;
     if (setting.fullscreen)
         flag |= SDL_FULLSCREEN;
 
+    logger.fineln ("creating main window");
     primary = SDL_SetVideoMode (setting.width, setting.height, 32, flag);
-    if (primary == NULL)
+    if (primary == NULL) {
+        logger.errln ("could not create main window");
         return false;
+    }
 
+    logger.fineln ("creating background surface");
     background = SDL_CreateRGBSurface (SDL_HWSURFACE, setting.width,
             setting.height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
+    if (background == NULL) {
+        logger.errln ("could not create background surface");
+        return false;
+    }
 
     fill_rect.x = 0;
     fill_rect.y = 0;
@@ -851,72 +976,106 @@ bool SDLRender::initialize () {
     fill_rect.h -= 2;
     SDL_FillRect (background, &fill_rect, 0x0);
 
-    init_fonts ();
+    if (!init_fonts ())
+        return false;
+
     if (paths.check_user_dir ()) {
         load_game_images (paths.get_user_data_dir ());
         load_smile_faces (paths.get_user_data_dir ());
     }
-    load_game_images (paths.get_data_dir ());
-    load_smile_faces (paths.get_data_dir ());
+    if (!load_game_images (paths.get_data_dir ())) {
+        logger.errln ("could not load all game images");
+        return false;
+    }
+    if (!load_smile_faces (paths.get_data_dir ())) {
+        logger.errln ("could not load all smile images");
+        return false;
+    }
 
     init_game_screen ();
     init_stat_screen ();
-    init_stat_columns ();
-
-    fake_face = SDL_CreateRGBSurface (SDL_HWSURFACE, 3, 3, 32, 0xff, 0xff00,
-            0xff0000, 0x00000000);
-    SDL_FillRect (fake_face, NULL, 0x800000);
+    if (!init_stat_columns ()) {
+        return false;
+    }
 
     return true;
 }
 
 void SDLRender::uninitialize () {
+    logger.fineln ("uninitilaze SDL render");
+
     free_stat_columns ();
     free_smile_faces ();
     free_game_images ();
     free_fonts ();
 
-    if (background != NULL)
+    if (background != NULL) {
         SDL_FreeSurface (background);
-    if (primary != NULL)
+        background = NULL;
+    }
+    if (primary != NULL) {
         SDL_FreeSurface (primary);
+        primary = NULL;
+    }
 
     SDL_QuitSubSystem (SDL_INIT_VIDEO);
 
     save_screen_setting ();
 }
 
-void SDLRender::load_players (const std::vector<const PlInfo*>& infos,
+bool SDLRender::load_players (const std::vector<const PlInfo*>& infos,
         const vector<uint32_t>& tcolors) {
-    pl_images.resize (infos.size ());
+    static const PlayerSurfaces def_face = {
+        NULL,
+        NULL};
+
+    logger.fineln ("creating players faces");
+    pl_images.resize (infos.size (), def_face);
 
     for (size_t pi = 0; pi < infos.size (); pi++) {
         const PlInfo& info = *infos[pi];
         pl_images[pi].face = create_player_face (info.color);
         pl_images[pi].numbers = create_numbers (info.color, tcolors[pi]);
+        if (pl_images[pi].face == NULL || pl_images[pi].numbers == NULL) {
+            return false;
+        }
     }
 
+    return true;
 }
 
 void SDLRender::free_players () {
+    logger.fineln ("freeing players faces");
     for (size_t p = 0; p < pl_images.size (); p++) {
-        SDL_FreeSurface (pl_images[p].face);
-        SDL_FreeSurface (pl_images[p].numbers);
+        if (pl_images[p].face != NULL) {
+            SDL_FreeSurface (pl_images[p].face);
+        }
+        if (pl_images[p].numbers != NULL) {
+            SDL_FreeSurface (pl_images[p].numbers);
+        }
     }
     pl_images.clear ();
 }
 
-void SDLRender::load_teams (const vector<const TeamInfo*>& infos) {
-    team_images.resize (infos.size ());
+bool SDLRender::load_teams (const vector<const TeamInfo*>& infos) {
+    logger.fineln ("creating team faces");
+    team_images.resize (infos.size (), NULL);
 
     for (size_t ti = 0; ti < infos.size (); ti++) {
         team_images[ti] = create_numbers (infos[ti]->color, 0x00);
+        if (team_images[ti] == NULL) {
+            return false;
+        }
     }
+    return true;
 }
 
 void SDLRender::free_teams () {
+    logger.fineln ("freeing team faces");
     for (size_t ti = 0; ti < team_images.size (); ti++) {
-        SDL_FreeSurface (team_images[ti]);
+        if (team_images[ti] != NULL) {
+            SDL_FreeSurface (team_images[ti]);
+        }
     }
 
     team_images.clear ();
@@ -926,22 +1085,24 @@ SDL_Surface* SDLRender::create_player_face (Uint32 color) {
     SDL_Surface* result;
     result = SDL_CreateRGBSurface (SDL_HWSURFACE, 256, 1, 32, 0xff, 0xff00,
             0xff0000, 0xff000000);
-    if (result != NULL) {
-        fill_rect.x = 0;
-        fill_rect.y = 0;
-        fill_rect.w = 256;
-        fill_rect.h = 1;
-
-        SDL_FillRect (result, &fill_rect, color);
-
-        SDL_LockSurface (result);
-        int x;
-        for (x = 0; x < 256; x++) {
-            Uint32 *pix = (Uint32*) result->pixels;
-            pix[x] |= x * 0x1000000;
-        }
-        SDL_UnlockSurface (result);
+    if (result == NULL) {
+        return NULL;
     }
+
+    fill_rect.x = 0;
+    fill_rect.y = 0;
+    fill_rect.w = 256;
+    fill_rect.h = 1;
+
+    SDL_FillRect (result, &fill_rect, color);
+
+    SDL_LockSurface (result);
+    int x;
+    for (x = 0; x < 256; x++) {
+        Uint32 *pix = (Uint32*) result->pixels;
+        pix[x] |= x * 0x1000000;
+    }
+    SDL_UnlockSurface (result);
     return result;
 }
 
@@ -949,12 +1110,20 @@ SDL_Surface* SDLRender::create_numbers (Uint32 color, Uint32 team) {
     int x, y;
     Uint32 p;
 
-    SDL_Surface *result = SDL_CreateRGBSurface (SDL_HWSURFACE,
+    SDL_Surface* result = SDL_CreateRGBSurface (SDL_HWSURFACE,
             images[IMT_Numbers]->w + 80, images[IMT_Numbers]->h, 32, 0xff,
             0xff00, 0xff0000, 0);
-    SDL_Surface *temp = SDL_CreateRGBSurface (SDL_HWSURFACE,
+    if (result == NULL) {
+        return NULL;
+    }
+
+    SDL_Surface* temp = SDL_CreateRGBSurface (SDL_HWSURFACE,
             images[IMT_Numbers]->w + 80, images[IMT_Numbers]->h, 32, 0xff,
             0xff00, 0xff0000, 0xff000000);
+    if (temp == NULL) {
+        SDL_FreeSurface (result);
+        return NULL;
+    }
 
     SDL_LockSurface (temp);
     SDL_LockSurface (images[IMT_Heart]);
@@ -1007,6 +1176,9 @@ SDL_Surface* SDLRender::create_smile_face (SmileType type, smilelvl_tu lvl) {
 
     result = SDL_CreateRGBSurface (SDL_HWSURFACE, 20, 20, 32, 0xff, 0xff00,
             0xff0000, 0x000000);
+    if (result == NULL) {
+        return NULL;
+    }
 
     SDL_BlitSurface (smile_images.backs[lvl], NULL, result, &dest);
     int eyes = random () % smile_images.eyes[type].size ();
@@ -1027,6 +1199,9 @@ SDL_Surface* SDLRender::create_cham_face (smilelvl_tu lvl) {
 
     result = SDL_CreateRGBSurface (SDL_HWSURFACE, 80, 20, 32, 0xff, 0xff00,
             0xff0000, 0x000000);
+    if (result == NULL) {
+        return NULL;
+    }
 
     for (int sti = 0; sti < ST_cham; sti++) {
         dest.y = 0;
@@ -1052,6 +1227,9 @@ SDL_Surface* SDLRender::create_ham_face (smilelvl_tu lvl) {
 
     result = SDL_CreateRGBSurface (SDL_HWSURFACE, 40, 20, 32, 0xff, 0xff00,
             0xff0000, 0x000000);
+    if (result == NULL) {
+        return NULL;
+    }
 
     SDL_BlitSurface (smile_images.backs[3 + lvl], NULL, result, &dest);
     dest.x = 20;
@@ -1300,7 +1478,7 @@ void SDLRender::draw_round (round_tu round) {
     SDLPango_SetMinimumSize (round_context, 0, 20);
 
     text = SDLPango_CreateSurfaceDraw (round_context);
-    cout << text->h << '\n';
+
     dest.x += (dest.w - text->w) / 2 + 2;
     dest.y += (dest.h - text->h) / 2 + 2;
     SDL_BlitSurface (text, NULL, primary, &dest);
@@ -1427,8 +1605,6 @@ void SDLRender::draw_status (const ustring& text) {
     SDL_Rect src;
     SDL_Rect dest;
 
-    cout << face->h << '\n';
-
     src.w = (face->w < gs_inner.statustext.w) ? face->w : gs_inner.statustext.w;
     src.h = (face->h < gs_inner.statustext.h) ? face->h : gs_inner.statustext.h;
     src.x = 0;
@@ -1527,17 +1703,6 @@ void SDLRender::draw_team_stat (plid_tu id, plid_tu order,
         const TeamInfo& info, const Statistic& stat) {
     draw_stat (stat_screen.teams_in.y + 2 + order * 24, info.name, info.color,
             stat, team_images[id]);
-}
-
-void SDLRender::draw_fake_face (const Point& pos) {
-    static SDL_Rect dest;
-
-    dest.x = pos.x + gs_outer.playerground.x;
-    dest.y = pos.y + gs_outer.playerground.y;
-
-    SDL_BlitSurface (fake_face, NULL, primary, &dest);
-
-    SDL_UpdateRects (primary, 1, &dest);
 }
 
 wsize_tu SDLRender::get_playerground_width () const {

@@ -40,8 +40,6 @@ void System::init_paths () {
     logger.fineln ("setting user_data_dir to \"%s\"", user_data_dir->c_str ());
 
     different_data_dirs = data_dir->compare (*user_data_dir) != 0;
-
-    logger.fineln ("paths initialized");
 }
 
 System::~System () {
@@ -61,7 +59,5 @@ System::~System () {
         delete user_data_dir;
         user_data_dir = NULL;
     }
-
-    logger.fineln ("paths freed");
 }
 

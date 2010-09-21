@@ -1,5 +1,4 @@
 #include <SDL.h>
-#include <iostream>
 
 #include "system.h"
 #include "engine/render.h"
@@ -51,7 +50,7 @@ void App::init_gui () {
 }
 
 bool App::initialize () {
-    logger.fineln ("starting initialization");
+    logger.fineln ("initialize whole program");
 
     paths.init_paths ();
 
@@ -75,7 +74,6 @@ bool App::initialize () {
     //audio.music_play (MT_Menu);
 
     init_gui ();
-    logger.fineln("initialization finished");
     return true;
 }
 

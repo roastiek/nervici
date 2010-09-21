@@ -27,7 +27,7 @@ void Logger::fineln (const char* str, ...) {
 #endif 
 }
 
-void Logger::stdln (const char* str, ...) {
+void Logger::warnln (const char* str, ...) {
     va_list arg;
 
     va_start (arg, str);

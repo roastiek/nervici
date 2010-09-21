@@ -2,6 +2,7 @@
 #include <glibmm/module.h>
 
 #include "system.h"
+#include "logger.h"
 #include "mods/mod_runner.h"
 #include "mods/mod.h"
 #include "mods/mod_interface.h"
@@ -30,6 +31,8 @@ Mods::Mods () :
 }
 
 Mods::~Mods () {
+    logger.fineln ("freeing mods");
+
     for (size_t mi = 0; mi < mods.size (); mi++) {
         delete mods[mi];
     }
@@ -39,9 +42,12 @@ Mods::~Mods () {
         delete mod_runners[mi];
     }
     mod_runners.clear ();
+
 }
 
 void Mods::find_mods () {
+    logger.fineln ("searching for mods");
+
     vector<ustring> files;
     ustring dir;
 
@@ -58,6 +64,8 @@ void Mods::find_mods () {
 }
 
 void Mods::load_mod (size_t mid) {
+    logger.fineln ("loading mod \"%s\"", mods[mid]->name.c_str ());
+
     GetFaceHandle handle;
     const ModRunner& runner = mods[mid]->runner;
     if (runner.get_face == NULL) {
@@ -71,6 +79,8 @@ void Mods::load_mod (size_t mid) {
 }
 
 void Mods::unload_mod () {
+    logger.fineln ("unloading mod");
+
     if (mod != NULL) {
         delete mod;
         mod = NULL;
@@ -82,6 +92,7 @@ void Mods::unload_mod () {
 }
 
 void Mods::scan_mods_dir (const ustring& path, vector<ustring>& files) {
+    logger.fineln ("searching for mods in %s", path.c_str ());
     try {
         Dir dir (path);
         for (DirIterator it = dir.begin (); it != dir.end (); it++) {
@@ -104,6 +115,7 @@ void Mods::find_mod_runners (const vector<ustring>& files) {
 
         if (suffix.compare (RUNNER_SUFFIX) == 0) {
             mod_runners.push_back (new ModRunner (file, NULL));
+            logger.fineln ("found mod runner %s", file.c_str ());
         }
     }
 }
@@ -151,6 +163,7 @@ void Mods::find_scripts (const vector<ustring>& files) {
 
                 mods.push_back (new Mod (runner, script, minfo->name,
                         minfo->autor, minfo->rules, minfo->spec));
+                logger.fineln ("found mod %s", minfo->name);
             }
         }
 
@@ -158,6 +171,7 @@ void Mods::find_scripts (const vector<ustring>& files) {
         if (minfo != NULL) {
             mods.push_back (new Mod (runner, "", minfo->name, minfo->autor,
                     minfo->rules, minfo->spec));
+            logger.fineln ("found mod %s", minfo->name);
         }
         delete face;
     }

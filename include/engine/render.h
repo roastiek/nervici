@@ -25,20 +25,20 @@ public:
     virtual void uninitialize () = 0;
 
     // loading part
-    virtual void load_players (const std::vector<const PlInfo*>& infos,
+    virtual bool load_players (const std::vector<const PlInfo*>& infos,
             const std::vector<uint32_t>& tcolors) = 0;
 
     virtual void free_players () = 0;
 
-    virtual void load_teams (const std::vector<const TeamInfo*>& infos) = 0;
+    virtual bool load_teams (const std::vector<const TeamInfo*>& infos) = 0;
 
     virtual void free_teams () = 0;
 
-    virtual void load_smiles (const SmileSetting& info) = 0;
+    virtual bool load_smiles (const SmileSetting& info) = 0;
 
     virtual void free_smiles () = 0;
 
-    virtual void load_smile_setting_images (SmileSettingImages& images) = 0;
+    virtual bool load_smile_setting_images (SmileSettingImages& images) = 0;
 
     virtual void free_smile_setting_images (SmileSettingImages& images) = 0;
 
@@ -84,9 +84,7 @@ public:
     virtual void draw_team_stat (plid_tu id, plid_tu order,
             const TeamInfo& info, const Statistic& stat) = 0;
 
-    virtual void draw_fake_face (const Point& pos) = 0;
-
-    // rest
+    // rest function
     virtual Screen* create_screen (const Glib::ustring& name) = 0;
 
     virtual int get_width () const = 0;
