@@ -40,7 +40,7 @@ private:
     void hide_previous ();
 
 public:
-    void initialize ();
+    bool initialize ();
 
     void uninitialize ();
 

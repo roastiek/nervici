@@ -14,6 +14,7 @@
 #include "frames/start_frame.h"
 #include "frames/game_frame.h"
 #include "frames/pledit_frame.h"
+#include "logger.h"
 
 #include "app.h"
 
@@ -49,21 +50,21 @@ void App::init_gui () {
     switch_to_start_frame ();
 }
 
-void App::initialize () {
+bool App::initialize () {
+    logger.fineln ("starting initialization");
+
     paths.init_paths ();
 
     bindtextdomain ("nervici", (paths.get_data_dir () + "locale/").c_str ());
     textdomain ("nervici");
-    
-    cout << _("cosii") << '\n';
 
     settings.load ();
     mods.find_mods ();
     pl_infos.load ();
     team_infos.load ();
 
-    if (render.initialize ())
-        return;
+    if (!render.initialize ())
+        return false;
     audio.initialize ();
 
     srand (SDL_GetTicks ());
@@ -74,6 +75,8 @@ void App::initialize () {
     //audio.music_play (MT_Menu);
 
     init_gui ();
+    logger.fineln("initialization finished");
+    return true;
 }
 
 void App::uninitialize () {

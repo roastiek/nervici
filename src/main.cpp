@@ -5,10 +5,10 @@
 #include <giomm/init.h>
 #include <glibmm/thread.h>
 #include <SDL.h>
-#include <iostream>
 
 #include "app.h"
 #include "basic_defs.h"
+#include "logger.h"
 
 #include "main.h"
 
@@ -31,18 +31,21 @@ static void calc_angles () {
 }
 
 int main (int argc, char *argv[]) {
-    setlocale (LC_ALL, ""); 
+    setlocale (LC_ALL, "");
 
     Glib::init ();
-    Glib::thread_init (); 
+    Glib::thread_init ();
     Gio::init ();
-    if (SDL_Init (0))
+    if (SDL_Init (0)) {
+        logger.errln ("Could not initialize SDL library, halting.");
         return 1;
+    }
 
     calc_angles ();
 
-    app.initialize ();
-    app.run ();
+    if (app.initialize ()) {
+        app.run ();
+    }
     app.uninitialize ();
 
     SDL_Quit ();

@@ -1,6 +1,7 @@
 
 set (NERVICI_SOURCES
     src/utils.cpp 
+    src/logger.cpp
     src/mods/mod_interface.cpp 
     src/system.cpp
     src/mods/mods.cpp

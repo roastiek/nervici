@@ -827,7 +827,7 @@ bool SDLRender::initialize () {
     load_screen_setting ();
 
     if (SDL_InitSubSystem (SDL_INIT_VIDEO))
-        return true;
+        return false;
 
     flag = SDL_HWSURFACE;
     if (setting.fullscreen)
@@ -835,7 +835,7 @@ bool SDLRender::initialize () {
 
     primary = SDL_SetVideoMode (setting.width, setting.height, 32, flag);
     if (primary == NULL)
-        return true;
+        return false;
 
     background = SDL_CreateRGBSurface (SDL_HWSURFACE, setting.width,
             setting.height, 32, 0xff, 0xff00, 0xff0000, 0x00000000);
@@ -867,7 +867,7 @@ bool SDLRender::initialize () {
             0xff0000, 0x00000000);
     SDL_FillRect (fake_face, NULL, 0x800000);
 
-    return false;
+    return true;
 }
 
 void SDLRender::uninitialize () {
