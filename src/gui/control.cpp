@@ -95,24 +95,25 @@ void Control::destroy_children () {
     last_child = NULL;
 }
 
-void Control::blit (Canvas *dest) {
-    dest->draw_image (x, y, canvas);
+void Control::blit (Canvas *dest, int dx, int dy, int w, int h) {
+    dest->draw_image (x + dx, y + dy, canvas, dx, dy, w, h);
 }
 
 void Control::update_children (Control* child, int x, int y, int w, int h) {
     if (child == NULL)
         return;
-    update_children (child->next, x, y, w, h);
 
-    if (child->get_x () >= x + w && child->get_x () + child->get_width () <= x
-            && child->get_y () >= y + h && child->get_y ()
-            + child->get_height () <= y)
-        return;
+    if (child->get_x () <= x + w && child->get_x () + child->get_width () >= x
+            && child->get_y () <= y + h && child->get_y ()
+            + child->get_height () >= y) {
 
-    if (child->is_visible ()) {
-        child->update (x, y, w, h);
-        child->blit (canvas);
+        if (child->is_visible ()) {
+            child->update (x, y, w, h);
+            child->blit (canvas, x - child->get_x (), y - child->get_y (), w, h);
+        }
     }
+
+    update_children (child->next, x, y, w, h);
 }
 
 void Control::update () {
@@ -152,8 +153,8 @@ void Control::invalidate () {
 }
 
 Control* Control::get_child_at_pos (int x, int y) {
-    Control* item = first_child;
-    for (; item != NULL; item = item->next) {
+    Control* item = last_child;
+    for (; item != NULL; item = item->prev) {
         Control* child = item;
         if (child->is_visible ()) {
             if (child->get_x () <= x && child->get_y () <= y && child->get_x ()
@@ -167,18 +168,23 @@ Control* Control::get_child_at_pos (int x, int y) {
 }
 
 Control* Control::control_at_pos (int x, int y) {
-    Control* item = first_child;
-    for (; item != NULL; item = item->next) {
-        Control* child = item;
-        if (child->is_visible ()) {
-            if (child->get_x () <= x && child->get_y () <= y && child->get_x ()
-                    + child->get_width () >= x && child->get_y ()
-                    + child->get_height () >= y) {
-                return child->control_at_pos (x - child->get_x (), y
-                        - child->get_y ());
-            }
-        }
-    }
+    /*Control* item = last_child;
+     for (; item != NULL; item = item->prev) {
+     Control* child = item;
+     if (child->is_visible ()) {
+     if (child->get_x () <= x && child->get_y () <= y && child->get_x ()
+     + child->get_width () >= x && child->get_y ()
+     + child->get_height () >= y) {
+     return child->control_at_pos (x - child->get_x (), y
+     - child->get_y ());
+     }
+     }
+     }
+     return this;*/
+    Control* item = get_child_at_pos (x, y);
+    if (item != NULL)
+        return item->control_at_pos (x - item->get_x (), y - item->get_y ());
+
     return this;
 }
 

@@ -173,7 +173,7 @@ private:
     /*
      * Draw itself into parent canvas
      */
-    void blit (Canvas *dest);
+    void blit (Canvas *dest, int x, int y, int w, int h);
 
     /*
      * Update adn redraw all children in specified area in reversed order, so 
