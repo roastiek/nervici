@@ -182,25 +182,20 @@ private:
     void update_children (Control* item, int x, int y, int w, int h);
 
     /*
-     * Tries switch focus on next child, return true if successful. item is one 
-     * of children.  
-     */
-    bool switch_focus (Control* item);
-
-    /*
-     * Steal focus from actual focused control.
+     * Steal focus from actual focused control. There will be no focused control
+     * in whole control tree.
      */
     void steal_focus ();
 
     /*
-     * Tells parent, that child gain focus.
+     * Tells parent, that child gained focus.
      */
     void propagate_focus (Control* child);
 
     /*
-     * Parent transfer own focus to one of children.
+     * Transfer focus to nearest next child, start_child included.
      */
-    bool child_grab_focus (Control* child);
+    bool focus_next_child (Control* start_child);
 
 protected:
     Canvas* canvas;

@@ -7,14 +7,6 @@
 
 using namespace Glib;
 
-/*
- * Focus algorithm
- * Controls are organized in three where root = Screen
- * Control can gain focus if is visible, enabled and focusable
- * Order for transfering focus with Tab key is same as DFS.
- * 
- */
-
 ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
         float nf) :
     x (nx), y (ny), w (nw), h (nh), font_size (nf) {
@@ -82,10 +74,10 @@ void Control::add_child (Control* child) {
 void Control::remove_child (Control* child) {
     Control* prev_child = child->prev;
     Control* next_child = child->next;
-    
+
     ((prev_child == NULL) ? first_child : prev_child->next) = next_child;
     ((next_child == NULL) ? last_child : next_child->prev) = prev_child;
-    
+
     invalidate ();
 }
 
@@ -190,21 +182,11 @@ Control* Control::control_at_pos (int x, int y) {
 }
 
 /*
- * Call grab_focus on children in reversed order, but stop before 
- * focused_child.
+ * From root control is possible go by focused_child to currently focused 
+ * control. This method set all focused_child on that path to NULL. 
+ * focused_child in all controls shall NULL then and no focused control shall 
+ * exist.
  */
-bool Control::switch_focus (Control* item) {
-    if (item == NULL)
-        return false;
-    if (item == focused_child)
-        return false;
-
-    if (switch_focus (item->next))
-        return true;
-
-    return item->grab_focus ();
-}
-
 void Control::steal_focus () {
     if (focused_child != NULL) {
         if (focused_child->is_focused ()) {
@@ -220,6 +202,10 @@ void Control::steal_focus () {
     }
 }
 
+/*
+ * Construct focused_child path from focused control to the root of control 
+ * tree.
+ */
 void Control::propagate_focus (Control* child) {
     focused_child = child;
     if (get_parent () != NULL)
@@ -241,7 +227,7 @@ bool Control::grab_focus () {
             }
             return true;
         } else if (focused_child == NULL) {
-            if (child_grab_focus (first_child))
+            if (focus_next_child (first_child))
                 return true;
         }
     }
@@ -249,16 +235,17 @@ bool Control::grab_focus () {
 }
 
 /*
- * call grab_focus on childrens in reserved order
+ * Call grab_focus on children started from start_child. First successful call
+ * will gain focus.
  */
-bool Control::child_grab_focus (Control* child) {
-    if (child == NULL)
+bool Control::focus_next_child (Control* start_child) {
+    if (start_child == NULL)
         return false;
 
-    if (child_grab_focus (child->next))
+    if (start_child->grab_focus ())
         return true;
 
-    return child->grab_focus ();
+    return focus_next_child (start_child->next);
 }
 
 bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
@@ -269,13 +256,27 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
             }
         }
     }
+
+    if ((event.keysym.mod & KMOD_ALT) != 0)
+        return false;
+    if ((event.keysym.mod & KMOD_CTRL) != 0)
+        return false;
+    if ((event.keysym.mod & KMOD_META) != 0)
+        return false;
+
+    if ((event.keysym.mod & KMOD_SHIFT) != 0) {
+        if (event.keysym.sym == SDLK_TAB) {
+        }
+    }
+
     if (event.keysym.sym == SDLK_TAB) {
-        if (switch_focus (first_child))
+        if (focus_next_child ((focused_child != NULL) ? focused_child->next
+                : first_child))
             return true;
 
         if (get_parent () == NULL) {
             steal_focus ();
-            if (switch_focus (first_child))
+            if (focus_next_child (first_child))
                 return true;
         }
     }
