@@ -66,18 +66,18 @@ bool App::initialize () {
         return false;
     audio.initialize ();
 
-    srand (SDL_GetTicks ());
     srandom (SDL_GetTicks ());
     SDL_EnableUNICODE (1);
     SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-    //audio.music_play (MT_Menu);
+    audio.music_play (MT_Menu);
 
     init_gui ();
     return true;
 }
 
 void App::uninitialize () {
+    logger.fineln ("uninitialize whole program");
     delete screen;
 
     audio.music_stop ();
@@ -91,6 +91,7 @@ void App::uninitialize () {
 }
 
 void App::run () {
+    logger.fineln ("entering main loop");
     SDL_Event event;
 
     while (!abort) {

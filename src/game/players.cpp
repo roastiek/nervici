@@ -1,6 +1,6 @@
 #include <vector>
-#include <iostream>
 
+#include "logger.h"
 #include "engine/audio.h"
 #include "engine/render.h"
 #include "settings/team_info.h"
@@ -16,14 +16,16 @@ using namespace std;
 
 Players Players::instance;
 
-Players& players = Players::get_instance();
+Players& players = Players::get_instance ();
 
 Players::Players () {
 
 }
 
-void Players::initialize (const std::vector<const PlInfo*>& infos,
+bool Players::initialize (const std::vector<const PlInfo*>& infos,
         const std::vector<plid_tu>& pl_teams, plsize_tu max_length) {
+    logger.fineln ("initialize players");
+
     vector<uint32_t> tcolors;
 
     players.clear ();
@@ -37,11 +39,14 @@ void Players::initialize (const std::vector<const PlInfo*>& infos,
 
     orders.resize (players.size ());
 
-    render.load_players (infos, tcolors);
+    if (!render.load_players (infos, tcolors))
+        return false;
     audio.load_players (infos);
+    return true;
 }
 
 void Players::uninitialize () {
+    logger.fineln ("freeing players");
     audio.free_players ();
     render.free_players ();
 

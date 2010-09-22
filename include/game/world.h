@@ -35,7 +35,7 @@ private:
     void queue_changed_item (wsize_tu x, wsize_tu y);
 
 public:
-    void initialize ();
+    bool initialize ();
 
     void uninitialize ();
 

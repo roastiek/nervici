@@ -13,7 +13,7 @@ protected:
 
 public:
 
-    virtual void initialize (const GameInfo & info) = 0;
+    virtual bool initialize (const GameInfo & info) = 0;
 
     virtual void run () = 0;
 

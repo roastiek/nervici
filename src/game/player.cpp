@@ -1,8 +1,8 @@
-#include <iostream>
 #include <cstring>
 
 #include "main.h"
 #include "basic_defs.h"
+#include "logger.h"
 #include "engine/audio.h"
 #include "engine/render.h"
 #include "settings/pl_info.h"
@@ -110,13 +110,13 @@ void Player::resize (plsize_tu new_size) {
                     - bottom_index) * sizeof(Point));
             for (int i = 0; i <= head_index; i++) {
                 if (body[i].x != new_body[i].x || body[i].y != new_body[i].y) {
-                    cout << "chyba pri kopirovani\n";
+                    logger.errln ("error by copying body");
                 }
             }
             for (int i = bottom_index; i < size; i++) {
                 if (body[i].x != new_body[i + delta].x || body[i].y
                         != new_body[i + delta].y) {
-                    cout << "chyba pri kopirovani\n";
+                    logger.errln ("error by copying body");
                 }
             }
 
@@ -155,7 +155,7 @@ void Player::add_part (const Point& part) {
             head %= 0x10000;
             length++;
         } else
-            cerr << "error: not enough bodysize\n";
+            logger.errln ("error: not enough bodysize");
     } else {
         if (length < max_length) {
             body[head_index] = part;
@@ -165,7 +165,7 @@ void Player::add_part (const Point& part) {
             head %= 0x10000;
             length++;
         } else
-            cerr << "error: not enough maxlength\n";
+            logger.errln ("error: not enough bodysize");
     }
 }
 
@@ -280,7 +280,7 @@ void Player::try_revive () {
 
 void Player::finish_step_preparation () {
     if (ai != NULL) {
-        ai->finish();
+        ai->finish ();
     }
 }
 
@@ -318,11 +318,11 @@ int Player::step (const uint8_t *keys) {
             break;
         }
     }
-    
-    if (info.type == PT_AI && is_live()) {
+
+    if (info.type == PT_AI && is_live ()) {
         ai->calc (jumptime, head);
     }
-    
+
     return is_live ();
 }
 
@@ -333,9 +333,6 @@ void Player::give_start (startid_tu start) {
     if (start >= 0) {
         st = world.get_start (start);
         if (st != NULL) {
-            cout << "give pl start " << (int) id << ' ' << (int) st->angle
-                    << '\n';
-
             exact = st->pos;
             angle = st->angle;
             set_state (PS_Start);

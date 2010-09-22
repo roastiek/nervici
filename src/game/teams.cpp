@@ -1,5 +1,6 @@
 #include <vector>
 
+#include "logger.h"
 #include "engine/render.h"
 #include "settings/team_infos.h"
 #include "game/team.h"
@@ -15,7 +16,9 @@ Teams& teams = Teams::get_instance ();
 Teams::Teams () {
 }
 
-void Teams::initialize (const std::vector<const TeamInfo*>& infos) {
+bool Teams::initialize (const std::vector<const TeamInfo*>& infos) {
+    logger.fineln ("initialzie teams");
+
     items.clear ();
     for (size_t ti = 0; ti < infos.size (); ti++) {
         const TeamInfo& tinfo = *infos[ti];
@@ -25,10 +28,15 @@ void Teams::initialize (const std::vector<const TeamInfo*>& infos) {
 
     items.push_back (new Team (orders.size (), team_infos[0]));
 
-    render.load_teams (infos);
+    if (!render.load_teams (infos))
+        return false;
+
+    return true;
 }
 
 void Teams::uninitialize () {
+    logger.fineln ("freeing teams");
+
     render.free_teams ();
 
     for (size_t ti = 0; ti < items.size (); ti++) {

@@ -245,7 +245,7 @@ bool AudioOpenAL::music_open (MusicType type) {
     }
 
     while (count < music[type].size ()) {
-        f = rand () % music[type].size ();
+        f = random () % music[type].size ();
         if (!music[type][f].played) {
             music[type][f].played = true;
             count++;
@@ -338,6 +338,9 @@ void AudioOpenAL::music_stop () {
 void AudioOpenAL::music_play (MusicType type) {
     if (!initialized)
         return;
+    
+    if (setting.music == 0)
+        return;
 
     if (music_is_playing ()) {
         if (music_type == type)
@@ -365,6 +368,9 @@ void AudioOpenAL::music_play (MusicType type) {
 
 void AudioOpenAL::music_update () {
     if (!initialized)
+        return;
+    
+    if (setting.music == 0)
         return;
 
     if (music_is_playing ()) {

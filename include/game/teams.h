@@ -25,7 +25,7 @@ private:
     Teams ();
     
 public:
-    void initialize (const std::vector<const TeamInfo*>& infos);
+    bool initialize (const std::vector<const TeamInfo*>& infos);
 
     void uninitialize ();
 

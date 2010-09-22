@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include <cmath>
-#include <iostream>
 
+#include "logger.h"
 #include "engine/render.h"
 #include "engine/audio.h"
 #include "settings/team_info.h"
@@ -51,7 +51,7 @@ private:
 
 public:
 
-    void initialize (const GameInfo & info);
+    bool initialize (const GameInfo & info);
 
     void run ();
 
@@ -89,18 +89,27 @@ GameImpl::GameImpl () :
 
 }
 
-void GameImpl::initialize (const GameInfo& info) {
-    cout << __func__ << '\n';
+bool GameImpl::initialize (const GameInfo& info) {
+    logger.fineln ("initialize game");
 
     set = info.setting;
     set_speed (info.setting.speed);
     smile_set = info.smiles;
 
     render.draw_game_screen ();
-    world.initialize ();
-    teams.initialize (info.team_infos);
-    players.initialize (info.pl_infos, info.pl_teams, info.setting.max_length);
-    smiles.initialize (info);
+
+    if (!world.initialize ())
+        return false;
+   
+    if (!teams.initialize (info.team_infos))
+        return false;
+    
+    if (!players.initialize (info.pl_infos, info.pl_teams,
+            info.setting.max_length))
+        return false;
+    
+    if (!smiles.initialize (info.smiles)) 
+        return false;
 
     end = false;
     abort = false;
@@ -113,10 +122,11 @@ void GameImpl::initialize (const GameInfo& info) {
     clear_playerground ();
 
     mods.load_mod (0);
+    return true;
 }
 
 void GameImpl::uninitialize () {
-    cout << __func__ << '\n';
+    logger.fineln ("uninitialize game");
 
     mods.unload_mod ();
 
@@ -319,7 +329,7 @@ void GameImpl::run () {
     size_t steps = 0;
     uint8_t *keys;
 
-    cout << __func__ << '\n';
+    logger.fineln ("entering game loop");
 
     //clock_gettime (CLOCK_REALTIME, &time);
     sdl_time = SDL_GetTicks ();
@@ -399,8 +409,6 @@ void GameImpl::run () {
     if (!abort) {
         run_statistic ();
     }
-
-    cout << sl_count << " " << nosl_count << " " << nosmlsl_count << '\n';
 
     mods.face ().on_game_end ();
 }

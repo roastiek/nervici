@@ -18,8 +18,11 @@
 
 struct GameInfo {
     GameSetting setting;
+    
     SmileSetting smiles;
+    
     std::vector<const TeamInfo*> team_infos;
+    
     std::vector<const PlInfo*> pl_infos;
     /*
      * maping between pl_infos and team_infos

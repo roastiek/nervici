@@ -1,8 +1,9 @@
-#include <iostream>
 #include <cmath>
+#include <cstdlib>
 
 #include "basic_defs.h"
 #include "main.h"
+#include "logger.h"
 #include "engine/render.h"
 #include "game/fields.h"
 #include "game/players.h"
@@ -27,11 +28,14 @@ World World::instance;
 
 World& world = World::get_instance ();
 
-World::World () {
+World::World () :
+    items (NULL), __items (NULL) {
 
 }
 
-void World::initialize () {
+bool World::initialize () {
+    logger.fineln ("initialize world");
+
     int x;
 
     width = render.get_playerground_width ();
@@ -39,8 +43,9 @@ void World::initialize () {
 
     __items = new WorldItem[width * height];
     items = new WorldItem*[width];
-    if (items == NULL) {
-        cerr << "nom memoty\n";
+    if (items == NULL || __items == NULL) {
+        logger.errln ("not enough memory for the world");
+        return false;
     }
     for (wsize_tu x = 0; x < width; x++) {
         items[x] = &__items[x * height];
@@ -59,12 +64,20 @@ void World::initialize () {
                 - (x * isin[starts[s].angle] * 0.8)) * DIGITS) / DIGITS;
         starts[s].ready = 1;
     }
-
+    return true;
 }
 
 void World::uninitialize () {
-    delete[] items;
-    delete[] __items;
+    logger.fineln ("freeing world");
+
+    if (items != NULL) {
+        delete[] items;
+        items = NULL;
+    }
+    if (__items != NULL) {
+        delete[] __items;
+        __items = NULL;
+    }
     starts.clear ();
 }
 
@@ -118,7 +131,7 @@ startid_tu World::find_free_start () {
 
     if (avai > 0) {
         do {
-            result = rand () % starts.size ();
+            result = random () % starts.size ();
         } while (!starts[result].ready);
         return result;
     }

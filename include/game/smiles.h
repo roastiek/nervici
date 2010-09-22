@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include "fakes/game_info.h"
+#include "fakes/smile_setting.h"
 #include "fakes/smile.h"
 
 class Smiles {
@@ -22,7 +22,7 @@ private:
     Smiles ();
 
 public:
-    void initialize (const GameInfo& info);
+    bool initialize (const SmileSetting& info);
 
     void uninitialize ();
 

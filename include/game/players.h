@@ -25,7 +25,7 @@ private:
     Players ();
 
 public:
-    void initialize (const std::vector<const PlInfo*>& infos,
+    bool initialize (const std::vector<const PlInfo*>& infos,
             const std::vector<plid_tu>& pl_teams, plsize_tu max_length);
 
     void uninitialize ();
