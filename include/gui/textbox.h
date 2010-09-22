@@ -10,7 +10,7 @@
 
 #include "input_control.h"
 
-class Textbox : public InputControl {
+class Textbox: public InputControl {
 
 private:
     Glib::ustring text;

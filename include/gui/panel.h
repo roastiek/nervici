@@ -26,6 +26,5 @@ public:
             const Glib::ustring& name);
 };
 
-
 #endif	/* PANEL_H */
 

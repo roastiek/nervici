@@ -6,13 +6,13 @@
 
 using namespace Glib;
 
-Button::Button (const ControlParameters& parms):
-Control (parms) {
+Button::Button (const ControlParameters& parms) :
+    Control (parms) {
 }
 
 Button* ButtonFactory::create (Control* par, const ustring& text,
         const ControlParameters& parms, const ustring& name) {
-    Button* result = new Button(parms);
+    Button* result = new Button (parms);
     result->set_name (name);
     result->init_control (par);
     result->set_text (text);
@@ -21,10 +21,14 @@ Button* ButtonFactory::create (Control* par, const ustring& text,
 
 bool Button::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
-        if ((event.keysym.mod & KMOD_META) != 0) return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
+        if ((event.keysym.mod & KMOD_ALT) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_META) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_SHIFT) != 0)
+            return false;
 
         switch (event.keysym.sym) {
         case SDLK_SPACE:
@@ -41,7 +45,8 @@ bool Button::process_key_pressed_event (const SDL_KeyboardEvent& event) {
 
 void Button::paint () {
     canvas->fill_backgound (get_background ());
-    canvas->draw_text (0, 0, get_width (), get_height (), HA_center, VA_center, get_text ());
+    canvas->draw_text (0, 0, get_width (), get_height (), HA_center, VA_center,
+            get_text ());
 }
 
 void Button::on_focus_gained () {

@@ -10,7 +10,7 @@
 
 #include "control.h"
 
-class Scale : public Control {
+class Scale: public Control {
 public:
 
     typedef Event1<Scale*, int> OnValueChanged;
@@ -61,7 +61,7 @@ public:
 
     virtual void set_big_step (int value);
 
-    virtual int get_min() const ;
+    virtual int get_min () const;
 
     virtual int get_max () const;
 
@@ -76,8 +76,10 @@ public:
 
 class ScaleFactory {
 public:
-    static Scale* create (Control* parent, int small_step, int big_step,
-            const ControlParameters& parms, const Glib::ustring& name= "scale");
+    static Scale
+            * create (Control* parent, int small_step, int big_step,
+                    const ControlParameters& parms, const Glib::ustring& name =
+                            "scale");
 };
 
 #endif	/* SCALE_H */

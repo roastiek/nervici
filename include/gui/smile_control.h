@@ -11,10 +11,9 @@
 #include "control.h"
 #include "screen.h"
 
-
 // za-sunuty, vy-sunuty, se-sunuty, ji-sunuty
 
-class SmileControl : public Control {
+class SmileControl: public Control {
 private:
     Canvas* smile;
     int value;
@@ -66,7 +65,8 @@ public:
 class SmileControlFactory {
 public:
     static SmileControl* create (Control* parent, Canvas* face,
-            const ControlParameters& parms, const Glib::ustring& name = "smile_control");
+            const ControlParameters& parms, const Glib::ustring& name =
+                    "smile_control");
 };
 
 #endif	/* SMILE_CONTROL_H */

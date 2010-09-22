@@ -35,8 +35,10 @@ public:
 
 class LabelFactory {
 public:
-    static Label* create (Control* parent, const Glib::ustring& text,
-            const ControlParameters& parms, const Glib::ustring& name = "label");
+    static Label
+            * create (Control* parent, const Glib::ustring& text,
+                    const ControlParameters& parms, const Glib::ustring& name =
+                            "label");
 };
 
 #endif	/* LABEL_H */

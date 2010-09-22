@@ -6,22 +6,18 @@
 
 using namespace Glib;
 
-ListboxParameters::ListboxParameters (float nx, float ny, float nw, float nh, float nf,
-        float nmh, float nih) :
-ControlParameters (nx, ny, nw, nh, nf), min_height (nmh), item_height (nih) {
+ListboxParameters::ListboxParameters (float nx, float ny, float nw, float nh,
+        float nf, float nmh, float nih) :
+    ControlParameters (nx, ny, nw, nh, nf), min_height (nmh), item_height (nih) {
 }
 
 ListItem::ListItem (const ustring& txt, uint32_t cl) :
-text (txt),
-color (cl) {
+    text (txt), color (cl) {
 }
 
 Listbox::Listbox (const ListboxParameters& parms) :
-InputControl (parms),
-selected (-1),
-min_height (0),
-item_height (0),
-lb_parms (parms) {
+    InputControl (parms), selected (-1), min_height (0), item_height (0),
+            lb_parms (parms) {
 }
 
 Listbox* ListboxFactory::create (Control* par, const ListboxParameters& parms,
@@ -65,7 +61,8 @@ void Listbox::select_down () {
 
 void Listbox::paint () {
 
-    canvas->draw_box (0, 0, get_width (), get_height (), get_input_background ());
+    canvas->draw_box (0, 0, get_width (), get_height (),
+            get_input_background ());
 
     int ih = get_item_height ();
     int y_offset = 0;
@@ -78,7 +75,8 @@ void Listbox::paint () {
         }
         set_font_color (items[i].color);
 
-        canvas->draw_text (1, y_offset, iw - 2, ih, HA_left, VA_center, items[i].text);
+        canvas->draw_text (1, y_offset, iw - 2, ih, HA_left, VA_center,
+                items[i].text);
     }
 }
 
@@ -101,10 +99,14 @@ void Listbox::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
 
 bool Listbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
-        if ((event.keysym.mod & KMOD_META) != 0) return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
+        if ((event.keysym.mod & KMOD_ALT) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_META) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_SHIFT) != 0)
+            return false;
 
         switch (event. keysym.sym) {
         case SDLK_UP:

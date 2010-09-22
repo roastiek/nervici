@@ -3,10 +3,7 @@
 using namespace Glib;
 
 View::View (const ControlParameters& parms) :
-Control (parms),
-content (NULL),
-x_offset (0),
-y_offset (0) {
+    Control (parms), content (NULL), x_offset (0), y_offset (0) {
 }
 
 View* ViewFactory::create (Control* par, Control* content,
@@ -31,8 +28,10 @@ void View::set_content (Control* value) {
             set_y_offset (-content->get_y ());
 
             content->set_parent (this);
-            content->register_on_x_changed (OnXChanged (this, &View::content_x_changed));
-            content->register_on_y_changed (OnYChanged (this, &View::content_y_changed));
+            content->register_on_x_changed (OnXChanged (this,
+                    &View::content_x_changed));
+            content->register_on_y_changed (OnYChanged (this,
+                    &View::content_y_changed));
         }
     }
 }
@@ -96,15 +95,15 @@ Control* View::get_content () const {
 }
 
 /*View::View (Control* par, int x, int y, int w, int h, Control* content, const ustring& name) :
-Control (par, x, y, w, h, name) {
-    set_frame (0);
+ Control (par, x, y, w, h, name) {
+ set_frame (0);
 
-    x_offset = -content->get_x ();
-    y_offset = -content->get_y ();
+ x_offset = -content->get_x ();
+ y_offset = -content->get_y ();
 
-    this->content = content;
-    content->set_parent (this);
-    content->register_on_x_changed (OnXChanged (this, &View::content_x_changed));
-    content->register_on_y_changed (OnYChanged (this, &View::content_y_changed));
-}*/
+ this->content = content;
+ content->set_parent (this);
+ content->register_on_x_changed (OnXChanged (this, &View::content_x_changed));
+ content->register_on_y_changed (OnYChanged (this, &View::content_y_changed));
+ }*/
 

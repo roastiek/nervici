@@ -17,6 +17,7 @@
 #include "frames/game_frame.h"
 
 using namespace Glib;
+using namespace std;
 
 #define ONE_COLUMN_W ((1024 - 16 - 3 * 17) / 4)
 #define ONE_COLUMN_H (24 + 20 + 14 + 26 * 16)

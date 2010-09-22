@@ -3,7 +3,7 @@
 #include "gui/input_control.h"
 
 InputControl::InputControl (const ControlParameters& parms) :
-Control (parms), colors ({0, 0, 0}) {
+Control (parms), colors ( {0, 0, 0}) {
 }
 
 void InputControl::init_control (Control* par) {
@@ -45,5 +45,4 @@ uint32_t InputControl::get_input_text () const {
 uint32_t InputControl::get_input_foreground () const {
     return colors.foreground;
 }
-
 

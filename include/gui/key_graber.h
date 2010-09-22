@@ -10,7 +10,7 @@
 
 #include "button.h"
 
-class KeyGraber : public Button {
+class KeyGraber: public Button {
 
 private:
     int key;
@@ -28,7 +28,7 @@ public:
     virtual void set_key (int value);
 
     void set_text (const Glib::ustring& value);
-    
+
     const Glib::ustring& get_text () const;
 
     friend class KeyGraberFactory;
@@ -37,11 +37,10 @@ public:
 class KeyGraberFactory {
 public:
     static KeyGraber* create (Control* parent, const Glib::ustring& text,
-            const ControlParameters& parms, const Glib::ustring& name = "key_graber");
+            const ControlParameters& parms, const Glib::ustring& name =
+                    "key_graber");
 
 };
-
-
 
 #endif	/* KEY_GRABER_H */
 

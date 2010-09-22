@@ -12,7 +12,7 @@
 #include "scrollbar.h"
 #include "view.h"
 
-class Scrollport : public Control {
+class Scrollport: public Control {
 
 private:
     View* view;
@@ -51,7 +51,8 @@ public:
 class ScrollportFactory {
 public:
     static Scrollport* create (Control* par, Control* content,
-            const ScrollbarParameters& parms, const Glib::ustring& name = "scrollport");
+            const ScrollbarParameters& parms, const Glib::ustring& name =
+                    "scrollport");
 };
 
 #endif	/* SCROLLPORT_H */

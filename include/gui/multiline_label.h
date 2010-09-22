@@ -10,8 +10,7 @@
 
 #include "control.h"
 
-
-class MultilineLabel : public Control {
+class MultilineLabel: public Control {
 private:
     Glib::ustring text;
 
@@ -36,9 +35,9 @@ public:
 class MultilineLabelFactory {
 public:
     static MultilineLabel* create (Control* par, const Glib::ustring& text,
-            const ControlParameters& parms, const Glib::ustring& name = "multiline label");
+            const ControlParameters& parms, const Glib::ustring& name =
+                    "multiline label");
 };
-
 
 #endif	/* MULTILINE_LABEL_H */
 

@@ -10,7 +10,7 @@
 
 #include "control.h"
 
-class Button : public Control {
+class Button: public Control {
 
 private:
     Glib::ustring text;
@@ -38,7 +38,8 @@ public:
 class ButtonFactory {
 public:
     static Button* create (Control* par, const Glib::ustring& text,
-            const ControlParameters& parms, const Glib::ustring& name = "button");
+            const ControlParameters& parms, const Glib::ustring& name =
+                    "button");
 };
 
 #endif	/* BUTTON_H */

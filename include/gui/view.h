@@ -10,7 +10,7 @@
 
 #include "control.h"
 
-class View : public Control {
+class View: public Control {
 public:
 
     typedef Event1<View*, int> OnXOffsetChanged;

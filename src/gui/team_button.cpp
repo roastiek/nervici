@@ -5,9 +5,8 @@
 
 using namespace Glib;
 
-TeamButton::TeamButton (const ControlParameters& parms):
-Control (parms),
-selected (-1) {
+TeamButton::TeamButton (const ControlParameters& parms) :
+    Control (parms), selected (-1) {
 }
 
 void TeamButton::init_control (Control* par) {
@@ -16,10 +15,12 @@ void TeamButton::init_control (Control* par) {
 }
 
 void TeamButton::paint () {
-    uint32_t color = (get_selected () > 0) ? (*colors)[get_selected ()] : get_background ();
+    uint32_t color = (get_selected () > 0) ? (*colors)[get_selected ()]
+            : get_background ();
     canvas->fill_backgound (color);
     if (get_selected () > 0) {
-        canvas->draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center, VA_center, int_to_string (get_selected ()));
+        canvas->draw_text (1, 1, get_width () - 2, get_height () - 2,
+                HA_center, VA_center, int_to_string (get_selected ()));
     }
 }
 
@@ -29,8 +30,10 @@ void TeamButton::set_colors (const TeamColors* value) {
 }
 
 void TeamButton::set_selected (int value) {
-    if (value < 0) value = 0;
-    if (value >= TEAMS_COUNT) value = 0;
+    if (value < 0)
+        value = 0;
+    if (value >= TEAMS_COUNT)
+        value = 0;
     if (value != selected) {
         selected = value;
         invalidate ();
@@ -60,8 +63,9 @@ void TeamButton::on_clicked () {
     set_selected (get_selected () + 1);
 }
 
-TeamButton* TeamButtonFactory::create (Control* parent, const TeamColors* colors,
-        const ControlParameters& parms, const ustring& name) {
+TeamButton* TeamButtonFactory::create (Control* parent,
+        const TeamColors* colors, const ControlParameters& parms,
+        const ustring& name) {
     TeamButton* result = new TeamButton (parms);
     result->set_name (name);
     result->init_control (parent);

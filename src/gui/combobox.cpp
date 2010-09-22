@@ -12,11 +12,10 @@ void Combobox::list_clicked (Control* ctl) {
 }
 
 Combobox::Combobox (const ListboxParameters& parms) :
-InputControl (parms),
-selected (-1),
-list_parms (ListboxParameters(0, 0, parms.w, parms.min_height, parms.font_size, parms.min_height, parms.item_height)),
-port_parms (ScrollbarParameters (0.0, 0.0, parms.w, 200, parms.font_size, 1, 10))
-{
+    InputControl (parms), selected (-1), list_parms (ListboxParameters (0, 0,
+            parms.w, parms.min_height, parms.font_size, parms.min_height,
+            parms.item_height)), port_parms (ScrollbarParameters (0.0, 0.0,
+            parms.w, 200, parms.font_size, 1, 10)) {
 }
 
 Combobox::~Combobox () {
@@ -26,7 +25,7 @@ Combobox::~Combobox () {
 
 Combobox* ComboboxFactory::create (Control* par,
         const ListboxParameters& parms, const ustring& name) {
-    Combobox* result = new Combobox(parms);
+    Combobox* result = new Combobox (parms);
     result->set_name (name);
     result->init_control (par);
     return result;
@@ -37,7 +36,7 @@ void Combobox::init_control (Control* par) {
     port = ScrollportFactory::create (NULL, list, port_parms);
     InputControl::init_control (par);
     list->set_frame (0);
-    list->register_on_clicked (OnClicked(this, &Combobox::list_clicked));
+    list->register_on_clicked (OnClicked (this, &Combobox::list_clicked));
 }
 
 void Combobox::reinitialize () {
@@ -81,10 +80,14 @@ void Combobox::on_clicked () {
 
 bool Combobox::process_key_pressed_event (SDL_KeyboardEvent event) {
     if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
-        if ((event.keysym.mod & KMOD_META) != 0) return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
+        if ((event.keysym.mod & KMOD_ALT) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_META) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_SHIFT) != 0)
+            return false;
 
         switch (event.keysym.sym) {
         case SDLK_UP:
@@ -173,7 +176,7 @@ int Combobox::get_selected () const {
 }
 
 void Combobox::on_selected_changed (int sel) {
-    call_selected_changed(this, sel);
+    call_selected_changed (this, sel);
 }
 
 void Combobox::register_on_selected_changed (const OnSelectedChanged& handler) {

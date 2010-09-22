@@ -7,7 +7,7 @@
 using namespace Glib;
 
 KeyGraber::KeyGraber (const ControlParameters& parms) :
-Button (parms), key (-1) {
+    Button (parms), key (-1) {
 }
 
 bool KeyGraber::process_key_pressed_event (const SDL_KeyboardEvent& event) {

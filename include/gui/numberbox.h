@@ -10,8 +10,7 @@
 
 #include "textbox.h"
 
-
-class Numberbox : public Textbox {
+class Numberbox: public Textbox {
 protected:
 
     Numberbox (const ControlParameters& parms);
@@ -31,8 +30,6 @@ public:
     static Numberbox* create (Control* parent, const ControlParameters& parms,
             const Glib::ustring& name = "numberbox");
 };
-
-
 
 #endif	/* NUMBERBOX_H */
 

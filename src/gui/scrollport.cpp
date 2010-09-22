@@ -6,26 +6,30 @@
 using namespace Glib;
 
 ControlParameters Scrollport::view_parms = {
-    0.0, 0.0, 0.0, 0.0, 0.1
-};
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.1};
 
 Scrollport::Scrollport (const ScrollbarParameters& parms) :
-Control (parms),
-view (NULL),
-content (NULL),
-bar (NULL),
-bar_parms (ScrollbarParameters (0, 0, 15, parms.h, 10, parms.small_step, parms.big_step)){
+    Control (parms), view (NULL), content (NULL), bar (NULL), bar_parms (
+            ScrollbarParameters (0, 0, 15, parms.h, 10, parms.small_step,
+                    parms.big_step)) {
 }
 
 void Scrollport::init_control (Control* par) {
     view = ViewFactory::create (this, NULL, view_parms);
     bar = ScrollbarFactory::create (this, bar_parms);
     Control::init_control (par);
-    bar->register_on_value_changed (Scrollbar::OnValueChanged (this, &Scrollport::bar_value_changed));
-    bar->register_on_focus_gained (OnFocusGained (this, &Scrollport::child_focus_gained));
-    bar->register_on_focus_lost (OnFocusLost (this, &Scrollport::child_focus_lost));
-   /* view->show_all ();
-    bar->show_all ();*/
+    bar->register_on_value_changed (Scrollbar::OnValueChanged (this,
+            &Scrollport::bar_value_changed));
+    bar->register_on_focus_gained (OnFocusGained (this,
+            &Scrollport::child_focus_gained));
+    bar->register_on_focus_lost (OnFocusLost (this,
+            &Scrollport::child_focus_lost));
+    /* view->show_all ();
+     bar->show_all ();*/
 }
 
 Scrollport* ScrollportFactory::create (Control* par, Control* content,
@@ -58,9 +62,9 @@ void Scrollport::content_height_changed (Control* ctl, int value) {
 }
 
 /*void Scrollport::paint () {
-    fill_backgound (C_BACKGROUND);
-    // draw_frame (C_FOREGROUND);
-}*/
+ fill_backgound (C_BACKGROUND);
+ // draw_frame (C_FOREGROUND);
+ }*/
 
 void Scrollport::set_content (Control* value) {
     if (content != value) {
@@ -84,9 +88,12 @@ void Scrollport::set_content (Control* value) {
 
             view->set_content (content);
 
-            content->register_on_height_changed (OnHeightChanged (this, &Scrollport::content_height_changed));
-            content->register_on_focus_gained (OnFocusGained (this, &Scrollport::child_focus_gained));
-            content->register_on_focus_lost (OnFocusLost (this, &Scrollport::child_focus_lost));
+            content->register_on_height_changed (OnHeightChanged (this,
+                    &Scrollport::content_height_changed));
+            content->register_on_focus_gained (OnFocusGained (this,
+                    &Scrollport::child_focus_gained));
+            content->register_on_focus_lost (OnFocusLost (this,
+                    &Scrollport::child_focus_lost));
         }
     }
 }

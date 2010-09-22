@@ -4,8 +4,8 @@
 
 using namespace Glib;
 
-Label::Label (const ControlParameters& parms):
-Control(parms) {
+Label::Label (const ControlParameters& parms) :
+    Control (parms) {
 }
 
 void Label::init_control (Control* par) {
@@ -15,7 +15,8 @@ void Label::init_control (Control* par) {
 
 void Label::paint () {
     canvas->fill_backgound (get_background ());
-    canvas->draw_text (0, 0, get_width (), get_height (), HA_left, VA_center, get_text ());
+    canvas->draw_text (0, 0, get_width (), get_height (), HA_left, VA_center,
+            get_text ());
 }
 
 bool Label::is_focusable () const {
@@ -36,6 +37,6 @@ Label* LabelFactory::create (Control* parent, const ustring& text,
     Label* result = new Label (parms);
     result->set_name (name);
     result->init_control (parent);
-    result->set_text(text);
+    result->set_text (text);
     return result;
 }

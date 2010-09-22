@@ -12,5 +12,4 @@ enum HorizontalAling {
     HA_left, HA_center, HA_right
 };
 
-
 #endif /* HORIZONTAL_ALING_H_ */

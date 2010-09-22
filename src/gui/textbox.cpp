@@ -7,10 +7,7 @@
 using namespace Glib;
 
 Textbox::Textbox (const ControlParameters& parms) :
-InputControl (parms),
-cursor (0),
-cursor_x (1),
-x_offset (0) {
+    InputControl (parms), cursor (0), cursor_x (1), x_offset (0) {
 }
 
 Textbox* TextboxFactory::create (Control* par, const ControlParameters& parms,
@@ -26,7 +23,8 @@ void Textbox::paint () {
     canvas->fill_backgound (get_input_background ());
     canvas->draw_frame (get_input_foreground ());
 
-    canvas->draw_text (2, 2, get_width () - 4, get_height () - 4, x_offset, VA_center, get_text ());
+    canvas->draw_text (2, 2, get_width () - 4, get_height () - 4, x_offset,
+            VA_center, get_text ());
 
     draw_inner_frame (get_input_background ());
 
@@ -61,15 +59,18 @@ void Textbox::insert_at_cursor (const char* part) {
     ustring part_str = part;
     if (filter (part_str[0])) {
         const ustring& old = get_text ();
-        update_text (old.substr (0, cursor) + part_str[0] + old.substr (cursor, -1));
+        update_text (old.substr (0, cursor) + part_str[0] + old.substr (cursor,
+                -1));
     }
 }
 
 void Textbox::set_cursor (int value) {
     const ustring& tx = get_text ();
     cursor = value;
-    if (cursor <= 0) cursor = 0;
-    if (cursor > int(tx.length ())) cursor = tx.length ();
+    if (cursor <= 0)
+        cursor = 0;
+    if (cursor > int(tx.length ()))
+        cursor = tx.length ();
 
     ustring part = tx.substr (0, cursor);
     int w = canvas->get_text_width (part);
@@ -89,9 +90,12 @@ void Textbox::set_cursor (int value) {
 
 bool Textbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
-        if ((event.keysym.mod & KMOD_META) != 0) return false;
+        if ((event.keysym.mod & KMOD_ALT) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_META) != 0)
+            return false;
 
         if ((event.keysym.mod & KMOD_SHIFT) == 0) {
             switch (event.keysym.sym) {
@@ -122,17 +126,21 @@ bool Textbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
         }
         Uint16 c = event.keysym.unicode;
         if (c != 0 && c != '\t') {
-            char part[4] = {0, 0, 0, 0};
+            char part[4] = {
+                0,
+                0,
+                0,
+                0};
 
             if (c <= 0x7f) {
-                part[0] = char (c & 0x7f);
+                part[0] = char(c & 0x7f);
             } else if (c <= 0x7ff) {
-                part[0] = char (0xc0 | (c >> 6 & 0x1f));
-                part[1] = char (0x80 | (c & 0x3f));
+                part[0] = char(0xc0 | (c >> 6 & 0x1f));
+                part[1] = char(0x80 | (c & 0x3f));
             } else {
-                part[0] = char (0xf0 | (c >> 12 & 0x0f));
-                part[1] = char (0x80 | (c >> 6 & 0x3f));
-                part[2] = char (0x80 | (c & 0x3f));
+                part[0] = char(0xf0 | (c >> 12 & 0x0f));
+                part[1] = char(0x80 | (c >> 6 & 0x3f));
+                part[2] = char(0x80 | (c & 0x3f));
             }
             insert_at_cursor (part);
             move_cursor_right ();
@@ -153,7 +161,7 @@ void Textbox::set_text (const ustring& value) {
     text = "";
     for (size_t ci = 0; ci < value.length (); ci++) {
         if (filter (value[ci]))
-            text+= value[ci];
+            text += value[ci];
     }
     set_cursor (0);
     invalidate ();

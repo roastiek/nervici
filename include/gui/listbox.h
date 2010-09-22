@@ -10,12 +10,10 @@
 
 #include <vector>
 
-using namespace std;
-
 #include "input_control.h"
 #include "scrollport.h"
 
-struct ListboxParameters : public ControlParameters {
+struct ListboxParameters: public ControlParameters {
     const float min_height;
     const float item_height;
 
@@ -31,9 +29,9 @@ public:
     ListItem (const Glib::ustring& txt = "", uint32_t cl = C_INPUT_TEXT);
 };
 
-class Listbox : public InputControl {
+class Listbox: public InputControl {
 private:
-    vector<ListItem> items;
+    std::vector<ListItem> items;
     int selected;
     int min_height;
     int item_height;
@@ -61,17 +59,20 @@ protected:
 public:
     virtual void clear ();
 
-    virtual void add_item (const Glib::ustring& text, uint32_t color = C_INPUT_TEXT);
+    virtual void add_item (const Glib::ustring& text, uint32_t color =
+            C_INPUT_TEXT);
 
     virtual const ListItem& get_item (int index);
 
     virtual int get_items_count () const;
 
-    virtual void update_item (int index, const Glib::ustring& text, uint32_t color = C_INPUT_TEXT);
+    virtual void update_item (int index, const Glib::ustring& text,
+            uint32_t color = C_INPUT_TEXT);
 
     virtual void remove_item (int index);
 
-    virtual void insert_item (int index, const Glib::ustring& text, uint32_t color = C_INPUT_TEXT);
+    virtual void insert_item (int index, const Glib::ustring& text,
+            uint32_t color = C_INPUT_TEXT);
 
     virtual void set_selected (int value);
 
@@ -91,10 +92,9 @@ public:
 
 class ListboxFactory {
 public:
-    static Listbox* create (Control* par,
-            const ListboxParameters& parms, const Glib::ustring& name = "listbox");
+    static Listbox* create (Control* par, const ListboxParameters& parms,
+            const Glib::ustring& name = "listbox");
 };
-
 
 #endif	/* LISTBOX_H */
 

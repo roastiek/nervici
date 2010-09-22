@@ -168,19 +168,6 @@ Control* Control::get_child_at_pos (int x, int y) {
 }
 
 Control* Control::control_at_pos (int x, int y) {
-    /*Control* item = last_child;
-     for (; item != NULL; item = item->prev) {
-     Control* child = item;
-     if (child->is_visible ()) {
-     if (child->get_x () <= x && child->get_y () <= y && child->get_x ()
-     + child->get_width () >= x && child->get_y ()
-     + child->get_height () >= y) {
-     return child->control_at_pos (x - child->get_x (), y
-     - child->get_y ());
-     }
-     }
-     }
-     return this;*/
     Control* item = get_child_at_pos (x, y);
     if (item != NULL)
         return item->control_at_pos (x - item->get_x (), y - item->get_y ());

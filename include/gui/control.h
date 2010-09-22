@@ -88,7 +88,7 @@ private:
      * stored in linked list.
      */
     Control* first_child;
-    
+
     Control* last_child;
     /*
      * Currently focused child, can be NULL
@@ -98,7 +98,7 @@ private:
      * Next children in linked list. NULL for last child. 
      */
     Control* next;
-    
+
     Control* prev;
 
     /*
@@ -107,7 +107,7 @@ private:
      */
     int x;
     int y;
-    
+
     /*
      * Name of control, used for more readable debugging. 
      */
@@ -126,17 +126,17 @@ private:
      * Indicate, if control shall be redrawn.
      */
     bool valid;
-    
+
     /*
      * Indicate, if control is enabled, can accept input from user.
      */
     bool enabled;
-    
+
     /*
      * Indicate, that control gets input from keyboard.
      */
     bool focused;
-    
+
     /*
      * Indicate, if control is visible.
      */

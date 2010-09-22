@@ -6,20 +6,14 @@
 
 using namespace Glib;
 
-ScrollbarParameters::ScrollbarParameters (float nx, float ny, float nw, float nh,
-        float nf, float nss, float nbs) :
-ControlParameters (nx, ny, nw, nh, nf), small_step (nss), big_step (nbs) {
+ScrollbarParameters::ScrollbarParameters (float nx, float ny, float nw,
+        float nh, float nf, float nss, float nbs) :
+    ControlParameters (nx, ny, nw, nh, nf), small_step (nss), big_step (nbs) {
 }
 
 Scrollbar::Scrollbar (const ScrollbarParameters& parms) :
-Control (parms),
-min (0),
-max (0),
-value (0),
-drag_start_y (-1),
-small_step (1),
-big_step (5),
-sc_parms (parms){
+    Control (parms), min (0), max (0), value (0), drag_start_y (-1),
+            small_step (1), big_step (5), sc_parms (parms) {
 }
 
 void Scrollbar::reinitialize () {
@@ -47,7 +41,8 @@ void Scrollbar::paint () {
     int w = get_width ();
     int space = h - 2 * w;
     int bar = space - (max - min);
-    if (bar < 16) bar = 16;
+    if (bar < 16)
+        bar = 16;
     int rest = space - bar;
     int y_offset = w;
     y_offset += (max != min) ? rest * value / (max - min) : 0;
@@ -55,7 +50,7 @@ void Scrollbar::paint () {
     canvas->draw_box (1, 1, w - 2, h - 2, background);
     canvas->draw_rectangle (0, y_offset, w, bar, foreground);
     canvas->draw_box (1, y_offset + 1, w - 2, bar - 2, filler);
-    
+
     canvas->draw_aaline (4, w - 4, w / 2, 4, foreground);
     canvas->draw_aaline (w - 5, w - 4, w / 2, 4, foreground);
     canvas->draw_aaline (4, h - w + 4, w / 2, h - 4, foreground);
@@ -73,10 +68,14 @@ void Scrollbar::scroll_dec (int distance) {
 
 bool Scrollbar::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
-        if ((event.keysym.mod & KMOD_META) != 0) return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
+        if ((event.keysym.mod & KMOD_ALT) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_META) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_SHIFT) != 0)
+            return false;
 
         switch (event.keysym.sym) {
         case SDLK_UP:
@@ -114,7 +113,8 @@ void Scrollbar::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
 
             int space = h - 2 * w;
             int bar = space - (max - min);
-            if (bar < 16) bar = 16;
+            if (bar < 16)
+                bar = 16;
             int rest = space - bar;
             int y_offset = w;
             y_offset += (max != min) ? rest * value / (max - min) : 0;
@@ -145,7 +145,8 @@ void Scrollbar::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
             int w = get_width ();
             int space = h - 2 * w;
             int bar = space - (max - min);
-            if (bar < 16) bar = 16;
+            if (bar < 16)
+                bar = 16;
             int rest = space - bar;
             if (rest > 0) {
                 int delta = event.y - drag_start_y;

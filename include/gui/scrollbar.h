@@ -10,14 +10,14 @@
 
 #include "control.h"
 
-struct ScrollbarParameters : public ControlParameters {
+struct ScrollbarParameters: public ControlParameters {
     const float small_step;
     const float big_step;
     ScrollbarParameters (float nx, float ny, float nw, float nh, float nf,
             float nss, float nbs);
 };
 
-class Scrollbar : public Control {
+class Scrollbar: public Control {
 public:
 
     typedef Event1<Scrollbar*, int> OnValueChanged;

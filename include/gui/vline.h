@@ -10,8 +10,7 @@
 
 #include "control.h"
 
-
-class VLine : public Control {
+class VLine: public Control {
 protected:
 
     VLine (const ControlParameters& parms);
@@ -32,8 +31,6 @@ public:
     static VLine* create (Control* parent, const ControlParameters& parms,
             const Glib::ustring& name = "vline");
 };
-
-
 
 #endif	/* HLINE_H */
 

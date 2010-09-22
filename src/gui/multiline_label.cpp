@@ -4,8 +4,8 @@
 
 using namespace Glib;
 
-MultilineLabel::MultilineLabel (const ControlParameters& parms):
-Control(parms) {
+MultilineLabel::MultilineLabel (const ControlParameters& parms) :
+    Control (parms) {
 }
 
 void MultilineLabel::init_control (Control* par) {
@@ -15,7 +15,8 @@ void MultilineLabel::init_control (Control* par) {
 
 void MultilineLabel::paint () {
     canvas->fill_backgound (get_background ());
-    canvas->draw_wrapped_text (1, 1, get_width () - 2, get_height () - 2, get_text ());
+    canvas->draw_wrapped_text (1, 1, get_width () - 2, get_height () - 2,
+            get_text ());
 }
 
 void MultilineLabel::set_text (const ustring& value) {
@@ -27,9 +28,10 @@ const ustring& MultilineLabel::get_text () const {
     return text;
 }
 
-MultilineLabel* MultilineLabelFactory::create (Control* par, const ustring& text,
-        const ControlParameters& parms, const ustring& name) {
-    MultilineLabel* result = new MultilineLabel(parms);
+MultilineLabel* MultilineLabelFactory::create (Control* par,
+        const ustring& text, const ControlParameters& parms,
+        const ustring& name) {
+    MultilineLabel* result = new MultilineLabel (parms);
     result->set_name (name);
     result->init_control (par);
     result->set_text (text);

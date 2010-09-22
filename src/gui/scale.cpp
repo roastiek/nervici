@@ -7,13 +7,9 @@
 using namespace Glib;
 
 Scale::Scale (const ControlParameters& parms) :
-Control (parms),
-min (0),
-max (0),
-value (0),
-//drag_start (-1),
-small_step (1),
-big_step (1) {
+    Control (parms), min (0), max (0), value (0),
+    //drag_start (-1),
+            small_step (1), big_step (1) {
 }
 
 void Scale::init_control (Control* par) {
@@ -31,27 +27,36 @@ void Scale::paint () {
     int scale_w = get_width () - slider_w - 2;
 
     for (int si = 0; si <= steps; si++) {
-        canvas->draw_vline (slider_w / 2 + 1 + si * scale_w / steps, 0, get_height (), get_foreground ());
+        canvas->draw_vline (slider_w / 2 + 1 + si * scale_w / steps, 0,
+                get_height (), get_foreground ());
     }
 
     int hh = 4 * 1024 / sw;
     int hb = hh * 3;
 
-    canvas->draw_box (0, (get_height () - hb) / 2, get_width (), hb, get_background ());
+    canvas->draw_box (0, (get_height () - hb) / 2, get_width (), hb,
+            get_background ());
 
-    canvas->draw_rectangle (slider_w / 2 + 1, (get_height () - hh) / 2, scale_w + 1, hh, get_foreground ());
+    canvas->draw_rectangle (slider_w / 2 + 1, (get_height () - hh) / 2, scale_w
+            + 1, hh, get_foreground ());
 
-    canvas->draw_box ((get_value () - get_min ()) * scale_w / steps + 1, (get_height () - slider_h) / 2, slider_w, slider_h, C_FILL);
+    canvas->draw_box ((get_value () - get_min ()) * scale_w / steps + 1,
+            (get_height () - slider_h) / 2, slider_w, slider_h, C_FILL);
     int color = (is_focused ()) ? C_FOC_FOREGROUND : C_FOREGROUND;
-    canvas->draw_rectangle ((get_value () - get_min ()) * scale_w / steps + 1, (get_height () - slider_h) / 2, slider_w, slider_h, color);
+    canvas->draw_rectangle ((get_value () - get_min ()) * scale_w / steps + 1,
+            (get_height () - slider_h) / 2, slider_w, slider_h, color);
 }
 
 bool Scale::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
-        if ((event.keysym.mod & KMOD_META) != 0) return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
+        if ((event.keysym.mod & KMOD_ALT) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_META) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_SHIFT) != 0)
+            return false;
 
         switch (event.keysym.sym) {
         case SDLK_LEFT:
@@ -77,8 +82,7 @@ bool Scale::process_key_pressed_event (const SDL_KeyboardEvent& event) {
 void Scale::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
     if (event.state == SDL_PRESSED) {
         switch (event.button) {
-        case SDL_BUTTON_LEFT:
-        {
+        case SDL_BUTTON_LEFT: {
             int steps = get_max () - get_min ();
             int sw = get_screen_width ();
             int slider_w = 7 * 1024 / sw;

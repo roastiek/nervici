@@ -47,7 +47,7 @@ public:
     virtual void draw_line (int x1, int y1, int x2, int y2, uint32_t color) = 0;
 
     virtual void
-            draw_aaline (int x1, int y1, int x2, int y2, uint32_t color) = 0;
+    draw_aaline (int x1, int y1, int x2, int y2, uint32_t color) = 0;
 
     virtual void draw_circle (int x, int y, int r, uint32_t color) = 0;
 
