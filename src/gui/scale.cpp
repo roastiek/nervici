@@ -1,5 +1,7 @@
 #include <SDL_events.h>
 
+#include "gui/defaults.h"
+
 #include "gui/scale.h"
 
 using namespace Glib;

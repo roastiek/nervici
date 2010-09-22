@@ -1,3 +1,4 @@
+#include "gui/defaults.h"
 #include "gui/sdl_canvas.h"
 
 #include "gui/screen.h"

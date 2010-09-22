@@ -1,3 +1,5 @@
+#include "gui/defaults.h"
+
 #include "gui/multiline_label.h"
 
 using namespace Glib;

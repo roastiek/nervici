@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "gui/defaults.h"
 
 #include "gui/team_button.h"
 

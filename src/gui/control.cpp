@@ -1,6 +1,7 @@
-#include <SDL.h>
+#include <SDL_events.h>
 
 #include "utils.h"
+#include "gui/defaults.h"
 
 #include "gui/control.h"
 

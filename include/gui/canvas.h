@@ -8,7 +8,8 @@
 #ifndef CANVAS_H
 #define	CANVAS_H
 
-#include "defaults.h"
+#include "horizontal_aling.h"
+#include "vertical_aling.h"
 #include "fakes/glibmm_decl.h"
 
 class Canvas {

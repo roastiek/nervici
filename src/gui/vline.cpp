@@ -1,3 +1,5 @@
+#include "gui/defaults.h"
+
 #include "gui/vline.h"
 
 using namespace Glib;

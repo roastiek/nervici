@@ -13,6 +13,8 @@
 #include <glibmm/ustring.h>
 
 #include "canvas.h"
+#include "horizontal_aling.h"
+#include "vertical_aling.h"
 
 class SDLCanvas: public Canvas {
 private:

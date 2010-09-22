@@ -1,6 +1,7 @@
 #include <SDL_events.h>
 
 #include "utils.h"
+#include "gui/defaults.h"
 
 #include "gui/smile_control.h"
 

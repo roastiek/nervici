@@ -1,3 +1,5 @@
+#include "gui/defaults.h"
+
 #include "gui/input_control.h"
 
 InputControl::InputControl (const ControlParameters& parms) :

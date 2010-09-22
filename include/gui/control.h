@@ -13,7 +13,7 @@
 
 #include <glibmm/ustring.h>
 
-#include "defaults.h"
+//#include "defaults.h"
 #include "event.h"
 #include "canvas.h"
 #include "fakes/sdl_decl.h"

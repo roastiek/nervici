@@ -1,4 +1,6 @@
+#include "gui/defaults.h"
 #include "gui/scrollport.h"
+
 #include "gui/view.h"
 
 using namespace Glib;

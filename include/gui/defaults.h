@@ -31,13 +31,5 @@
 #define E_SHOW_POPUP    SDL_USEREVENT + 1
 #define E_HIDE_POPUP    SDL_USEREVENT + 2
 
-enum HorizontalAling {
-    HA_left, HA_center, HA_right
-};
-
-enum VerticalAling {
-    VA_top, VA_center, VA_bottom
-};
-
 #endif	/* UTILS_H */
 

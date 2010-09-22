@@ -8,6 +8,7 @@
 #ifndef COMBOBOX_H
 #define	COMBOBOX_H
 
+#include "defaults.h"
 #include "input_control.h"
 #include "listbox.h"
 
