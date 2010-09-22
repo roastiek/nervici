@@ -64,7 +64,8 @@ void TeamInfos::load () {
     *infos[0] = def_infos[0];
 
     for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
-        section = "team" + to_string<size_t> (ti);
+        section = "team";
+        section+= uint_to_string (ti);
 
         infos[ti] = new TeamInfo ();
         infos[ti]->id = ti;
@@ -81,7 +82,8 @@ void TeamInfos::save () {
     ustring section;
 
     for (size_t ti = 1; ti < infos.size (); ti++) {
-        section = "team" + to_string<size_t> (ti);
+        section = "team";
+        section+= uint_to_string (ti);
 
         set.write_hex (section, "color", infos[ti]->color);
         set.write_string (section, "name", infos[ti]->name);

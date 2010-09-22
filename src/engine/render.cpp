@@ -848,7 +848,7 @@ bool SDLRender::load_smile_faces (const ustring& dir) {
 
     for (int bi = 0; bi < 6; bi++) {
         if (smile_images.backs[bi] == NULL) {
-            path = smiles_dir + "smile" + to_string<int> (bi + 1) + ".png";
+            path = smiles_dir + "smile" + int_to_string (bi + 1) + ".png";
             smile_images.backs[bi] = IMG_Load (path.c_str ());
             if (smile_images.backs[bi] != NULL) {
                 if (smile_images.backs[bi]->w != 20

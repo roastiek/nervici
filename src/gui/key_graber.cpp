@@ -27,7 +27,7 @@ int KeyGraber::get_key () const {
 void KeyGraber::set_key (int value) {
     if (key != value) {
         key = value;
-        Button::set_text (get_text () + to_string<int> (value));
+        Button::set_text (get_text () + int_to_string (value));
     }
 }
 
@@ -37,7 +37,7 @@ const ustring& KeyGraber::get_text () const {
 
 void KeyGraber::set_text (const ustring& value) {
     text = value;
-    Button::set_text (text + to_string<int> (get_key ()));
+    Button::set_text (text + int_to_string (get_key ()));
 }
 
 KeyGraber* KeyGraberFactory::create (Control* parent, const ustring& text,

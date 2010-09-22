@@ -67,7 +67,7 @@ void SDLCanvas::set_height (int value) {
 void SDLCanvas::set_font (const ustring& value) {
     SDLPango_FreeContext ( pango_context);
     font.name = value;
-    ustring desc = value + " " + to_string<int> (font.size) + "px";
+    ustring desc = value + " " + int_to_string (font.size) + "px";
     pango_context = SDLPango_CreateContext_GivenFontDesc (desc.c_str ());
     SDLPango_SetDefaultColor (pango_context, &font_color);
 }
@@ -88,7 +88,7 @@ void SDLCanvas::set_font_color (Uint32 value) {
 void SDLCanvas::set_font_size (int value) {
     SDLPango_FreeContext ( pango_context);
     font.size = value;
-    ustring desc = font.name + " " + to_string<int> (value) + "px";
+    ustring desc = font.name + " " + int_to_string (value) + "px";
     pango_context = SDLPango_CreateContext_GivenFontDesc (desc.c_str ());
     SDLPango_SetDefaultColor (pango_context, &font_color);
 }

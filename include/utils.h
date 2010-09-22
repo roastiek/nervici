@@ -8,16 +8,11 @@
 #ifndef UTILS_H
 #define	UTILS_H
 
-#include <sstream>
+const char* int_to_string (long int value);
 
-//using namespace std;
+const char* uint_to_string (long unsigned int value);
 
-template<class T>
-inline std::string to_string (const T& value) {
-    std::stringstream ss;
-    ss << value;
-    return ss.str ();
-}
+const char* double_to_string (double value);
 
 #endif	/* UTILS_H */
 

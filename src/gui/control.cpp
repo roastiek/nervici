@@ -11,9 +11,9 @@ ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
     x (nx), y (ny), w (nw), h (nh), font_size (nf) {
 }
 
-inline ustring make_font (const ustring& name, int size) {
-    return name + " " + to_string<int> (size);
-}
+/*inline ustring make_font (const ustring& name, int size) {
+    return name + " " + int_to_string (size);
+}*/
 
 struct KeyEvent {
     SDL_KeyboardEvent& event;

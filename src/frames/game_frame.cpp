@@ -327,7 +327,8 @@ void GameFrame::init_control (Control* par) {
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
-    la_speed_text->set_text (to_string<float> (float(base_speed) / value) + "x");
+    la_speed_text->set_text (ustring (double_to_string (double(base_speed)
+            / value)) + "x");
 }
 
 GameFrame* GameFrame::create_frame (Control* par) {
@@ -359,8 +360,8 @@ void GameFrame::preapare () {
     }
 
     for (int pi = 0; pi < 16; pi++) {
-        const ustring& name = set.read_string ("game", "player"
-                + to_string<int> (pi), "");
+        const ustring& name = set.read_string ("game", ustring ("player")
+                + int_to_string (pi), "");
         cb_players[pi]->set_selected (0);
         for (size_t pli = 0; pli < pl_infos.count (); pli++) {
             if (name.compare (pl_infos[pli].name) == 0) {
@@ -369,8 +370,8 @@ void GameFrame::preapare () {
             }
         }
 
-        btn_teams[pi]->set_selected (set.read_int ("game", "team" + to_string<
-                int> (pi), 0));
+        btn_teams[pi]->set_selected (set.read_int ("game", ustring ("team")
+                + int_to_string (pi), 0));
     }
 }
 
@@ -454,8 +455,8 @@ void GameFrame::load_mod (const Mod& mod) {
 
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
-            sc_smiles[si][li]->set_value (set.read_int (mod.name, "smile"
-                    + to_string<int> (si) + "-" + to_string<int> (li),
+            sc_smiles[si][li]->set_value (set.read_int (mod.name, ustring (
+                    "smile") + int_to_string (si) + "-" + int_to_string (li),
                     mod.spec.default_smiles.counts[si][li]));
         }
     }
@@ -537,9 +538,9 @@ void GameFrame::save_state () {
     for (int pi = 0; pi < 16; pi++) {
         int sel = cb_players[pi]->get_selected ();
         const ustring& name = (sel > 0) ? pl_infos[sel - 1].name : "";
-        set.write_string ("game", "player" + to_string<int> (pi), name);
+        set.write_string ("game", ustring ("player") + int_to_string (pi), name);
 
-        set.write_int ("game", "team" + to_string<int> (pi),
+        set.write_int ("game", ustring ("team") + int_to_string (pi),
                 btn_teams[pi]->get_selected ());
     }
 
@@ -553,8 +554,8 @@ void GameFrame::save_state () {
 
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
-            set.write_int (mod_name, "smile" + to_string<int> (si) + "-"
-                    + to_string<int> (li), sc_smiles[si][li]->get_value ());
+            set.write_int (mod_name, ustring ("smile") + int_to_string (si)
+                    + "-" + int_to_string (li), sc_smiles[si][li]->get_value ());
         }
     }
 }

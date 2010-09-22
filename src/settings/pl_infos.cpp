@@ -113,7 +113,8 @@ void PlInfos::save_players () {
 
     ustring section;
     for (size_t pi = 0; pi < players.size (); pi++) {
-        section = "player" + to_string<size_t> (pi);
+        section = "player";
+        section += uint_to_string (pi);
         const PlInfo* info = players[pi];
 
         set.write_hex (section, "color", info->color);
@@ -132,7 +133,8 @@ void PlInfos::save_ais () {
 
     ustring section;
     for (size_t pi = 0; pi < ais.size (); pi++) {
-        section = "plastik" + to_string<size_t> (pi);
+        section = "plastik";
+        section += uint_to_string (pi);
         const PlInfo* info = ais[pi];
 
         set.write_hex (section, "color", info->color);

@@ -18,7 +18,7 @@ void TeamButton::paint () {
     uint32_t color = (get_selected () > 0) ? (*colors)[get_selected ()] : get_background ();
     canvas->fill_backgound (color);
     if (get_selected () > 0) {
-        canvas->draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center, VA_center, to_string<int> (get_selected ()));
+        canvas->draw_text (1, 1, get_width () - 2, get_height () - 2, HA_center, VA_center, int_to_string (get_selected ()));
     }
 }
 

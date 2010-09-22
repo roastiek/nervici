@@ -7,11 +7,7 @@
 using namespace Glib;
 
 SmileControl::SmileControl (const ControlParameters& parms, Canvas* face) :
-Control (parms),
-smile (face),
-enabled (true),
-count (1),
-step (1) {
+    Control (parms), smile (face), enabled (true), count (1), step (1) {
 }
 
 void SmileControl::init_control (Control* par) {
@@ -26,12 +22,14 @@ void SmileControl::paint () {
     int c = get_count ();
     int s = get_step ();
 
-    canvas->draw_box (0, h, get_width (), -h * get_value () / c + 1, (is_smile_enabled ()) ? C_FILL : C_DIS_FILL);
+    canvas->draw_box (0, h, get_width (), -h * get_value () / c + 1,
+            (is_smile_enabled ()) ? C_FILL : C_DIS_FILL);
 
     //int
 
     for (int i = 0; i < c / s; i++) {
-        canvas->draw_hline (0, h * (i + 1) * s / c + 1, get_width (), (is_smile_enabled ()) ? get_foreground () : C_DIS_FOREGROUND);
+        canvas->draw_hline (0, h * (i + 1) * s / c + 1, get_width (),
+                (is_smile_enabled ()) ? get_foreground () : C_DIS_FOREGROUND);
     }
 
     int left = (get_width () - 20) / 2;
@@ -48,7 +46,8 @@ void SmileControl::paint () {
 
     canvas->draw_rectangle (0, 0, get_width (), h + get_width (), color);
 
-    canvas->draw_text (0, get_height () - 20, get_width (), 20, HA_center, VA_bottom, to_string<int>(get_value ()));
+    canvas->draw_text (0, get_height () - 20, get_width (), 20, HA_center,
+            VA_bottom, int_to_string (get_value ()));
 }
 
 void SmileControl::update_value (int y) {
@@ -69,11 +68,11 @@ void SmileControl::dec_value (int delta) {
     set_value (get_value () - delta);
 }
 
-void SmileControl::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
+void SmileControl::process_mouse_button_event (
+        const SDL_MouseButtonEvent& event) {
     if (event.state == SDL_PRESSED) {
         switch (event.button) {
-        case SDL_BUTTON_LEFT:
-        {
+        case SDL_BUTTON_LEFT: {
             int h = get_height () - get_width () - 12;
 
             if (event.y <= h) {
@@ -108,10 +107,14 @@ void SmileControl::process_mouse_move_event (const SDL_MouseMotionEvent& event) 
 
 bool SmileControl::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0) return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0) return false;
-        if ((event.keysym.mod & KMOD_META) != 0) return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0) return false;
+        if ((event.keysym.mod & KMOD_ALT) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_CTRL) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_META) != 0)
+            return false;
+        if ((event.keysym.mod & KMOD_SHIFT) != 0)
+            return false;
 
         switch (event. keysym.sym) {
         case SDLK_UP:
