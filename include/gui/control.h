@@ -13,11 +13,22 @@
 
 #include <glibmm/ustring.h>
 
-//#include "defaults.h"
 #include "event.h"
 #include "canvas.h"
 #include "fakes/sdl_decl.h"
 
+/*
+ * Simple gui control.
+ * Controls have static dimensions, so they do not support auto-resize.
+ * There is only suppor for one root window and no modal windows, popup windows
+ * are possible.
+ * Dimensions of controls scale with screen resolution.
+ */
+
+/*
+ * All parameters are relative to screen width 1024, so they scale with screen 
+ * resolution. 
+ */
 struct ControlParameters {
     float x;
     float y;
@@ -68,28 +79,77 @@ public:
     };
 
 private:
+    /*
+     * Parent control
+     */
     Control* parent;
-    Control* children;
+    /*
+     * First children of control. They die with contol at same time. They are 
+     * stored in linked list.
+     */
+    Control* first_child;
+    
+    Control* last_child;
+    /*
+     * Currently focused child, can be NULL
+     */
     Control* focused_child;
+    /*
+     * Next children in linked list. NULL for last child. 
+     */
     Control* next;
+    
+    Control* prev;
 
+    /*
+     * X, Y coordinates in absolute screen resolution, relative to parent, 
+     * in pixels
+     */
     int x;
     int y;
+    
+    /*
+     * Name of control, used for more readable debugging. 
+     */
     Glib::ustring name;
 
+    /*
+     * Basic three colors. 
+     */
     struct {
         uint32_t background;
         uint32_t foreground;
         uint32_t frame;
     } colors;
 
+    /*
+     * Indicate, if control shall be redrawn.
+     */
     bool valid;
+    
+    /*
+     * Indicate, if control is enabled, can accept input from user.
+     */
     bool enabled;
+    
+    /*
+     * Indicate, that control gets input from keyboard.
+     */
     bool focused;
+    
+    /*
+     * Indicate, if control is visible.
+     */
     bool visible;
 
+    /*
+     * Default control sizes, they are translated to actual screen resolution
+     */
     const ControlParameters parms;
 
+    /*
+     * Saving callback for events
+     */
     struct {
         OnClicked clicked;
         OnMouseButton mouse_button;
@@ -105,18 +165,41 @@ private:
         OnHeightChanged height_changed;
     } call;
 
+    /*
+     * Destroy all children when parent die
+     */
     void destroy_children ();
 
+    /*
+     * Draw itself into parent canvas
+     */
     void blit (Canvas *dest);
 
+    /*
+     * Update adn redraw all children in specified area in reversed order, so 
+     * first child is on top.
+     */
     void update_children (Control* item, int x, int y, int w, int h);
 
+    /*
+     * Tries switch focus on next child, return true if successful. item is one 
+     * of children.  
+     */
     bool switch_focus (Control* item);
 
+    /*
+     * Steal focus from actual focused control.
+     */
     void steal_focus ();
 
+    /*
+     * Tells parent, that child gain focus.
+     */
     void propagate_focus (Control* child);
 
+    /*
+     * Parent transfer own focus to one of children.
+     */
     bool child_grab_focus (Control* child);
 
 protected:

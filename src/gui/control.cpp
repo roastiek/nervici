@@ -7,32 +7,25 @@
 
 using namespace Glib;
 
+/*
+ * Focus algorithm
+ * Controls are organized in three where root = Screen
+ * Control can gain focus if is visible, enabled and focusable
+ * Order for transfering focus with Tab key is same as DFS.
+ * 
+ */
+
 ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
         float nf) :
     x (nx), y (ny), w (nw), h (nh), font_size (nf) {
 }
 
-/*inline ustring make_font (const ustring& name, int size) {
-    return name + " " + int_to_string (size);
-}*/
-
-struct KeyEvent {
-    SDL_KeyboardEvent& event;
-
-    KeyEvent (SDL_KeyboardEvent& ev) :
-        event (ev) {
-    }
-
-    operator SDL_KeyboardEvent& () {
-        return event;
-    }
-};
-
 Control::Control (const ControlParameters& pp) :
 parent (NULL),
-children (NULL),
+first_child (NULL),
+last_child (NULL),
 focused_child (NULL),
-next (NULL),
+next (NULL), prev (NULL),
 x (0),
 y (0),
 colors ( {  0, 0, 0}),
@@ -79,29 +72,25 @@ Control* ControlFactory::create (Control* par, const ControlParameters& parms,
 }
 
 void Control::add_child (Control* child) {
-    child->next = children;
-    children = child;
+    ((first_child == NULL) ? first_child : last_child->next) = child;
+    child->prev = last_child;
+    child->next = NULL;
+    last_child = child;
     invalidate ();
 }
 
 void Control::remove_child (Control* child) {
-    Control* item = children;
-    Control* last = NULL;
-
-    for (; item != NULL; last = item, item = item->next) {
-        if (child == item) {
-            break;
-        }
-    }
-
-    if (item != NULL) {
-        ((last != NULL) ? last->next : children) = item->next;
-    }
+    Control* prev_child = child->prev;
+    Control* next_child = child->next;
+    
+    ((prev_child == NULL) ? first_child : prev_child->next) = next_child;
+    ((next_child == NULL) ? last_child : next_child->prev) = prev_child;
+    
     invalidate ();
 }
 
 void Control::destroy_children () {
-    Control* item = children;
+    Control* item = first_child;
     Control* next;
 
     while (item != NULL) {
@@ -109,6 +98,8 @@ void Control::destroy_children () {
         delete item;
         item = next;
     }
+    first_child = NULL;
+    last_child = NULL;
 }
 
 void Control::blit (Canvas *dest) {
@@ -141,7 +132,7 @@ void Control::update (int x, int y, int w, int h) {
         valid = true;
     }
 
-    update_children (children, x - get_x (), y - get_y (), w, h);
+    update_children (first_child, x - get_x (), y - get_y (), w, h);
     if (get_frame () != 0)
         canvas->draw_frame (get_frame ());
     on_update (x, y, w, h);
@@ -168,7 +159,7 @@ void Control::invalidate () {
 }
 
 Control* Control::get_child_at_pos (int x, int y) {
-    Control* item = children;
+    Control* item = first_child;
     for (; item != NULL; item = item->next) {
         Control* child = item;
         if (child->is_visible ()) {
@@ -183,7 +174,7 @@ Control* Control::get_child_at_pos (int x, int y) {
 }
 
 Control* Control::control_at_pos (int x, int y) {
-    Control* item = children;
+    Control* item = first_child;
     for (; item != NULL; item = item->next) {
         Control* child = item;
         if (child->is_visible ()) {
@@ -199,7 +190,8 @@ Control* Control::control_at_pos (int x, int y) {
 }
 
 /*
- * call grab_focus on childrens in reserved order, but stop before focused_child
+ * Call grab_focus on children in reversed order, but stop before 
+ * focused_child.
  */
 bool Control::switch_focus (Control* item) {
     if (item == NULL)
@@ -235,7 +227,7 @@ void Control::propagate_focus (Control* child) {
 }
 
 /*
- * If visible, enable and fusuable control will gain focus,
+ * If visible, enabled and focusable control will gain focus,
  * or if not focusable some of its childrens
  */
 bool Control::grab_focus () {
@@ -249,7 +241,7 @@ bool Control::grab_focus () {
             }
             return true;
         } else if (focused_child == NULL) {
-            if (child_grab_focus (children))
+            if (child_grab_focus (first_child))
                 return true;
         }
     }
@@ -278,12 +270,12 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
         }
     }
     if (event.keysym.sym == SDLK_TAB) {
-        if (switch_focus (children))
+        if (switch_focus (first_child))
             return true;
 
         if (get_parent () == NULL) {
             steal_focus ();
-            if (switch_focus (children))
+            if (switch_focus (first_child))
                 return true;
         }
     }
@@ -317,7 +309,7 @@ void Control::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
 
 void Control::show_all () {
     set_visible (true);
-    for (Control* child = children; child != NULL; child = child->next) {
+    for (Control* child = first_child; child != NULL; child = child->next) {
         child->show_all ();
     }
 }
