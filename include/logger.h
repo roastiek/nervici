@@ -20,6 +20,8 @@ private:
 public:
     void fineln (const char* str, ...);
     
+    void debugln (const char* str, ...);
+
     void warnln (const char* str, ...);
     
     void errln (const char* str, ...);

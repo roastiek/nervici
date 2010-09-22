@@ -14,10 +14,22 @@ Logger::Logger () {
 
 }
 
-#define SHOW_FINE
+//#define SHOW_FINE
+#define SHOW_DEBUG
 
 void Logger::fineln (const char* str, ...) {
 #ifdef SHOW_FINE
+    va_list arg;
+
+    va_start (arg, str);
+    vprintf (str, arg);
+    va_end (arg);
+    printf ("\n");
+#endif 
+}
+
+void Logger::debugln (const char* str, ...) {
+#ifdef SHOW_DEBUG
     va_list arg;
 
     va_start (arg, str);

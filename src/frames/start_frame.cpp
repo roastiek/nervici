@@ -42,17 +42,17 @@ void StartFrame::init_control (Control* par) {
     Control::init_control (par);
 
     Button* btn_new_game = ButtonFactory::create (this, "chcu si zahrat",
-            btn_new_game_parms);
+            btn_new_game_parms, "btn_new_game");
     btn_new_game->register_on_clicked (OnClicked (this,
             &StartFrame::btn_new_game_clicked));
 
     Button* btn_pledit = ButtonFactory::create (this, "s kym se plazit",
-            btn_pledit_parms);
+            btn_pledit_parms, "btn_pledit");
     btn_pledit->register_on_clicked (OnClicked (this,
             &StartFrame::btn_pledit_clicked));
 
     Button* btn_quit = ButtonFactory::create (this, "uz me to nebavi",
-            btn_quit_parms);
+            btn_quit_parms, "btn_quit");
     btn_quit->register_on_clicked (OnClicked (this,
             &StartFrame::btn_quit_clicked));
 }

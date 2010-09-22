@@ -197,6 +197,11 @@ private:
      */
     bool focus_next_child (Control* start_child);
 
+    /*
+     * Transfer focus to nearest previous child, start_child included.
+     */
+    bool focus_prev_child (Control* start_child);
+
 protected:
     Canvas* canvas;
 
@@ -241,7 +246,17 @@ public:
 
     virtual void invalidate ();
 
+    /*
+     * Control grabs focus, if not focusable, first focusable child will gain 
+     * focus.
+     */
     virtual bool grab_focus ();
+
+    /*
+     * Control grabs focus, if not focusable, last focusable child will gain 
+     * focus.
+     */
+    virtual bool grab_focus_last ();
 
     virtual Control* get_child_at_pos (int x, int y);
 

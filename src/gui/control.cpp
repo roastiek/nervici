@@ -1,6 +1,7 @@
 #include <SDL_events.h>
 
 #include "utils.h"
+#include "logger.h"
 #include "gui/defaults.h"
 
 #include "gui/control.h"
@@ -234,6 +235,23 @@ bool Control::grab_focus () {
     return false;
 }
 
+bool Control::grab_focus_last () {
+    if (is_visible () && is_enabled ()) {
+        if (is_focusable ()) {
+            if (!is_focused ()) {
+                steal_focus ();
+                if (get_parent () != NULL)
+                    get_parent ()->propagate_focus (this);
+                set_focused (true);
+            }
+            return true;
+        } else if (focused_child == NULL) {
+            if (focus_prev_child (last_child))
+                return true;
+        }
+    }
+    return false;
+}
 /*
  * Call grab_focus on children started from start_child. First successful call
  * will gain focus.
@@ -246,6 +264,16 @@ bool Control::focus_next_child (Control* start_child) {
         return true;
 
     return focus_next_child (start_child->next);
+}
+
+bool Control::focus_prev_child (Control* start_child) {
+    if (start_child == NULL)
+        return false;
+
+    if (start_child->grab_focus_last ())
+        return true;
+
+    return focus_prev_child (start_child->prev);
 }
 
 bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
@@ -266,7 +294,17 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
 
     if ((event.keysym.mod & KMOD_SHIFT) != 0) {
         if (event.keysym.sym == SDLK_TAB) {
+            if (focus_prev_child ((focused_child != NULL) ? focused_child->prev
+                    : last_child))
+                return true;
+
+            if (get_parent () == NULL) {
+                steal_focus ();
+                if (focus_prev_child (last_child))
+                    return true;
+            }
         }
+        return false;
     }
 
     if (event.keysym.sym == SDLK_TAB) {
