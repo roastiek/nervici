@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nervici 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-22 00:00+0200\n"
+"POT-Creation-Date: 2010-09-22 15:34+0200\n"
 "PO-Revision-Date: 2010-09-21 17:59+0200\n"
 "Last-Translator: bobo <bobo@localhost>\n"
 "Language-Team: English\n"
@@ -26,6 +26,15 @@ msgstr ""
 
 #: src/engine/render.cpp:549
 msgid "length"
+msgstr ""
+
+#: src/engine/render.cpp:1469
+#, c-format
+msgid "round: %d"
+msgstr ""
+
+#: src/engine/render.cpp:1488
+msgid "The End"
 msgstr ""
 
 #~ msgid "cosii"

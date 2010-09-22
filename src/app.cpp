@@ -1,5 +1,6 @@
 #include <SDL.h>
 
+#include "logger.h"
 #include "system.h"
 #include "engine/render.h"
 #include "engine/audio.h"
@@ -13,7 +14,6 @@
 #include "frames/start_frame.h"
 #include "frames/game_frame.h"
 #include "frames/pledit_frame.h"
-#include "logger.h"
 
 #include "app.h"
 
@@ -55,6 +55,7 @@ bool App::initialize () {
     paths.init_paths ();
 
     bindtextdomain ("nervici", (paths.get_data_dir () + "locale/").c_str ());
+    bind_textdomain_codeset ("nervici", "UTF-8");
     textdomain ("nervici");
 
     settings.load ();

@@ -1,6 +1,5 @@
 #include <cmath>
 #include <clocale>
-#include <libintl.h>
 #include <glibmm/init.h>
 #include <giomm/init.h>
 #include <glibmm/thread.h>

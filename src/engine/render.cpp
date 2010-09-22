@@ -1458,21 +1458,15 @@ void SDLRender::draw_semafor (int state) {
 }
 
 void SDLRender::draw_round (round_tu round) {
-    static char tt[] = "kolo:   ";
+#define TT_LEN 32
+    static char tt[TT_LEN];
+
     dest = gs_inner.round;
     SDL_Surface *text;
 
     SDL_BlitSurface (background, &dest, primary, &dest);
 
-    while (round > 99)
-        round /= 10;
-    if (round > 9) {
-        tt[6] = '0' + round / 10;
-        tt[7] = '0' + round % 10;
-    } else {
-        tt[6] = '0' + round;
-        tt[7] = ' ';
-    }
+    snprintf (tt, TT_LEN, _("round: %d"), round);
 
     SDLPango_SetText (round_context, tt, -1);
     SDLPango_SetMinimumSize (round_context, 0, 20);
@@ -1491,7 +1485,7 @@ void SDLRender::draw_end () {
     dest = gs_outer.playerground;
     SDL_Surface *text;
 
-    SDLPango_SetMarkup (end_context, "The Konec", -1);
+    SDLPango_SetMarkup (end_context, _("The End"), -1);
     text = SDLPango_CreateSurfaceDraw (end_context);
     dest.x += (dest.w - text->w) / 2;
     dest.y += (dest.h - text->h) / 2;

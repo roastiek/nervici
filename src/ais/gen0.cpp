@@ -5,7 +5,6 @@
  *      Author: bobo
  */
 
-#include <iostream>
 #include <cmath>
 #include <limits>
 #include <glibmm/threadpool.h>
