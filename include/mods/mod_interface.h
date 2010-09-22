@@ -1,8 +1,6 @@
 #ifndef __MOD_INTERFACE_H__
 #define __MOD_INTERFACE_H__
 
-//#include <glibmm/ustring.h>
-
 #include "int_type.h"
 #include "iplayer.h"
 #include "fakes/game_setting.h"
