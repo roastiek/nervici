@@ -1,10 +1,10 @@
 #include <al.h>
 #include <alc.h>
-#include <iostream>
 #include <glibmm/fileutils.h>
 #include <glibmm/stringutils.h>
 
 #include "system.h"
+#include "logger.h"
 #include "settings/pl_info.h"
 #include "settings/setting.h"
 #include "settings/settings.h"
@@ -33,6 +33,8 @@ private:
         ustring filename;
         bool played;
     };
+
+    bool initialized;
 
     bool music_loop;
 
@@ -190,12 +192,13 @@ const ustring AudioOpenAL::st_bfrCount = "bfrCount";
 AudioOpenAL AudioOpenAL::instance;
 
 AudioOpenAL::AudioOpenAL () :
-    music_loop (false), music_type (MT_Count), music_data (NULL),
-            music_decoder (NULL) {
+    initialized (false), music_loop (false), music_type (MT_Count), device (
+            NULL), context (NULL), music_data (NULL), music_decoder (NULL) {
 
 }
 
 void AudioOpenAL::load_setting () {
+    logger.fineln ("loading audio setting");
 
     Setting& set = settings.app ();
 
@@ -206,6 +209,7 @@ void AudioOpenAL::load_setting () {
 }
 
 void AudioOpenAL::save_setting () {
+    logger.fineln ("saving audio setting");
 
     Setting& set = settings.app ();
 
@@ -217,7 +221,6 @@ void AudioOpenAL::save_setting () {
 
 int AudioOpenAL::find_profil (const ustring& name) const {
     for (size_t si = 0; si < sound_profiles.size (); si++) {
-        cout << name << " / " << sound_profiles[si]->name << '\n';
         if (name.compare (sound_profiles[si]->name) == 0) {
             return si;
         }
@@ -251,6 +254,8 @@ bool AudioOpenAL::music_open (MusicType type) {
             if (music_decoder->open (music[type][f].filename)) {
                 return true;
             }
+            logger.warnln ("could not play %s",
+                    music[type][f].filename.c_str ());
             delete music_decoder;
             music_decoder = NULL;
         }
@@ -260,10 +265,22 @@ bool AudioOpenAL::music_open (MusicType type) {
 }
 
 void AudioOpenAL::initialize () {
+    logger.fineln ("initialize OpenAL audio");
+
     load_setting ();
 
     device = alcOpenDevice (NULL);
+    if (device == NULL) {
+        logger.warnln ("could not open audio device");
+        return;
+    }
+
     context = alcCreateContext (device, NULL);
+    if (context == NULL) {
+        logger.warnln ("could not create audio context");
+        return;
+    }
+
     alcMakeContextCurrent (context);
 
     alListenerfv (AL_POSITION, listener_pos);
@@ -272,20 +289,35 @@ void AudioOpenAL::initialize () {
 
     load_sounds ();
     load_music ();
+
+    initialized = true;
 }
 
 void AudioOpenAL::uninitialize () {
+    logger.fineln ("uninitialize OpenAL audio");
+
+    initialized = false;
+
     free_music ();
     free_sounds ();
 
     alcMakeContextCurrent (NULL);
-    alcDestroyContext (context);
-    alcCloseDevice (device);
+    if (context != NULL) {
+        alcDestroyContext (context);
+        context = NULL;
+    }
+    if (device != NULL) {
+        alcCloseDevice (device);
+        device = NULL;
+    }
 
     save_setting ();
 }
 
 void AudioOpenAL::music_stop () {
+    if (!initialized)
+        return;
+
     int queued;
     ALuint buffer;
 
@@ -304,6 +336,9 @@ void AudioOpenAL::music_stop () {
 }
 
 void AudioOpenAL::music_play (MusicType type) {
+    if (!initialized)
+        return;
+
     if (music_is_playing ()) {
         if (music_type == type)
             return;
@@ -329,6 +364,9 @@ void AudioOpenAL::music_play (MusicType type) {
 }
 
 void AudioOpenAL::music_update () {
+    if (!initialized)
+        return;
+
     if (music_is_playing ()) {
         int processed;
         ALuint buffer;
@@ -351,6 +389,8 @@ void AudioOpenAL::load_music () {
         "game/",
         "menu/",
         "stat/"};
+    logger.fineln ("loading music files");
+
     ustring dir_name;
     int mt;
 
@@ -381,6 +421,7 @@ void AudioOpenAL::scan_music_dir (const ustring& path,
     ustring file_path;
     MusicFile entry;
 
+    logger.fineln ("searching %s for music files", path.c_str ());
     try {
 
         Dir dir (path);
@@ -403,6 +444,7 @@ void AudioOpenAL::scan_music_dir (const ustring& path,
                 continue;
             }
 
+            logger.fineln ("found music file %s", file_path.c_str ());
             entry.filename = file_path;
             entry.played = false;
             files.push_back (entry);
@@ -413,6 +455,7 @@ void AudioOpenAL::scan_music_dir (const ustring& path,
 }
 
 void AudioOpenAL::free_music () {
+    logger.fineln ("freeing music");
     alDeleteBuffers (setting.bfrs_count, music_buffers);
     alDeleteSources (1, &music_source);
 
@@ -425,8 +468,7 @@ void AudioOpenAL::scan_sounds_dir (const ustring& path, vector<char>& data) {
     ustring lower;
     size_t sound_count;
 
-    cout << __func__ << '\n';
-
+    logger.fineln ("searching %s for sounds", path.c_str ());
     try {
         Dir sound_dir (path);
 
@@ -479,6 +521,8 @@ void AudioOpenAL::load_sounds () {
     vector<char> data;
     ustring dir;
 
+    logger.fineln ("loading sound files");
+
     data.resize (0xffff);
 
     dir = paths.get_data_dir () + "sounds/";
@@ -491,6 +535,8 @@ void AudioOpenAL::load_sounds () {
 }
 
 void AudioOpenAL::free_sounds () {
+    logger.fineln ("freeing sound files");
+
     for (size_t pi = 0; pi < sound_profiles.size (); pi++) {
         SoundProfileImpl& spi = get_sprofile (pi);
         for (int eti = 0; eti < ET_Count; eti++) {
@@ -553,15 +599,21 @@ bool AudioOpenAL::load_sound (SoundProfileImpl* prof, EffectType effect,
         prof->buffers[effect].push_back (sound_buffer);
         return true;
     }
+    logger.warnln ("could not play %s", filename.c_str ());
     return false;
 }
 
 void AudioOpenAL::music_set_rate (float rate) {
+    if (!initialized)
+        return;
+
     alSourcef (music_source, AL_PITCH, rate);
 }
 
 void AudioOpenAL::load_players (const std::vector<const PlInfo*>& infos) {
-    sounds.clear ();
+    logger.fineln ("loading players sounds");
+    if (!initialized)
+        return;
 
     for (size_t si = 0; si < infos.size (); si++) {
         const PlInfo& info = *infos[si];
@@ -571,21 +623,26 @@ void AudioOpenAL::load_players (const std::vector<const PlInfo*>& infos) {
         alSourcef (entry.source, AL_GAIN, setting.sound / 20.0);
         alSourcefv (entry.source, AL_VELOCITY, source_vel);
         alSourcefv (entry.source, AL_POSITION, source_pos);
-        cout << info.profil << '\n';
         entry.prof = find_profil (info.profil);
         sounds.push_back (entry);
     }
 }
 
 void AudioOpenAL::free_players () {
+    logger.fineln ("freeing players sounds");
     for (size_t si = 0; si < sounds.size (); si++) {
 
         alSourceStop (sounds[si].source);
         alDeleteSources (1, &sounds[si].source);
     }
+    sounds.clear ();
+
 }
 
 void AudioOpenAL::play_effect (plid_tu plid, EffectType effect) {
+    if (!initialized)
+        return;
+
     ALint play;
     ALuint source;
 

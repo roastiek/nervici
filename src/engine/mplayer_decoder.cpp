@@ -1,9 +1,9 @@
 #include <glibmm/fileutils.h>
 #include <glibmm/regex.h>
 #include <glibmm/stringutils.h>
-#include <iostream>
 #include <stdexcept>
 
+#include "logger.h"
 #include "settings/setting.h"
 #include "settings/settings.h"
 
@@ -21,6 +21,8 @@ MplayerDecoder::~MplayerDecoder () {
 }
 
 bool MplayerDecoder::open (const Glib::ustring& filename) {
+    logger.fineln ("opening %s with mplayer", filename.c_str ());
+
     Setting& set = settings.app ();
     vector<ustring> cmd;
     cmd.push_back ("/usr/bin/mplayer");
@@ -94,13 +96,16 @@ bool MplayerDecoder::open (const Glib::ustring& filename) {
         } catch (FileError) {
             spawn_close_pid (pid);
             pid = 0;
+            logger.warnln ("reading audio file failed");
         }
     } catch (SpawnError) {
+        logger.warnln ("could not run mplayer");
     }
     return false;
 }
 
 void MplayerDecoder::close () {
+    logger.fineln ("closing mplayer");
     if (pid != 0) {
         source->close (false);
         spawn_close_pid (pid);
@@ -137,6 +142,8 @@ size_t MplayerDecoder::read (char* buffer, size_t len) {
 }
 
 double MplayerDecoder::get_length (const Glib::ustring& filename) {
+    logger.fineln ("opening %s with mplayer", filename.c_str ());
+
     Setting& set = settings.app ();
     vector<ustring> cmd;
     cmd.push_back ("/usr/bin/mplayer");
@@ -179,11 +186,13 @@ double MplayerDecoder::get_length (const Glib::ustring& filename) {
 
         } catch (IOChannelError) {
         } catch (FileError) {
+            logger.warnln ("reading audio file failed");
         }
 
         spawn_close_pid (info_pid);
 
     } catch (SpawnError) {
+        logger.warnln ("could not run mplayer");
     }
     return result;
 }
