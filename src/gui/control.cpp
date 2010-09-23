@@ -70,17 +70,19 @@ void Control::add_child (Control* child) {
     child->prev = last_child;
     child->next = NULL;
     last_child = child;
-    invalidate ();
+    child->invalidate ();
 }
 
 void Control::remove_child (Control* child) {
     Control* prev_child = child->prev;
     Control* next_child = child->next;
 
+    child->invalidate();
+    
     ((prev_child == NULL) ? first_child : prev_child->next) = next_child;
     ((next_child == NULL) ? last_child : next_child->prev) = prev_child;
 
-    invalidate ();
+    //invalidate ();
 }
 
 void Control::destroy_children () {
@@ -231,6 +233,7 @@ bool Control::grab_focus () {
                 steal_focus ();
                 if (get_parent () != NULL)
                     get_parent ()->propagate_focus (this);
+                logger.debugln("focus %s", get_name().c_str());
                 set_focused (true);
             }
             return true;
@@ -509,9 +512,9 @@ void Control::set_visible (bool value) {
     if (visible != value) {
         visible = value;
         invalidate ();
-        if (!visible && get_parent () != NULL) {
+        /*if (!visible && get_parent () != NULL) {
             get_parent ()->invalidate ();
-        }
+        }*/
     }
 }
 

@@ -156,7 +156,7 @@ void Screen::poput_lost_focus (Control* ctl) {
     ctl->register_on_focus_lost (OnFocusLost ());
 }
 
-bool Screen::is_focusable () {
+bool Screen::is_focusable () const {
     return false;
 }
 

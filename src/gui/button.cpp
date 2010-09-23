@@ -44,6 +44,7 @@ bool Button::process_key_pressed_event (const SDL_KeyboardEvent& event) {
 }
 
 void Button::paint () {
+    canvas->clear();
     canvas->fill_backgound (get_background ());
     canvas->draw_text (0, 0, get_width (), get_height (), HA_center, VA_center,
             get_text ());

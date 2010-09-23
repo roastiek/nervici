@@ -105,7 +105,7 @@ void SDLCanvas::set_font_size (int value) {
 }
 
 void SDLCanvas::clear () {
-    SDL_FillRect(surface, NULL, 0);
+    SDL_FillRect (surface, NULL, 0);
 }
 
 void SDLCanvas::draw_point (int x, int y, Uint32 color) {
@@ -240,7 +240,7 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, HorizontalAling ha,
         break;
     }
 
-    SDL_BlitSurface (face, &src, surface, &dest);
+    SDL_gfxBlitRGBA (face, &src, surface, &dest);
 
     SDL_FreeSurface (face);
 }
@@ -282,7 +282,7 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, int x_shift,
         break;
     }
 
-    SDL_BlitSurface (face, &src, surface, &dest);
+    SDL_gfxBlitRGBA (face, &src, surface, &dest);
 
     SDL_FreeSurface (face);
 }
@@ -308,7 +308,7 @@ void SDLCanvas::draw_wrapped_text (int x, int y, int w, int h,
     src.y = 0;
     dest.y = y;
 
-    SDL_BlitSurface (face, &src, surface, &dest);
+    SDL_gfxBlitRGBA (face, &src, surface, &dest);
 
     SDL_FreeSurface (face);
 }
@@ -331,9 +331,9 @@ SDLClip* SDLClip::clip (int x, int y, int w, int h) {
     if (ry < 0)
         ry = 0;
 
-/*    logger.debugln("clip %d %d", height, y);
-    logger.debugln("clip %d %d", y + h, rel_y);*/
-    
+    /*    logger.debugln("clip %d %d", height, y);
+     logger.debugln("clip %d %d", y + h, rel_y);*/
+
     if (rel_x + width <= x)
         return NULL;
     if (rel_y + height <= y)
@@ -342,16 +342,17 @@ SDLClip* SDLClip::clip (int x, int y, int w, int h) {
         return NULL;
     if (y + h <= rel_y)
         return NULL;
-    
+
     int ex = x + w;
     if (ex > rel_x + width)
         ex = rel_x + width;
-    
+
     int ey = y + h;
     if (ey > rel_y + height)
         ey = rel_y + height;
 
-    return new SDLClip (surface, off_x + x, off_y + y, ex - x - rx, ey - y - ry, rx, ry);
+    return new SDLClip (surface, off_x + x, off_y + y, ex - x - rx,
+            ey - y - ry, rx, ry);
 }
 
 SDLClip* SDLClip::start_clip (int x, int y, int w, int h) {

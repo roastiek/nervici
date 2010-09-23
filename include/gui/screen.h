@@ -44,7 +44,7 @@ public:
 
     void process_event (const SDL_Event& event);
 
-    bool is_focusable ();
+    bool is_focusable () const;
 };
 
 #endif	/* SCREEN_H */
