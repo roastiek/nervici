@@ -12,9 +12,51 @@
 #include "vertical_aling.h"
 #include "fakes/glibmm_decl.h"
 
+class Canvas;
+
+class Clip {
+protected:
+    int off_x;
+
+    int off_y;
+    
+    int width;
+
+    int height;
+    
+    int rel_x;
+    
+    int rel_y;
+
+    Clip (int x, int y, int w, int h, int rx, int ry);
+
+public:
+    virtual ~Clip ();
+
+    virtual Clip* clip (int x, int y, int w, int h) = 0;
+
+    virtual Clip* start_clip (int x, int y, int w, int h) = 0;
+
+    virtual void draw_image (int x, int y, Canvas* image) = 0;
+
+    virtual void draw_image (int x, int y, Canvas* image, int src_x, int src_y,
+            int src_w, int src_h) = 0;
+
+    int get_x () const;
+
+    int get_y () const;
+
+    int get_off_x () const;
+
+    int get_off_y () const;
+
+    int get_width () const;
+
+    int get_height () const;
+};
+
 class Canvas {
 protected:
-
     int width;
 
     int height;
@@ -23,6 +65,10 @@ protected:
 
 public:
     virtual ~Canvas ();
+
+    virtual Clip* clip () = 0;
+
+    virtual Clip* clip (int x, int y, int w, int h) = 0;
 
     virtual void set_width (int value) = 0;
 
@@ -34,6 +80,8 @@ public:
 
     virtual void set_font_color (uint32_t value) = 0;
 
+    virtual void clear () = 0;
+    
     virtual void draw_point (int x, int y, uint32_t color) = 0;
 
     virtual void draw_hline (int x, int y, int w, uint32_t color) = 0;
@@ -93,6 +141,30 @@ public:
 
     static Canvas* create_canvas ();
 };
+
+inline int Clip::get_x () const {
+    return rel_x;
+}
+
+inline int Clip::get_y () const {
+    return rel_y;
+}
+
+inline int Clip::get_off_x () const {
+    return off_x;
+}
+
+inline int Clip::get_off_y () const {
+    return off_y;
+}
+
+inline int Clip::get_width () const {
+    return width;
+}
+
+inline int Clip::get_height () const {
+    return height;
+}
 
 inline void Canvas::draw_frame (uint32_t color) {
     draw_rectangle (0, 0, get_width (), get_height (), color);

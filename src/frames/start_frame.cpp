@@ -55,6 +55,8 @@ void StartFrame::init_control (Control* par) {
             btn_quit_parms, "btn_quit");
     btn_quit->register_on_clicked (OnClicked (this,
             &StartFrame::btn_quit_clicked));
+
+    set_background (0xff10);
 }
 
 StartFrame* StartFrame::create_frame (Control* par) {
@@ -76,7 +78,7 @@ void StartFrame::btn_new_game_clicked (Control* ctl) {
 
 void StartFrame::btn_pledit_clicked (Control* ctl) {
     app.switch_to_pledit_frame ();
-    app.get_pledit_frame().preapare();
+    app.get_pledit_frame ().preapare ();
 }
 
 void StartFrame::btn_quit_clicked (Control* ctl) {

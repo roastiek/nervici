@@ -16,6 +16,26 @@
 #include "horizontal_aling.h"
 #include "vertical_aling.h"
 
+class SDLClip: public Clip {
+private:
+    SDL_Surface* surface;
+
+public:
+
+    SDLClip (SDL_Surface* face, int x, int y, int w, int h, int dx, int dy);
+
+    SDLClip* clip (int x, int y, int w, int h);
+
+    SDLClip* start_clip (int x, int y, int w, int h);
+
+    void draw_image (int x, int y, Canvas* image);
+
+    void draw_image (int x, int y, Canvas* image, int src_x, int src_y,
+            int src_w, int src_h);
+
+    SDL_Surface* get_surface () const;
+};
+
 class SDLCanvas: public Canvas {
 private:
     struct {
@@ -35,6 +55,10 @@ public:
 
     ~SDLCanvas ();
 
+    SDLClip* clip ();
+
+    SDLClip* clip (int x, int y, int w, int h);
+
     void set_width (int value);
 
     void set_height (int value);
@@ -44,6 +68,8 @@ public:
     void set_font_size (int value);
 
     void set_font_color (Uint32 value);
+
+    void clear ();
 
     void draw_point (int x, int y, Uint32 color);
 
@@ -92,10 +118,14 @@ public:
     void draw_image (int x, int y, Canvas* image, int src_x, int src_y,
             int src_w, int src_h);
 
-    SDL_Surface* get_surface ();
+    SDL_Surface* get_surface () const;
 };
 
-inline SDL_Surface* SDLCanvas::get_surface () {
+inline SDL_Surface* SDLClip::get_surface () const {
+    return surface;
+}
+
+inline SDL_Surface* SDLCanvas::get_surface () const {
     return surface;
 }
 

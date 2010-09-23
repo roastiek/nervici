@@ -11,8 +11,6 @@
 #include "screen.h"
 
 class SDLScreen: public Screen {
-private:
-    SDL_Surface *primary;
 
 protected:
     void reinitialize ();

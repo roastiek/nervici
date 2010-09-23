@@ -8,16 +8,18 @@
 #include <SDL.h>
 #include <SDL_Pango.h>
 #include <SDL_gfxPrimitives.h>
+#include <SDL_gfxBlitFunc.h>
 #include <glibmm/ustring.h>
 
 #include "utils.h"
+#include "logger.h"
 
 #include "gui/sdl_canvas.h"
 
 using namespace Glib;
 
 static SDL_Surface *make_surface (int width, int height) {
-    return SDL_CreateRGBSurface (SDL_SWSURFACE, width, height, 32, 0xff,
+    return SDL_CreateRGBSurface (SDL_HWSURFACE, width, height, 32, 0xff,
             0xff00, 0xff0000, 0xff000000);
 }
 
@@ -32,6 +34,15 @@ SDLCanvas::~SDLCanvas () {
         surface = NULL;
     }
     SDLPango_FreeContext (pango_context);
+}
+
+SDLClip* SDLCanvas::clip () {
+    return clip (0, 0, get_width (), get_height ());
+}
+
+SDLClip* SDLCanvas::clip (int x, int y, int w, int h) {
+    SDLClip* result = new SDLClip (this->get_surface (), x, y, w, h, x, y);
+    return result;
 }
 
 void SDLCanvas::set_width (int value) {
@@ -93,6 +104,10 @@ void SDLCanvas::set_font_size (int value) {
     SDLPango_SetDefaultColor (pango_context, &font_color);
 }
 
+void SDLCanvas::clear () {
+    SDL_FillRect(surface, NULL, 0);
+}
+
 void SDLCanvas::draw_point (int x, int y, Uint32 color) {
     pixelColor (surface, x, y, color);
 }
@@ -134,7 +149,7 @@ void SDLCanvas::draw_filled_circle (int x, int y, int r, Uint32 color) {
 }
 
 void SDLCanvas::draw_aacircle (int x, int y, int r, Uint32 color) {
-    circleColor (surface, x, y, r, color);
+    aacircleColor (surface, x, y, r, color);
 }
 
 void SDLCanvas::draw_trigon (int x1, int y1, int x2, int y2, int x3, int y3,
@@ -301,5 +316,79 @@ void SDLCanvas::draw_wrapped_text (int x, int y, int w, int h,
 int SDLCanvas::get_text_width (const ustring& text) {
     SDLPango_SetMarkup (pango_context, text.c_str (), -1);
     return SDLPango_GetLayoutWidth (pango_context);
+}
+
+SDLClip::SDLClip (SDL_Surface* face, int x, int y, int w, int h, int dx, int dy) :
+    Clip (x, y, w, h, dx, dy), surface (face) {
+
+}
+
+SDLClip* SDLClip::clip (int x, int y, int w, int h) {
+    int rx = rel_x - x;
+    int ry = rel_y - y;
+    if (rx < 0)
+        rx = 0;
+    if (ry < 0)
+        ry = 0;
+
+/*    logger.debugln("clip %d %d", height, y);
+    logger.debugln("clip %d %d", y + h, rel_y);*/
+    
+    if (rel_x + width <= x)
+        return NULL;
+    if (rel_y + height <= y)
+        return NULL;
+    if (x + w <= rel_x)
+        return NULL;
+    if (y + h <= rel_y)
+        return NULL;
+    
+    int ex = x + w;
+    if (ex > rel_x + width)
+        ex = rel_x + width;
+    
+    int ey = y + h;
+    if (ey > rel_y + height)
+        ey = rel_y + height;
+
+    return new SDLClip (surface, off_x + x, off_y + y, ex - x - rx, ey - y - ry, rx, ry);
+}
+
+SDLClip* SDLClip::start_clip (int x, int y, int w, int h) {
+    return new SDLClip (surface, 0, 0, w, h, x, y);
+}
+
+void SDLClip::draw_image (int x, int y, Canvas* image) {
+    SDL_Rect dest_area;
+    dest_area.x = off_x + rel_x + x;
+    dest_area.y = off_y + rel_y + y;
+
+    SDLCanvas *sdlimage = dynamic_cast<SDLCanvas*> (image);
+    if (sdlimage != NULL) {
+        SDL_BlitSurface (sdlimage->get_surface (), NULL, surface, &dest_area);
+    }
+
+}
+
+void SDLClip::draw_image (int x, int y, Canvas* image, int src_x, int src_y,
+        int src_w, int src_h) {
+
+    SDL_Rect src_area;
+    src_area.x = src_x;
+    src_area.y = src_y;
+    src_area.w = src_w;
+    src_area.h = src_h;
+
+    SDL_Rect dest_area;
+    dest_area.x = off_x + rel_x + x;
+    dest_area.y = off_y + rel_y + y;
+
+    SDLCanvas *sdlimage = dynamic_cast<SDLCanvas*> (image);
+    if (sdlimage != NULL) {
+        SDL_BlitSurface (sdlimage->get_surface (), &src_area, surface,
+                &dest_area);
+        /*SDL_BlitSurface (sdlimage->get_surface (), NULL, surface,
+         &dest_area);*/
+    }
 }
 

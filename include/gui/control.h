@@ -173,13 +173,13 @@ private:
     /*
      * Draw itself into parent canvas
      */
-    void blit (Canvas *dest, int x, int y, int w, int h);
+    void blit (Clip *dest);
 
     /*
      * Update adn redraw all children in specified area in reversed order, so 
      * first child is on top.
      */
-    void update_children (Control* item, int x, int y, int w, int h);
+    void update_children (Control* item, Clip* scrvas);
 
     /*
      * Steal focus from actual focused control. There will be no focused control
@@ -235,14 +235,12 @@ protected:
 
     virtual const ControlParameters& get_parms ();
 
+    virtual void update (Clip* scrvas);
+
 public:
     virtual ~Control ();
 
     virtual void reinitialize ();
-
-    virtual void update ();
-
-    virtual void update (int x, int y, int w, int h);
 
     virtual void invalidate ();
 

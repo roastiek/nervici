@@ -1,4 +1,5 @@
 #include <SDL_events.h>
+#include <SDL.h>
 
 #include "utils.h"
 #include "logger.h"
@@ -95,41 +96,54 @@ void Control::destroy_children () {
     last_child = NULL;
 }
 
-void Control::blit (Canvas *dest, int dx, int dy, int w, int h) {
-    dest->draw_image (x + dx, y + dy, canvas, dx, dy, w, h);
+void Control::blit (Clip *dest) {
+/*        logger.debugln ("blit %s %d %d %d %d %d %d", get_name ().c_str (),
+     dest->get_x (), dest->get_y (), dest->get_width (),
+     dest->get_height (), dest->get_off_x (), dest->get_off_y ());*/
+    /*    dest->draw_image (dest->get_x (), dest->get_y (), canvas, dest->get_x (),
+     dest->get_y (), dest->get_width (), dest->get_height ());*/
+    dest->draw_image (0, 0, canvas, dest->get_x (), dest->get_y (),
+            dest->get_width (), dest->get_height ());
+    //logger.debugln("%d blit %s", SDL_GetTicks(), get_name().c_str());
 }
 
-void Control::update_children (Control* child, int x, int y, int w, int h) {
+void Control::update_children (Control* child, Clip* scrvas) {
     if (child == NULL)
         return;
 
-    if (child->get_x () <= x + w && child->get_x () + child->get_width () >= x
-            && child->get_y () <= y + h && child->get_y ()
-            + child->get_height () >= y) {
-
-        if (child->is_visible ()) {
-            child->update (x, y, w, h);
-            child->blit (canvas, x - child->get_x (), y - child->get_y (), w, h);
+    /*  if (child->get_x () <= x + w && child->get_x () + child->get_width () >= x
+     && child->get_y () <= y + h && child->get_y ()
+     + child->get_height () >= y) {
+     */
+    if (child->is_visible ()) {
+        Clip* childclip = scrvas->clip (child->get_x (), child->get_y (),
+                child->get_width (), child->get_height ());
+        if (childclip != NULL) {
+            child->update (childclip);
+            delete childclip;
         }
+        //            child->blit (scrvas, x - child->get_x (), y - child->get_y (), w, h);
     }
+    //    }
 
-    update_children (child->next, x, y, w, h);
+    update_children (child->next, scrvas);
 }
 
-void Control::update () {
-    update (0, 0, get_width (), get_height ());
-}
-
-void Control::update (int x, int y, int w, int h) {
+void Control::update (Clip* scrvas) {
     if (!valid) {
         paint ();
         valid = true;
     }
 
-    update_children (first_child, x - get_x (), y - get_y (), w, h);
     if (get_frame () != 0)
         canvas->draw_frame (get_frame ());
-    on_update (x, y, w, h);
+
+    blit (scrvas);
+
+    update_children (first_child, scrvas);
+
+    on_update (scrvas->get_x (), scrvas->get_y (), scrvas->get_width (),
+            scrvas->get_height ());
 }
 
 void Control::invalidate () {
@@ -424,6 +438,7 @@ void Control::on_height_changed (int value) {
 }
 
 void Control::paint () {
+    canvas->clear ();
     canvas->fill_backgound (get_background ());
 }
 

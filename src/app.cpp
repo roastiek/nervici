@@ -45,6 +45,7 @@ void App::init_gui () {
     pledit_frame->set_visible (false);
 
     SDL_SetEventFilter (NULL);
+    screen->invalidate ();
 
     switch_to_start_frame ();
 }

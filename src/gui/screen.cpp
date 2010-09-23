@@ -1,17 +1,22 @@
 #include "gui/defaults.h"
+#include "logger.h"
 #include "gui/sdl_canvas.h"
 
 #include "gui/screen.h"
 
 ControlParameters Screen::parms = ControlParameters (0, 0, 0, 0, 10);
 
-Screen::Screen () :
+Screen::Screen (Clip* prim) :
     Control (parms), be_clicked (NULL), mouse_target (NULL), popup (NULL),
-            popup_owner (NULL) {
+            popup_owner (NULL), primary (prim) {
 }
 
 Screen::~Screen () {
     remove_popup (false);
+    if (primary != NULL) {
+        delete primary;
+        primary = NULL;
+    }
 }
 
 void Screen::init_control (Control* par) {
@@ -86,7 +91,9 @@ void Screen::process_event (const SDL_Event& event) {
     case E_PAINT: {
         SDL_Rect* area = static_cast<SDL_Rect*> (event.user.data1);
 
-        update (area->x, area->y, area->w, area->h);
+       /* logger.debugln ("update %d %d %d %d", area->x, area->y, area->w,
+                area->h);*/
+        update (primary->start_clip (area->x, area->y, area->w, area->h));
 
         delete area;
         break;
@@ -151,4 +158,41 @@ void Screen::poput_lost_focus (Control* ctl) {
 
 bool Screen::is_focusable () {
     return false;
+}
+
+#define SC_BACKGROUND    0x00442204
+#define SC_MEDROUND      0x00663306
+#define SC_HIGHGROUND    0x00884408
+#define SC_TEXT          0x00ffd5d5
+#define SC_ACTIVETEXT    0x00d5d5ff
+
+void Screen::paint () {
+    static uint32_t colors[] = {
+        0x041D38ff,
+        0x041E3Bff,
+        0x041F3Dff,
+        0x042040ff,
+        0x042142ff,
+        0x042244ff,
+        0x042447ff,
+        0x04254Aff,
+        0x04264Dff,
+        0x04274Fff};
+
+    canvas->fill_backgound (0x042244ff);
+    /*for (int x = 0; x < canvas->get_width (); x += 24) {
+     canvas->draw_vline (x + 5, 0, canvas->get_height (), 0x05264dff);
+     canvas->draw_vline (x + 7, 0, canvas->get_height (), 0x05264dff);
+     }
+
+     for (int y = 0; y < canvas->get_height (); y += 24) {
+     canvas->draw_hline (0, y + 5, canvas->get_width (), 0x05264dff);
+     canvas->draw_hline (0, y + 7, canvas->get_width (), 0x05264dff);
+     }*/
+    for (int y = -8; y < canvas->get_height (); y += 24) {
+        for (int x = -8; x < canvas->get_width (); x += 24) {
+            canvas->draw_rectangle (x - 1, y - 1, 22, 22, 0x05264dff);
+            canvas->draw_box (x, y, 20, 20, colors[random () % 3 + 4]);
+        }
+    }
 }

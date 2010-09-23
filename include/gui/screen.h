@@ -19,7 +19,7 @@ private:
     Control* popup;
 
     Control* popup_owner;
-
+    
     static ControlParameters parms;
 
     void set_mouse_target (Control* value);
@@ -31,10 +31,13 @@ private:
     void poput_lost_focus (Control* ctl);
 
 protected:
+    Clip* primary;  
 
-    Screen ();
+    Screen (Clip* prim);
 
     virtual void init_control (Control* par);
+    
+    void paint ();
 
 public:
     ~Screen ();
