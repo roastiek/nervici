@@ -235,8 +235,6 @@ protected:
 
     virtual void paint ();
 
-    virtual void on_update (int x, int y, int w, int h);
-
     virtual const ControlParameters& get_parms ();
 
     virtual void update (Clip* scrvas);

@@ -969,7 +969,7 @@ bool SDLRender::initialize () {
     fill_rect.y = 0;
     fill_rect.w = setting.width;
     fill_rect.h = setting.height;
-    SDL_FillRect (background, &fill_rect, 0xffffff);
+    SDL_FillRect (background, &fill_rect, 0xffffffff);
     fill_rect.x++;
     fill_rect.y++;
     fill_rect.w -= 2;

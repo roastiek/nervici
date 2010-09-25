@@ -62,7 +62,7 @@ void Scrollport::content_height_changed (Control* ctl, int value) {
 }
 
 /*void Scrollport::paint () {
- fill_backgound (C_BACKGROUND);
+ fill_background (C_BACKGROUND);
  // draw_frame (C_FOREGROUND);
  }*/
 

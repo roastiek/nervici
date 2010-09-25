@@ -17,7 +17,7 @@ void SmileControl::init_control (Control* par) {
 }
 
 void SmileControl::paint () {
-    canvas->fill_backgound (get_background ());
+    canvas->fill_background (get_background ());
 
     int h = get_height () - get_width () - 12;
     int c = get_count ();

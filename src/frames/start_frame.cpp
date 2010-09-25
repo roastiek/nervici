@@ -81,8 +81,8 @@ void StartFrame::init_control (Control* par) {
     btn_quit->register_on_clicked (OnClicked (this,
         &StartFrame::btn_quit_clicked));
 
-    set_background (0);
-    set_frame (0);
+    set_background (0x10);
+    set_frame (0x00);
 }
 
 StartFrame* StartFrame::create_frame (Control* par) {

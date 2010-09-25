@@ -20,13 +20,13 @@ using namespace Glib;
 
 static SDL_Surface *make_surface (int width, int height) {
     return SDL_CreateRGBSurface (SDL_HWSURFACE,
-                                 width,
-                                 height,
-                                 32,
-                                 0xff,
-                                 0xff00,
-                                 0xff0000,
-                                 0xff000000);
+        width,
+        height,
+        32,
+        0xff,
+        0xff00,
+        0xff0000,
+        0xff000000);
 }
 
 SDLCanvas::SDLCanvas () :
@@ -123,6 +123,12 @@ void SDLCanvas::draw_rectangle (int x, int y, int w, int h, Uint32 color) {
 
 void SDLCanvas::draw_box (int x, int y, int w, int h, Uint32 color) {
     boxColor (surface, x, y, x + w - 1, y + h - 1, color);
+    /*SDL_Rect area;
+    area.x = x;
+    area.y = y;
+    area.w = w;
+    area.h = h;
+    SDL_FillRect (surface, &area, 0xff442204);*/
 }
 
 void SDLCanvas::draw_line (int x1, int y1, int x2, int y2, Uint32 color) {
@@ -279,7 +285,8 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, int x_shift,
         break;
     }
 
-    SDL_gfxBlitRGBA (face, &src, surface, &dest);
+    //    SDL_gfxBlitRGBA (face, &src, surface, &dest);
+    SDL_BlitSurface (face, &src, surface, &dest);
 
     SDL_FreeSurface (face);
 }
@@ -305,7 +312,8 @@ void SDLCanvas::draw_wrapped_text (int x, int y, int w, int h,
     src.y = 0;
     dest.y = y;
 
-    SDL_gfxBlitRGBA (face, &src, surface, &dest);
+    SDL_BlitSurface (face, &src, surface, &dest);
+    //SDL_gfxBlitRGBA (face, &src, surface, &dest);
 
     SDL_FreeSurface (face);
 }
@@ -320,6 +328,11 @@ SDLClip::SDLClip (SDL_Surface* face, int x, int y, int w, int h, int dx, int dy)
 
 }
 
+SDLClip::SDLClip (SDL_Surface* face, int w, int h, int dx, int dy) :
+    Clip (0, 0, w, h, dx, dy), surface (face) {
+
+}
+
 SDLClip* SDLClip::clip (int x, int y, int w, int h) {
     int rx = rel_x - x;
     int ry = rel_y - y;
@@ -327,9 +340,6 @@ SDLClip* SDLClip::clip (int x, int y, int w, int h) {
         rx = 0;
     if (ry < 0)
         ry = 0;
-
-    /*    logger.debugln("clip %d %d", height, y);
-     logger.debugln("clip %d %d", y + h, rel_y);*/
 
     if (rel_x + width <= x)
         return NULL;
@@ -349,16 +359,12 @@ SDLClip* SDLClip::clip (int x, int y, int w, int h) {
         ey = rel_y + height;
 
     return new SDLClip (surface,
-                        off_x + x,
-                        off_y + y,
-                        ex - x - rx,
-                        ey - y - ry,
-                        rx,
-                        ry);
-}
-
-SDLClip* SDLClip::start_clip (int x, int y, int w, int h) {
-    return new SDLClip (surface, 0, 0, w, h, x, y);
+        off_x + x,
+        off_y + y,
+        ex - x - rx,
+        ey - y - ry,
+        rx,
+        ry);
 }
 
 void SDLClip::draw_image (int x, int y, Canvas* image) {
@@ -389,9 +395,9 @@ void SDLClip::draw_image (int x, int y, Canvas* image, int src_x, int src_y,
     SDLCanvas *sdlimage = dynamic_cast<SDLCanvas*> (image);
     if (sdlimage != NULL) {
         SDL_BlitSurface (sdlimage->get_surface (),
-                         &src_area,
-                         surface,
-                         &dest_area);
+            &src_area,
+            surface,
+            &dest_area);
         /*SDL_BlitSurface (sdlimage->get_surface (), NULL, surface,
          &dest_area);*/
     }

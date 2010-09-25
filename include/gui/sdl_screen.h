@@ -9,13 +9,18 @@
 #define SDL_SCREEN_H_
 
 #include "screen.h"
+#include "fakes/sdl_decl.h"
 
 class SDLScreen: public Screen {
-
+private:
+    SDL_Surface* off_face;
+    
+    SDL_Surface* primary;
+    
 protected:
     void reinitialize ();
 
-    void on_update (int x, int y, int w, int h);
+    void update (Clip* scrvas);
 
     int get_screen_width () const;
 
@@ -24,6 +29,8 @@ protected:
 public:
 
     SDLScreen (SDL_Surface* primary);
+
+    void process_event (const SDL_Event& event);
 
     friend class SDLRender;
 };

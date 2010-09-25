@@ -31,9 +31,7 @@ private:
     void poput_lost_focus (Control* ctl);
 
 protected:
-    Clip* primary;  
-
-    Screen (Clip* prim);
+    Screen ();
 
     virtual void init_control (Control* par);
     
@@ -42,7 +40,7 @@ protected:
 public:
     ~Screen ();
 
-    void process_event (const SDL_Event& event);
+    virtual void process_event (const SDL_Event& event);
 
     bool is_focusable () const;
 };

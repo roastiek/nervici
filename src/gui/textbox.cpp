@@ -20,7 +20,8 @@ Textbox* TextboxFactory::create (Control* par, const ControlParameters& parms,
 }
 
 void Textbox::paint () {
-    canvas->fill_backgound (get_input_background ());
+    
+    canvas->fill_background (get_input_background ());
     canvas->draw_frame (get_input_foreground ());
 
     canvas->draw_text (2, 2, get_width () - 4, get_height () - 4, x_offset,

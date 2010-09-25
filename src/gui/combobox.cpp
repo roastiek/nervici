@@ -59,7 +59,7 @@ void Combobox::select_down () {
 }
 
 void Combobox::paint () {
-    canvas->fill_backgound (get_input_background ());
+    canvas->fill_background (get_input_background ());
     set_font_color (get_input_text ());
     //draw_frame (C_FOREGROUND);
 

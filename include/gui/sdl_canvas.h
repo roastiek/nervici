@@ -18,15 +18,15 @@
 
 class SDLClip: public Clip {
 private:
-    SDL_Surface* surface;
+    SDL_Surface* const surface;
 
 public:
 
     SDLClip (SDL_Surface* face, int x, int y, int w, int h, int dx, int dy);
 
-    SDLClip* clip (int x, int y, int w, int h);
+    SDLClip (SDL_Surface* face, int w, int h, int dx, int dy);
 
-    SDLClip* start_clip (int x, int y, int w, int h);
+    SDLClip* clip (int x, int y, int w, int h);
 
     void draw_image (int x, int y, Canvas* image);
 

@@ -39,10 +39,10 @@ Control::~Control () {
 
 void Control::init_control (Control* par) {
     set_parent (par);
-    set_background (C_BACKGROUND);
-    set_foreground (C_FOREGROUND);
-    set_font_color (C_FOREGROUND);
-    set_frame (C_FOREGROUND);
+    set_background (NC_BACKGROUND);
+    set_foreground (NC_HIGHGROUND);
+    set_font_color (NC_TEXT);
+    set_frame (NC_HIGHGROUND);
     set_font ("Sans");
     reinitialize ();
 }
@@ -152,10 +152,10 @@ void Control::update (Clip* scrvas) {
         scrvas->draw_rectangle (0, 0, get_width (), get_height (), get_frame ());
     }
 
-    on_update (scrvas->get_x (),
+    /*on_update (scrvas->get_x (),
                scrvas->get_y (),
                scrvas->get_width (),
-               scrvas->get_height ());
+               scrvas->get_height ());*/
 }
 
 void Control::invalidate () {
@@ -243,7 +243,6 @@ bool Control::grab_focus () {
                 steal_focus ();
                 if (get_parent () != NULL)
                     get_parent ()->propagate_focus (this);
-                logger.debugln ("focus %s", get_name ().c_str ());
                 set_focused (true);
             }
             return true;
@@ -478,10 +477,7 @@ void Control::on_height_changed (int value) {
 
 void Control::paint () {
     canvas->clear ();
-    canvas->fill_backgound (get_background ());
-}
-
-void Control::on_update (int x, int y, int w, int h) {
+    canvas->fill_background (get_background ());
 }
 
 void Control::register_on_clicked (const OnClicked& handler) {

@@ -8,44 +8,71 @@
 #include <SDL.h>
 
 #include "logger.h"
+#include "gui/defaults.h"
 #include "gui/sdl_canvas.h"
 
 #include "gui/sdl_screen.h"
 
 SDLScreen::SDLScreen (SDL_Surface* prim) :
-    Screen (new SDLClip (prim, 0, 0, prim->w, prim->h, 0, 0)) {
+    Screen (), off_face (NULL), primary (prim) {
 
 }
 
 void SDLScreen::reinitialize () {
     set_x (0);
     set_y (0);
-    set_width (primary->get_width ());
-    set_height (primary->get_height ());
+    set_width (primary->w);
+    set_height (primary->h);
+    if (off_face != NULL) {
+        SDL_FreeSurface (off_face);
+        off_face = NULL;
+    }
+    off_face = SDL_CreateRGBSurface (SDL_HWSURFACE,
+        get_width (),
+        get_height (),
+        32,
+        0xff,
+        0xff00,
+        0xff0000,
+        0x000000);
 }
 
-void SDLScreen::on_update (int x, int y, int w, int h) {
+void SDLScreen::process_event (const SDL_Event& event) {
+    switch (event.type) {
+    case E_PAINT: {
+        SDL_Rect* area = static_cast<SDL_Rect*> (event.user.data1);
+        SDLClip clip (off_face, area->w, area->h, area->x, area->y);
+
+        update (&clip);
+
+        delete area;
+        break;
+    }
+    default:
+        Screen::process_event (event);
+        break;
+    }
+}
+
+void SDLScreen::update (Clip* scrvas) {
+    Screen::update (scrvas);
+
     SDL_Rect dest;
 
-    dest.x = x;
-    dest.y = y;
-    dest.w = w;
-    dest.h = h;
+    dest.x = scrvas->get_x ();
+    dest.y = scrvas->get_y ();
+    dest.w = scrvas->get_width ();
+    dest.h = scrvas->get_height ();
 
-    //SDLCanvas* sdlcanvas = dynamic_cast<SDLCanvas*> (canvas);
-    SDLClip* sdlclip = dynamic_cast<SDLClip*> (primary);
-
-    /*SDL_BlitSurface (sdlcanvas->get_surface (), &dest, sdlclip->get_surface (),
-            &dest);*/
-    SDL_UpdateRects (sdlclip->get_surface (), 1, &dest);
-    //SDL_UpdateRect(sdlclip->get_surface (), 0, 0, 1024, 768);
+    SDL_BlitSurface (off_face, &dest, primary, &dest);
+    SDL_UpdateRects (primary, 1, &dest);
 }
 
 int SDLScreen::get_screen_width () const {
-    return primary->get_width ();
+    return primary->w;
 }
 
 int SDLScreen::get_screen_height () const {
-    return primary->get_height ();
+    return primary->h;
 }
 

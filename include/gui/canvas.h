@@ -35,8 +35,6 @@ public:
 
     virtual Clip* clip (int x, int y, int w, int h) = 0;
 
-    virtual Clip* start_clip (int x, int y, int w, int h) = 0;
-
     virtual void draw_image (int x, int y, Canvas* image) = 0;
 
     virtual void draw_image (int x, int y, Canvas* image, int src_x, int src_y,
@@ -131,7 +129,7 @@ public:
 
     void draw_frame (uint32_t color);
 
-    void fill_backgound (uint32_t color);
+    void fill_background (uint32_t color);
 
     int get_width () const;
 
@@ -168,7 +166,7 @@ inline void Canvas::draw_frame (uint32_t color) {
     draw_rectangle (0, 0, get_width (), get_height (), color);
 }
 
-inline void Canvas::fill_backgound (uint32_t color) {
+inline void Canvas::fill_background (uint32_t color) {
     draw_box (0, 0, get_width (), get_height (), color);
 }
 

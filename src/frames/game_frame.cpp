@@ -325,6 +325,8 @@ void GameFrame::init_control (Control* par) {
 
     update_mods ();
     update_players ();
+    
+    set_background(0);
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {

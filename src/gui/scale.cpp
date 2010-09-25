@@ -18,7 +18,7 @@ void Scale::init_control (Control* par) {
 }
 
 void Scale::paint () {
-    canvas->fill_backgound (get_background ());
+    canvas->fill_background (get_background ());
 
     int steps = get_max () - get_min ();
     int sw = get_screen_width ();

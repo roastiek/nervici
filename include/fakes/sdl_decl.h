@@ -9,6 +9,10 @@
 struct SDL_Surface;
 #endif 
 
+#ifndef SDL_Rect
+struct SDL_Rect;
+#endif 
+
 #ifndef SDL_SDL_KeyboardEvent
 struct SDL_KeyboardEvent;
 #endif 

@@ -6,17 +6,13 @@
 
 ControlParameters Screen::parms = ControlParameters (0, 0, 0, 0, 10);
 
-Screen::Screen (Clip* prim) :
+Screen::Screen () :
     Control (parms), be_clicked (NULL), mouse_target (NULL), popup (NULL),
-            popup_owner (NULL), primary (prim) {
+            popup_owner (NULL) {
 }
 
 Screen::~Screen () {
     remove_popup (false);
-    if (primary != NULL) {
-        delete primary;
-        primary = NULL;
-    }
 }
 
 void Screen::init_control (Control* par) {
@@ -88,21 +84,10 @@ void Screen::process_event (const SDL_Event& event) {
         }
         break;
 
-    case E_PAINT: {
-        SDL_Rect* area = static_cast<SDL_Rect*> (event.user.data1);
-
-       /* logger.debugln ("update %d %d %d %d", area->x, area->y, area->w,
-                area->h);*/
-        update (primary->start_clip (area->x, area->y, area->w, area->h));
-
-        delete area;
-        break;
-    }
-
     case E_SHOW_POPUP:
         remove_popup (false);
         add_popup (static_cast<Control*> (event.user.data1),
-                static_cast<Control*> (event.user.data2));
+            static_cast<Control*> (event.user.data2));
         break;
 
     case E_HIDE_POPUP:
@@ -179,18 +164,12 @@ void Screen::paint () {
         0x04264Dff,
         0x04274Fff};
 
-    canvas->fill_backgound (0x042244ff);
-    /*for (int x = 0; x < canvas->get_width (); x += 24) {
-     canvas->draw_vline (x + 5, 0, canvas->get_height (), 0x05264dff);
-     canvas->draw_vline (x + 7, 0, canvas->get_height (), 0x05264dff);
-     }
+    int start_x = -10 + (get_width () % 24) / 2;
+    int start_y = -10 + (get_height () % 24) / 2;
 
-     for (int y = 0; y < canvas->get_height (); y += 24) {
-     canvas->draw_hline (0, y + 5, canvas->get_width (), 0x05264dff);
-     canvas->draw_hline (0, y + 7, canvas->get_width (), 0x05264dff);
-     }*/
-    for (int y = -8; y < canvas->get_height (); y += 24) {
-        for (int x = -8; x < canvas->get_width (); x += 24) {
+    canvas->fill_background (0x042244ff);
+    for (int y = start_y; y < canvas->get_height (); y += 24) {
+        for (int x = start_x; x < canvas->get_width (); x += 24) {
             canvas->draw_rectangle (x - 1, y - 1, 22, 22, 0x05264dff);
             canvas->draw_box (x, y, 20, 20, colors[random () % 3 + 4]);
         }

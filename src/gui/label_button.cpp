@@ -29,6 +29,7 @@ void LabelButton::init_control (Control* par) {
     Control::init_control (par);
     set_font_color (NC_TEXT);
     set_frame (0);
+    //set_background(0xff);
 }
 
 void LabelButton::paint () {
