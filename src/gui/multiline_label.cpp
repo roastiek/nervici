@@ -10,11 +10,11 @@ MultilineLabel::MultilineLabel (const ControlParameters& parms) :
 
 void MultilineLabel::init_control (Control* par) {
     Control::init_control (par);
-    set_frame (C_BACKGROUND);
+    set_frame (0);
 }
 
 void MultilineLabel::paint () {
-    canvas->fill_background (get_background ());
+//    canvas->fill_background (get_background ());
     canvas->draw_wrapped_text (1, 1, get_width () - 2, get_height () - 2,
             get_text ());
 }

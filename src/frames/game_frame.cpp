@@ -224,81 +224,115 @@ void GameFrame::init_control (Control* par) {
         separator.x += ONE_COLUMN_W + 17;
     }
 
-    la_rules_caption = LabelFactory::create (this, "rules:",
-            la_rules_caption_parms, "la_rules_caption");
-    ml_rules = MultilineLabelFactory::create (this, "", ml_rules_parms,
-            "ml_rules");
+    la_rules_caption = LabelFactory::create (this,
+        "rules:",
+        la_rules_caption_parms,
+        "la_rules_caption");
+    ml_rules = MultilineLabelFactory::create (this,
+        "",
+        ml_rules_parms,
+        "ml_rules");
 
-    la_mod_caption = LabelFactory::create (this, "mod:", la_mod_caption_parms,
-            "la_mod_caption");
+    la_mod_caption = LabelFactory::create (this,
+        "mod:",
+        la_mod_caption_parms,
+        "la_mod_caption");
     cb_mod = ComboboxFactory::create (this, cb_mod_parms, "cb_mod");
     cb_mod->register_on_selected_changed (Combobox::OnSelectedChanged (this,
-            &GameFrame::cb_mob_selected_changed));
+        &GameFrame::cb_mob_selected_changed));
 
     ControlParameters btn_teams_parms (cb_mod_parms.x, cb_mod_parms.y
             + cb_mod_parms.h + 8, 24, 24, 12);
     ListboxParameters btn_players_parms (cb_mod_parms.x + 24 + 2,
-            cb_mod_parms.y + cb_mod_parms.h + 8, ONE_COLUMN_W - 24 - 2, 24, 12,
-            22, 20);
+        cb_mod_parms.y + cb_mod_parms.h + 8,
+        ONE_COLUMN_W - 24 - 2,
+        24,
+        12,
+        22,
+        20);
 
     for (int pi = 0; pi < 16; pi++) {
-        btn_teams[pi] = TeamButtonFactory::create (this, &team_colors,
-                btn_teams_parms, "btn_team");
+        btn_teams[pi] = TeamButtonFactory::create (this,
+            &team_colors,
+            btn_teams_parms,
+            "btn_team");
         btn_teams_parms.y += 24 + 2;
 
-        cb_players[pi] = ComboboxFactory::create (this, btn_players_parms,
-                "cb_players");
+        cb_players[pi] = ComboboxFactory::create (this,
+            btn_players_parms,
+            "cb_players");
         btn_players_parms.y += 24 + 2;
     }
 
     la_speed
             = LabelFactory::create (this, "speed:", la_speed_parms, "la_speed");
-    la_speed_text = LabelFactory::create (this, "1.00x", la_speed_text_parms,
-            "la_speed_text");
+    la_speed_text = LabelFactory::create (this,
+        "1.00x",
+        la_speed_text_parms,
+        "la_speed_text");
     sa_speed = ScaleFactory::create (this, 1, 1, sa_speed_parms, "sa_speed");
     sa_speed->set_min (base_speed / 2);
     sa_speed->set_max (base_speed * 2);
     sa_speed->register_on_value_changed (Scale::OnValueChanged (this,
-            &GameFrame::speed_value_changed));
+        &GameFrame::speed_value_changed));
 
-    la_rounds = LabelFactory::create (this, "pocet kol o vozu:",
-            la_rounds_parms, "la_rounds");
+    la_rounds = LabelFactory::create (this,
+        "pocet kol o vozu:",
+        la_rounds_parms,
+        "la_rounds");
     nb_rounds = NumberboxFactory::create (this, nb_rounds_parms, "nb_rounds");
 
-    la_max_score = LabelFactory::create (this, "konecne skore:",
-            la_max_score_parms, "la_max_score");
-    nb_max_score = NumberboxFactory::create (this, nb_max_score_parms,
-            "nb_max_score");
+    la_max_score = LabelFactory::create (this,
+        "konecne skore:",
+        la_max_score_parms,
+        "la_max_score");
+    nb_max_score = NumberboxFactory::create (this,
+        nb_max_score_parms,
+        "nb_max_score");
 
-    la_max_length = LabelFactory::create (this, "maximalni natahnuti:",
-            la_max_length_parms, "la_max_length");
-    nb_max_length = NumberboxFactory::create (this, nb_max_length_parms,
-            "nb_max_length");
+    la_max_length = LabelFactory::create (this,
+        "maximalni natahnuti:",
+        la_max_length_parms,
+        "la_max_length");
+    nb_max_length = NumberboxFactory::create (this,
+        nb_max_length_parms,
+        "nb_max_length");
 
-    la_timer = LabelFactory::create (this, "cas na kolo:", la_timer_parms,
-            "la_timer");
+    la_timer = LabelFactory::create (this,
+        "cas na kolo:",
+        la_timer_parms,
+        "la_timer");
     nb_timer = NumberboxFactory::create (this, nb_timer_parms, "nb_timer");
 
-    la_step = LabelFactory::create (this, "bod na krok:", la_step_parms,
-            "la_step");
+    la_step = LabelFactory::create (this,
+        "bod na krok:",
+        la_step_parms,
+        "la_step");
     nb_step = NumberboxFactory::create (this, nb_step_parms, "nb_step");
 
     la_bonus
             = LabelFactory::create (this, "bonus:", la_bonus_parms, "la_bonus");
     nb_bonus = NumberboxFactory::create (this, nb_bonus_parms, "nb_bonus");
 
-    la_smile_caption = LabelFactory::create (this, "smiles:",
-            la_smile_caption_parms, "la_smile_caption");
+    la_smile_caption = LabelFactory::create (this,
+        "smiles:",
+        la_smile_caption_parms,
+        "la_smile_caption");
 
     ControlParameters smiles_parms (la_smile_caption_parms.x,
-            la_smile_caption_parms.y + la_smile_caption_parms.h, 22, 146, 10);
+        la_smile_caption_parms.y + la_smile_caption_parms.h,
+        22,
+        146,
+        10);
 
     int smi = 0;
 
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
             sc_smiles[si][li] = SmileControlFactory::create (this,
-                    smile_images[smi], smiles_parms, "smiles");
+                smile_images[smi],
+                smiles_parms,
+                "smiles");
             sc_smiles[si][li]->set_count (16);
             sc_smiles[si][li]->set_value (game_info.smiles.counts[si][li]);
 
@@ -313,20 +347,25 @@ void GameFrame::init_control (Control* par) {
         }
     }
 
-    btn_start = ButtonFactory::create (this, "start", btn_start_parms,
-            "btn_start");
+    btn_start = ButtonFactory::create (this,
+        "start",
+        btn_start_parms,
+        "btn_start");
     btn_start->register_on_clicked (OnClicked (this,
-            &GameFrame::btn_start_clicked));
+        &GameFrame::btn_start_clicked));
 
-    btn_cancel = ButtonFactory::create (this, "ale nic", btn_cancel_parms,
-            "btn_cancel");
+    btn_cancel = ButtonFactory::create (this,
+        "ale nic",
+        btn_cancel_parms,
+        "btn_cancel");
     btn_cancel->register_on_clicked (OnClicked (this,
-            &GameFrame::btn_cancel_clicked));
+        &GameFrame::btn_cancel_clicked));
 
     update_mods ();
     update_players ();
-    
-    set_background(0);
+
+    set_background (0x20);
+    set_frame (0);
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
@@ -442,25 +481,32 @@ void GameFrame::load_mod (const Mod& mod) {
     Setting& set = settings.game ();
 
     max_players = (mod.spec.max_players <= 16) ? mod.spec.max_players : 16;
-    nb_bonus->set_value (set.read_int (mod.name, "bonus",
-            mod.spec.defaults.bonus));
-    nb_timer->set_value (set.read_int (mod.name, "timer",
-            mod.spec.defaults.game_time));
-    nb_max_length->set_value (set.read_int (mod.name, "max_length",
-            mod.spec.defaults.max_length));
-    nb_max_score->set_value (set.read_int (mod.name, "max_score",
-            mod.spec.defaults.max_score));
-    nb_rounds->set_value (set.read_int (mod.name, "rounds",
-            mod.spec.defaults.rounds));
-    sa_speed->set_value (set.read_int (mod.name, "speed",
-            mod.spec.defaults.speed));
+    nb_bonus->set_value (set.read_int (mod.name,
+        "bonus",
+        mod.spec.defaults.bonus));
+    nb_timer->set_value (set.read_int (mod.name,
+        "timer",
+        mod.spec.defaults.game_time));
+    nb_max_length->set_value (set.read_int (mod.name,
+        "max_length",
+        mod.spec.defaults.max_length));
+    nb_max_score->set_value (set.read_int (mod.name,
+        "max_score",
+        mod.spec.defaults.max_score));
+    nb_rounds->set_value (set.read_int (mod.name,
+        "rounds",
+        mod.spec.defaults.rounds));
+    sa_speed->set_value (set.read_int (mod.name,
+        "speed",
+        mod.spec.defaults.speed));
     nb_step->set_value (set.read_int (mod.name, "step", mod.spec.defaults.step));
 
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
-            sc_smiles[si][li]->set_value (set.read_int (mod.name, ustring (
-                    "smile") + int_to_string (si) + "-" + int_to_string (li),
-                    mod.spec.default_smiles.counts[si][li]));
+            sc_smiles[si][li]->set_value (set.read_int (mod.name,
+                ustring ("smile") + int_to_string (si) + "-"
+                        + int_to_string (li),
+                mod.spec.default_smiles.counts[si][li]));
         }
     }
 
@@ -543,8 +589,9 @@ void GameFrame::save_state () {
         const ustring& name = (sel > 0) ? pl_infos[sel - 1].name : "";
         set.write_string ("game", ustring ("player") + int_to_string (pi), name);
 
-        set.write_int ("game", ustring ("team") + int_to_string (pi),
-                btn_teams[pi]->get_selected ());
+        set.write_int ("game",
+            ustring ("team") + int_to_string (pi),
+            btn_teams[pi]->get_selected ());
     }
 
     set.write_int (mod_name, "bonus", nb_bonus->get_value ());

@@ -102,6 +102,8 @@ public:
     virtual void cycle_column_sub (StatColumn col) = 0;
 
     virtual StatColumn get_column_from_pos (int x, int y) = 0;
+    
+    virtual void draw_image (Canvas* canvas, int x, int y) = 0;
 };
 
 extern Render& render;

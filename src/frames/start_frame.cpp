@@ -55,7 +55,7 @@ void StartFrame::init_control (Control* par) {
         btn_new_game_parms,
         "btn_new_game");
 
-    btn_new_game->set_background (0x00);
+    //btn_new_game->set_background (0x00);
 
     btn_new_game->register_on_clicked (OnClicked (this,
         &StartFrame::btn_new_game_clicked));
@@ -81,7 +81,7 @@ void StartFrame::init_control (Control* par) {
     btn_quit->register_on_clicked (OnClicked (this,
         &StartFrame::btn_quit_clicked));
 
-    set_background (0x10);
+    set_background (0x20);
     set_frame (0x00);
 }
 

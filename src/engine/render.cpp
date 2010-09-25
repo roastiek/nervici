@@ -257,6 +257,8 @@ public:
 
     StatColumn get_column_from_pos (int x, int y);
 
+    void draw_image (Canvas* canvas, int x, int y);
+
     static SDLRender& get_instance ();
 };
 
@@ -1759,6 +1761,16 @@ StatColumn SDLRender::get_column_from_pos (int x, int y) {
 
     return STC_count;
 }
+
+void SDLRender::draw_image (Canvas* canvas, int x, int y) {
+    SDLCanvas* sdlcvn = dynamic_cast<SDLCanvas*> (canvas);
+    SDL_Rect dest;
+    dest.x = x;
+    dest.y = y;
+    SDL_BlitSurface (sdlcvn->get_surface(), NULL, primary, &dest);
+    SDL_UpdateRects(primary, 1, &dest);
+}
+
 
 inline SDLRender& SDLRender::get_instance () {
     return instance;

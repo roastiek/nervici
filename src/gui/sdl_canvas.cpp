@@ -53,6 +53,7 @@ void SDLCanvas::set_width (int value) {
 
         if (width > 0 && height > 0) {
             surface = make_surface (width, height);
+            SDL_FillRect(surface, NULL, 0xff000000);
         }
     }
 }
@@ -68,6 +69,7 @@ void SDLCanvas::set_height (int value) {
 
         if (width > 0 && height > 0) {
             surface = make_surface (width, height);
+            SDL_FillRect(surface, NULL, 0xff000000);
         }
     }
 }
@@ -124,11 +126,11 @@ void SDLCanvas::draw_rectangle (int x, int y, int w, int h, Uint32 color) {
 void SDLCanvas::draw_box (int x, int y, int w, int h, Uint32 color) {
     boxColor (surface, x, y, x + w - 1, y + h - 1, color);
     /*SDL_Rect area;
-    area.x = x;
-    area.y = y;
-    area.w = w;
-    area.h = h;
-    SDL_FillRect (surface, &area, 0xff442204);*/
+     area.x = x;
+     area.y = y;
+     area.w = w;
+     area.h = h;
+     SDL_FillRect (surface, &area, 0xff442204);*/
 }
 
 void SDLCanvas::draw_line (int x1, int y1, int x2, int y2, Uint32 color) {
@@ -207,6 +209,13 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, HorizontalAling ha,
     if (text == "")
         return;
 
+    SDLPango_SetSurfaceCreateArgs (pango_context,
+        SDL_HWSURFACE,
+        32,
+        0xff000000,
+        0xff0000,
+        0xff00,
+        0xff);
     SDLPango_SetMarkup (pango_context, text.c_str (), -1);
     SDL_Surface* face = SDLPango_CreateSurfaceDraw (pango_context);
 
@@ -243,7 +252,8 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, HorizontalAling ha,
         break;
     }
 
-    SDL_gfxBlitRGBA (face, &src, surface, &dest);
+    SDL_BlitSurface (face, &src, surface, &dest);
+    //SDLPango_Draw(pango_context, surface, dest.x, dest.y);
 
     SDL_FreeSurface (face);
 }
@@ -256,6 +266,13 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, int x_shift,
     if (text == "")
         return;
 
+    SDLPango_SetSurfaceCreateArgs (pango_context,
+        SDL_HWSURFACE,
+        32,
+        0xff000000,
+        0xff0000,
+        0xff00,
+        0xff);
     SDLPango_SetMarkup (pango_context, text.c_str (), -1);
     SDL_Surface* face = SDLPango_CreateSurfaceDraw (pango_context);
 
@@ -285,7 +302,7 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, int x_shift,
         break;
     }
 
-    //    SDL_gfxBlitRGBA (face, &src, surface, &dest);
+    //SDL_gfxBlitRGBA (face, &src, surface, &dest);
     SDL_BlitSurface (face, &src, surface, &dest);
 
     SDL_FreeSurface (face);
@@ -299,6 +316,13 @@ void SDLCanvas::draw_wrapped_text (int x, int y, int w, int h,
     if (text == "")
         return;
 
+    SDLPango_SetSurfaceCreateArgs (pango_context,
+        SDL_HWSURFACE,
+        32,
+        0xff000000,
+        0xff0000,
+        0xff00,
+        0xff);
     SDLPango_SetMarkup (pango_context, text.c_str (), -1);
     SDLPango_SetMinimumSize (pango_context, w, h);
     SDL_Surface* face = SDLPango_CreateSurfaceDraw (pango_context);

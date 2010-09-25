@@ -33,8 +33,7 @@ void LabelButton::init_control (Control* par) {
 }
 
 void LabelButton::paint () {
-    canvas->clear ();
-    
+    //canvas->clear ();
     ustring tt = (mouse_in) ? "<u>" + get_text() + "</u>" : get_text();
     
     canvas->draw_text (0, 0, get_width (), get_height (), HA_center, VA_center,

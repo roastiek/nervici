@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "logger.h"
 #include "gui/defaults.h"
+#include "engine/render.h"
 
 #include "gui/control.h"
 
@@ -105,12 +106,12 @@ void Control::blit (Clip *dest) {
     /*    dest->draw_image (dest->get_x (), dest->get_y (), canvas, dest->get_x (),
      dest->get_y (), dest->get_width (), dest->get_height ());*/
     dest->draw_image (0,
-                      0,
-                      canvas,
-                      dest->get_x (),
-                      dest->get_y (),
-                      dest->get_width (),
-                      dest->get_height ());
+        0,
+        canvas,
+        dest->get_x (),
+        dest->get_y (),
+        dest->get_width (),
+        dest->get_height ());
     //logger.debugln("%d blit %s", SDL_GetTicks(), get_name().c_str());
 }
 
@@ -124,9 +125,9 @@ void Control::update_children (Control* child, Clip* scrvas) {
      */
     if (child->is_visible ()) {
         Clip* childclip = scrvas->clip (child->get_x (),
-                                        child->get_y (),
-                                        child->get_width (),
-                                        child->get_height ());
+            child->get_y (),
+            child->get_width (),
+            child->get_height ());
         if (childclip != NULL) {
             child->update (childclip);
             delete childclip;
@@ -140,6 +141,15 @@ void Control::update_children (Control* child, Clip* scrvas) {
 
 void Control::update (Clip* scrvas) {
     if (!valid) {
+        if (get_parent () != NULL) {
+            canvas->draw_image (0,
+                0,
+                get_parent ()->canvas,
+                get_x (),
+                get_y (),
+                get_width (),
+                get_height ());
+        }
         paint ();
         valid = true;
     }
@@ -153,9 +163,9 @@ void Control::update (Clip* scrvas) {
     }
 
     /*on_update (scrvas->get_x (),
-               scrvas->get_y (),
-               scrvas->get_width (),
-               scrvas->get_height ());*/
+     scrvas->get_y (),
+     scrvas->get_width (),
+     scrvas->get_height ());*/
 }
 
 void Control::invalidate () {
@@ -321,7 +331,6 @@ bool Control::focus_previous () {
     return false;
 }
 
-
 bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (focused_child != NULL) {
         if (focused_child->is_visible () && focused_child->is_enabled ()) {
@@ -340,28 +349,28 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
 
     if ((event.keysym.mod & KMOD_SHIFT) != 0) {
         if (event.keysym.sym == SDLK_TAB) {
-            if (focus_previous())
+            if (focus_previous ())
                 return true;
         }
         return false;
     }
 
     switch (event.keysym.sym) {
-        case SDLK_LEFT:
-        case SDLK_UP:
-            if (focus_previous ())
-                return true;
-            break;
+    case SDLK_LEFT:
+    case SDLK_UP:
+        if (focus_previous ())
+            return true;
+        break;
 
-        case SDLK_TAB:
-        case SDLK_RIGHT:
-        case SDLK_DOWN:
-            if (focus_next ())
-                return true;
-            break;
-            
-        default:
-            break;
+    case SDLK_TAB:
+    case SDLK_RIGHT:
+    case SDLK_DOWN:
+        if (focus_next ())
+            return true;
+        break;
+
+    default:
+        break;
     }
 
     return false;
@@ -476,7 +485,7 @@ void Control::on_height_changed (int value) {
 }
 
 void Control::paint () {
-    canvas->clear ();
+    //canvas->clear ();
     canvas->fill_background (get_background ());
 }
 

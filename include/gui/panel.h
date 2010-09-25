@@ -14,6 +14,8 @@ class Panel: public Control {
 protected:
     Panel (const ControlParameters& parms);
 
+    void init_control (Control* par);
+    
 public:
     bool is_focusable () const;
 
