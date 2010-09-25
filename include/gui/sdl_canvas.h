@@ -33,6 +33,8 @@ public:
     void draw_image (int x, int y, Canvas* image, int src_x, int src_y,
             int src_w, int src_h);
 
+    void draw_rectangle (int x, int y, int w, int h, uint32_t color);
+
     SDL_Surface* get_surface () const;
 };
 
@@ -54,10 +56,6 @@ public:
     SDLCanvas ();
 
     ~SDLCanvas ();
-
-    SDLClip* clip ();
-
-    SDLClip* clip (int x, int y, int w, int h);
 
     void set_width (int value);
 

@@ -42,6 +42,8 @@ public:
     virtual void draw_image (int x, int y, Canvas* image, int src_x, int src_y,
             int src_w, int src_h) = 0;
 
+    virtual void draw_rectangle (int x, int y, int w, int h, uint32_t color) = 0;
+
     int get_x () const;
 
     int get_y () const;
@@ -65,10 +67,6 @@ protected:
 
 public:
     virtual ~Canvas ();
-
-    virtual Clip* clip () = 0;
-
-    virtual Clip* clip (int x, int y, int w, int h) = 0;
 
     virtual void set_width (int value) = 0;
 

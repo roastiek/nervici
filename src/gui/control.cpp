@@ -77,8 +77,8 @@ void Control::remove_child (Control* child) {
     Control* prev_child = child->prev;
     Control* next_child = child->next;
 
-    child->invalidate();
-    
+    child->invalidate ();
+
     ((prev_child == NULL) ? first_child : prev_child->next) = next_child;
     ((next_child == NULL) ? last_child : next_child->prev) = prev_child;
 
@@ -99,13 +99,18 @@ void Control::destroy_children () {
 }
 
 void Control::blit (Clip *dest) {
-/*        logger.debugln ("blit %s %d %d %d %d %d %d", get_name ().c_str (),
+    /*        logger.debugln ("blit %s %d %d %d %d %d %d", get_name ().c_str (),
      dest->get_x (), dest->get_y (), dest->get_width (),
      dest->get_height (), dest->get_off_x (), dest->get_off_y ());*/
     /*    dest->draw_image (dest->get_x (), dest->get_y (), canvas, dest->get_x (),
      dest->get_y (), dest->get_width (), dest->get_height ());*/
-    dest->draw_image (0, 0, canvas, dest->get_x (), dest->get_y (),
-            dest->get_width (), dest->get_height ());
+    dest->draw_image (0,
+                      0,
+                      canvas,
+                      dest->get_x (),
+                      dest->get_y (),
+                      dest->get_width (),
+                      dest->get_height ());
     //logger.debugln("%d blit %s", SDL_GetTicks(), get_name().c_str());
 }
 
@@ -118,8 +123,10 @@ void Control::update_children (Control* child, Clip* scrvas) {
      + child->get_height () >= y) {
      */
     if (child->is_visible ()) {
-        Clip* childclip = scrvas->clip (child->get_x (), child->get_y (),
-                child->get_width (), child->get_height ());
+        Clip* childclip = scrvas->clip (child->get_x (),
+                                        child->get_y (),
+                                        child->get_width (),
+                                        child->get_height ());
         if (childclip != NULL) {
             child->update (childclip);
             delete childclip;
@@ -137,15 +144,18 @@ void Control::update (Clip* scrvas) {
         valid = true;
     }
 
-    if (get_frame () != 0)
-        canvas->draw_frame (get_frame ());
-
     blit (scrvas);
 
     update_children (first_child, scrvas);
 
-    on_update (scrvas->get_x (), scrvas->get_y (), scrvas->get_width (),
-            scrvas->get_height ());
+    if (get_frame () != 0) {
+        scrvas->draw_rectangle (0, 0, get_width (), get_height (), get_frame ());
+    }
+
+    on_update (scrvas->get_x (),
+               scrvas->get_y (),
+               scrvas->get_width (),
+               scrvas->get_height ());
 }
 
 void Control::invalidate () {
@@ -233,7 +243,7 @@ bool Control::grab_focus () {
                 steal_focus ();
                 if (get_parent () != NULL)
                     get_parent ()->propagate_focus (this);
-                logger.debugln("focus %s", get_name().c_str());
+                logger.debugln ("focus %s", get_name ().c_str ());
                 set_focused (true);
             }
             return true;
@@ -286,6 +296,33 @@ bool Control::focus_prev_child (Control* start_child) {
     return focus_prev_child (start_child->prev);
 }
 
+bool Control::focus_next () {
+    if (focus_next_child ((focused_child != NULL) ? focused_child->next
+            : first_child))
+        return true;
+
+    if (get_parent () == NULL) {
+        steal_focus ();
+        if (focus_next_child (first_child))
+            return true;
+    }
+    return false;
+}
+
+bool Control::focus_previous () {
+    if (focus_prev_child ((focused_child != NULL) ? focused_child->prev
+            : last_child))
+        return true;
+
+    if (get_parent () == NULL) {
+        steal_focus ();
+        if (focus_prev_child (last_child))
+            return true;
+    }
+    return false;
+}
+
+
 bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (focused_child != NULL) {
         if (focused_child->is_visible () && focused_child->is_enabled ()) {
@@ -304,29 +341,28 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
 
     if ((event.keysym.mod & KMOD_SHIFT) != 0) {
         if (event.keysym.sym == SDLK_TAB) {
-            if (focus_prev_child ((focused_child != NULL) ? focused_child->prev
-                    : last_child))
+            if (focus_previous())
                 return true;
-
-            if (get_parent () == NULL) {
-                steal_focus ();
-                if (focus_prev_child (last_child))
-                    return true;
-            }
         }
         return false;
     }
 
-    if (event.keysym.sym == SDLK_TAB) {
-        if (focus_next_child ((focused_child != NULL) ? focused_child->next
-                : first_child))
-            return true;
-
-        if (get_parent () == NULL) {
-            steal_focus ();
-            if (focus_next_child (first_child))
+    switch (event.keysym.sym) {
+        case SDLK_LEFT:
+        case SDLK_UP:
+            if (focus_previous ())
                 return true;
-        }
+            break;
+
+        case SDLK_TAB:
+        case SDLK_RIGHT:
+        case SDLK_DOWN:
+            if (focus_next ())
+                return true;
+            break;
+            
+        default:
+            break;
     }
 
     return false;
@@ -513,8 +549,8 @@ void Control::set_visible (bool value) {
         visible = value;
         invalidate ();
         /*if (!visible && get_parent () != NULL) {
-            get_parent ()->invalidate ();
-        }*/
+         get_parent ()->invalidate ();
+         }*/
     }
 }
 

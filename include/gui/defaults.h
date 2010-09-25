@@ -31,5 +31,8 @@
 #define E_SHOW_POPUP    SDL_USEREVENT + 1
 #define E_HIDE_POPUP    SDL_USEREVENT + 2
 
+#define NC_TEXT     0xd5d5ffff
+#define NC_SEL_TEXT 0xd585afff
+
 #endif	/* UTILS_H */
 

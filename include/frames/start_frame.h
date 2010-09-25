@@ -9,13 +9,16 @@
 #define	START_FRAME__H
 
 #include "gui/control.h"
-#include "gui/button.h"
 
 class StartFrame : public Control {
 private:
     void btn_new_game_clicked (Control* ctl);
+    
     void btn_quit_clicked (Control* ctl);
+    
     void btn_pledit_clicked (Control* ctl);
+
+    void btn_options_clicked (Control* ctl);
 
 protected:
     StartFrame();

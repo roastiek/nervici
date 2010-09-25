@@ -202,6 +202,10 @@ private:
      */
     bool focus_prev_child (Control* start_child);
 
+    bool focus_next ();
+    
+    bool focus_previous ();
+
 protected:
     Canvas* canvas;
 
@@ -236,7 +240,7 @@ protected:
     virtual const ControlParameters& get_parms ();
 
     virtual void update (Clip* scrvas);
-
+    
 public:
     virtual ~Control ();
 

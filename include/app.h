@@ -66,6 +66,8 @@ public:
 
     PlEditFrame& get_pledit_frame ();
 
+    bool is_aborted () const;
+    
     static App& get_instance ();
 };
 
@@ -73,6 +75,10 @@ extern App& app;
 
 inline App& App::get_instance() {
     return instance;
+}
+
+inline bool App::is_aborted() const {
+    return abort;
 }
 
 inline const StartFrame& App::get_start_frame () const {

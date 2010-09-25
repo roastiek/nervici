@@ -19,8 +19,14 @@
 using namespace Glib;
 
 static SDL_Surface *make_surface (int width, int height) {
-    return SDL_CreateRGBSurface (SDL_HWSURFACE, width, height, 32, 0xff,
-            0xff00, 0xff0000, 0xff000000);
+    return SDL_CreateRGBSurface (SDL_HWSURFACE,
+                                 width,
+                                 height,
+                                 32,
+                                 0xff,
+                                 0xff00,
+                                 0xff0000,
+                                 0xff000000);
 }
 
 SDLCanvas::SDLCanvas () :
@@ -34,15 +40,6 @@ SDLCanvas::~SDLCanvas () {
         surface = NULL;
     }
     SDLPango_FreeContext (pango_context);
-}
-
-SDLClip* SDLCanvas::clip () {
-    return clip (0, 0, get_width (), get_height ());
-}
-
-SDLClip* SDLCanvas::clip (int x, int y, int w, int h) {
-    SDLClip* result = new SDLClip (this->get_surface (), x, y, w, h, x, y);
-    return result;
 }
 
 void SDLCanvas::set_width (int value) {
@@ -351,8 +348,13 @@ SDLClip* SDLClip::clip (int x, int y, int w, int h) {
     if (ey > rel_y + height)
         ey = rel_y + height;
 
-    return new SDLClip (surface, off_x + x, off_y + y, ex - x - rx,
-            ey - y - ry, rx, ry);
+    return new SDLClip (surface,
+                        off_x + x,
+                        off_y + y,
+                        ex - x - rx,
+                        ey - y - ry,
+                        rx,
+                        ry);
 }
 
 SDLClip* SDLClip::start_clip (int x, int y, int w, int h) {
@@ -386,10 +388,17 @@ void SDLClip::draw_image (int x, int y, Canvas* image, int src_x, int src_y,
 
     SDLCanvas *sdlimage = dynamic_cast<SDLCanvas*> (image);
     if (sdlimage != NULL) {
-        SDL_BlitSurface (sdlimage->get_surface (), &src_area, surface,
-                &dest_area);
+        SDL_BlitSurface (sdlimage->get_surface (),
+                         &src_area,
+                         surface,
+                         &dest_area);
         /*SDL_BlitSurface (sdlimage->get_surface (), NULL, surface,
          &dest_area);*/
     }
+}
+
+void SDLClip::draw_rectangle (int x, int y, int w, int h, Uint32 color) {
+    rectangleColor (surface, off_x + x, off_y + y, off_x + x + w - 1, off_y + y
+            + h - 1, color);
 }
 

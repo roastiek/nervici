@@ -32,7 +32,7 @@ void SDLScreen::on_update (int x, int y, int w, int h) {
     dest.w = w;
     dest.h = h;
 
-    SDLCanvas* sdlcanvas = dynamic_cast<SDLCanvas*> (canvas);
+    //SDLCanvas* sdlcanvas = dynamic_cast<SDLCanvas*> (canvas);
     SDLClip* sdlclip = dynamic_cast<SDLClip*> (primary);
 
     /*SDL_BlitSurface (sdlcanvas->get_surface (), &dest, sdlclip->get_surface (),
