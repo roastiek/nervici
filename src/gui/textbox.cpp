@@ -6,11 +6,15 @@
 
 using namespace Glib;
 
+#define BORDER 2
+
 Textbox::Textbox (const ControlParameters& parms) :
-    InputControl (parms), cursor (0), cursor_x (1), x_offset (0) {
+    InputControl (parms), cursor (0), cursor_x (1), x_offset (0),
+            pre_selected (false), prevent_selected (false) {
 }
 
-Textbox* TextboxFactory::create (Control* par, const ControlParameters& parms,
+Textbox* TextboxFactory::create (Control* par,
+        const ControlParameters& parms,
         const ustring& name) {
     Textbox* result = new Textbox (parms);
     result->set_name (name);
@@ -20,48 +24,66 @@ Textbox* TextboxFactory::create (Control* par, const ControlParameters& parms,
 }
 
 void Textbox::paint () {
-    
+
     canvas->fill_background (get_input_background ());
     canvas->draw_frame (get_input_foreground ());
 
-    canvas->draw_text (2, 2, get_width () - 4, get_height () - 4, x_offset,
-            VA_center, get_text ());
+    if (is_pre_selected ()) {
+        int text_width = canvas->get_text_width (get_text ());
+        canvas->draw_box (BORDER, BORDER, text_width, get_height () - 2
+                * BORDER, NC_HIGHGROUND);
+    }
+
+    canvas->draw_text (BORDER, BORDER, get_width () - 2 * BORDER, get_height ()
+            - 2 * BORDER, x_offset, VA_center, get_text ());
 
     draw_inner_frame (get_input_background ());
 
-    //text.at
-
     if (is_focused ()) {
-        canvas->draw_vline (cursor_x + 2, 2, get_height () - 4, C_TEXT_CURSOR);
+        canvas->draw_vline (cursor_x + BORDER, BORDER, get_height () - 2
+                * BORDER, NC_TEXT_CURSOR);
     }
 }
 
 void Textbox::draw_inner_frame (uint32_t color) {
-    canvas->draw_rectangle (1, 1, get_width () - 2, get_height () - 2, color);
+    canvas->draw_rectangle (BORDER - 1, BORDER - 1, get_width () - 2 * (BORDER
+            - 1), get_height () - 2 * (BORDER - 1), color);
 }
 
 void Textbox::move_cursor_left (int distance) {
+    set_pre_selected (false);
     set_cursor (get_cursor () - distance);
 }
 
 void Textbox::move_cursor_right (int distance) {
+    set_pre_selected (false);
     set_cursor (get_cursor () + distance);
 }
 
 void Textbox::delete_at_cursor () {
     const ustring& old = get_text ();
 
-    if (cursor < int(old.length ())) {
-        update_text (old.substr (0, cursor) + old.substr (cursor + 1, -1));
+    if (get_cursor () < int(old.length ())) {
+        update_text (old.substr (0, get_cursor ()) + old.substr (get_cursor ()
+                + 1, -1));
+    }
+}
+
+void Textbox::check_pre_selected () {
+    if (is_pre_selected ()) {
+        set_text ("");
+        set_pre_selected (false);
     }
 }
 
 void Textbox::insert_at_cursor (const char* part) {
+    check_pre_selected ();
+
     ustring part_str = part;
     if (filter (part_str[0])) {
         const ustring& old = get_text ();
-        update_text (old.substr (0, cursor) + part_str[0] + old.substr (cursor,
-                -1));
+        update_text (old.substr (0, get_cursor ()) + part_str[0]
+                + old.substr (get_cursor (), -1));
     }
 }
 
@@ -76,11 +98,10 @@ void Textbox::set_cursor (int value) {
     ustring part = tx.substr (0, cursor);
     int w = canvas->get_text_width (part);
 
-    if (w - x_offset > get_width () - 5) {
-        x_offset = w - (get_width () - 5);
+    if (w - x_offset > get_width () - BORDER * 2 - 1) {
+        x_offset = w - (get_width () - BORDER * 2 - 1);
     }
     if (x_offset > w) {
-
         x_offset = w;
     }
 
@@ -113,12 +134,14 @@ bool Textbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
                 set_cursor (get_text ().length ());
                 return true;
             case SDLK_BACKSPACE:
-                if (cursor > 0) {
+                check_pre_selected ();
+                if (get_cursor () > 0) {
                     move_cursor_left ();
                     delete_at_cursor ();
                 }
                 return true;
             case SDLK_DELETE:
+                check_pre_selected ();
                 delete_at_cursor ();
                 return true;
             default:
@@ -153,8 +176,28 @@ bool Textbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     return Control::process_key_pressed_event (event);
 }
 
-bool Textbox::filter (const ustring::value_type& c) {
+void Textbox::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
+    InputControl::process_mouse_button_event (event);
 
+    if (event.state == SDL_PRESSED && event.button == SDL_BUTTON_LEFT) {
+        if (is_pre_selected ()) {
+            set_pre_selected (false);
+        }
+        if (!is_focused()) {
+            prevent_selected = true;
+        }
+        for (size_t ci = 0; ci <= get_text ().length (); ci++) {
+            int x = canvas->get_text_width (get_text ().substr (0, ci));
+            if (x > event.x) {
+                set_cursor (ci - 1);
+                return;
+            }
+        }
+        set_cursor (get_text ().length () + 1);
+    }
+}
+
+bool Textbox::filter (const ustring::value_type& c) {
     return true;
 }
 
@@ -169,24 +212,25 @@ void Textbox::set_text (const ustring& value) {
 }
 
 const ustring& Textbox::get_text () const {
-
     return text;
 }
 
 int Textbox::get_cursor () const {
-
     return cursor;
 }
 
 void Textbox::on_focus_gained () {
-
-    set_frame (C_FOC_FOREGROUND);
+    set_frame (NC_TEXT);
+    if (!prevent_selected) {
+        set_pre_selected (true);
+    }
+    prevent_selected = false;
     Control::on_focus_gained ();
 }
 
 void Textbox::on_focus_lost () {
-
-    set_frame (C_FOREGROUND);
+    set_frame (NC_HIGHGROUND);
+    set_pre_selected (false);
     Control::on_focus_lost ();
 }
 
@@ -197,3 +241,15 @@ void Textbox::update_text (const ustring& value) {
     }
     invalidate ();
 }
+
+bool Textbox::is_pre_selected () const {
+    return pre_selected;
+}
+
+void Textbox::set_pre_selected (bool value) {
+    if (value != pre_selected) {
+        pre_selected = value;
+        invalidate ();
+    }
+}
+

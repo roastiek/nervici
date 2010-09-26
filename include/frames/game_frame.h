@@ -18,7 +18,7 @@
 #include "gui/label.h"
 #include "gui/numberbox.h"
 #include "gui/smile_control.h"
-#include "gui/button.h"
+#include "gui/label_button.h"
 #include "game/game_info.h"
 #include "fakes/mod.h"
 
@@ -58,8 +58,8 @@ private:
     SmileControl* sc_smiles[ST_count][3];
     SmileSettingImages smile_images;
 
-    Button* btn_start;
-    Button* btn_cancel;
+    LabelButton* btn_start;
+    LabelButton* btn_cancel;
 
     void speed_value_changed (Scale* ctl, int value);
 

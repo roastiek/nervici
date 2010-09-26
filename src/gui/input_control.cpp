@@ -8,9 +8,9 @@ Control (parms), colors ( {0, 0, 0}) {
 
 void InputControl::init_control (Control* par) {
     Control::init_control (par);
-    set_input_background (C_INPUT_BACKGROUND);
-    set_input_text (C_INPUT_TEXT);
-    set_input_foreground (C_INPUT_FOREGROUND);
+    set_input_background (NC_INPUT_BACKGROUND);
+    set_input_text (NC_INPUT_TEXT);
+    set_input_foreground (NC_INPUT_FOREGROUND);
 }
 
 void InputControl::set_input_background (uint32_t value) {

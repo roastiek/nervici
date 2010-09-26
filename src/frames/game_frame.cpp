@@ -171,7 +171,7 @@ static const ControlParameters btn_start_parms = {
     ONE_COLUMN_H + 16,
     100,
     24,
-    12};
+    16};
 
 static const ControlParameters la_smile_caption_parms = {
     la_speed_parms.x + la_speed_parms.w + 17,
@@ -185,7 +185,7 @@ static const ControlParameters btn_cancel_parms = {
     btn_start_parms.y,
     btn_start_parms.w,
     btn_start_parms.h,
-    12};
+    16};
 
 GameFrame::GameFrame () :
     Control (frame_parms) {
@@ -347,15 +347,15 @@ void GameFrame::init_control (Control* par) {
         }
     }
 
-    btn_start = ButtonFactory::create (this,
-        "start",
+    btn_start = LabelButtonFactory::create (this,
+        _("start game"),
         btn_start_parms,
         "btn_start");
     btn_start->register_on_clicked (OnClicked (this,
         &GameFrame::btn_start_clicked));
 
-    btn_cancel = ButtonFactory::create (this,
-        "ale nic",
+    btn_cancel = LabelButtonFactory::create (this,
+        _("back to menu"),
         btn_cancel_parms,
         "btn_cancel");
     btn_cancel->register_on_clicked (OnClicked (this,

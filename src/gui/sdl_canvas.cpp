@@ -116,7 +116,7 @@ void SDLCanvas::draw_hline (int x, int y, int w, Uint32 color) {
 }
 
 void SDLCanvas::draw_vline (int x, int y, int h, Uint32 color) {
-    vlineColor (surface, x, y - 1, y + h - 1, color);
+    vlineColor (surface, x, y, y + h - 1, color);
 }
 
 void SDLCanvas::draw_rectangle (int x, int y, int w, int h, Uint32 color) {

@@ -36,6 +36,10 @@
 #define NC_BACKGROUND       0x042244ff
 #define NC_MEDROUND         0x06336gff
 #define NC_HIGHGROUND       0x084488ff
+#define NC_TEXT_CURSOR      0xffffffff
+#define NC_INPUT_BACKGROUND 0x000000ff
+#define NC_INPUT_FOREGROUND 0xd5d5ffff
+#define NC_INPUT_TEXT       0xd5d5ffff
 
 #endif	/* UTILS_H */
 
