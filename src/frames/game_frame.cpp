@@ -218,6 +218,15 @@ GameFrame::~GameFrame () {
 
 #define trans(color) ((color & 0xff) << 24 | (color & 0xff00) << 8 | (color & 0xff0000) >> 8 | 0xff)
 
+static const char* render_speed (float value) {
+#define SPEED_BUF_LEN 16
+    static char buf[SPEED_BUF_LEN];
+
+    snprintf (buf, SPEED_BUF_LEN, "%.2fx", value);
+
+    return buf;
+}
+
 void GameFrame::init_control (Control* par) {
     Control::init_control (par);
 
@@ -375,8 +384,7 @@ void GameFrame::init_control (Control* par) {
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
-    la_speed_text->set_text (ustring (double_to_string (double(base_speed)
-            / value)) + "x");
+    la_speed_text->set_text (ustring (render_speed (float(base_speed) / value)));
 }
 
 GameFrame* GameFrame::create_frame (Control* par) {
