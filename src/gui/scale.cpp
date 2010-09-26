@@ -7,44 +7,64 @@
 using namespace Glib;
 
 Scale::Scale (const ControlParameters& parms) :
-    Control (parms), min (0), max (0), value (0),
-    //drag_start (-1),
-            small_step (1), big_step (1) {
+    Control (parms), min (0), max (0), value (0), small_step (1), big_step (1) {
 }
 
 void Scale::init_control (Control* par) {
     Control::init_control (par);
-    set_frame (C_BACKGROUND);
+    set_background (0);
+    set_frame (0);
+}
+
+void Scale::reinitialize () {
+    Control::reinitialize ();
+
+    int sw = get_screen_width ();
+    slider_width = 7 * STANDARD_WIDTH / sw;
+    slider_height = 16 * STANDARD_WIDTH / sw;
+
+    fold_height = 4 * STANDARD_WIDTH / sw;
+    fold_border = fold_height * 3;
+    fold_width = get_width () - slider_width - 2;
+    fold_x = slider_width / 2 + 1;
 }
 
 void Scale::paint () {
     canvas->fill_background (get_background ());
 
     int steps = get_max () - get_min ();
-    int sw = get_screen_width ();
-    int slider_w = 7 * 1024 / sw;
-    int slider_h = 16 * 1024 / sw;
-    int scale_w = get_width () - slider_w - 2;
+
+    int degree_height = (get_height () - fold_border) / 2;
+    int bottom_degree_y = (get_height () + fold_border) / 2;
 
     for (int si = 0; si <= steps; si++) {
-        canvas->draw_vline (slider_w / 2 + 1 + si * scale_w / steps, 0,
-                get_height (), get_foreground ());
+        int degree_x = fold_x + si * fold_width / steps;
+
+        canvas->draw_vline (degree_x, 0, degree_height, get_foreground ());
+
+        canvas->draw_vline (degree_x,
+            bottom_degree_y,
+            degree_height,
+            get_foreground ());
     }
 
-    int hh = 4 * 1024 / sw;
-    int hb = hh * 3;
+    int color = (is_focused ()) ? NC_FOCUSED : NC_HIGHGROUND;
 
-    canvas->draw_box (0, (get_height () - hb) / 2, get_width (), hb,
-            get_background ());
+    canvas->draw_rectangle (fold_x,
+        (get_height () - fold_height) / 2,
+        fold_width + 1,
+        fold_height,
+        color);
 
-    canvas->draw_rectangle (slider_w / 2 + 1, (get_height () - hh) / 2, scale_w
-            + 1, hh, get_foreground ());
+    int slider_x = (get_value () - get_min ()) * fold_width / steps + 1;
+    int slider_y = (get_height () - slider_height) / 2;
 
-    canvas->draw_box ((get_value () - get_min ()) * scale_w / steps + 1,
-            (get_height () - slider_h) / 2, slider_w, slider_h, C_FILL);
-    int color = (is_focused ()) ? C_FOC_FOREGROUND : C_FOREGROUND;
-    canvas->draw_rectangle ((get_value () - get_min ()) * scale_w / steps + 1,
-            (get_height () - slider_h) / 2, slider_w, slider_h, color);
+    canvas->draw_box (slider_x, slider_y, slider_width, slider_height, NC_FILL);
+    canvas->draw_rectangle (slider_x,
+        slider_y,
+        slider_width,
+        slider_height,
+        color);
 }
 
 bool Scale::process_key_pressed_event (const SDL_KeyboardEvent& event) {
@@ -79,16 +99,17 @@ bool Scale::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     return Control::process_key_pressed_event (event);
 }
 
+void Scale::scroll_to_x (int value) {
+    int steps = get_max () - get_min ();
+    int val = value * steps / fold_width;
+    set_value (val + get_min ());
+}
+
 void Scale::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
     if (event.state == SDL_PRESSED) {
         switch (event.button) {
         case SDL_BUTTON_LEFT: {
-            int steps = get_max () - get_min ();
-            int sw = get_screen_width ();
-            int slider_w = 7 * 1024 / sw;
-            int scale_w = get_width () - slider_w - 2 + 1;
-            int val = event.x * steps / scale_w;
-            set_value (val + get_min ());
+            scroll_to_x (event.x);
             break;
         }
         case SDL_BUTTON_WHEELUP:
@@ -101,6 +122,14 @@ void Scale::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
     }
 
     Control::process_mouse_button_event (event);
+}
+
+void Scale::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
+    if (event.state == SDL_PRESSED && (event.state & SDL_BUTTON_LMASK) != 0) {
+        scroll_to_x (event.x);
+    }
+
+    Control::process_mouse_move_event (event);
 }
 
 void Scale::scroll_inc (int distance) {
@@ -192,8 +221,11 @@ void Scale::on_focus_lost () {
     invalidate ();
 }
 
-Scale* ScaleFactory::create (Control* parent, int small_step, int big_step,
-        const ControlParameters& parms, const ustring& name) {
+Scale* ScaleFactory::create (Control* parent,
+        int small_step,
+        int big_step,
+        const ControlParameters& parms,
+        const ustring& name) {
     Scale* result = new Scale (parms);
     result->set_name (name);
     result->init_control (parent);

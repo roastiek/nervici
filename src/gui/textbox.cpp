@@ -220,7 +220,7 @@ int Textbox::get_cursor () const {
 }
 
 void Textbox::on_focus_gained () {
-    set_frame (NC_TEXT);
+    set_frame (NC_FOCUSED);
     if (!prevent_selected) {
         set_pre_selected (true);
     }
