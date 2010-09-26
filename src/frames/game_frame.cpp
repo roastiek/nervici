@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "app.h"
 #include "utils.h"
 #include "engine/render.h"
@@ -11,7 +9,15 @@
 #include "settings/pl_infos.h"
 #include "mods/mod.h"
 #include "mods/mods.h"
+#include "gui/combobox.h"
 #include "gui/label.h"
+#include "gui/label_button.h"
+#include "gui/multiline_label.h"
+#include "gui/numberbox.h"
+#include "gui/scale.h"
+#include "gui/smile_control.h"
+#include "gui/team_button.h"
+#include "gui/vline.h"
 #include "game/game.h"
 
 #include "frames/game_frame.h"

@@ -10,17 +10,18 @@
 
 #include "engine/smile_set_images.h"
 #include "gui/control.h"
-#include "gui/multiline_label.h"
-#include "gui/combobox.h"
-#include "gui/team_button.h"
-#include "gui/scale.h"
-#include "gui/vline.h"
-#include "gui/label.h"
-#include "gui/numberbox.h"
-#include "gui/smile_control.h"
-#include "gui/label_button.h"
+#include "gui/team_colors.h"
 #include "game/game_info.h"
 #include "fakes/mod.h"
+#include "fakes/gui/multiline_label.h"
+#include "fakes/gui/combobox.h"
+#include "fakes/gui/team_button.h"
+#include "fakes/gui/scale.h"
+#include "fakes/gui/vline.h"
+#include "fakes/gui/label.h"
+#include "fakes/gui/numberbox.h"
+#include "fakes/gui/smile_control.h"
+#include "fakes/gui/label_button.h"
 
 class GameFrame : public Control {
 private:

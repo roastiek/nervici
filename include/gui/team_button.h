@@ -8,10 +8,8 @@
 #ifndef TEAM_BUTTON_H
 #define	TEAM_BUTTON_H
 
-#include "basic_defs.h"
 #include "control.h"
-
-typedef uint32_t TeamColors[TEAMS_COUNT];
+#include "team_colors.h"
 
 class TeamButton: public Control {
 private:

@@ -9,17 +9,16 @@
 #define	PLEDIT_FRAME_H
 
 #include "gui/control.h"
-#include "gui/combobox.h"
-#include "gui/button.h"
-#include "gui/label.h"
-#include "gui/textbox.h"
-#include "gui/scale.h"
-#include "gui/panel.h"
-#include "gui/key_graber.h"
 #include "settings/pl_type.h"
+#include "fakes/gui/combobox.h"
+#include "fakes/gui/button.h"
+#include "fakes/gui/label.h"
+#include "fakes/gui/textbox.h"
+#include "fakes/gui/scale.h"
+#include "fakes/gui/panel.h"
+#include "fakes/gui/key_graber.h"
 
-
-class PlEditFrame : public Panel {
+class PlEditFrame: public Control {
 private:
     Panel* pa_inner;
     Combobox* cb_select;
@@ -56,7 +55,7 @@ private:
     void on_sa_color_changed (Scale* ctl, int value);
 
 protected:
-    PlEditFrame();
+    PlEditFrame ();
 
     void init_control (Control* par);
 
@@ -66,8 +65,6 @@ public:
 
     void preapare ();
 };
-
-
 
 #endif	/* PLEDIT_FRAME_H */
 

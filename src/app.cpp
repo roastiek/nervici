@@ -11,6 +11,7 @@
 #include "game/game.h"
 #include "settings/team_infos.h"
 #include "gui/screen.h"
+#include "gui/defaults.h"
 #include "frames/start_frame.h"
 #include "frames/game_frame.h"
 #include "frames/pledit_frame.h"

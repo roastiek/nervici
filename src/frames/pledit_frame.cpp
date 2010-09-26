@@ -7,6 +7,13 @@
 #include "settings/pl_info.h"
 #include "settings/pl_infos.h"
 #include "frames/game_frame.h"
+#include "gui/button.h"
+#include "gui/combobox.h"
+#include "gui/key_graber.h"
+#include "gui/label.h"
+#include "gui/panel.h"
+#include "gui/scale.h"
+#include "gui/textbox.h"
 
 #include "frames/pledit_frame.h"
 
@@ -184,7 +191,7 @@ static const ControlParameters frame_parms = {
 //soutretid mysl a delo/hu
 
 PlEditFrame::PlEditFrame () :
-    Panel (frame_parms) {
+    Control (frame_parms) {
 }
 
 void PlEditFrame::init_control (Control* par) {
@@ -198,41 +205,52 @@ void PlEditFrame::init_control (Control* par) {
     btn_del
             = ButtonFactory::create (pa_inner, "smaz", btn_del_parms, "btn_del");
     btn_del->register_on_clicked (OnClicked (this,
-            &PlEditFrame::on_btn_del_clicked));
+        &PlEditFrame::on_btn_del_clicked));
 
     cb_select
             = ComboboxFactory::create (pa_inner, cb_select_parms, "cb_select");
     cb_select->register_on_selected_changed (Combobox::OnSelectedChanged (this,
-            &PlEditFrame::on_cb_select_changed));
+        &PlEditFrame::on_cb_select_changed));
 
-    la_name = LabelFactory::create (pa_inner, "menno:", la_name_parms,
-            "la_name");
+    la_name = LabelFactory::create (pa_inner,
+        "menno:",
+        la_name_parms,
+        "la_name");
     te_name = TextboxFactory::create (pa_inner, te_name_parms, "te_name");
 
-    la_color = LabelFactory::create (pa_inner, "barva:", la_color_parms,
-            "la_color");
+    la_color = LabelFactory::create (pa_inner,
+        "barva:",
+        la_color_parms,
+        "la_color");
     sa_red = ScaleFactory::create (pa_inner, 1, 16, sa_red_parms, "sa_red");
     sa_red->set_max (255);
     sa_red->register_on_value_changed (Scale::OnValueChanged (this,
-            &PlEditFrame::on_sa_color_changed));
-    sa_green = ScaleFactory::create (pa_inner, 1, 16, sa_green_parms,
-            "sa_green");
+        &PlEditFrame::on_sa_color_changed));
+    sa_green = ScaleFactory::create (pa_inner,
+        1,
+        16,
+        sa_green_parms,
+        "sa_green");
     sa_green->set_max (255);
     sa_green->register_on_value_changed (Scale::OnValueChanged (this,
-            &PlEditFrame::on_sa_color_changed));
+        &PlEditFrame::on_sa_color_changed));
     sa_blue = ScaleFactory::create (pa_inner, 1, 16, sa_blue_parms, "sa_blue");
     sa_blue->set_max (255);
     sa_blue->register_on_value_changed (Scale::OnValueChanged (this,
-            &PlEditFrame::on_sa_color_changed));
+        &PlEditFrame::on_sa_color_changed));
     pa_color = PanelFactory::create (pa_inner, pa_color_parms, "pa_color");
 
-    la_profil = LabelFactory::create (pa_inner, "profil:", la_profil_parms,
-            "la_profil");
+    la_profil = LabelFactory::create (pa_inner,
+        "profil:",
+        la_profil_parms,
+        "la_profil");
     cb_profil
             = ComboboxFactory::create (pa_inner, cb_profil_parms, "cb_profil");
 
-    la_pitch = LabelFactory::create (pa_inner, "zkresleni:", la_pitch_parms,
-            "la_pitch");
+    la_pitch = LabelFactory::create (pa_inner,
+        "zkresleni:",
+        la_pitch_parms,
+        "la_pitch");
     sa_pitch
             = ScaleFactory::create (pa_inner, 1, 1, sa_pitch_parms, "sa_pitch");
     sa_pitch->set_max (20);
@@ -241,21 +259,29 @@ void PlEditFrame::init_control (Control* par) {
     la_ai = LabelFactory::create (pa_inner, "plastik:", la_ai_parms, "la_ai");
     cb_ai = ComboboxFactory::create (pa_inner, cb_ai_parms, "cb_ai");
 
-    la_keys = LabelFactory::create (pa_inner, "klavesy:", la_keys_parms,
-            "la_keys");
-    kg_left = KeyGraberFactory::create (pa_inner, "vlevo: ", kg_left_parms,
-            "btn_left");
-    kg_right = KeyGraberFactory::create (pa_inner, "vpravo: ", kg_right_parms,
-            "btn_right");
-    kg_jump = KeyGraberFactory::create (pa_inner, "skok: ", kg_jump_parms,
-            "btn_jump");
+    la_keys = LabelFactory::create (pa_inner,
+        "klavesy:",
+        la_keys_parms,
+        "la_keys");
+    kg_left = KeyGraberFactory::create (pa_inner,
+        "vlevo: ",
+        kg_left_parms,
+        "btn_left");
+    kg_right = KeyGraberFactory::create (pa_inner,
+        "vpravo: ",
+        kg_right_parms,
+        "btn_right");
+    kg_jump = KeyGraberFactory::create (pa_inner,
+        "skok: ",
+        kg_jump_parms,
+        "btn_jump");
 
     btn_save = ButtonFactory::create (this, "uloz", btn_save_parms, "btn_save");
     btn_save->register_on_clicked (OnClicked (this,
-            &PlEditFrame::on_btn_save_clicked));
+        &PlEditFrame::on_btn_save_clicked));
     btn_back = ButtonFactory::create (this, "zpet", btn_back_parms, "btn_back");
     btn_back->register_on_clicked (OnClicked (this,
-            &PlEditFrame::on_btn_back_clicked));
+        &PlEditFrame::on_btn_back_clicked));
 
     cb_ai->add_item ("zadny");
 
@@ -297,8 +323,9 @@ void PlEditFrame::on_btn_save_clicked (Control* ctl) {
     if (info.name.length () > 0) {
         info.color = (sa_blue->get_value () * 256 + sa_green->get_value ())
                 * 256 + sa_red->get_value ();
-        info.profil = (cb_profil->get_selected () > 0) ? cb_profil->get_item (
-                cb_profil->get_selected ()).text : "";
+        info.profil
+                = (cb_profil->get_selected () > 0) ? cb_profil->get_item (cb_profil->get_selected ()).text
+                        : "";
         info.pitch = sa_pitch->get_value ();
         if (pl_type == PT_Human) {
             info.keys.left = kg_left->get_key ();
@@ -312,8 +339,9 @@ void PlEditFrame::on_btn_save_clicked (Control* ctl) {
         switch (index) {
         case 0:
             pl_infos.add (info);
-            cb_select->insert_item (pl_infos.players_count () + 1, info.name,
-                    trans (info.color));
+            cb_select->insert_item (pl_infos.players_count () + 1,
+                info.name,
+                trans (info.color));
             cb_select->set_selected (pl_infos.players_count () + 1);
             break;
         case 1:

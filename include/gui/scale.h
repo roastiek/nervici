@@ -17,10 +17,13 @@ public:
 
 private:
     int min;
+
     int max;
+
     int value;
-    //int drag_start;
+
     int small_step;
+
     int big_step;
 
     OnValueChanged call_value_changed;
@@ -37,17 +40,17 @@ protected:
 
     void paint ();
 
-    virtual void on_value_changed (int val);
-
-    void on_focus_gained ();
-
-    void on_focus_lost ();
-
     bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
     void process_mouse_button_event (const SDL_MouseButtonEvent& event);
 
 public:
+
+    virtual void on_value_changed (int val);
+
+    void on_focus_gained ();
+
+    void on_focus_lost ();
 
     virtual void register_on_value_changed (const OnValueChanged& handler);
 
@@ -77,9 +80,11 @@ public:
 class ScaleFactory {
 public:
     static Scale
-            * create (Control* parent, int small_step, int big_step,
-                    const ControlParameters& parms, const Glib::ustring& name =
-                            "scale");
+    * create (Control* parent,
+            int small_step,
+            int big_step,
+            const ControlParameters& parms,
+            const Glib::ustring& name = "scale");
 };
 
 #endif	/* SCALE_H */
