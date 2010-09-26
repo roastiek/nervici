@@ -53,7 +53,7 @@ void SDLCanvas::set_width (int value) {
 
         if (width > 0 && height > 0) {
             surface = make_surface (width, height);
-            SDL_FillRect(surface, NULL, 0xff000000);
+            SDL_FillRect (surface, NULL, 0xff000000);
         }
     }
 }
@@ -69,7 +69,7 @@ void SDLCanvas::set_height (int value) {
 
         if (width > 0 && height > 0) {
             surface = make_surface (width, height);
-            SDL_FillRect(surface, NULL, 0xff000000);
+            SDL_FillRect (surface, NULL, 0xff000000);
         }
     }
 }
@@ -80,6 +80,10 @@ void SDLCanvas::set_font (const ustring& value) {
     ustring desc = value + " " + int_to_string (font.size) + "px";
     pango_context = SDLPango_CreateContext_GivenFontDesc (desc.c_str ());
     SDLPango_SetDefaultColor (pango_context, &font_color);
+}
+
+int SDLCanvas::get_font_size () const {
+    return font.size;
 }
 
 void SDLCanvas::set_font_color (Uint32 value) {
@@ -157,17 +161,32 @@ void SDLCanvas::draw_aacircle (int x, int y, int r, Uint32 color) {
     aacircleColor (surface, x, y, r, color);
 }
 
-void SDLCanvas::draw_trigon (int x1, int y1, int x2, int y2, int x3, int y3,
+void SDLCanvas::draw_trigon (int x1,
+        int y1,
+        int x2,
+        int y2,
+        int x3,
+        int y3,
         Uint32 color) {
     trigonColor (surface, x1, y1, x2, y2, x3, y3, color);
 }
 
-void SDLCanvas::draw_filled_trigon (int x1, int y1, int x2, int y2, int x3,
-        int y3, Uint32 color) {
+void SDLCanvas::draw_filled_trigon (int x1,
+        int y1,
+        int x2,
+        int y2,
+        int x3,
+        int y3,
+        Uint32 color) {
     filledTrigonColor (surface, x1, y1, x2, y2, x3, y3, color);
 }
 
-void SDLCanvas::draw_aatrigon (int x1, int y1, int x2, int y2, int x3, int y3,
+void SDLCanvas::draw_aatrigon (int x1,
+        int y1,
+        int x2,
+        int y2,
+        int x3,
+        int y3,
         Uint32 color) {
     aatrigonColor (surface, x1, y1, x2, y2, x3, y3, color);
 }
@@ -183,8 +202,13 @@ void SDLCanvas::draw_image (int x, int y, Canvas* image) {
     }
 }
 
-void SDLCanvas::draw_image (int x, int y, Canvas* image, int src_x, int src_y,
-        int src_w, int src_h) {
+void SDLCanvas::draw_image (int x,
+        int y,
+        Canvas* image,
+        int src_x,
+        int src_y,
+        int src_w,
+        int src_h) {
     SDL_Rect src_area;
     src_area.x = src_x;
     src_area.y = src_y;
@@ -201,8 +225,13 @@ void SDLCanvas::draw_image (int x, int y, Canvas* image, int src_x, int src_y,
     }
 }
 
-void SDLCanvas::draw_text (int x, int y, int w, int h, HorizontalAling ha,
-        VerticalAling va, const ustring& text) {
+void SDLCanvas::draw_text (int x,
+        int y,
+        int w,
+        int h,
+        HorizontalAling ha,
+        VerticalAling va,
+        const ustring& text) {
     SDL_Rect src;
     SDL_Rect dest;
 
@@ -258,8 +287,13 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, HorizontalAling ha,
     SDL_FreeSurface (face);
 }
 
-void SDLCanvas::draw_text (int x, int y, int w, int h, int x_shift,
-        VerticalAling va, const ustring& text) {
+void SDLCanvas::draw_text (int x,
+        int y,
+        int w,
+        int h,
+        int x_shift,
+        VerticalAling va,
+        const ustring& text) {
     SDL_Rect src;
     SDL_Rect dest;
 
@@ -308,7 +342,10 @@ void SDLCanvas::draw_text (int x, int y, int w, int h, int x_shift,
     SDL_FreeSurface (face);
 }
 
-void SDLCanvas::draw_wrapped_text (int x, int y, int w, int h,
+void SDLCanvas::draw_wrapped_text (int x,
+        int y,
+        int w,
+        int h,
         const ustring& text) {
     SDL_Rect src;
     SDL_Rect dest;
@@ -403,8 +440,13 @@ void SDLClip::draw_image (int x, int y, Canvas* image) {
 
 }
 
-void SDLClip::draw_image (int x, int y, Canvas* image, int src_x, int src_y,
-        int src_w, int src_h) {
+void SDLClip::draw_image (int x,
+        int y,
+        Canvas* image,
+        int src_x,
+        int src_y,
+        int src_w,
+        int src_h) {
 
     SDL_Rect src_area;
     src_area.x = src_x;

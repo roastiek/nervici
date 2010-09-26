@@ -48,7 +48,13 @@ void Scale::paint () {
             get_foreground ());
     }
 
-    int color = (is_focused ()) ? NC_FOCUSED : NC_HIGHGROUND;
+    uint32_t color = (is_focused ()) ? NC_FOCUSED : NC_HIGHGROUND;
+
+    canvas->draw_box (fold_x,
+        (get_height () - fold_height) / 2,
+        fold_width + 1,
+        fold_height,
+        NC_BACKGROUND);
 
     canvas->draw_rectangle (fold_x,
         (get_height () - fold_height) / 2,
@@ -125,7 +131,7 @@ void Scale::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
 }
 
 void Scale::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
-    if (event.state == SDL_PRESSED && (event.state & SDL_BUTTON_LMASK) != 0) {
+    if ((event.state & SDL_BUTTON_LMASK) != 0) {
         scroll_to_x (event.x);
     }
 

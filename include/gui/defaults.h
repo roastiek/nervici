@@ -42,6 +42,9 @@
 #define NC_INPUT_TEXT       0xd5d5ffff
 #define NC_FOCUSED          0xd585afff
 #define NC_FILL             0x0a66aaff
+#define NC_DIS_FILL         0x808080ff
+#define NC_DIS_FOREGROUND   0xa0a0a0ff
+
 
 #endif	/* UTILS_H */
 

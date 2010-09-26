@@ -65,6 +65,8 @@ protected:
 
 public:
     virtual ~Canvas ();
+    
+    virtual int get_font_size () const = 0;
 
     virtual void set_width (int value) = 0;
 

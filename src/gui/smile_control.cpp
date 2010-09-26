@@ -13,50 +13,70 @@ SmileControl::SmileControl (const ControlParameters& parms, Canvas* face) :
 
 void SmileControl::init_control (Control* par) {
     Control::init_control (par);
+    set_background (0);
     set_frame (0);
 }
 
+void SmileControl::reinitialize () {
+    Control::reinitialize ();
+
+    bar_height = get_height () - get_width () - canvas->get_font_size () - 2;
+}
+
 void SmileControl::paint () {
+#define SMILE_SIZE 20
+
     canvas->fill_background (get_background ());
 
-    int h = get_height () - get_width () - 12;
-    int c = get_count ();
-    int s = get_step ();
+    uint32_t sep_color = (is_smile_enabled ()) ? get_foreground ()
+            : NC_DIS_FOREGROUND;
+    uint32_t fill_color = (is_smile_enabled ()) ? NC_FILL : NC_DIS_FILL;
 
-    canvas->draw_box (0, h, get_width (), -h * get_value () / c + 1,
-            (is_smile_enabled ()) ? C_FILL : C_DIS_FILL);
+    uint32_t frame_color = (is_focused ()) ? NC_FOCUSED : sep_color;
 
-    //int
+    canvas->draw_box (0, 0, get_width (), bar_height, NC_BACKGROUND);
 
-    for (int i = 0; i < c / s; i++) {
-        canvas->draw_hline (0, h * (i + 1) * s / c + 1, get_width (),
-                (is_smile_enabled ()) ? get_foreground () : C_DIS_FOREGROUND);
+    canvas->draw_box (0, bar_height, get_width (), -bar_height * get_value ()
+            / get_count () + 1, fill_color);
+
+    for (int i = 0; i < get_count () / get_step (); i++) {
+        canvas->draw_hline (0, bar_height * (i + 1) * get_step ()
+                / get_count () + 1, get_width (), sep_color);
     }
 
-    int left = (get_width () - 20) / 2;
+    int smile_border = (get_width () - SMILE_SIZE) / 2;
 
     int ax = 0;
-    int ay = (is_smile_enabled ()) ? 0 : 20;
-    int aw = 20;
-    int ah = 20;
+    int ay = (is_smile_enabled ()) ? 0 : SMILE_SIZE;
+    int aw = SMILE_SIZE;
+    int ah = SMILE_SIZE;
 
-    canvas->draw_image (left, h + left, smile, ax, ay, aw, ah);
-    //draw_box (left, h + left, 20, 20, 0x20ffff);
+    canvas->draw_image (smile_border,
+        bar_height + smile_border,
+        smile,
+        ax,
+        ay,
+        aw,
+        ah);
 
-    int color = (is_focused ()) ? C_FOC_FOREGROUND : get_foreground ();
+    canvas->draw_rectangle (0,
+        0,
+        get_width (),
+        bar_height + get_width (),
+        frame_color);
 
-    canvas->draw_rectangle (0, 0, get_width (), h + get_width (), color);
-
-    canvas->draw_text (0, get_height () - 20, get_width (), 20, HA_center,
-            VA_bottom, int_to_string (get_value ()));
+    canvas->draw_text (0,
+        get_height () - canvas->get_font_size () * 2,
+        get_width (),
+        canvas->get_font_size () * 2,
+        HA_center,
+        VA_bottom,
+        int_to_string (get_value ()));
 }
 
 void SmileControl::update_value (int y) {
-    int h = get_height () - get_width () - 12;
-    int c = get_count ();
-
-    if (y <= h) {
-        int v = (h - y) * c / h + 1;
+    if (y <= bar_height) {
+        int v = (bar_height - y) * get_count () / bar_height + 1;
         set_value (v);
     }
 }
@@ -69,14 +89,11 @@ void SmileControl::dec_value (int delta) {
     set_value (get_value () - delta);
 }
 
-void SmileControl::process_mouse_button_event (
-        const SDL_MouseButtonEvent& event) {
+void SmileControl::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
     if (event.state == SDL_PRESSED) {
         switch (event.button) {
         case SDL_BUTTON_LEFT: {
-            int h = get_height () - get_width () - 12;
-
-            if (event.y <= h) {
+            if (event.y <= bar_height) {
                 update_value (event.y);
             } else {
                 set_smile_enabled (!is_smile_enabled ());
@@ -188,8 +205,10 @@ int SmileControl::get_step () const {
     return step;
 }
 
-SmileControl* SmileControlFactory::create (Control* parent, Canvas* face,
-        const ControlParameters& parms, const ustring& name) {
+SmileControl* SmileControlFactory::create (Control* parent,
+        Canvas* face,
+        const ControlParameters& parms,
+        const ustring& name) {
     SmileControl* result = new SmileControl (parms, face);
     result->set_name (name);
     result->init_control (parent);

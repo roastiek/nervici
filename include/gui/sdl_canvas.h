@@ -63,6 +63,8 @@ public:
 
     void set_font (const Glib::ustring& value);
 
+    int get_font_size () const;
+
     void set_font_size (int value);
 
     void set_font_color (Uint32 value);

@@ -25,13 +25,13 @@
 using namespace Glib;
 using namespace std;
 
-#define ONE_COLUMN_W ((1024 - 16 - 3 * 17) / 4)
+#define ONE_COLUMN_W ((STANDARD_WIDTH - 16 - 3 * 17) / 4)
 #define ONE_COLUMN_H (24 + 20 + 14 + 26 * 16)
 
 static const ControlParameters frame_parms = {
     8,
-    8,
-    1024 - 16,
+    (STANDARD_HEIGHT - ONE_COLUMN_H - 16 - 24 - 8) / 2,
+    STANDARD_WIDTH - 16,
     ONE_COLUMN_H + 16 + 24 + 8,
     12};
 
@@ -240,7 +240,7 @@ void GameFrame::init_control (Control* par) {
     }
 
     la_rules_caption = LabelFactory::create (this,
-        "rules:",
+        _("rules:"),
         la_rules_caption_parms,
         "la_rules_caption");
     ml_rules = MultilineLabelFactory::create (this,
@@ -249,7 +249,7 @@ void GameFrame::init_control (Control* par) {
         "ml_rules");
 
     la_mod_caption = LabelFactory::create (this,
-        "mod:",
+        _("mod:"),
         la_mod_caption_parms,
         "la_mod_caption");
     cb_mod = ComboboxFactory::create (this, cb_mod_parms, "cb_mod");
@@ -279,8 +279,10 @@ void GameFrame::init_control (Control* par) {
         btn_players_parms.y += 24 + 2;
     }
 
-    la_speed
-            = LabelFactory::create (this, "speed:", la_speed_parms, "la_speed");
+    la_speed = LabelFactory::create (this,
+        _("speed:"),
+        la_speed_parms,
+        "la_speed");
     la_speed_text = LabelFactory::create (this,
         "1.00x",
         la_speed_text_parms,
@@ -292,13 +294,13 @@ void GameFrame::init_control (Control* par) {
         &GameFrame::speed_value_changed));
 
     la_rounds = LabelFactory::create (this,
-        "pocet kol o vozu:",
+        _("rounds:"),
         la_rounds_parms,
         "la_rounds");
     nb_rounds = NumberboxFactory::create (this, nb_rounds_parms, "nb_rounds");
 
     la_max_score = LabelFactory::create (this,
-        "konecne skore:",
+        _("final score:"),
         la_max_score_parms,
         "la_max_score");
     nb_max_score = NumberboxFactory::create (this,
@@ -306,7 +308,7 @@ void GameFrame::init_control (Control* par) {
         "nb_max_score");
 
     la_max_length = LabelFactory::create (this,
-        "maximalni natahnuti:",
+        _("max length:"),
         la_max_length_parms,
         "la_max_length");
     nb_max_length = NumberboxFactory::create (this,
@@ -314,23 +316,25 @@ void GameFrame::init_control (Control* par) {
         "nb_max_length");
 
     la_timer = LabelFactory::create (this,
-        "cas na kolo:",
+        _("timer:"),
         la_timer_parms,
         "la_timer");
     nb_timer = NumberboxFactory::create (this, nb_timer_parms, "nb_timer");
 
     la_step = LabelFactory::create (this,
-        "bod na krok:",
+        _("step value:"),
         la_step_parms,
         "la_step");
     nb_step = NumberboxFactory::create (this, nb_step_parms, "nb_step");
 
-    la_bonus
-            = LabelFactory::create (this, "bonus:", la_bonus_parms, "la_bonus");
+    la_bonus = LabelFactory::create (this,
+        _("bonus:"),
+        la_bonus_parms,
+        "la_bonus");
     nb_bonus = NumberboxFactory::create (this, nb_bonus_parms, "nb_bonus");
 
     la_smile_caption = LabelFactory::create (this,
-        "smiles:",
+        _("smiles:"),
         la_smile_caption_parms,
         "la_smile_caption");
 
@@ -578,7 +582,7 @@ void GameFrame::update_players () {
     for (int ci = 0; ci < 16; ci++) {
         cb_players[ci]->clear ();
 
-        cb_players[ci]->add_item ("(zadny)", 0x808080ff);
+        cb_players[ci]->add_item (_("(none)"), 0x808080ff);
 
         for (size_t pi = 0; pi < pl_infos.count (); pi++) {
             const PlInfo& info = pl_infos[pi];
@@ -586,8 +590,6 @@ void GameFrame::update_players () {
         }
 
         cb_players[ci]->set_selected (0);
-
-        //btn_teams[ci]->set_selected (0);
     }
 }
 

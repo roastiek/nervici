@@ -16,10 +16,16 @@
 class SmileControl: public Control {
 private:
     Canvas* smile;
+
     int value;
+
     bool enabled;
+
     int count;
+
     int step;
+    
+    int bar_height;
 
     void update_value (int y);
 
@@ -42,6 +48,7 @@ protected:
     bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
 public:
+    void reinitialize ();
 
     virtual void set_value (int val);
 
@@ -64,9 +71,10 @@ public:
 
 class SmileControlFactory {
 public:
-    static SmileControl* create (Control* parent, Canvas* face,
-            const ControlParameters& parms, const Glib::ustring& name =
-                    "smile_control");
+    static SmileControl* create (Control* parent,
+            Canvas* face,
+            const ControlParameters& parms,
+            const Glib::ustring& name = "smile_control");
 };
 
 #endif	/* SMILE_CONTROL_H */
