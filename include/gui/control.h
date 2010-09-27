@@ -229,12 +229,6 @@ protected:
 
     virtual Control* control_at_pos (int x, int);
 
-    virtual bool process_key_pressed_event (const SDL_KeyboardEvent& event);
-
-    virtual void process_mouse_button_event (const SDL_MouseButtonEvent& event);
-
-    virtual void process_mouse_move_event (const SDL_MouseMotionEvent& event);
-
     virtual void paint ();
 
     virtual const ControlParameters& get_parms ();
@@ -243,6 +237,12 @@ protected:
     
     virtual void parent_invalidated ();
     
+    virtual bool process_key_pressed_event (const SDL_KeyboardEvent& event);
+
+    virtual void process_mouse_button_event (const SDL_MouseButtonEvent& event);
+
+    virtual void process_mouse_move_event (const SDL_MouseMotionEvent& event);
+
 public:
     virtual ~Control ();
 
