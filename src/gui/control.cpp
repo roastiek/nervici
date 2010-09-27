@@ -131,7 +131,7 @@ void Control::update_children (Clip* scrvas) {
 
 void Control::update (Clip* scrvas) {
     if (!valid) {
-        if (get_parent () != NULL) {
+        if (get_parent () != NULL && (get_background () & 0xff) != 0xff) {
             canvas->draw_image (0,
                 0,
                 get_parent ()->canvas,
@@ -160,8 +160,10 @@ void Control::invalidate_children () {
 }
 
 void Control::parent_invalidated () {
-    valid = false;
-    invalidate_children ();
+    if ((get_background () & 0xff) != 0xff) {
+        valid = false;
+        invalidate_children ();
+    }
 }
 
 void Control::invalidate () {
@@ -479,7 +481,6 @@ void Control::on_height_changed (int value) {
 }
 
 void Control::paint () {
-    //canvas->clear ();
     canvas->fill_background (get_background ());
 }
 

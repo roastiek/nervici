@@ -16,8 +16,10 @@ LabelButton::LabelButton (const ControlParameters& parms) :
 
 }
 
-LabelButton* LabelButtonFactory::create (Control* par, const ustring& text,
-        const ControlParameters& parms, const ustring& name) {
+LabelButton* LabelButtonFactory::create (Control* par,
+        const ustring& text,
+        const ControlParameters& parms,
+        const ustring& name) {
     LabelButton* result = new LabelButton (parms);
     result->set_name (name);
     result->init_control (par);
@@ -29,15 +31,20 @@ void LabelButton::init_control (Control* par) {
     Control::init_control (par);
     set_font_color (NC_TEXT);
     set_frame (0);
-    //set_background(0xff);
+    set_background (0);
 }
 
 void LabelButton::paint () {
-    //canvas->clear ();
-    ustring tt = (mouse_in) ? "<u>" + get_text() + "</u>" : get_text();
-    
-    canvas->draw_text (0, 0, get_width (), get_height (), HA_center, VA_center,
-            tt);
+    canvas->fill_background (get_background ());
+    ustring tt = (mouse_in) ? "<u>" + get_text () + "</u>" : get_text ();
+
+    canvas->draw_text (0,
+        0,
+        get_width (),
+        get_height (),
+        HA_center,
+        VA_center,
+        tt);
 }
 
 void LabelButton::on_focus_gained () {
@@ -53,11 +60,11 @@ void LabelButton::on_focus_lost () {
 void LabelButton::on_mouse_enter () {
     mouse_in = true;
     Control::on_mouse_enter ();
-    invalidate();
+    invalidate ();
 }
 
 void LabelButton::on_mouse_leave () {
     mouse_in = false;
     Control::on_mouse_leave ();
-    invalidate();
+    invalidate ();
 }
