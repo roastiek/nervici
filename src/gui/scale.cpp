@@ -18,7 +18,7 @@ void Scale::init_control (Control* par) {
 void Scale::reinitialize () {
     Control::reinitialize ();
 
-    int sw = get_screen_width ();
+    int sw = screen->get_width ();
     slider_width = 7 * sw / STANDARD_WIDTH;
     slider_height = 16 * sw / STANDARD_WIDTH;
 

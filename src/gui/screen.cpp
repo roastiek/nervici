@@ -112,14 +112,20 @@ void Screen::add_popup (Control* pop, Control* own) {
     popup = pop;
     popup_owner = own;
 
+    /*    int pop_x = popup->get_x ();
+     int pop_y = popup->get_y ();
+
+     popup->set_x (pop_x);
+     popup->set_y (pop_y);*/
+
     while (own != this) {
         popup->set_x (popup->get_x () + own->get_x ());
         popup->set_y (popup->get_y () + own->get_y ());
         own = own->get_parent ();
     }
-
     popup->set_parent (this);
-    popup->show_all ();
+
+    popup->set_visible (true);
     //popup->register_on_focus_lost (OnFocusLost (this, &Screen::poput_lost_focus));
     popup->grab_focus ();
 }

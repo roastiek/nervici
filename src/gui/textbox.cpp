@@ -25,7 +25,6 @@ Textbox* TextboxFactory::create (Control* par,
 void Textbox::paint () {
 
     canvas->fill_background (get_input_background ());
-    canvas->draw_frame (get_input_foreground ());
 
     if (is_pre_selected ()) {
         int text_width = canvas->get_text_width (get_text ());

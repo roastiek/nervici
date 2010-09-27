@@ -25,7 +25,6 @@ static const ListboxParameters cb_select_parms = {
     3 * BTN_WIDTH + 8 - 24,
     24,
     12,
-    20,
     18};
 
 static const ControlParameters btn_del_parms = {
@@ -97,7 +96,6 @@ static const ListboxParameters cb_profil_parms = {
     la_profil_parms.w,
     24,
     12,
-    20,
     18};
 
 static const ControlParameters la_pitch_parms = {
@@ -127,7 +125,6 @@ static const ListboxParameters cb_ai_parms = {
     la_ai_parms.w,
     24,
     12,
-    20,
     18};
 
 static const ControlParameters la_keys_parms = {

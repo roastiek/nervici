@@ -1,6 +1,6 @@
-#include <SDL_events.h>
-
+#include "logger.h"
 #include "gui/defaults.h"
+#include "gui/event_helper.h"
 
 #include "gui/combobox.h"
 
@@ -12,10 +12,18 @@ void Combobox::list_clicked (Control* ctl) {
 }
 
 Combobox::Combobox (const ListboxParameters& parms) :
-    InputControl (parms), selected (-1), list_parms (ListboxParameters (0, 0,
-            parms.w, parms.min_height, parms.font_size, parms.min_height,
-            parms.item_height)), port_parms (ScrollbarParameters (0.0, 0.0,
-            parms.w, 200, parms.font_size, 1, 10)) {
+    InputControl (parms), selected (-1), list_parms (ListboxParameters (0,
+        0,
+        parms.w,
+        parms.item_height,
+        parms.font_size,
+        parms.item_height)), port_parms (ScrollbarParameters (0.0,
+        0.0,
+        parms.w,
+        200,
+        parms.font_size,
+        1,
+        10)) {
 }
 
 Combobox::~Combobox () {
@@ -24,7 +32,8 @@ Combobox::~Combobox () {
 }
 
 Combobox* ComboboxFactory::create (Control* par,
-        const ListboxParameters& parms, const ustring& name) {
+        const ListboxParameters& parms,
+        const ustring& name) {
     Combobox* result = new Combobox (parms);
     result->set_name (name);
     result->init_control (par);
@@ -37,6 +46,7 @@ void Combobox::init_control (Control* par) {
     InputControl::init_control (par);
     list->set_frame (0);
     list->register_on_clicked (OnClicked (this, &Combobox::list_clicked));
+    port->show_all ();
 }
 
 void Combobox::reinitialize () {
@@ -60,19 +70,66 @@ void Combobox::select_down () {
 
 void Combobox::paint () {
     canvas->fill_background (get_input_background ());
-    set_font_color (get_input_text ());
-    //draw_frame (C_FOREGROUND);
 
     if (get_selected () >= 0) {
         set_font_color (get_item (get_selected ()).color);
-        canvas->draw_text (2, 2, get_width () - 4, get_height () - 4, HA_left,
-                VA_center, get_item (get_selected ()).text);
+        canvas->draw_text (2,
+            2,
+            get_width () - 4,
+            get_height () - 4,
+            HA_left,
+            VA_center,
+            get_item (get_selected ()).text);
     }
+
+    canvas->draw_box (get_width () - get_height (),
+        0,
+        get_height (),
+        get_height (),
+        get_background ());
+
+    canvas->draw_rectangle (get_width () - get_height (),
+        0,
+        get_height (),
+        get_height (),
+        get_foreground ());
+
+    int ax_y = get_width () - get_height () + get_height () / 2;
+    int border = get_height () / 3;
+    int half_w = (get_height () - border * 2) / 2;
+    canvas->draw_aaline (ax_y,
+        get_height () - border,
+        ax_y - half_w,
+        border,
+        get_foreground ());
+    canvas->draw_aaline (ax_y,
+        get_height () - border,
+        ax_y + half_w,
+        border,
+        get_foreground ());
 }
 
 void Combobox::on_clicked () {
-    port->set_x (0);
-    port->set_y (get_height ());
+    int real_y = get_y ();
+    for (Control* par = get_parent (); par != NULL; par = par->get_parent ()) {
+        real_y += par->get_y ();
+    }
+    int remain = screen->get_height () - (real_y + get_height () + 1 + 4);
+
+    int items_count =
+            (16 > list->get_items_count ()) ? list->get_items_count () : 16;
+    int list_min_height = items_count * list->get_item_height ();
+
+    if (list->get_height () < list_min_height) {
+        list->set_height (list_min_height);
+    }
+
+    port->set_x (-1);
+    port->set_y (get_height () + 1);
+    port->set_width (get_width () + 2);
+    port->set_height ((remain > list_min_height + 2) ? list_min_height + 2
+            : remain);
+
     show_popup (port, this);
 
     Control::on_clicked ();
@@ -109,12 +166,12 @@ bool Combobox::process_key_pressed_event (SDL_KeyboardEvent event) {
 }
 
 void Combobox::on_focus_gained () {
-    set_frame (C_FOC_FOREGROUND);
+    set_frame (NC_FOCUSED);
     Control::on_focus_gained ();
 }
 
 void Combobox::on_focus_lost () {
-    set_frame (C_FOREGROUND);
+    set_frame (NC_HIGHGROUND);
     Control::on_focus_lost ();
 }
 

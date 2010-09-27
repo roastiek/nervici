@@ -215,10 +215,6 @@ protected:
 
     virtual void init_control (Control* par);
 
-    virtual int get_screen_width () const;
-
-    virtual int get_screen_height () const;
-
     virtual void add_child (Control* child);
 
     virtual void remove_child (Control* child);
@@ -372,6 +368,7 @@ public:
 
     friend class ControlFactory;
 
+    static Control* screen;
 };
 
 class ControlFactory {
@@ -379,6 +376,7 @@ public:
     static Control* create (Control* par, const ControlParameters& parms,
             const Glib::ustring& = "control");
 };
+
 
 #endif	/* CONTROL_H */
 

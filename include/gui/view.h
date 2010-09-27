@@ -34,6 +34,8 @@ private:
 protected:
     View (const ControlParameters& parms);
 
+    void init_control (Control* par);
+    
     virtual void on_x_offset_changed (int value);
 
     virtual void on_y_offset_changed (int value);

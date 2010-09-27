@@ -25,7 +25,9 @@ private:
     int selected;
 
     ListboxParameters list_parms;
+    
     ScrollbarParameters port_parms;
+    
     OnSelectedChanged call_selected_changed;
 
     void list_clicked (Control* ctl);

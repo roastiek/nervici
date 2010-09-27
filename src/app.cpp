@@ -35,6 +35,7 @@ void App::init_gui () {
     SDL_SetEventFilter (paint_filter);
 
     screen = render.create_screen ("nervici");
+    Control::screen = screen;
     screen->show_all ();
 
     start_frame = StartFrame::create_frame (screen);

@@ -35,14 +35,17 @@ protected:
 
     void init_control (Control* par);
 
-    void reinitialize ();
-
 public:
+    void reinitialize ();
 
     bool is_focusable () const;
 
-    void set_content (Control* value);
+    void set_width (int value);
+    
+    void set_height (int value);
 
+    void set_content (Control* value);
+    
     Control* get_content () const;
 
     friend class ScrollportFactory;

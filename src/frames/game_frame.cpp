@@ -55,7 +55,6 @@ static const ListboxParameters la_mod_caption_parms = {
     ONE_COLUMN_W,
     20,
     12,
-    20,
     18};
 
 static const ListboxParameters cb_mod_parms = {
@@ -64,7 +63,6 @@ static const ListboxParameters cb_mod_parms = {
     ONE_COLUMN_W,
     24,
     12,
-    20,
     18};
 
 static const ControlParameters la_speed_parms = {
@@ -263,7 +261,6 @@ void GameFrame::init_control (Control* par) {
         ONE_COLUMN_W - 24 - 2,
         24,
         12,
-        22,
         20);
 
     for (int pi = 0; pi < 16; pi++) {
@@ -389,7 +386,7 @@ void GameFrame::init_control (Control* par) {
 
 void GameFrame::reinitialize () {
     Control::reinitialize ();
-    set_y ((get_screen_height() - get_height()) / 2);
+    set_y ((screen->get_height() - get_height()) / 2);
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {

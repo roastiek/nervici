@@ -30,7 +30,7 @@ void Scrollbar::init_control (Control* par) {
 void Scrollbar::reinitialize () {
     Control::reinitialize ();
 
-    int sw = get_screen_width ();
+    int sw = screen->get_width ();
     set_small_step (get_parms ().small_step * sw / STANDARD_WIDTH);
     set_big_step (get_parms ().big_step * sw / STANDARD_WIDTH);
 
@@ -162,6 +162,15 @@ void Scrollbar::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
     }
     Control::process_mouse_move_event (event);
 }
+
+void Scrollbar::set_height (int value) {
+    Control::set_height (value);
+    fold_height = get_height () - 2 * get_width ();
+    set_bar_height (fold_height - (max - min));
+    bar_y = get_width ();
+    bar_y += (max != min) ? rest_space * get_value() / (max - min) : 0;
+}
+
 
 void Scrollbar::set_min (int m) {
     if (min != m) {

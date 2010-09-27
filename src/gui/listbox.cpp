@@ -1,14 +1,17 @@
-#include <SDL_events.h>
-
 #include "gui/defaults.h"
+#include "gui/event_helper.h"
 
 #include "gui/listbox.h"
 
 using namespace Glib;
 
-ListboxParameters::ListboxParameters (float nx, float ny, float nw, float nh,
-        float nf, float nmh, float nih) :
-    ControlParameters (nx, ny, nw, nh, nf), min_height (nmh), item_height (nih) {
+ListboxParameters::ListboxParameters (float nx,
+        float ny,
+        float nw,
+        float nh,
+        float nf,
+        float nih) :
+    ControlParameters (nx, ny, nw, nh, nf), item_height (nih) {
 }
 
 ListItem::ListItem (const ustring& txt, uint32_t cl) :
@@ -20,7 +23,8 @@ Listbox::Listbox (const ListboxParameters& parms) :
             lb_parms (parms) {
 }
 
-Listbox* ListboxFactory::create (Control* par, const ListboxParameters& parms,
+Listbox* ListboxFactory::create (Control* par,
+        const ListboxParameters& parms,
         const ustring& name) {
     Listbox* result = new Listbox (parms);
     result->set_name (name);
@@ -35,9 +39,8 @@ void Listbox::init_control (Control* par) {
 
 void Listbox::reinitialize () {
     InputControl::reinitialize ();
-    int sw = get_screen_width ();
+    int sw = screen->get_width ();
     const ListboxParameters& p = get_parms ();
-    set_min_height (p.min_height * sw / STANDARD_WIDTH);
     set_item_height (p.item_height * sw / STANDARD_WIDTH);
 }
 
@@ -60,9 +63,7 @@ void Listbox::select_down () {
 }
 
 void Listbox::paint () {
-
-    canvas->draw_box (0, 0, get_width (), get_height (),
-            get_input_background ());
+    canvas->fill_background (get_input_background ());
 
     int ih = get_item_height ();
     int y_offset = 0;
@@ -70,13 +71,18 @@ void Listbox::paint () {
 
     for (size_t i = 0; i < items.size (); i++, y_offset += ih) {
         if (int(i) == get_selected ()) {
-            canvas->draw_box (0, y_offset, iw, ih, C_FILL);
-            canvas->draw_rectangle (0, y_offset, iw, ih, get_foreground ());
+            canvas->draw_box (0, y_offset, iw, ih, get_background ());
+            canvas->draw_rectangle (-1, y_offset, iw + 2, ih, get_foreground ());
         }
         set_font_color (items[i].color);
 
-        canvas->draw_text (1, y_offset, iw - 2, ih, HA_left, VA_center,
-                items[i].text);
+        canvas->draw_text (1,
+            y_offset,
+            iw - 2,
+            ih,
+            HA_left,
+            VA_center,
+            items[i].text);
     }
 }
 
@@ -98,16 +104,7 @@ void Listbox::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
 }
 
 bool Listbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
-    if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_META) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0)
-            return false;
-
+    if ((event.keysym.mod & ALL_MODS) == 0) {
         switch (event. keysym.sym) {
         case SDLK_UP:
             select_up ();
@@ -211,17 +208,3 @@ void Listbox::set_item_height (int value) {
 int Listbox::get_item_height () const {
     return item_height;
 }
-
-int Listbox::get_min_height () const {
-    return min_height;
-}
-
-void Listbox::set_min_height (int value) {
-    if (value != min_height) {
-        min_height = value;
-        if (get_height () < min_height) {
-            set_height (min_height);
-        }
-    }
-}
-

@@ -56,8 +56,6 @@ protected:
 
     void init_control (Control* par);
     
-    void reinitialize ();
-
     const ScrollbarParameters& get_parms ();
 
     void paint ();
@@ -75,9 +73,12 @@ protected:
     void on_focus_lost ();
 
 public:
+    void reinitialize ();
 
     void register_on_value_changed (const OnValueChanged& handler);
 
+    void set_height (int value);
+    
     void scroll_inc (int distance = 1);
 
     void scroll_dec (int distance = 1);

@@ -16,6 +16,8 @@ ControlParameters::ControlParameters (float nx,
     x (nx), y (ny), w (nw), h (nh), font_size (nf) {
 }
 
+Control* Control::screen;
+
 Control::Control (const ControlParameters& pp) :
 parent (NULL),
 first_child (NULL),
@@ -50,13 +52,17 @@ void Control::init_control (Control* par) {
 }
 
 void Control::reinitialize () {
-    int sw = get_screen_width ();
+    int sw = screen->get_width ();
     const ControlParameters& p = get_parms ();
     set_width (p.w * sw / STANDARD_WIDTH);
     set_height (p.h * sw / STANDARD_WIDTH);
     set_x (p.x * sw / STANDARD_WIDTH);
     set_y (p.y * sw / STANDARD_WIDTH);
     set_font_size (p.font_size * sw / STANDARD_WIDTH);
+
+    for (Control* child = first_child; child != NULL; child = child->next) {
+        child->reinitialize ();
+    }
 }
 
 Control* ControlFactory::create (Control* par,
@@ -398,16 +404,6 @@ void Control::show_all () {
     for (Control* child = first_child; child != NULL; child = child->next) {
         child->show_all ();
     }
-}
-
-int Control::get_screen_width () const {
-    Control* par = get_parent ();
-    return (par != NULL) ? par->get_screen_width () : STANDARD_WIDTH;
-}
-
-int Control::get_screen_height () const {
-    Control* par = get_parent ();
-    return (par != NULL) ? par->get_screen_height () : STANDARD_HEIGHT;
 }
 
 void Control::show_popup (Control* popup, Control* owner) {
