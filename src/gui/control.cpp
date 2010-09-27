@@ -10,7 +10,10 @@
 
 using namespace Glib;
 
-ControlParameters::ControlParameters (float nx, float ny, float nw, float nh,
+ControlParameters::ControlParameters (float nx,
+        float ny,
+        float nw,
+        float nh,
         float nf) :
     x (nx), y (ny), w (nw), h (nh), font_size (nf) {
 }
@@ -58,7 +61,8 @@ void Control::reinitialize () {
     set_font_size (p.font_size * sw / STANDARD_WIDTH);
 }
 
-Control* ControlFactory::create (Control* par, const ControlParameters& parms,
+Control* ControlFactory::create (Control* par,
+        const ControlParameters& parms,
         const ustring& name) {
     Control* result = new Control (parms);
     result->set_name (name);
@@ -82,8 +86,6 @@ void Control::remove_child (Control* child) {
 
     ((prev_child == NULL) ? first_child : prev_child->next) = next_child;
     ((next_child == NULL) ? last_child : next_child->prev) = prev_child;
-
-    //invalidate ();
 }
 
 void Control::destroy_children () {
@@ -100,11 +102,6 @@ void Control::destroy_children () {
 }
 
 void Control::blit (Clip *dest) {
-    /*        logger.debugln ("blit %s %d %d %d %d %d %d", get_name ().c_str (),
-     dest->get_x (), dest->get_y (), dest->get_width (),
-     dest->get_height (), dest->get_off_x (), dest->get_off_y ());*/
-    /*    dest->draw_image (dest->get_x (), dest->get_y (), canvas, dest->get_x (),
-     dest->get_y (), dest->get_width (), dest->get_height ());*/
     dest->draw_image (0,
         0,
         canvas,
@@ -112,31 +109,21 @@ void Control::blit (Clip *dest) {
         dest->get_y (),
         dest->get_width (),
         dest->get_height ());
-    //logger.debugln("%d blit %s", SDL_GetTicks(), get_name().c_str());
 }
 
-void Control::update_children (Control* child, Clip* scrvas) {
-    if (child == NULL)
-        return;
-
-    /*  if (child->get_x () <= x + w && child->get_x () + child->get_width () >= x
-     && child->get_y () <= y + h && child->get_y ()
-     + child->get_height () >= y) {
-     */
-    if (child->is_visible ()) {
-        Clip* childclip = scrvas->clip (child->get_x (),
-            child->get_y (),
-            child->get_width (),
-            child->get_height ());
-        if (childclip != NULL) {
-            child->update (childclip);
-            delete childclip;
+void Control::update_children (Clip* scrvas) {
+    for (Control* child = first_child; child != NULL; child = child->next) {
+        if (child->is_visible ()) {
+            Clip* childclip = scrvas->clip (child->get_x (),
+                child->get_y (),
+                child->get_width (),
+                child->get_height ());
+            if (childclip != NULL) {
+                child->update (childclip);
+                delete childclip;
+            }
         }
-        //            child->blit (scrvas, x - child->get_x (), y - child->get_y (), w, h);
     }
-    //    }
-
-    update_children (child->next, scrvas);
 }
 
 void Control::update (Clip* scrvas) {
@@ -156,20 +143,28 @@ void Control::update (Clip* scrvas) {
 
     blit (scrvas);
 
-    update_children (first_child, scrvas);
+    update_children (scrvas);
 
     if (get_frame () != 0) {
         scrvas->draw_rectangle (0, 0, get_width (), get_height (), get_frame ());
     }
+}
 
-    /*on_update (scrvas->get_x (),
-     scrvas->get_y (),
-     scrvas->get_width (),
-     scrvas->get_height ());*/
+void Control::invalidate_children () {
+    for (Control* child = first_child; child != NULL; child = child->next) {
+        child->parent_invalidated ();
+    }
+}
+
+void Control::parent_invalidated () {
+    valid = false;
+    invalidate_children ();
 }
 
 void Control::invalidate () {
     valid = false;
+    invalidate_children ();
+
     SDL_Event event;
     SDL_Rect *area = new SDL_Rect;
 
@@ -286,23 +281,19 @@ bool Control::grab_focus_last () {
  * will gain focus.
  */
 bool Control::focus_next_child (Control* start_child) {
-    if (start_child == NULL)
-        return false;
-
-    if (start_child->grab_focus ())
-        return true;
-
-    return focus_next_child (start_child->next);
+    for (Control* child = start_child; child != NULL; child = child->next) {
+        if (child->grab_focus ())
+            return true;
+    }
+    return false;
 }
 
 bool Control::focus_prev_child (Control* start_child) {
-    if (start_child == NULL)
-        return false;
-
-    if (start_child->grab_focus_last ())
-        return true;
-
-    return focus_prev_child (start_child->prev);
+    for (Control* child = start_child; child != NULL; child = child->prev) {
+        if (child->grab_focus_last ())
+            return true;
+    }
+    return false;
 }
 
 bool Control::focus_next () {

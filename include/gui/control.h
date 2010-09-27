@@ -179,7 +179,7 @@ private:
      * Update adn redraw all children in specified area in reversed order, so 
      * first child is on top.
      */
-    void update_children (Control* item, Clip* scrvas);
+    void update_children (Clip* scrvas);
 
     /*
      * Steal focus from actual focused control. There will be no focused control
@@ -205,6 +205,8 @@ private:
     bool focus_next ();
     
     bool focus_previous ();
+    
+    void invalidate_children ();
 
 protected:
     Canvas* canvas;
@@ -238,6 +240,8 @@ protected:
     virtual const ControlParameters& get_parms ();
 
     virtual void update (Clip* scrvas);
+    
+    virtual void parent_invalidated ();
     
 public:
     virtual ~Control ();
