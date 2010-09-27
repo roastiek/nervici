@@ -23,7 +23,9 @@ private:
 protected:
     StartFrame();
 
-    virtual void init_control (Control* par);
+    void init_control (Control* par);
+    
+    void reinitialize ();
 
 public:
     static StartFrame* create_frame (Control* par);

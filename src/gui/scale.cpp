@@ -19,10 +19,10 @@ void Scale::reinitialize () {
     Control::reinitialize ();
 
     int sw = get_screen_width ();
-    slider_width = 7 * STANDARD_WIDTH / sw;
-    slider_height = 16 * STANDARD_WIDTH / sw;
+    slider_width = 7 * sw / STANDARD_WIDTH;
+    slider_height = 16 * sw / STANDARD_WIDTH;
 
-    fold_height = 4 * STANDARD_WIDTH / sw;
+    fold_height = 4 * sw / STANDARD_WIDTH;
     fold_border = fold_height * 3;
     fold_width = get_width () - slider_width - 2;
     fold_x = slider_width / 2 + 1;

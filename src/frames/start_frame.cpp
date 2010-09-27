@@ -85,6 +85,11 @@ void StartFrame::init_control (Control* par) {
     set_frame (0x00);
 }
 
+void StartFrame::reinitialize () {
+    Control::reinitialize ();
+    set_y ((get_screen_height() - get_height()) / 2);
+}
+
 StartFrame* StartFrame::create_frame (Control* par) {
     StartFrame* result = new StartFrame ();
     result->set_name ("start_frame");

@@ -77,7 +77,7 @@ static const ControlParameters la_speed_parms = {
 static const ControlParameters sa_speed_parms = {
     la_speed_parms.x,
     la_speed_parms.y + la_speed_parms.h,
-    ONE_COLUMN_W - 32,
+    ONE_COLUMN_W - 36,
     24,
     12};
 
@@ -385,6 +385,11 @@ void GameFrame::init_control (Control* par) {
 
     set_background (0x20);
     set_frame (0);
+}
+
+void GameFrame::reinitialize () {
+    Control::reinitialize ();
+    set_y ((get_screen_height() - get_height()) / 2);
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {

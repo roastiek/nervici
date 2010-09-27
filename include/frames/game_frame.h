@@ -83,6 +83,8 @@ protected:
 
     void init_control (Control* par);
 
+    void reinitialize ();
+
 public:
     ~GameFrame ();
 
