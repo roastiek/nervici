@@ -34,7 +34,7 @@ void Screen::process_event (const SDL_Event& event) {
 
     case SDL_MOUSEBUTTONDOWN:
         under_cursor = control_at_pos (event.button.x, event.button.y);
-        process_mouse_button_event (event.button);
+        on_mouse_button (event.button);
 
         if (event.button.button == SDL_BUTTON_LEFT) {
             be_clicked = under_cursor;
@@ -46,7 +46,7 @@ void Screen::process_event (const SDL_Event& event) {
 
     case SDL_MOUSEBUTTONUP:
         under_cursor = control_at_pos (event.button.x, event.button.y);
-        process_mouse_button_event (event.button);
+        on_mouse_button (event.button);
 
         if (event.button.button == SDL_BUTTON_LEFT) {
             par = under_cursor;
@@ -66,7 +66,7 @@ void Screen::process_event (const SDL_Event& event) {
         under_cursor = control_at_pos (event.motion.x, event.motion.y);
         set_mouse_target (under_cursor);
 
-        process_mouse_move_event (event.motion);
+        on_mouse_move (event.motion);
         break;
 
     case SDL_ACTIVEEVENT:

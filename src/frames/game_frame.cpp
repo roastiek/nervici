@@ -288,8 +288,8 @@ void GameFrame::init_control (Control* par) {
         la_speed_text_parms,
         "la_speed_text");
     sa_speed = ScaleFactory::create (this, 1, 1, sa_speed_parms, "sa_speed");
-    sa_speed->set_min (base_speed / 2);
-    sa_speed->set_max (base_speed * 2);
+    sa_speed->set_min (-base_speed * 2);
+    sa_speed->set_max (-base_speed / 2);
     sa_speed->register_on_value_changed (Scale::OnValueChanged (this,
         &GameFrame::speed_value_changed));
 
@@ -388,7 +388,7 @@ void GameFrame::init_control (Control* par) {
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
-    la_speed_text->set_text (ustring (render_speed (float(base_speed) / value)));
+    la_speed_text->set_text (ustring (render_speed (float(-base_speed) / value)));
 }
 
 GameFrame* GameFrame::create_frame (Control* par) {
@@ -443,7 +443,7 @@ void GameFrame::btn_start_clicked (Control* ctl) {
     game_info.setting.max_length = nb_max_length->get_value ();
     game_info.setting.max_score = nb_max_score->get_value ();
     game_info.setting.rounds = nb_rounds->get_value ();
-    game_info.setting.speed = sa_speed->get_value ();
+    game_info.setting.speed = -sa_speed->get_value ();
     game_info.setting.step = nb_step->get_value ();
 
     vector<int> team_id;
@@ -514,7 +514,7 @@ void GameFrame::load_mod (const Mod& mod) {
     nb_rounds->set_value (set.read_int (mod.name,
         "rounds",
         mod.spec.defaults.rounds));
-    sa_speed->set_value (set.read_int (mod.name,
+    sa_speed->set_value (-set.read_int (mod.name,
         "speed",
         mod.spec.defaults.speed));
     nb_step->set_value (set.read_int (mod.name, "step", mod.spec.defaults.step));
@@ -615,7 +615,7 @@ void GameFrame::save_state () {
     set.write_int (mod_name, "max_length", nb_max_length->get_value ());
     set.write_int (mod_name, "max_score", nb_max_score->get_value ());
     set.write_int (mod_name, "rounds", nb_rounds->get_value ());
-    set.write_int (mod_name, "speed", sa_speed->get_value ());
+    set.write_int (mod_name, "speed", -sa_speed->get_value ());
     set.write_int (mod_name, "step", nb_step->get_value ());
 
     for (int si = 0; si < ST_count; si++) {

@@ -1,6 +1,5 @@
-#include <SDL_events.h>
-
 #include "gui/defaults.h"
+#include "gui/event_helper.h"
 
 #include "gui/textbox.h"
 
@@ -111,79 +110,68 @@ void Textbox::set_cursor (int value) {
 }
 
 bool Textbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
-    if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_META) != 0)
-            return false;
-
-        if ((event.keysym.mod & KMOD_SHIFT) == 0) {
-            switch (event.keysym.sym) {
-            case SDLK_LEFT:
-                move_cursor_left ();
-                return true;
-            case SDLK_RIGHT:
-                move_cursor_right ();
-                return true;
-            case SDLK_HOME:
-                set_cursor (0);
-                return true;
-            case SDLK_END:
-                set_cursor (get_text ().length ());
-                return true;
-            case SDLK_BACKSPACE:
-                check_pre_selected ();
-                if (get_cursor () > 0) {
-                    move_cursor_left ();
-                    delete_at_cursor ();
-                }
-                return true;
-            case SDLK_DELETE:
-                check_pre_selected ();
-                delete_at_cursor ();
-                return true;
-            default:
-                break;
-            }
-        }
-        Uint16 c = event.keysym.unicode;
-        if (c != 0 && c != '\t') {
-            char part[4] = {
-                0,
-                0,
-                0,
-                0};
-
-            if (c <= 0x7f) {
-                part[0] = char(c & 0x7f);
-            } else if (c <= 0x7ff) {
-                part[0] = char(0xc0 | (c >> 6 & 0x1f));
-                part[1] = char(0x80 | (c & 0x3f));
-            } else {
-                part[0] = char(0xf0 | (c >> 12 & 0x0f));
-                part[1] = char(0x80 | (c >> 6 & 0x3f));
-                part[2] = char(0x80 | (c & 0x3f));
-            }
-            insert_at_cursor (part);
-            move_cursor_right ();
-
+    if ((event.keysym.mod & ALL_MODS) == 0) {
+        switch (event.keysym.sym) {
+        case SDLK_LEFT:
+            move_cursor_left ();
             return true;
+        case SDLK_RIGHT:
+            move_cursor_right ();
+            return true;
+        case SDLK_HOME:
+            set_cursor (0);
+            return true;
+        case SDLK_END:
+            set_cursor (get_text ().length ());
+            return true;
+        case SDLK_BACKSPACE:
+            check_pre_selected ();
+            if (get_cursor () > 0) {
+                move_cursor_left ();
+                delete_at_cursor ();
+            }
+            return true;
+        case SDLK_DELETE:
+            check_pre_selected ();
+            delete_at_cursor ();
+            return true;
+        default:
+            break;
         }
+    }
+    Uint16 c = event.keysym.unicode;
+    if (c != 0 && c != '\t') {
+        char part[4] = {
+            0,
+            0,
+            0,
+            0};
+
+        if (c <= 0x7f) {
+            part[0] = char(c & 0x7f);
+        } else if (c <= 0x7ff) {
+            part[0] = char(0xc0 | (c >> 6 & 0x1f));
+            part[1] = char(0x80 | (c & 0x3f));
+        } else {
+            part[0] = char(0xf0 | (c >> 12 & 0x0f));
+            part[1] = char(0x80 | (c >> 6 & 0x3f));
+            part[2] = char(0x80 | (c & 0x3f));
+        }
+        insert_at_cursor (part);
+        move_cursor_right ();
+
+        return true;
     }
 
     return Control::process_key_pressed_event (event);
 }
 
 void Textbox::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
-    InputControl::process_mouse_button_event (event);
-
     if (event.state == SDL_PRESSED && event.button == SDL_BUTTON_LEFT) {
         if (is_pre_selected ()) {
             set_pre_selected (false);
         }
-        if (!is_focused()) {
+        if (!is_focused ()) {
             prevent_selected = true;
         }
         for (size_t ci = 0; ci <= get_text ().length (); ci++) {
@@ -195,6 +183,8 @@ void Textbox::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
         }
         set_cursor (get_text ().length () + 1);
     }
+
+    InputControl::process_mouse_button_event (event);
 }
 
 bool Textbox::filter (const ustring::value_type& c) {

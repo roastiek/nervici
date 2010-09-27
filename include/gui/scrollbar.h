@@ -24,22 +24,38 @@ public:
 
 private:
     int min;
+    
     int max;
+    
     int value;
+    
     int drag_start_y;
+    
+    int drag_start_value;
+    
     int small_step;
+    
     int big_step;
+    
+    int fold_height;
+    
+    int bar_height;
+    
+    int bar_y;
+    
+    int rest_space;
 
     const ScrollbarParameters sc_parms;
+    
     OnValueChanged call_value_changed;
-
-    void scroll_inc (int distance = 1);
-
-    void scroll_dec (int distance = 1);
+    
+    void set_bar_height (int value);
 
 protected:
     Scrollbar (const ScrollbarParameters& parms);
 
+    void init_control (Control* par);
+    
     void reinitialize ();
 
     const ScrollbarParameters& get_parms ();
@@ -61,6 +77,10 @@ protected:
 public:
 
     void register_on_value_changed (const OnValueChanged& handler);
+
+    void scroll_inc (int distance = 1);
+
+    void scroll_dec (int distance = 1);
 
     void set_min (int m);
 

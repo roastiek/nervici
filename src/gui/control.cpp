@@ -1,9 +1,7 @@
-#include <SDL_events.h>
-#include <SDL.h>
-
 #include "utils.h"
 #include "logger.h"
 #include "gui/defaults.h"
+#include "gui/event_helper.h"
 #include "engine/render.h"
 
 #include "gui/control.h"
@@ -330,43 +328,42 @@ bool Control::focus_previous () {
 bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if (focused_child != NULL) {
         if (focused_child->is_visible () && focused_child->is_enabled ()) {
-            if (focused_child->process_key_pressed_event (event)) {
+            if (focused_child->on_key_pressed (event)) {
                 return true;
             }
         }
     }
 
-    if ((event.keysym.mod & KMOD_ALT) != 0)
-        return false;
-    if ((event.keysym.mod & KMOD_CTRL) != 0)
-        return false;
-    if ((event.keysym.mod & KMOD_META) != 0)
+    if ((event.keysym.mod & (KMOD_ALT | KMOD_CTRL | KMOD_META)) != 0)
         return false;
 
     if ((event.keysym.mod & KMOD_SHIFT) != 0) {
-        if (event.keysym.sym == SDLK_TAB) {
+        switch (event.keysym.sym) {
+        case SDLK_TAB:
             if (focus_previous ())
                 return true;
+            break;
+        default:
+            break;
         }
-        return false;
-    }
+    } else {
+        switch (event.keysym.sym) {
+        case SDLK_LEFT:
+        case SDLK_UP:
+            if (focus_previous ())
+                return true;
+            break;
 
-    switch (event.keysym.sym) {
-    case SDLK_LEFT:
-    case SDLK_UP:
-        if (focus_previous ())
-            return true;
-        break;
+        case SDLK_TAB:
+        case SDLK_RIGHT:
+        case SDLK_DOWN:
+            if (focus_next ())
+                return true;
+            break;
 
-    case SDLK_TAB:
-    case SDLK_RIGHT:
-    case SDLK_DOWN:
-        if (focus_next ())
-            return true;
-        break;
-
-    default:
-        break;
+        default:
+            break;
+        }
     }
 
     return false;
@@ -450,10 +447,10 @@ void Control::on_mouse_leave () {
 }
 
 bool Control::on_key_pressed (const SDL_KeyboardEvent& event) {
-    if (!call.key_pressed (this, event)) {
-        return process_key_pressed_event (event);
+    if (call.key_pressed (this, event)) {
+        return true;
     }
-    return true;
+    return process_key_pressed_event (event);
 }
 
 void Control::on_focus_gained () {
@@ -548,9 +545,6 @@ void Control::set_visible (bool value) {
     if (visible != value) {
         visible = value;
         invalidate ();
-        /*if (!visible && get_parent () != NULL) {
-         get_parent ()->invalidate ();
-         }*/
     }
 }
 

@@ -1,7 +1,6 @@
-#include <SDL_events.h>
-
 #include "utils.h"
 #include "gui/defaults.h"
+#include "gui/event_helper.h"
 
 #include "gui/smile_control.h"
 
@@ -124,23 +123,8 @@ void SmileControl::process_mouse_move_event (const SDL_MouseMotionEvent& event) 
 }
 
 bool SmileControl::process_key_pressed_event (const SDL_KeyboardEvent& event) {
-    if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_META) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0)
-            return false;
-
+    if ((event.keysym.mod & ALL_MODS) == 0) {
         switch (event. keysym.sym) {
-        case SDLK_UP:
-            inc_value ();
-            return true;
-        case SDLK_DOWN:
-            dec_value ();
-            return true;
         case SDLK_SPACE:
         case SDLK_RETURN:
         case SDLK_KP_ENTER:
@@ -150,7 +134,15 @@ bool SmileControl::process_key_pressed_event (const SDL_KeyboardEvent& event) {
             break;
         }
     }
-
+    
+    switch (event.keysym.unicode) {
+    case '+':
+        inc_value ();
+        return true;
+    case '-':
+        dec_value ();
+        return true;
+    };
     return Control::process_key_pressed_event (event);
 }
 

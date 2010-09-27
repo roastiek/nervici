@@ -1,6 +1,5 @@
-#include <SDL_events.h>
-
 #include "gui/defaults.h"
+#include "gui/event_helper.h"
 
 #include "gui/scale.h"
 
@@ -74,23 +73,8 @@ void Scale::paint () {
 }
 
 bool Scale::process_key_pressed_event (const SDL_KeyboardEvent& event) {
-    if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_META) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0)
-            return false;
-
+    if ((event.keysym.mod & ALL_MODS) == 0) {
         switch (event.keysym.sym) {
-        case SDLK_LEFT:
-            scroll_dec (get_small_step ());
-            return true;
-        case SDLK_RIGHT:
-            scroll_inc (get_small_step ());
-            return true;
         case SDLK_PAGEUP:
             scroll_dec (get_big_step ());
             return true;
@@ -100,6 +84,14 @@ bool Scale::process_key_pressed_event (const SDL_KeyboardEvent& event) {
         default:
             break;
         }
+    }
+    switch (event.keysym.unicode) {
+    case '+':
+        scroll_inc (get_small_step ());
+        return true;
+    case '-':
+        scroll_dec (get_small_step ());
+        return true;
     }
 
     return Control::process_key_pressed_event (event);
