@@ -33,7 +33,9 @@ protected:
 public:
     virtual ~Clip ();
 
-    virtual Clip* clip (int x, int y, int w, int h) = 0;
+    virtual Clip* new_clip () = 0; 
+    
+    virtual bool clip (int x, int y, int w, int h, Clip* dest) = 0;
 
     virtual void draw_image (int x, int y, Canvas* image) = 0;
 

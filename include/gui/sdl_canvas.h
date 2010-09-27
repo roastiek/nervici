@@ -26,7 +26,9 @@ public:
 
     SDLClip (SDL_Surface* face, int w, int h, int dx, int dy);
 
-    SDLClip* clip (int x, int y, int w, int h);
+    SDLClip* new_clip (); 
+    
+    bool clip (int x, int y, int w, int h, Clip* dest);
 
     void draw_image (int x, int y, Canvas* image);
 

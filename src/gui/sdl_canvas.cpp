@@ -394,7 +394,11 @@ SDLClip::SDLClip (SDL_Surface* face, int w, int h, int dx, int dy) :
 
 }
 
-SDLClip* SDLClip::clip (int x, int y, int w, int h) {
+SDLClip* SDLClip::new_clip () {
+    return new SDLClip (surface, 0, 0, 0, 0, 0, 0);
+}
+
+bool SDLClip::clip (int x, int y, int w, int h, Clip* dest) {
     int rx = rel_x - x;
     int ry = rel_y - y;
     if (rx < 0)
@@ -403,13 +407,13 @@ SDLClip* SDLClip::clip (int x, int y, int w, int h) {
         ry = 0;
 
     if (rel_x + width <= x)
-        return NULL;
+        return false;
     if (rel_y + height <= y)
-        return NULL;
+        return false;
     if (x + w <= rel_x)
-        return NULL;
+        return false;
     if (y + h <= rel_y)
-        return NULL;
+        return false;
 
     int ex = x + w;
     if (ex > rel_x + width)
@@ -419,13 +423,15 @@ SDLClip* SDLClip::clip (int x, int y, int w, int h) {
     if (ey > rel_y + height)
         ey = rel_y + height;
 
-    return new SDLClip (surface,
-        off_x + x,
-        off_y + y,
-        ex - x - rx,
-        ey - y - ry,
-        rx,
-        ry);
+    SDLClip* sdldest = dynamic_cast<SDLClip*> (dest);
+    
+    sdldest->off_x = off_x + x;
+    sdldest->off_y = off_y + y;
+    sdldest->width = ex - x - rx;
+    sdldest->height = ey - y - ry;
+    sdldest->rel_x = rx;
+    sdldest->rel_y = ry;
+    return true;
 }
 
 void SDLClip::draw_image (int x, int y, Canvas* image) {

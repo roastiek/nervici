@@ -112,18 +112,21 @@ void Control::blit (Clip *dest) {
 }
 
 void Control::update_children (Clip* scrvas) {
+    Clip* childclip = scrvas->new_clip ();
+
     for (Control* child = first_child; child != NULL; child = child->next) {
         if (child->is_visible ()) {
-            Clip* childclip = scrvas->clip (child->get_x (),
+            if (scrvas->clip (child->get_x (),
                 child->get_y (),
                 child->get_width (),
-                child->get_height ());
-            if (childclip != NULL) {
+                child->get_height (),
+                childclip)) {
                 child->update (childclip);
-                delete childclip;
             }
         }
     }
+
+    delete childclip;
 }
 
 void Control::update (Clip* scrvas) {
