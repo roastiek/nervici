@@ -475,6 +475,10 @@ void Control::on_height_changed (int value) {
     call.height_changed (this, value);
 }
 
+void Control::on_visibility_changed (bool value) {
+    call.visibility_changed (this, value);
+}
+
 void Control::paint () {
     canvas->fill_background (get_background ());
 }
@@ -515,16 +519,20 @@ void Control::register_on_x_changed (const OnXChanged& handler) {
     call.x_changed = handler;
 }
 
-void Control::register_on_y_changed (const OnXChanged& handler) {
+void Control::register_on_y_changed (const OnYChanged& handler) {
     call.y_changed = handler;
 }
 
-void Control::register_on_width_changed (const OnXChanged& handler) {
+void Control::register_on_width_changed (const OnWidthChanged& handler) {
     call.width_changed = handler;
 }
 
-void Control::register_on_height_changed (const OnXChanged& handler) {
+void Control::register_on_height_changed (const OnHeightChanged& handler) {
     call.height_changed = handler;
+}
+
+void Control::register_on_visibility_changed (const OnVisibilityChanged& handler) {
+    call.visibility_changed = handler;
 }
 
 void Control::set_parent (Control* value) {
@@ -542,6 +550,7 @@ void Control::set_parent (Control* value) {
 void Control::set_visible (bool value) {
     if (visible != value) {
         visible = value;
+        on_visibility_changed (value);
         invalidate ();
     }
 }

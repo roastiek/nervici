@@ -52,6 +52,7 @@ public:
     typedef Event1<Control*, int> OnYChanged;
     typedef Event1<Control*, int> OnWidthChanged;
     typedef Event1<Control*, int> OnHeightChanged;
+    typedef Event1<Control*, bool> OnVisibilityChanged;
 
     struct OnKeyPressed {
     private:
@@ -107,7 +108,7 @@ private:
      */
     int x;
     int y;
-    
+
     int width;
     int height;
 
@@ -166,6 +167,7 @@ private:
         OnYChanged y_changed;
         OnWidthChanged width_changed;
         OnHeightChanged height_changed;
+        OnVisibilityChanged visibility_changed;
     } call;
 
     /*
@@ -206,9 +208,9 @@ private:
     bool focus_prev_child (Control* start_child);
 
     bool focus_next ();
-    
+
     bool focus_previous ();
-    
+
     void invalidate_children ();
 
 protected:
@@ -233,9 +235,9 @@ protected:
     virtual const ControlParameters& get_parms ();
 
     virtual void update (Clip* scrvas);
-    
+
     virtual void parent_invalidated ();
-    
+
     virtual void on_x_changed (int value);
 
     virtual void on_y_changed (int value);
@@ -243,6 +245,8 @@ protected:
     virtual void on_width_changed (int value);
 
     virtual void on_height_changed (int value);
+
+    virtual void on_visibility_changed (bool value);
 
     virtual bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
@@ -291,11 +295,14 @@ public:
 
     virtual void register_on_x_changed (const OnXChanged& handler);
 
-    virtual void register_on_y_changed (const OnXChanged& handler);
+    virtual void register_on_y_changed (const OnYChanged& handler);
 
-    virtual void register_on_width_changed (const OnXChanged& handler);
+    virtual void register_on_width_changed (const OnWidthChanged& handler);
 
-    virtual void register_on_height_changed (const OnXChanged& handler);
+    virtual void register_on_height_changed (const OnHeightChanged& handler);
+
+    virtual void
+            register_on_visibility_changed (const OnVisibilityChanged& handler);
 
     virtual void on_clicked ();
 
@@ -376,7 +383,8 @@ public:
 
 class ControlFactory {
 public:
-    static Control* create (Control* par, const ControlParameters& parms,
+    static Control* create (Control* par,
+            const ControlParameters& parms,
             const Glib::ustring& = "control");
 };
 
@@ -395,10 +403,6 @@ inline int Control::get_x () const {
 inline int Control::get_y () const {
     return y;
 }
-
-
-
-
 
 #endif	/* CONTROL_H */
 

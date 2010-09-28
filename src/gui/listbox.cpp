@@ -6,8 +6,7 @@
 using namespace Glib;
 
 Listbox::Listbox (const ListboxParameters& parms) :
-    InputControl (parms), selected (-1), min_height (0), item_height (0),
-            lb_parms (parms) {
+    InputControl (parms), selected (-1), item_height (0), lb_parms (parms) {
 }
 
 Listbox* ListboxFactory::create (Control* par,
@@ -93,11 +92,17 @@ void Listbox::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
 bool Listbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     if ((event.keysym.mod & ALL_MODS) == 0) {
         switch (event. keysym.sym) {
-        case SDLK_UP:
+        case SDLK_PAGEUP:
             select_up ();
             return true;
-        case SDLK_DOWN:
+        case SDLK_PAGEDOWN:
             select_down ();
+            return true;
+        case SDLK_HOME:
+            set_selected (0);
+            return true;
+        case SDLK_END:
+            set_selected (get_items_count () - 1);
             return true;
         case SDLK_SPACE:
         case SDLK_RETURN:
@@ -107,6 +112,15 @@ bool Listbox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
         default:
             break;
         }
+    }
+
+    switch (event.keysym.unicode) {
+    case '+':
+        select_down ();
+        return true;
+    case '-':
+        select_up ();
+        return true;
     }
 
     return Control::process_key_pressed_event (event);
@@ -123,7 +137,9 @@ void Listbox::add_item (const ustring& text, uint32_t color) {
 
     int h = items.size () * get_item_height ();
 
-    set_height ((h > min_height) ? h : min_height);
+    if (get_height () < h) {
+        set_height (h);
+    }
 
     invalidate ();
 }
@@ -154,6 +170,12 @@ void Listbox::remove_item (int index) {
 
 void Listbox::insert_item (int index, const ustring& text, uint32_t color) {
     items.insert (items.begin () + index, ListItem (text, color));
+    int h = items.size () * get_item_height ();
+
+    if (get_height () < h) {
+        set_height (h);
+    }
+
     if (get_selected () >= index) {
         set_selected (get_selected () + 1);
     }

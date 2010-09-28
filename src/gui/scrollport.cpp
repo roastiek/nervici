@@ -2,6 +2,7 @@
 #include "gui/defaults.h"
 #include "gui/view.h"
 #include "gui/scrollbar.h"
+#include "gui/event_helper.h"
 
 #include "gui/scrollport.h"
 
@@ -16,6 +17,7 @@ ControlParameters Scrollport::view_parms = {
 
 Scrollport::Scrollport (const ScrollbarParameters& parms) :
     Control (parms), view (NULL), content (NULL), bar (NULL),
+            ignore_content_y_changed (false), ignore_bar_value_changed (false),
             bar_parms (ScrollbarParameters (0,
                 0,
                 15,
@@ -28,15 +30,17 @@ Scrollport::Scrollport (const ScrollbarParameters& parms) :
 void Scrollport::init_control (Control* par) {
     view = ViewFactory::create (this, NULL, view_parms);
     bar = ScrollbarFactory::create (this, bar_parms);
+
     Control::init_control (par);
+
     bar->register_on_value_changed (Scrollbar::OnValueChanged (this,
         &Scrollport::bar_value_changed));
+    bar->register_on_visibility_changed (OnVisibilityChanged (this,
+        &Scrollport::bar_visibility_changed));
     bar->register_on_focus_gained (OnFocusGained (this,
         &Scrollport::child_focus_gained));
     bar->register_on_focus_lost (OnFocusLost (this,
         &Scrollport::child_focus_lost));
-    /* view->show_all ();
-     bar->show_all ();*/
 }
 
 Scrollport* ScrollportFactory::create (Control* par,
@@ -56,10 +60,23 @@ void Scrollport::reinitialize () {
     view->set_y (1);
 }
 
-void Scrollport::set_width (int value) {
-    Control::set_width (value);
+void Scrollport::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
+    if (event.state == SDL_PRESSED) {
+        switch (event.button) {
+        case SDL_BUTTON_WHEELDOWN:
+            bar->scroll_inc (bar->get_big_step ());
+            break;
+        case SDL_BUTTON_WHEELUP:
+            bar->scroll_dec (bar->get_big_step ());
+            break;
+        }
+    }
+    Control::process_mouse_button_event (event);
+}
+
+void Scrollport::update_content_width () {
     if (bar->is_visible ()) {
-        view->set_width (get_width () - bar->get_width () - 1);
+        view->set_width (get_width () - bar->get_width ());
     } else {
         view->set_width (get_width ());
     }
@@ -69,30 +86,51 @@ void Scrollport::set_width (int value) {
     bar->set_x (get_width () - bar->get_width ());
 }
 
-void Scrollport::set_height (int value) {
-    Control::set_height (value);
-    view->set_height (get_height () - 2);
-    bar->set_height (get_height ());
+void Scrollport::on_width_changed (int value) {
+    update_content_width ();
+    Control::on_width_changed (value);
+}
+
+void Scrollport::on_height_changed (int value) {
+    view->set_height (value - 2);
+    bar->set_height (value);
+
     if (view->get_content () != NULL) {
-        bar->set_max (view->get_content()->get_height() - get_height ());
+        bar->set_max (view->get_content ()->get_height () - get_height ());
         bar->set_visible (view->get_height ()
                 < view->get_content ()->get_height ());
-        set_width (get_width ());
     } else {
         bar->set_visible (false);
     }
+
+    Control::on_height_changed (value);
 }
 
 void Scrollport::bar_value_changed (Scrollbar* ctl, int value) {
-    content->set_y (1 - value);
-    invalidate ();
+    if (!ignore_bar_value_changed) {
+        ignore_content_y_changed = true;
+        content->set_y (1 - value);
+        ignore_content_y_changed = false;
+        invalidate ();
+    }
+}
+
+void Scrollport::bar_visibility_changed (Control* ctl, bool value) {
+    update_content_width ();
 }
 
 void Scrollport::content_height_changed (Control* ctl, int value) {
     bar->set_max (value - get_height ());
-    bar->set_visible (view->get_height ()
-            < view->get_content ()->get_height ());
+    bar->set_visible (view->get_height () < view->get_content ()->get_height ());
     set_width (get_width ());
+}
+
+void Scrollport::content_y_changed (Control* ctl, int value) {
+    if (!ignore_content_y_changed) {
+        ignore_bar_value_changed = true;
+        bar->set_value (-value);
+        ignore_bar_value_changed = false;
+    }
 }
 
 void Scrollport::set_content (Control* value) {
@@ -119,6 +157,8 @@ void Scrollport::set_content (Control* value) {
 
             content->register_on_height_changed (OnHeightChanged (this,
                 &Scrollport::content_height_changed));
+            content->register_on_y_changed (OnYChanged (this,
+                &Scrollport::content_y_changed));
             content->register_on_focus_gained (OnFocusGained (this,
                 &Scrollport::child_focus_gained));
             content->register_on_focus_lost (OnFocusLost (this,

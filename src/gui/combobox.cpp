@@ -53,7 +53,6 @@ void Combobox::init_control (Control* par) {
 
 void Combobox::reinitialize () {
     InputControl::reinitialize ();
-    //port->set_width (get_width ());
 }
 
 void Combobox::select_up () {
@@ -126,34 +125,34 @@ void Combobox::on_clicked () {
         list->set_height (list_min_height);
     }
 
+    list_min_height += 2;
+
     port->set_x (-1);
     port->set_y (get_height () + 1);
     port->set_width (get_width () + 2);
-    port->set_height ((remain > list_min_height + 2) ? list_min_height + 2
-            : remain);
+    port->set_height ((remain > list_min_height) ? list_min_height : remain);
+
+    list->set_selected (get_selected ());
 
     show_popup (port, this);
 
     Control::on_clicked ();
 }
 
-bool Combobox::process_key_pressed_event (SDL_KeyboardEvent event) {
-    if (event.state == SDL_PRESSED) {
-        if ((event.keysym.mod & KMOD_ALT) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_CTRL) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_META) != 0)
-            return false;
-        if ((event.keysym.mod & KMOD_SHIFT) != 0)
-            return false;
-
+bool Combobox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
+    if ((event.keysym.mod & ALL_MODS) == 0) {
         switch (event.keysym.sym) {
-        case SDLK_UP:
+        case SDLK_PAGEUP:
             select_up ();
             return true;
-        case SDLK_DOWN:
+        case SDLK_PAGEDOWN:
             select_down ();
+            return true;
+        case SDLK_HOME:
+            set_selected (0);
+            return true;
+        case SDLK_END:
+            set_selected (get_items_count () - 1);
             return true;
         case SDLK_SPACE:
         case SDLK_RETURN:
@@ -164,6 +163,16 @@ bool Combobox::process_key_pressed_event (SDL_KeyboardEvent event) {
             break;
         }
     }
+
+    switch (event.keysym.unicode) {
+    case '+':
+        select_down ();
+        return true;
+    case '-':
+        select_up ();
+        return true;
+    }
+    
     return Control::process_key_pressed_event (event);
 }
 

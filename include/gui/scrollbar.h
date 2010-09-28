@@ -96,6 +96,8 @@ public:
     int get_small_step () const;
 
     int get_big_step () const;
+    
+    bool is_focusable () const;
 
     friend class ScrollbarFactory;
 };

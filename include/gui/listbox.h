@@ -20,8 +20,6 @@ private:
     
     int selected;
     
-    int min_height;
-    
     int item_height;
     
     const ListboxParameters lb_parms;

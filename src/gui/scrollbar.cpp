@@ -105,25 +105,23 @@ bool Scrollbar::process_key_pressed_event (const SDL_KeyboardEvent& event) {
 
 void Scrollbar::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
     if (event.state == SDL_PRESSED) {
-        if (event.button == SDL_BUTTON_LEFT) {
-            int w = get_width ();
-            int h = get_height ();
-
-            if (event.y <= w) {
+        switch (event.button) {
+        case SDL_BUTTON_LEFT:
+            if (event.y <= get_width ()) {
                 scroll_dec (get_small_step ());
             }
-            if (event.y >= h - w) {
+            if (event.y >= get_height () - get_width ()) {
                 scroll_inc (get_small_step ());
             }
-        }
-
-        if (event.button == SDL_BUTTON_WHEELUP) {
+            break;
+        case SDL_BUTTON_WHEELUP:
             scroll_dec (get_big_step ());
+            break;
+        case SDL_BUTTON_WHEELDOWN:
+            scroll_inc (get_big_step ());
+            break;
         }
 
-        if (event.button == SDL_BUTTON_WHEELDOWN) {
-            scroll_inc (get_big_step ());
-        }
     } else {
         if (event.button == SDL_BUTTON_LEFT) {
             drag_start_y = -1;
@@ -158,9 +156,8 @@ void Scrollbar::set_height (int value) {
     fold_height = get_height () - 2 * get_width ();
     set_bar_height (fold_height - (max - min));
     bar_y = get_width ();
-    bar_y += (max != min) ? rest_space * get_value() / (max - min) : 0;
+    bar_y += (max != min) ? rest_space * get_value () / (max - min) : 0;
 }
-
 
 void Scrollbar::set_min (int m) {
     if (min != m) {
@@ -250,6 +247,10 @@ int Scrollbar::get_small_step () const {
 
 int Scrollbar::get_big_step () const {
     return big_step;
+}
+
+bool Scrollbar::is_focusable () const {
+    return false;
 }
 
 const ScrollbarParameters& Scrollbar::get_parms () {

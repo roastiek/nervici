@@ -52,7 +52,7 @@ protected:
 
     void on_clicked ();
 
-    bool process_key_pressed_event (SDL_KeyboardEvent event);
+    bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
     void on_focus_gained ();
 
