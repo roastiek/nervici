@@ -185,21 +185,20 @@ void Listbox::insert_item (int index, const ustring& text, uint32_t color) {
 void Listbox::set_selected (int value) {
     if (value != selected) {
         selected = value;
-
-        int ph = get_parent ()->get_height ();
-        int ih = get_item_height ();
-        int my = -get_y ();
-        int sy = value * ih;
-
-        if (sy + ih <= my) {
-            set_y (-sy);
-        }
-
-        if (sy >= my + ph) {
-            set_y (-(sy - ph + ih));
-        }
-
         invalidate ();
+    }
+
+    int ph = get_parent ()->get_height ();
+    int ih = get_item_height ();
+    int my = -get_y ();
+    int sy = value * ih;
+
+    if (sy + ih <= my) {
+        set_y (-sy);
+    }
+
+    if (sy >= my + ph) {
+        set_y (-(sy - ph + ih));
     }
 }
 
