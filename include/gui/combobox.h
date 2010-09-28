@@ -10,7 +10,11 @@
 
 #include "defaults.h"
 #include "input_control.h"
-#include "listbox.h"
+#include "listbox_parameters.h"
+#include "scrollbar_parameters.h"
+#include "fakes/gui/listbox.h"
+#include "fakes/gui/list_item.h"
+#include "fakes/gui/scrollport.h"
 
 class Combobox: public InputControl {
 public:
@@ -63,19 +67,19 @@ public:
     virtual void clear ();
 
     virtual void add_item (const Glib::ustring& text, uint32_t color =
-            C_INPUT_TEXT);
+            NC_INPUT_TEXT);
 
     virtual const ListItem& get_item (int index);
 
     virtual int get_items_count () const;
 
     virtual void update_item (int index, const Glib::ustring& text,
-            uint32_t color = C_INPUT_TEXT);
+            uint32_t color = NC_INPUT_TEXT);
 
     virtual void remove_item (int index);
 
     virtual void insert_item (int index, const Glib::ustring& text,
-            uint32_t color = C_INPUT_TEXT);
+            uint32_t color = NC_INPUT_TEXT);
 
     virtual void set_selected (int value);
 

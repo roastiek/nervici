@@ -1,6 +1,7 @@
 #include "logger.h"
 #include "gui/defaults.h"
 #include "gui/view.h"
+#include "gui/scrollbar.h"
 
 #include "gui/scrollport.h"
 

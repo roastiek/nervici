@@ -14,6 +14,7 @@
 #include "gui/panel.h"
 #include "gui/scale.h"
 #include "gui/textbox.h"
+#include "gui/list_item.h"
 
 #include "frames/pledit_frame.h"
 

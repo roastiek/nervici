@@ -20,6 +20,7 @@ View* ViewFactory::create (Control* par,
 void View::init_control (Control* par) {
     Control::init_control (par);
     set_frame (0);
+    set_background (0);
 }
 
 void View::set_content (Control* value) {
@@ -85,14 +86,6 @@ void View::set_y_offset (int value) {
     }
 }
 
-int View::get_x_offset () const {
-    return x_offset;
-}
-
-int View::get_y_offset () const {
-    return y_offset;
-}
-
 bool View::is_focusable () const {
     return false;
 }
@@ -100,18 +93,4 @@ bool View::is_focusable () const {
 Control* View::get_content () const {
     return content;
 }
-
-
-/*View::View (Control* par, int x, int y, int w, int h, Control* content, const ustring& name) :
- Control (par, x, y, w, h, name) {
- set_frame (0);
-
- x_offset = -content->get_x ();
- y_offset = -content->get_y ();
-
- this->content = content;
- content->set_parent (this);
- content->register_on_x_changed (OnXChanged (this, &View::content_x_changed));
- content->register_on_y_changed (OnYChanged (this, &View::content_y_changed));
- }*/
 

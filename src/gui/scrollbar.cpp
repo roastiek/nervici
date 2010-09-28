@@ -6,16 +6,6 @@
 
 using namespace Glib;
 
-ScrollbarParameters::ScrollbarParameters (float nx,
-        float ny,
-        float nw,
-        float nh,
-        float nf,
-        float nss,
-        float nbs) :
-    ControlParameters (nx, ny, nw, nh, nf), small_step (nss), big_step (nbs) {
-}
-
 Scrollbar::Scrollbar (const ScrollbarParameters& parms) :
     Control (parms), min (0), max (0), value (0), drag_start_y (-1),
             small_step (1), big_step (5), sc_parms (parms) {

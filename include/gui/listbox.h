@@ -11,26 +11,8 @@
 #include <vector>
 
 #include "input_control.h"
-#include "scrollport.h"
-
-struct ListboxParameters: public ControlParameters {
-    const float item_height;
-
-    ListboxParameters (float nx,
-            float ny,
-            float nw,
-            float nh,
-            float nf,
-            float nih);
-};
-
-struct ListItem {
-public:
-    Glib::ustring text;
-    uint32_t color;
-
-    ListItem (const Glib::ustring& txt = "", uint32_t cl = C_INPUT_TEXT);
-};
+#include "listbox_parameters.h"
+#include "list_item.h"
 
 class Listbox: public InputControl {
 private:

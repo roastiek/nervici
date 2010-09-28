@@ -19,7 +19,9 @@ public:
 
 private:
     Control* content;
+    
     int x_offset;
+    
     int y_offset;
 
     struct {
@@ -46,13 +48,13 @@ public:
 
     virtual void register_on_y_offset_changed (const OnXOffsetChanged& handler);
 
-    virtual void set_x_offset (int value);
+    void set_x_offset (int value);
 
-    virtual void set_y_offset (int value);
+    void set_y_offset (int value);
 
-    virtual int get_x_offset () const;
+    int get_x_offset () const;
 
-    virtual int get_y_offset () const;
+    int get_y_offset () const;
 
     bool is_focusable () const;
 
@@ -68,6 +70,16 @@ public:
     static View* create (Control* par, Control* content,
             const ControlParameters& parms, const Glib::ustring& name = "view");
 };
+
+inline int View::get_x_offset () const {
+    return x_offset;
+}
+
+inline int View::get_y_offset () const {
+    return y_offset;
+}
+
+
 
 #endif	/* VIEW_H */
 

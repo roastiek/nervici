@@ -9,13 +9,7 @@
 #define	SCROLLBAR_H
 
 #include "control.h"
-
-struct ScrollbarParameters: public ControlParameters {
-    const float small_step;
-    const float big_step;
-    ScrollbarParameters (float nx, float ny, float nw, float nh, float nf,
-            float nss, float nbs);
-};
+#include "scrollbar_parameters.h"
 
 class Scrollbar: public Control {
 public:

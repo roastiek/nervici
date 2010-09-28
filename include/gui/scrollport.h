@@ -9,17 +9,21 @@
 #define	SCROLLPORT_H
 
 #include "control.h"
-#include "scrollbar.h"
-#include "view.h"
+#include "scrollbar_parameters.h"
+#include "fakes/gui/scrollbar.h"
+#include "fakes/gui/view.h"
 
 class Scrollport: public Control {
 
 private:
     View* view;
+    
     Control* content;
+    
     Scrollbar* bar;
 
     const ScrollbarParameters bar_parms;
+    
     static ControlParameters view_parms;
 
     void bar_value_changed (Scrollbar* ctl, int value);

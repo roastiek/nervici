@@ -5,19 +5,6 @@
 
 using namespace Glib;
 
-ListboxParameters::ListboxParameters (float nx,
-        float ny,
-        float nw,
-        float nh,
-        float nf,
-        float nih) :
-    ControlParameters (nx, ny, nw, nh, nf), item_height (nih) {
-}
-
-ListItem::ListItem (const ustring& txt, uint32_t cl) :
-    text (txt), color (cl) {
-}
-
 Listbox::Listbox (const ListboxParameters& parms) :
     InputControl (parms), selected (-1), min_height (0), item_height (0),
             lb_parms (parms) {

@@ -1,6 +1,8 @@
 #include "logger.h"
 #include "gui/defaults.h"
 #include "gui/event_helper.h"
+#include "gui/listbox.h"
+#include "gui/scrollport.h"
 
 #include "gui/combobox.h"
 

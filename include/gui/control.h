@@ -107,6 +107,9 @@ private:
      */
     int x;
     int y;
+    
+    int width;
+    int height;
 
     /*
      * Name of control, used for more readable debugging. 
@@ -233,6 +236,14 @@ protected:
     
     virtual void parent_invalidated ();
     
+    virtual void on_x_changed (int value);
+
+    virtual void on_y_changed (int value);
+
+    virtual void on_width_changed (int value);
+
+    virtual void on_height_changed (int value);
+
     virtual bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
     virtual void process_mouse_button_event (const SDL_MouseButtonEvent& event);
@@ -302,14 +313,6 @@ public:
 
     virtual void on_focus_lost ();
 
-    virtual void on_x_changed (int value);
-
-    virtual void on_y_changed (int value);
-
-    virtual void on_width_changed (int value);
-
-    virtual void on_height_changed (int value);
-
     virtual void set_parent (Control* value);
 
     virtual void set_visible (bool value);
@@ -320,13 +323,13 @@ public:
 
     virtual void set_frame (uint32_t value);
 
-    virtual void set_width (int value);
+    void set_width (int value);
 
-    virtual void set_height (int value);
+    void set_height (int value);
 
-    virtual void set_x (int value);
+    void set_x (int value);
 
-    virtual void set_y (int value);
+    void set_y (int value);
 
     virtual void set_enabled (bool value);
 
@@ -340,13 +343,13 @@ public:
 
     virtual void set_name (const Glib::ustring& value);
 
-    virtual int get_width () const;
+    int get_width () const;
 
-    virtual int get_height () const;
+    int get_height () const;
 
-    virtual int get_x () const;
+    int get_x () const;
 
-    virtual int get_y () const;
+    int get_y () const;
 
     virtual bool is_focusable () const;
 
@@ -376,6 +379,25 @@ public:
     static Control* create (Control* par, const ControlParameters& parms,
             const Glib::ustring& = "control");
 };
+
+inline int Control::get_width () const {
+    return width;
+}
+
+inline int Control::get_height () const {
+    return height;
+}
+
+inline int Control::get_x () const {
+    return x;
+}
+
+inline int Control::get_y () const {
+    return y;
+}
+
+
+
 
 
 #endif	/* CONTROL_H */

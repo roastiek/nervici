@@ -26,6 +26,8 @@ focused_child (NULL),
 next (NULL), prev (NULL),
 x (0),
 y (0),
+width (0),
+height (0),
 colors ( {  0, 0, 0}),
 valid (true),
 enabled (true),
@@ -566,17 +568,19 @@ void Control::set_frame (Uint32 value) {
 }
 
 void Control::set_width (int value) {
-    if (value != canvas->get_width ()) {
-        canvas->set_width (value);
-        on_width_changed (value);
+    if (value != width) {
+        width = value;
+        canvas->set_width (width);
+        on_width_changed (width);
         invalidate ();
     }
 }
 
 void Control::set_height (int value) {
-    if (value != canvas->get_height ()) {
-        canvas->set_height (value);
-        on_height_changed (value);
+    if (value != height) {
+        height = value;
+        canvas->set_height (height);
+        on_height_changed (height);
         invalidate ();
     }
 }
@@ -629,22 +633,6 @@ void Control::set_font_size (int value) {
 
 void Control::set_name (const ustring& value) {
     name = value;
-}
-
-int Control::get_width () const {
-    return canvas->get_width ();
-}
-
-int Control::get_height () const {
-    return canvas->get_height ();
-}
-
-int Control::get_x () const {
-    return x;
-}
-
-int Control::get_y () const {
-    return y;
 }
 
 bool Control::is_focusable () const {
