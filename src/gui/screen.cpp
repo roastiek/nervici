@@ -54,7 +54,8 @@ void Screen::process_event (const SDL_Event& event) {
                 par = par->get_parent ();
             }
             if (par == NULL)
-                remove_popup (true);
+                remove_popup (under_cursor->is_focusable ()
+                        && under_cursor->is_focused ());
             if (under_cursor == be_clicked) {
                 be_clicked->on_clicked ();
             }
