@@ -32,6 +32,10 @@ public:
             return (listener->*callback) (ctl);
         }
     }
+    
+    bool operator == (const Event0<C> other) const {
+        return listener == other.listener && callback == other.callback;
+    }
 };
 
 template<typename C, typename P>
@@ -55,6 +59,39 @@ public:
         if (listener != NULL && callback != NULL) {
             (listener->*callback) (ctl, p1);
         }
+    }
+    
+    bool operator == (const Event1<C, P>& other) const {
+        return listener == other.listener && callback == other.callback;
+    }
+};
+
+template <typename C, typename P>
+struct BoolEvent1 {
+private:
+    Listener* listener;
+    bool (Listener::*callback) (C, P);
+public:
+
+    BoolEvent1 () :
+        listener (NULL), callback (NULL) {
+    }
+
+    template<class T>
+    BoolEvent1 (T* list, void(T::*call) (C, P)) {
+        listener = reinterpret_cast<Listener*> (list);
+        callback = reinterpret_cast<void(Listener::*) (C, P)> (call);
+    }
+
+    bool operator() (C ctl, P p1) {
+        if (listener != NULL && callback != NULL) {
+            return (listener->*callback) (ctl, p1);
+        }
+        return false;
+    }
+
+    bool operator == (const BoolEvent1<C, P>& other) const {
+        return listener == other.listener && callback == other.callback;
     }
 };
 

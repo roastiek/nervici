@@ -53,31 +53,7 @@ public:
     typedef Event1<Control*, int> OnWidthChanged;
     typedef Event1<Control*, int> OnHeightChanged;
     typedef Event1<Control*, bool> OnVisibilityChanged;
-
-    struct OnKeyPressed {
-    private:
-        Listener* listener;
-        bool (Listener::*callback) (Control*, const SDL_KeyboardEvent&);
-    public:
-
-        OnKeyPressed () :
-            listener (NULL), callback (NULL) {
-        }
-
-        template<class T>
-        OnKeyPressed (T* list, void(T::*call) (Control*,
-                const SDL_KeyboardEvent&)) {
-            listener = reinterpret_cast<Listener*> (list);
-            callback = reinterpret_cast<void(Listener::*) (Control*)> (call);
-        }
-
-        bool operator() (Control* ctl, const SDL_KeyboardEvent& p1) {
-            if (listener != NULL && callback != NULL) {
-                return (listener->*callback) (ctl, p1);
-            }
-            return false;
-        }
-    };
+    typedef BoolEvent1<Control*, const SDL_KeyboardEvent&> OnKeyPressed;
 
 private:
     /*
@@ -101,6 +77,14 @@ private:
     Control* next;
 
     Control* prev;
+    
+    Control* nearest_left;
+    
+    Control* nearest_right;
+    
+    Control* nearest_top;
+    
+    Control* nearest_bottom;
 
     /*
      * X, Y coordinates in absolute screen resolution, relative to parent, 
