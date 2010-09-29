@@ -53,9 +53,10 @@ void Screen::process_event (const SDL_Event& event) {
             while (par != popup && par != NULL) {
                 par = par->get_parent ();
             }
-            if (par == NULL)
-                remove_popup (under_cursor->is_focusable ()
-                        && under_cursor->is_focused ());
+            if (par == NULL) {
+                remove_popup (!(under_cursor->is_focusable ()
+                        && under_cursor->is_focused ()));
+            }
             if (under_cursor == be_clicked) {
                 be_clicked->on_clicked ();
             }
@@ -128,8 +129,9 @@ void Screen::remove_popup (bool restore_focus) {
     if (popup != NULL) {
         popup->set_visible (false);
         popup->set_parent (NULL);
-        if (restore_focus)
+        if (restore_focus) {
             popup_owner->grab_focus ();
+        }
 
         popup = NULL;
         popup_owner = NULL;
