@@ -29,10 +29,12 @@ private:
     int selected;
 
     ListboxParameters list_parms;
-    
+
     ScrollbarParameters port_parms;
-    
-    OnSelectedChanged call_selected_changed;
+
+    struct {
+        std::list<OnSelectedChanged> selected_changed;
+    } call;
 
     void list_clicked (Control* ctl);
 
@@ -73,12 +75,14 @@ public:
 
     virtual int get_items_count () const;
 
-    virtual void update_item (int index, const Glib::ustring& text,
+    virtual void update_item (int index,
+            const Glib::ustring& text,
             uint32_t color = NC_INPUT_TEXT);
 
     virtual void remove_item (int index);
 
-    virtual void insert_item (int index, const Glib::ustring& text,
+    virtual void insert_item (int index,
+            const Glib::ustring& text,
             uint32_t color = NC_INPUT_TEXT);
 
     virtual void set_selected (int value);
@@ -86,14 +90,18 @@ public:
     virtual int get_selected () const;
 
     virtual void
-            register_on_selected_changed (const OnSelectedChanged& handler);
+    register_on_selected_changed (const OnSelectedChanged& handler);
+
+    virtual void
+    unregister_on_selected_changed (const OnSelectedChanged& handler);
 
     friend class ComboboxFactory;
 };
 
 class ComboboxFactory {
 public:
-    static Combobox* create (Control* par, const ListboxParameters& parms,
+    static Combobox* create (Control* par,
+            const ListboxParameters& parms,
             const Glib::ustring& name = "combobox");
 };
 

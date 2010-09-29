@@ -1,6 +1,7 @@
 #include "gui/view.h"
 
 using namespace Glib;
+using namespace std;
 
 View::View (const ControlParameters& parms) :
     Control (parms), content (NULL), x_offset (0), y_offset (0) {
@@ -26,8 +27,10 @@ void View::init_control (Control* par) {
 void View::set_content (Control* value) {
     if (value != content) {
         if (content != NULL) {
-            content->register_on_x_changed (OnXChanged ());
-            content->register_on_y_changed (OnYChanged ());
+            content->unregister_on_x_changed (OnXChanged (this,
+                &View::content_x_changed));
+            content->unregister_on_y_changed (OnYChanged (this,
+                &View::content_y_changed));
             content->set_parent (NULL);
         }
         content = value;
@@ -53,19 +56,35 @@ void View::content_y_changed (Control* ctl, int value) {
 }
 
 void View::on_x_offset_changed (int value) {
-    call.x_offset_changed (this, value);
+    for (list<OnXOffsetChanged>::iterator calli =
+            call.x_offset_changed.begin (); calli
+            != call.x_offset_changed.end (); calli++) {
+        (*calli) (this, value);
+    }
 }
 
 void View::on_y_offset_changed (int value) {
-    call.y_offset_changed (this, value);
+    for (list<OnYOffsetChanged>::iterator calli =
+            call.y_offset_changed.begin (); calli
+            != call.y_offset_changed.end (); calli++) {
+        (*calli) (this, value);
+    }
 }
 
 void View::register_on_x_offset_changed (const OnXOffsetChanged& handler) {
-    call.x_offset_changed = handler;
+    call.x_offset_changed.push_back (handler);
 }
 
 void View::register_on_y_offset_changed (const OnXOffsetChanged& handler) {
-    call.y_offset_changed = handler;
+    call.y_offset_changed.push_back (handler);
+}
+
+void View::unregister_on_x_offset_changed (const OnXOffsetChanged& handler) {
+    call.x_offset_changed.remove (handler);
+}
+
+void View::unregister_on_y_offset_changed (const OnXOffsetChanged& handler) {
+    call.y_offset_changed.remove (handler);
 }
 
 void View::set_x_offset (int value) {

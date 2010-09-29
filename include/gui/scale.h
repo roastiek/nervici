@@ -38,7 +38,9 @@ private:
 
     int fold_x;
 
-    OnValueChanged call_value_changed;
+    struct {
+        std::list<OnValueChanged> value_changed;
+    } call;
 
     void scroll_inc (int distance = 1);
 
@@ -71,6 +73,8 @@ public:
     void on_focus_lost ();
 
     virtual void register_on_value_changed (const OnValueChanged& handler);
+
+    virtual void unregister_on_value_changed (const OnValueChanged& handler);
 
     virtual void set_min (int value);
 

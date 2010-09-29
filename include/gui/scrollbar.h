@@ -41,7 +41,9 @@ private:
 
     const ScrollbarParameters sc_parms;
     
-    OnValueChanged call_value_changed;
+    struct {
+        std::list<OnValueChanged> value_changed;
+    } call;
     
     void set_bar_height (int value);
 
@@ -66,38 +68,40 @@ protected:
 
     void on_focus_lost ();
 
+    void on_height_changed (int value);
+    
 public:
     void reinitialize ();
 
-    void register_on_value_changed (const OnValueChanged& handler);
+    virtual void register_on_value_changed (const OnValueChanged& handler);
 
-    void set_height (int value);
+    virtual void unregister_on_value_changed (const OnValueChanged& handler);
+
+    virtual void scroll_inc (int distance = 1);
+
+    virtual void scroll_dec (int distance = 1);
+
+    virtual void set_min (int m);
+
+    virtual void set_max (int m);
+
+    virtual void set_value (int v);
+
+    virtual void set_small_step (int v);
+
+    virtual void set_big_step (int v);
+
+    virtual int get_min () const;
+
+    virtual int get_max () const;
+
+    virtual int get_value () const;
+
+    virtual int get_small_step () const;
+
+    virtual int get_big_step () const;
     
-    void scroll_inc (int distance = 1);
-
-    void scroll_dec (int distance = 1);
-
-    void set_min (int m);
-
-    void set_max (int m);
-
-    void set_value (int v);
-
-    void set_small_step (int v);
-
-    void set_big_step (int v);
-
-    int get_min () const;
-
-    int get_max () const;
-
-    int get_value () const;
-
-    int get_small_step () const;
-
-    int get_big_step () const;
-    
-    bool is_focusable () const;
+    virtual bool is_focusable () const;
 
     friend class ScrollbarFactory;
 };

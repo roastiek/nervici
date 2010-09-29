@@ -22,9 +22,9 @@ public:
     }
 
     template<class T>
-    Event0 (T* list, void(T::*call) (C)) {
-        listener = reinterpret_cast<Listener*> (list);
-        callback = reinterpret_cast<void(Listener::*) (C)> (call);
+    Event0 (T* list, void(T::*call) (C)) :
+        listener (reinterpret_cast<Listener*> (list)),
+                callback (reinterpret_cast<void(Listener::*) (C)> (call)) {
     }
 
     void operator() (C ctl) {
@@ -32,7 +32,7 @@ public:
             return (listener->*callback) (ctl);
         }
     }
-    
+
     bool operator == (const Event0<C> other) const {
         return listener == other.listener && callback == other.callback;
     }
@@ -50,9 +50,9 @@ public:
     }
 
     template<class T>
-    Event1 (T* list, void(T::*call) (C, P)) {
-        listener = reinterpret_cast<Listener*> (list);
-        callback = reinterpret_cast<void(Listener::*) (C, P)> (call);
+    Event1 (T* list, void(T::*call) (C, P)) :
+        listener (reinterpret_cast<Listener*> (list)),
+                callback (reinterpret_cast<void(Listener::*) (C, P)> (call)) {
     }
 
     void operator() (C ctl, P p1) {
@@ -60,13 +60,14 @@ public:
             (listener->*callback) (ctl, p1);
         }
     }
-    
+
     bool operator == (const Event1<C, P>& other) const {
         return listener == other.listener && callback == other.callback;
     }
+
 };
 
-template <typename C, typename P>
+template<typename C, typename P>
 struct BoolEvent1 {
 private:
     Listener* listener;
@@ -78,9 +79,9 @@ public:
     }
 
     template<class T>
-    BoolEvent1 (T* list, void(T::*call) (C, P)) {
-        listener = reinterpret_cast<Listener*> (list);
-        callback = reinterpret_cast<void(Listener::*) (C, P)> (call);
+    BoolEvent1 (T* list, void(T::*call) (C, P)) :
+        listener (reinterpret_cast<Listener*> (list)),
+                callback (reinterpret_cast<void(Listener::*) (C, P)> (call)) {
     }
 
     bool operator() (C ctl, P p1) {

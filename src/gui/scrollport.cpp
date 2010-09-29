@@ -136,9 +136,14 @@ void Scrollport::content_y_changed (Control* ctl, int value) {
 void Scrollport::set_content (Control* value) {
     if (content != value) {
         if (content != NULL) {
-            content->register_on_height_changed (OnHeightChanged ());
-            content->register_on_focus_gained (OnFocusGained ());
-            content->register_on_focus_lost (OnFocusLost ());
+            content->unregister_on_height_changed (OnHeightChanged (this,
+                &Scrollport::content_height_changed));
+            content->unregister_on_y_changed (OnYChanged (this,
+                &Scrollport::content_y_changed));
+            content->unregister_on_focus_gained (OnFocusGained (this,
+                &Scrollport::child_focus_gained));
+            content->unregister_on_focus_lost (OnFocusLost (this,
+                &Scrollport::child_focus_lost));
 
             view->set_content (NULL);
 

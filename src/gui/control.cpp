@@ -7,6 +7,7 @@
 #include "gui/control.h"
 
 using namespace Glib;
+using namespace std;
 
 ControlParameters::ControlParameters (float nx,
         float ny,
@@ -428,60 +429,99 @@ void Control::hide_popup () {
 }
 
 void Control::on_clicked () {
-    call.clicked (this);
+    for (list<OnClicked>::iterator calli = call.clicked.begin (); calli
+            != call.clicked.end (); calli++) {
+        (*calli) (this);
+    }
 }
 
 void Control::on_mouse_button (const SDL_MouseButtonEvent& event) {
-    call.mouse_button (this, event);
+    for (list<OnMouseButton>::iterator calli = call.mouse_button.begin (); calli
+            != call.mouse_button.end (); calli++) {
+        (*calli) (this, event);
+    }
     process_mouse_button_event (event);
 }
 
 void Control::on_mouse_move (const SDL_MouseMotionEvent& event) {
-    call.mouse_move (this, event);
+    for (list<OnMouseMove>::iterator calli = call.mouse_move.begin (); calli
+            != call.mouse_move.end (); calli++) {
+        (*calli) (this, event);
+    }
     process_mouse_move_event (event);
 }
 
 void Control::on_mouse_enter () {
-    call.mouse_enter (this);
+    for (list<OnMouseEnter>::iterator calli = call.mouse_enter.begin (); calli
+            != call.mouse_enter.end (); calli++) {
+        (*calli) (this);
+    }
 }
 
 void Control::on_mouse_leave () {
-    call.mouse_leave (this);
+    for (list<OnMouseLeave>::iterator calli = call.mouse_leave.begin (); calli
+            != call.mouse_leave.end (); calli++) {
+        (*calli) (this);
+    }
 }
 
 bool Control::on_key_pressed (const SDL_KeyboardEvent& event) {
-    if (call.key_pressed (this, event)) {
-        return true;
+    for (list<OnKeyPressed>::iterator calli = call.key_pressed.begin (); calli
+            != call.key_pressed.end (); calli++) {
+        if ((*calli) (this, event))
+            return true;
     }
     return process_key_pressed_event (event);
 }
 
 void Control::on_focus_gained () {
-    call.focus_gained (this);
+    for (list<OnFocusGained>::iterator calli = call.focus_gained.begin (); calli
+            != call.focus_gained.end (); calli++) {
+        (*calli) (this);
+    }
 }
 
 void Control::on_focus_lost () {
-    call.focus_lost (this);
+    for (list<OnFocusLost>::iterator calli = call.focus_lost.begin (); calli
+            != call.focus_lost.end (); calli++) {
+        (*calli) (this);
+    }
 }
 
 void Control::on_x_changed (int value) {
-    call.x_changed (this, value);
+    for (list<OnXChanged>::iterator calli = call.x_changed.begin (); calli
+            != call.x_changed.end (); calli++) {
+        (*calli) (this, value);
+    }
 }
 
 void Control::on_y_changed (int value) {
-    call.y_changed (this, value);
+    for (list<OnYChanged>::iterator calli = call.y_changed.begin (); calli
+            != call.y_changed.end (); calli++) {
+        (*calli) (this, value);
+    }
 }
 
 void Control::on_width_changed (int value) {
-    call.width_changed (this, value);
+    for (list<OnWidthChanged>::iterator calli = call.width_changed.begin (); calli
+            != call.width_changed.end (); calli++) {
+        (*calli) (this, value);
+    }
 }
 
 void Control::on_height_changed (int value) {
-    call.height_changed (this, value);
+    for (list<OnHeightChanged>::iterator calli = call.height_changed.begin (); calli
+            != call.height_changed.end (); calli++) {
+        (*calli) (this, value);
+    }
 }
 
 void Control::on_visibility_changed (bool value) {
-    call.visibility_changed (this, value);
+    for (list<OnVisibilityChanged>::iterator calli =
+            call.visibility_changed.begin (); calli
+            != call.visibility_changed.end (); calli++) {
+        (*calli) (this, value);
+    }
 }
 
 void Control::paint () {
@@ -489,55 +529,107 @@ void Control::paint () {
 }
 
 void Control::register_on_clicked (const OnClicked& handler) {
-    call.clicked = handler;
+    call.clicked.push_back (handler);
 }
 
 void Control::register_on_mouse_button (const OnMouseButton& handler) {
-    call.mouse_button = handler;
+    call.mouse_button.push_back (handler);
 }
 
 void Control::register_on_mouse_move (const OnMouseMove& handler) {
-    call.mouse_move = handler;
+    call.mouse_move.push_back (handler);
 }
 
 void Control::register_on_mouse_enter (const OnMouseEnter& handler) {
-    call.mouse_enter = handler;
+    call.mouse_enter.push_back (handler);
 }
 
 void Control::register_on_mouse_leave (const OnMouseLeave& handler) {
-    call.mouse_leave = handler;
+    call.mouse_leave.push_back (handler);
 }
 
 void Control::register_on_key_pressed (const OnKeyPressed& handler) {
-    call.key_pressed = handler;
+    call.key_pressed.push_back (handler);
 }
 
 void Control::register_on_focus_gained (const OnFocusGained& handler) {
-    call.focus_gained = handler;
+    call.focus_gained.push_back (handler);
 }
 
 void Control::register_on_focus_lost (const OnFocusLost& handler) {
-    call.focus_lost = handler;
+    call.focus_lost.push_back (handler);
 }
 
 void Control::register_on_x_changed (const OnXChanged& handler) {
-    call.x_changed = handler;
+    call.x_changed.push_back (handler);
 }
 
 void Control::register_on_y_changed (const OnYChanged& handler) {
-    call.y_changed = handler;
+    call.y_changed.push_back (handler);
 }
 
 void Control::register_on_width_changed (const OnWidthChanged& handler) {
-    call.width_changed = handler;
+    call.width_changed.push_back (handler);
 }
 
 void Control::register_on_height_changed (const OnHeightChanged& handler) {
-    call.height_changed = handler;
+    call.height_changed.push_back (handler);
+}
+
+void Control::unregister_on_clicked (const OnClicked& handler) {
+    call.clicked.remove (handler);
+}
+
+void Control::unregister_on_mouse_button (const OnMouseButton& handler) {
+    call.mouse_button.remove (handler);
+}
+
+void Control::unregister_on_mouse_move (const OnMouseMove& handler) {
+    call.mouse_move.remove (handler);
+}
+
+void Control::unregister_on_mouse_enter (const OnMouseEnter& handler) {
+    call.mouse_enter.remove (handler);
+}
+
+void Control::unregister_on_mouse_leave (const OnMouseLeave& handler) {
+    call.mouse_leave.remove (handler);
+}
+
+void Control::unregister_on_key_pressed (const OnKeyPressed& handler) {
+    call.key_pressed.remove (handler);
+}
+
+void Control::unregister_on_focus_gained (const OnFocusGained& handler) {
+    call.focus_gained.remove (handler);
+}
+
+void Control::unregister_on_focus_lost (const OnFocusLost& handler) {
+    call.focus_lost.remove (handler);
+}
+
+void Control::unregister_on_x_changed (const OnXChanged& handler) {
+    call.x_changed.remove (handler);
+}
+
+void Control::unregister_on_y_changed (const OnYChanged& handler) {
+    call.y_changed.remove (handler);
+}
+
+void Control::unregister_on_width_changed (const OnWidthChanged& handler) {
+    call.width_changed.remove (handler);
+}
+
+void Control::unregister_on_height_changed (const OnHeightChanged& handler) {
+    call.height_changed.remove (handler);
 }
 
 void Control::register_on_visibility_changed (const OnVisibilityChanged& handler) {
-    call.visibility_changed = handler;
+    call.visibility_changed.push_back (handler);
+}
+
+void Control::unregister_on_visibility_changed (const OnVisibilityChanged& handler) {
+    call.visibility_changed.remove (handler);
 }
 
 void Control::set_parent (Control* value) {

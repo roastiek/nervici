@@ -11,6 +11,7 @@
 #define STANDARD_WIDTH 1024
 #define STANDARD_HEIGHT 768
 
+#include <list>
 #include <glibmm/ustring.h>
 
 #include "event.h"
@@ -77,13 +78,13 @@ private:
     Control* next;
 
     Control* prev;
-    
+
     Control* nearest_left;
-    
+
     Control* nearest_right;
-    
+
     Control* nearest_top;
-    
+
     Control* nearest_bottom;
 
     /*
@@ -139,19 +140,19 @@ private:
      * Saving callback for events
      */
     struct {
-        OnClicked clicked;
-        OnMouseButton mouse_button;
-        OnMouseMove mouse_move;
-        OnMouseEnter mouse_enter;
-        OnMouseLeave mouse_leave;
-        OnKeyPressed key_pressed;
-        OnFocusGained focus_gained;
-        OnFocusLost focus_lost;
-        OnXChanged x_changed;
-        OnYChanged y_changed;
-        OnWidthChanged width_changed;
-        OnHeightChanged height_changed;
-        OnVisibilityChanged visibility_changed;
+        std::list<OnClicked> clicked;
+        std::list<OnMouseButton> mouse_button;
+        std::list<OnMouseMove> mouse_move;
+        std::list<OnMouseEnter> mouse_enter;
+        std::list<OnMouseLeave> mouse_leave;
+        std::list<OnKeyPressed> key_pressed;
+        std::list<OnFocusGained> focus_gained;
+        std::list<OnFocusLost> focus_lost;
+        std::list<OnXChanged> x_changed;
+        std::list<OnYChanged> y_changed;
+        std::list<OnWidthChanged> width_changed;
+        std::list<OnHeightChanged> height_changed;
+        std::list<OnVisibilityChanged> visibility_changed;
     } call;
 
     /*
@@ -286,7 +287,34 @@ public:
     virtual void register_on_height_changed (const OnHeightChanged& handler);
 
     virtual void
-            register_on_visibility_changed (const OnVisibilityChanged& handler);
+    register_on_visibility_changed (const OnVisibilityChanged& handler);
+
+    virtual void unregister_on_clicked (const OnClicked& handler);
+
+    virtual void unregister_on_mouse_button (const OnMouseButton& handler);
+
+    virtual void unregister_on_mouse_move (const OnMouseMove& handler);
+
+    virtual void unregister_on_mouse_enter (const OnMouseEnter& handler);
+
+    virtual void unregister_on_mouse_leave (const OnMouseLeave& handler);
+
+    virtual void unregister_on_key_pressed (const OnKeyPressed& handler);
+
+    virtual void unregister_on_focus_gained (const OnFocusGained& handler);
+
+    virtual void unregister_on_focus_lost (const OnFocusLost& handler);
+
+    virtual void unregister_on_x_changed (const OnXChanged& handler);
+
+    virtual void unregister_on_y_changed (const OnYChanged& handler);
+
+    virtual void unregister_on_width_changed (const OnWidthChanged& handler);
+
+    virtual void unregister_on_height_changed (const OnHeightChanged& handler);
+
+    virtual void
+    unregister_on_visibility_changed (const OnVisibilityChanged& handler);
 
     virtual void on_clicked ();
 

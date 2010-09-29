@@ -172,7 +172,7 @@ bool Combobox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
         select_up ();
         return true;
     }
-    
+
     return Control::process_key_pressed_event (event);
 }
 
@@ -244,9 +244,17 @@ int Combobox::get_selected () const {
 }
 
 void Combobox::on_selected_changed (int sel) {
-    call_selected_changed (this, sel);
+    for (std::list<OnSelectedChanged>::iterator calli =
+            call.selected_changed.begin (); calli
+            != call.selected_changed.end (); calli++) {
+        (*calli) (this, sel);
+    }
 }
 
 void Combobox::register_on_selected_changed (const OnSelectedChanged& handler) {
-    call_selected_changed = handler;
+    call.selected_changed.push_back (handler);
+}
+
+void Combobox::unregister_on_selected_changed (const OnSelectedChanged& handler) {
+    call.selected_changed.push_back (handler);
 }

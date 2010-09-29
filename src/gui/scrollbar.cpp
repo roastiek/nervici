@@ -5,6 +5,7 @@
 #include "gui/scrollbar.h"
 
 using namespace Glib;
+using namespace std;
 
 Scrollbar::Scrollbar (const ScrollbarParameters& parms) :
     Control (parms), min (0), max (0), value (0), drag_start_y (-1),
@@ -151,12 +152,13 @@ void Scrollbar::process_mouse_move_event (const SDL_MouseMotionEvent& event) {
     Control::process_mouse_move_event (event);
 }
 
-void Scrollbar::set_height (int value) {
-    Control::set_height (value);
-    fold_height = get_height () - 2 * get_width ();
+void Scrollbar::on_height_changed (int value) {
+    fold_height = value - 2 * get_width ();
     set_bar_height (fold_height - (max - min));
     bar_y = get_width ();
     bar_y += (max != min) ? rest_space * get_value () / (max - min) : 0;
+
+    Control::on_height_changed (value);
 }
 
 void Scrollbar::set_min (int m) {
@@ -200,7 +202,10 @@ void Scrollbar::set_value (int v) {
 }
 
 void Scrollbar::on_value_changed (int value) {
-    call_value_changed (this, value);
+    for (list<OnValueChanged>::iterator calli = call.value_changed.begin (); calli
+            != call.value_changed.end (); calli++) {
+        (*calli) (this, value);
+    }
 }
 
 void Scrollbar::on_focus_gained () {
@@ -218,7 +223,11 @@ void Scrollbar::on_focus_lost () {
 }
 
 void Scrollbar::register_on_value_changed (const OnValueChanged& handler) {
-    call_value_changed = handler;
+    call.value_changed.push_back (handler);
+}
+
+void Scrollbar::unregister_on_value_changed (const OnValueChanged& handler) {
+    call.value_changed.remove (handler);
 }
 
 void Scrollbar::set_small_step (int v) {

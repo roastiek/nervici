@@ -28,8 +28,6 @@ private:
 
     void remove_popup (bool restore_focus);
 
-    void poput_lost_focus (Control* ctl);
-
 protected:
     Screen ();
 

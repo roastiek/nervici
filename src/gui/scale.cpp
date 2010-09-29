@@ -4,6 +4,7 @@
 #include "gui/scale.h"
 
 using namespace Glib;
+using namespace std;
 
 Scale::Scale (const ControlParameters& parms) :
     Control (parms), min (0), max (0), value (0), small_step (1), big_step (1) {
@@ -139,11 +140,18 @@ void Scale::scroll_dec (int distance) {
 }
 
 void Scale::on_value_changed (int val) {
-    call_value_changed (this, val);
+    for (list<OnValueChanged>::iterator calli = call.value_changed.begin (); calli
+            != call.value_changed.end (); calli++) {
+        (*calli) (this, val);
+    }
 }
 
 void Scale::register_on_value_changed (const OnValueChanged& handler) {
-    call_value_changed = handler;
+    call.value_changed.push_back (handler);
+}
+
+void Scale::unregister_on_value_changed (const OnValueChanged& handler) {
+    call.value_changed.push_back (handler);
 }
 
 void Scale::set_min (int value) {
