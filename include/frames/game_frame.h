@@ -23,6 +23,8 @@
 #include "fakes/gui/smile_control.h"
 #include "fakes/gui/label_button.h"
 
+#define PLAYERS_SLOTS 16
+
 class GameFrame : public Control {
 private:
     GameInfo game_info;
@@ -35,8 +37,8 @@ private:
 
     Label* la_mod_caption;
     Combobox* cb_mod;
-    TeamButton* btn_teams[16];
-    Combobox* cb_players[16];
+    TeamButton* btn_teams[PLAYERS_SLOTS];
+    Combobox* cb_players[PLAYERS_SLOTS];
     TeamColors team_colors;
 
     Label* la_speed;
@@ -77,6 +79,8 @@ private:
     void update_mods ();
 
     void save_state ();
+    
+    void init_neighbours ();
 
 protected:
     GameFrame();

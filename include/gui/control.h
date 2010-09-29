@@ -79,13 +79,13 @@ private:
 
     Control* prev;
 
-    Control* nearest_left;
+    Control* east;
 
-    Control* nearest_right;
+    Control* west;
 
-    Control* nearest_top;
+    Control* north;
 
-    Control* nearest_bottom;
+    Control* south;
 
     /*
      * X, Y coordinates in absolute screen resolution, relative to parent, 
@@ -387,6 +387,19 @@ public:
     virtual uint32_t get_frame () const;
 
     virtual const Glib::ustring& get_name () const;
+
+    virtual void set_neighbours (Control* north,
+            Control* west,
+            Control* east,
+            Control* south);
+    
+    virtual void set_north (Control* north);
+    
+    virtual void set_west (Control* west);
+    
+    virtual void set_east (Control* east);
+    
+    virtual void set_south (Control* south);
 
     friend class ControlFactory;
 

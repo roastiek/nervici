@@ -193,7 +193,7 @@ static const ControlParameters btn_cancel_parms = {
 
 GameFrame::GameFrame () :
     Control (frame_parms) {
-    max_players = 16;
+    max_players = PLAYERS_SLOTS;
     game_info.setting.bonus = 1000;
     game_info.setting.game_time = 0;
     game_info.setting.max_length = 0;
@@ -263,7 +263,7 @@ void GameFrame::init_control (Control* par) {
         12,
         20);
 
-    for (int pi = 0; pi < 16; pi++) {
+    for (int pi = 0; pi < PLAYERS_SLOTS; pi++) {
         btn_teams[pi] = TeamButtonFactory::create (this,
             &team_colors,
             btn_teams_parms,
@@ -382,11 +382,149 @@ void GameFrame::init_control (Control* par) {
 
     set_background (0x20);
     set_frame (0);
+
+    init_neighbours ();
+}
+
+void GameFrame::init_neighbours () {
+    cb_mod->set_neighbours (cb_players[15],
+        sc_smiles[ST_fleg][2],
+        sa_speed,
+        cb_players[0]);
+
+    for (size_t pi = 0; pi < PLAYERS_SLOTS; pi++) {
+        btn_teams[pi]->set_east (cb_players[pi]);
+        cb_players[pi]->set_west (btn_teams[pi]);
+    }
+
+    btn_teams[0]->set_north (cb_mod);
+    cb_players[0]->set_north (cb_mod);
+    btn_teams[PLAYERS_SLOTS - 1]->set_south (cb_mod);
+    cb_players[PLAYERS_SLOTS - 1]->set_south (cb_mod);
+    for (size_t pi = 1; pi < PLAYERS_SLOTS; pi++) {
+        btn_teams[pi]->set_north (btn_teams[pi - 1]);
+        cb_players[pi]->set_north (cb_players[pi - 1]);
+        btn_teams[pi - 1]->set_south (btn_teams[pi]);
+        cb_players[pi - 1]->set_south (cb_players[pi]);
+    }
+
+    for (size_t pi = 0; pi < 4; pi++) {
+        btn_teams[pi]->set_west (sc_smiles[ST_fleg][2]);
+    }
+    for (size_t pi = 4; pi < 10; pi++) {
+        btn_teams[pi]->set_west (sc_smiles[ST_ham][2]);
+    }
+    for (size_t pi = 10; pi < 12; pi++) {
+        btn_teams[pi]->set_west (nb_bonus);
+    }
+    for (size_t pi = 12; pi < PLAYERS_SLOTS; pi++) {
+        btn_teams[pi]->set_west (btn_cancel);
+    }
+
+    for (size_t pi = 0; pi < 2; pi++) {
+        cb_players[pi]->set_east (nb_rounds);
+    }
+    for (size_t pi = 2; pi < 4; pi++) {
+        cb_players[pi]->set_east (nb_max_score);
+    }
+    for (size_t pi = 4; pi < 6; pi++) {
+        cb_players[pi]->set_east (nb_max_length);
+    }
+    for (size_t pi = 6; pi < 8; pi++) {
+        cb_players[pi]->set_east (nb_timer);
+    }
+    for (size_t pi = 8; pi < 10; pi++) {
+        cb_players[pi]->set_east (nb_step);
+    }
+    for (size_t pi = 10; pi < 12; pi++) {
+        cb_players[pi]->set_east (nb_bonus);
+    }
+    for (size_t pi = 12; pi < PLAYERS_SLOTS; pi++) {
+        cb_players[pi]->set_east (btn_start);
+    }
+
+    sa_speed->set_neighbours (nb_bonus,
+        cb_mod,
+        sc_smiles[ST_pozi][0],
+        nb_rounds);
+    nb_rounds->set_neighbours (sa_speed,
+        cb_players[1],
+        sc_smiles[ST_pozi][0],
+        nb_max_score);
+    nb_max_score->set_neighbours (nb_rounds,
+        cb_players[3],
+        sc_smiles[ST_pozi][0],
+        nb_max_length);
+    nb_max_length->set_neighbours (cb_players[5],
+        nb_max_score,
+        sc_smiles[ST_iron][0],
+        nb_timer);
+    nb_timer->set_neighbours (nb_max_length,
+        cb_players[7],
+        sc_smiles[ST_iron][0],
+        nb_step);
+    nb_step->set_neighbours (nb_timer,
+        cb_players[9],
+        sc_smiles[ST_iron][0],
+        nb_bonus);
+    nb_bonus->set_neighbours (nb_step, cb_players[11], btn_start, sa_speed);
+
+    sc_smiles[ST_pozi][0]->set_west (sa_speed);
+    sc_smiles[ST_pozi][1]->set_west (sc_smiles[ST_pozi][0]);
+    sc_smiles[ST_pozi][2]->set_west (sc_smiles[ST_pozi][1]);
+    sc_smiles[ST_fleg][0]->set_east (sc_smiles[ST_fleg][1]);
+    sc_smiles[ST_fleg][1]->set_east (sc_smiles[ST_fleg][2]);
+    sc_smiles[ST_fleg][2]->set_east (cb_mod);
+    sc_smiles[ST_iron][0]->set_west (nb_max_length);
+    sc_smiles[ST_iron][1]->set_west (sc_smiles[ST_iron][0]);
+    sc_smiles[ST_iron][2]->set_west (sc_smiles[ST_iron][1]);
+    sc_smiles[ST_ham][0]->set_east (sc_smiles[ST_ham][1]);
+    sc_smiles[ST_ham][1]->set_east (sc_smiles[ST_ham][2]);
+    sc_smiles[ST_ham][2]->set_east (btn_teams[5]);
+    for (size_t si = 1; si < 3; si++) {
+        sc_smiles[si][0]->set_west (sc_smiles[si - 1][2]);
+        sc_smiles[si][1]->set_west (sc_smiles[si][0]);
+        sc_smiles[si][2]->set_west (sc_smiles[si][1]);
+        sc_smiles[si - 1][0]->set_east (sc_smiles[si - 1][1]);
+        sc_smiles[si - 1][1]->set_east (sc_smiles[si - 1][2]);
+        sc_smiles[si - 1][2]->set_east (sc_smiles[si][0]);
+        sc_smiles[si + 3][0]->set_west (sc_smiles[si + 2][2]);
+        sc_smiles[si + 3][1]->set_west (sc_smiles[si + 3][0]);
+        sc_smiles[si + 3][2]->set_west (sc_smiles[si + 3][1]);
+        sc_smiles[si + 2][0]->set_east (sc_smiles[si + 2][1]);
+        sc_smiles[si + 2][1]->set_east (sc_smiles[si + 2][2]);
+        sc_smiles[si + 2][2]->set_east (sc_smiles[si + 3][0]);
+    }
+    for (size_t si = 0; si < 3; si++) {
+        for (size_t li = 0; li < 3; li++) {
+            sc_smiles[si][li]->set_north (btn_start);
+            sc_smiles[si][li]->set_south (sc_smiles[si + 3][li]);
+            sc_smiles[si + 3][li]->set_north (sc_smiles[si][li]);
+            sc_smiles[si + 3][li]->set_south (btn_start);
+        }
+    }
+    sc_smiles[ST_nega][2]->set_north (btn_cancel);
+    sc_smiles[ST_fleg][0]->set_north (btn_cancel);
+    sc_smiles[ST_fleg][1]->set_north (btn_cancel);
+    sc_smiles[ST_fleg][2]->set_north (btn_cancel);
+    sc_smiles[ST_cham][2]->set_south (btn_cancel);
+    sc_smiles[ST_ham][0]->set_south (btn_cancel);
+    sc_smiles[ST_ham][1]->set_south (btn_cancel);
+    sc_smiles[ST_ham][2]->set_south (btn_cancel);
+
+    btn_start->set_neighbours (sc_smiles[ST_iron][0],
+        nb_bonus,
+        btn_cancel,
+        sc_smiles[ST_pozi][0]);
+    btn_cancel->set_neighbours (sc_smiles[ST_cham][2],
+        btn_start,
+        btn_teams[15],
+        sc_smiles[ST_nega][2]);
 }
 
 void GameFrame::reinitialize () {
     Control::reinitialize ();
-    set_y ((screen->get_height() - get_height()) / 2);
+    set_y ((screen->get_height () - get_height ()) / 2);
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
@@ -421,7 +559,7 @@ void GameFrame::preapare () {
         cb_mod->set_selected (0);
     }
 
-    for (int pi = 0; pi < 16; pi++) {
+    for (int pi = 0; pi < PLAYERS_SLOTS; pi++) {
         const ustring& name = set.read_string ("game", ustring ("player")
                 + int_to_string (pi), "");
         cb_players[pi]->set_selected (0);
@@ -454,7 +592,7 @@ void GameFrame::btn_start_clicked (Control* ctl) {
     game_info.team_infos.clear ();
     game_info.pl_infos.clear ();
     game_info.pl_teams.clear ();
-    for (int pi = 0; pi < 16; pi++) {
+    for (int pi = 0; pi < PLAYERS_SLOTS; pi++) {
         int plid = cb_players[pi]->get_selected () - 1;
         if (plid >= 0) {
             game_info.pl_infos.push_back (&pl_infos[plid]);
@@ -500,7 +638,9 @@ void GameFrame::cb_mob_selected_changed (Combobox* box, int selected) {
 void GameFrame::load_mod (const Mod& mod) {
     Setting& set = settings.game ();
 
-    max_players = (mod.spec.max_players <= 16) ? mod.spec.max_players : 16;
+    max_players
+            = (mod.spec.max_players <= PLAYERS_SLOTS) ? mod.spec.max_players
+                    : PLAYERS_SLOTS;
     nb_bonus->set_value (set.read_int (mod.name,
         "bonus",
         mod.spec.defaults.bonus));
@@ -530,7 +670,7 @@ void GameFrame::load_mod (const Mod& mod) {
         }
     }
 
-    for (int pi = 0; pi < 16; pi++) {
+    for (int pi = 0; pi < PLAYERS_SLOTS; pi++) {
         btn_teams[pi]->set_visible (pi < max_players);
         cb_players[pi]->set_visible (pi < max_players);
     }
@@ -581,7 +721,7 @@ void GameFrame::update_mods () {
 }
 
 void GameFrame::update_players () {
-    for (int ci = 0; ci < 16; ci++) {
+    for (int ci = 0; ci < PLAYERS_SLOTS; ci++) {
         cb_players[ci]->clear ();
 
         cb_players[ci]->add_item (_("(none)"), 0x808080ff);
@@ -602,7 +742,7 @@ void GameFrame::save_state () {
 
     set.write_string ("game", "last_mod", mod_name);
 
-    for (int pi = 0; pi < 16; pi++) {
+    for (int pi = 0; pi < PLAYERS_SLOTS; pi++) {
         int sel = cb_players[pi]->get_selected ();
         const ustring& name = (sel > 0) ? pl_infos[sel - 1].name : "";
         set.write_string ("game", ustring ("player") + int_to_string (pi), name);

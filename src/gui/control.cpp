@@ -26,10 +26,10 @@ last_child (NULL),
 focused_child (NULL),
 next (NULL),
 prev (NULL),
-nearest_left (NULL),
-nearest_right (NULL),
-nearest_top (NULL),
-nearest_bottom (NULL),
+east (NULL),
+west (NULL),
+north (NULL),
+south (NULL),
 x (0),
 y (0),
 width (0),
@@ -348,6 +348,43 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
         }
     }
 
+    switch (event.keysym.sym) {
+    case SDLK_LEFT:
+        for (Control* focus = west; focus != NULL; focus = focus->west) {
+            if (focus->is_visible() && focus->is_enabled() && focus->is_focusable()) {
+                focus->grab_focus();
+                return true;
+            }
+        }
+        break;
+    case SDLK_UP:
+        for (Control* focus = north; focus != NULL; focus = focus->north) {
+            if (focus->is_visible() && focus->is_enabled() && focus->is_focusable()) {
+                focus->grab_focus();
+                return true;
+            }
+        }
+        break;
+    case SDLK_RIGHT:
+        for (Control* focus = east; focus != NULL; focus = focus->east) {
+            if (focus->is_visible() && focus->is_enabled() && focus->is_focusable()) {
+                focus->grab_focus();
+                return true;
+            }
+        }
+        break;
+    case SDLK_DOWN:
+        for (Control* focus = south; focus != NULL; focus = focus->south) {
+            if (focus->is_visible() && focus->is_enabled() && focus->is_focusable()) {
+                focus->grab_focus();
+                return true;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
     if ((event.keysym.mod & (KMOD_ALT | KMOD_CTRL | KMOD_META)) != 0)
         return false;
 
@@ -362,15 +399,7 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
         }
     } else {
         switch (event.keysym.sym) {
-        case SDLK_LEFT:
-        case SDLK_UP:
-            if (focus_previous ())
-                return true;
-            break;
-
         case SDLK_TAB:
-        case SDLK_RIGHT:
-        case SDLK_DOWN:
             if (focus_next ())
                 return true;
             break;
@@ -775,6 +804,32 @@ Uint32 Control::get_frame () const {
 
 const ustring& Control::get_name () const {
     return name;
+}
+
+void Control::set_neighbours (Control* nnorth,
+        Control* nwest,
+        Control* neast,
+        Control* nsouth) {
+    east = neast;
+    west = nwest;
+    north = nnorth;
+    south = nsouth;
+}
+
+void Control::set_north (Control* nnorth) {
+    north = nnorth;
+}
+
+void Control::set_west (Control* nwest) {
+    west = nwest;
+}
+
+void Control::set_east (Control* neast) {
+    east = neast;
+}
+
+void Control::set_south (Control* nsouth) {
+    south = nsouth;
 }
 
 const ControlParameters& Control::get_parms () {

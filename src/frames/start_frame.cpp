@@ -81,13 +81,18 @@ void StartFrame::init_control (Control* par) {
     btn_quit->register_on_clicked (OnClicked (this,
         &StartFrame::btn_quit_clicked));
 
+    btn_new_game->set_neighbours (btn_quit, NULL, NULL, btn_pledit);
+    btn_pledit->set_neighbours (btn_new_game, NULL, NULL, btn_options);
+    btn_options->set_neighbours (btn_pledit, NULL, NULL, btn_quit);
+    btn_quit->set_neighbours (btn_options, NULL, NULL, btn_new_game);
+
     set_background (0x20);
     set_frame (0x00);
 }
 
 void StartFrame::reinitialize () {
     Control::reinitialize ();
-    set_y ((screen->get_height() - get_height()) / 2);
+    set_y ((screen->get_height () - get_height ()) / 2);
 }
 
 StartFrame* StartFrame::create_frame (Control* par) {
@@ -117,5 +122,5 @@ void StartFrame::btn_quit_clicked (Control* ctl) {
 }
 
 void StartFrame::btn_options_clicked (Control* ctl) {
-    
+
 }
