@@ -44,7 +44,7 @@ static const ControlParameters btn_quit_parms = {
     btn_new_game_parms.font_size};
 
 StartFrame::StartFrame () :
-    Control (frame_parms) {
+    Frame (frame_parms) {
 }
 
 void StartFrame::init_control (Control* par) {
@@ -90,23 +90,6 @@ void StartFrame::init_control (Control* par) {
     set_frame (0x00);
 }
 
-void StartFrame::reinitialize () {
-    Control::reinitialize ();
-    set_y ((screen->get_height () - get_height ()) / 2);
-}
-
-StartFrame* StartFrame::create_frame (Control* par) {
-    StartFrame* result = new StartFrame ();
-    result->set_name ("start_frame");
-    result->init_control (par);
-    result->show_all ();
-    return result;
-}
-
-bool StartFrame::is_focusable () const {
-    return false;
-}
-
 void StartFrame::btn_new_game_clicked (Control* ctl) {
     app.switch_to_game_frame ();
     app.get_game_frame ().preapare ();
@@ -124,3 +107,12 @@ void StartFrame::btn_quit_clicked (Control* ctl) {
 void StartFrame::btn_options_clicked (Control* ctl) {
 
 }
+
+StartFrame* StartFrameFactory::create (Control* par) {
+    StartFrame* result = new StartFrame ();
+    result->set_name ("start_frame");
+    result->init_control (par);
+    result->show_all ();
+    return result;
+}
+

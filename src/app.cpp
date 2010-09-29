@@ -38,8 +38,8 @@ void App::init_gui () {
     Control::screen = screen;
     screen->show_all ();
 
-    start_frame = StartFrame::create_frame (screen);
-    game_frame = GameFrame::create_frame (screen);
+    start_frame = StartFrameFactory::create (screen);
+    game_frame = GameFrameFactory::create (screen);
     pledit_frame = PlEditFrame::create_frame (screen);
 
     start_frame->set_visible (false);

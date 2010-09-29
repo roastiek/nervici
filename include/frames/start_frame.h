@@ -8,31 +8,31 @@
 #ifndef START_FRAME__H
 #define	START_FRAME__H
 
-#include "gui/control.h"
+#include "gui/frame.h"
 
-class StartFrame : public Control {
+class StartFrame: public Frame {
 private:
     void btn_new_game_clicked (Control* ctl);
-    
+
     void btn_quit_clicked (Control* ctl);
-    
+
     void btn_pledit_clicked (Control* ctl);
 
     void btn_options_clicked (Control* ctl);
 
 protected:
-    StartFrame();
+    StartFrame ();
 
     void init_control (Control* par);
-    
-    void reinitialize ();
 
 public:
-    static StartFrame* create_frame (Control* par);
-
-    bool is_focusable () const;
+    friend class StartFrameFactory;
 };
 
+class StartFrameFactory {
+public:
+    static StartFrame* create (Control* par);
+};
 
 #endif	/* START_H */
 

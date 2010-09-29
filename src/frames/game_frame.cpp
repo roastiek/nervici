@@ -192,7 +192,7 @@ static const ControlParameters btn_cancel_parms = {
     16};
 
 GameFrame::GameFrame () :
-    Control (frame_parms) {
+    Frame (frame_parms) {
     max_players = PLAYERS_SLOTS;
     game_info.setting.bonus = 1000;
     game_info.setting.game_time = 0;
@@ -522,25 +522,8 @@ void GameFrame::init_neighbours () {
         sc_smiles[ST_nega][2]);
 }
 
-void GameFrame::reinitialize () {
-    Control::reinitialize ();
-    set_y ((screen->get_height () - get_height ()) / 2);
-}
-
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
     la_speed_text->set_text (ustring (render_speed (float(-base_speed) / value)));
-}
-
-GameFrame* GameFrame::create_frame (Control* par) {
-    GameFrame* result = new GameFrame ();
-    result->set_name ("game frame");
-    result->init_control (par);
-    result->show_all ();
-    return result;
-}
-
-bool GameFrame::is_focusable () const {
-    return false;
 }
 
 void GameFrame::preapare () {
@@ -767,3 +750,12 @@ void GameFrame::save_state () {
         }
     }
 }
+
+GameFrame* GameFrameFactory::create (Control* par) {
+    GameFrame* result = new GameFrame ();
+    result->set_name ("game frame");
+    result->init_control (par);
+    result->show_all ();
+    return result;
+}
+

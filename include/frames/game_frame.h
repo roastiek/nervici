@@ -9,7 +9,7 @@
 #define	GAME_FRAME_H
 
 #include "engine/smile_set_images.h"
-#include "gui/control.h"
+#include "gui/frame.h"
 #include "gui/team_colors.h"
 #include "game/game_info.h"
 #include "fakes/mod.h"
@@ -25,7 +25,7 @@
 
 #define PLAYERS_SLOTS 16
 
-class GameFrame : public Control {
+class GameFrame : public Frame {
 private:
     GameInfo game_info;
     plid_tu max_players;
@@ -87,18 +87,20 @@ protected:
 
     void init_control (Control* par);
 
-    void reinitialize ();
-
 public:
     ~GameFrame ();
-
-    static GameFrame* create_frame (Control* par);
-
-    bool is_focusable () const;
 
     void preapare ();
 
     void update_players ();
+    
+    friend class GameFrameFactory;
+};
+
+class GameFrameFactory {
+public:
+    static GameFrame* create (Control* par);
+
 };
 
 #endif	/* GAME_FRAME_H */
