@@ -151,6 +151,7 @@ void Scrollport::set_content (Control* value) {
             bar->set_value (0);
             bar->set_max (0);
         }
+        
         content = value;
 
         if (content != NULL) {

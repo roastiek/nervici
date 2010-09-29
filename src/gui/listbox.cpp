@@ -1,3 +1,4 @@
+#include "logger.h"
 #include "gui/defaults.h"
 #include "gui/event_helper.h"
 
@@ -188,17 +189,19 @@ void Listbox::set_selected (int value) {
         invalidate ();
     }
 
-    int ph = get_parent ()->get_height ();
-    int ih = get_item_height ();
-    int my = -get_y ();
-    int sy = value * ih;
+    if (get_parent () != NULL && value != -1) {
+        int ph = get_parent ()->get_height ();
+        int ih = get_item_height ();
+        int my = -get_y ();
+        int sy = value * ih;
 
-    if (sy + ih <= my) {
-        set_y (-sy);
-    }
+        if (sy + ih <= my) {
+            set_y (-sy);
+        }
 
-    if (sy >= my + ph) {
-        set_y (-(sy - ph + ih));
+        if (sy >= my + ph) {
+            set_y (-(sy - ph + ih));
+        }
     }
 }
 
