@@ -11,6 +11,7 @@
 #include "mods/mod_specification.h"
 
 struct ModInfo {
+    const char* id;
     const char* name;
     const char* autor;
     const char* rules;

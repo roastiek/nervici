@@ -14,19 +14,33 @@
 struct Mod {
     const ModRunner& runner;
     Glib::ustring script;
+    Glib::ustring id;
     Glib::ustring name;
     Glib::ustring autor;
     Glib::ustring rules;
     ModSpecification spec;
 
-    Mod (const ModRunner& nrunner, const Glib::ustring& nscript,
-            const Glib::ustring& nname, const Glib::ustring& nautor,
-            const Glib::ustring& nrules, const ModSpecification& nspec) :
-        runner (nrunner), script (nscript), name (nname), autor (nautor),
-                rules (nrules), spec (nspec) {
+    Mod (const ModRunner& nrunner,
+            const Glib::ustring& nscript,
+            const Glib::ustring& nid,
+            const Glib::ustring nname,
+            const Glib::ustring& nautor,
+            const Glib::ustring& nrules,
+            const ModSpecification& nspec);
 
-    }
 };
+
+inline Mod::Mod (const ModRunner& nrunner,
+        const Glib::ustring& nscript,
+        const Glib::ustring& nid,
+        const Glib::ustring nname,
+        const Glib::ustring& nautor,
+        const Glib::ustring& nrules,
+        const ModSpecification& nspec) :
+    runner (nrunner), script (nscript), id (nid), name (nname), autor (nautor),
+            rules (nrules), spec (nspec) {
+
+}
 
 #endif	/* MOD_H */
 

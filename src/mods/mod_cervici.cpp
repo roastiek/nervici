@@ -1,5 +1,6 @@
 #include <cstddef>
 
+#include "basic_defs.h"
 #include "mods/nervici.h"
 #include "mods/mod_runner_info.h"
 #include "mods/mod_info.h"
@@ -18,10 +19,11 @@ static const ModRunnerInfo runner_info = {
 
 };
 
-static const ModInfo info = {
+static ModInfo info = {
     "cervici",
+    N_("worms"),
     "bobo",
-    "proste cervici",
+    N_("proste cervici"),
     {16,
         true, true, true, true, true, true, true,
         {
@@ -98,6 +100,13 @@ public:
     }
 
     const ModInfo * get_info (const Glib::ustring & script) {
+        static bool translated = false;
+        if (!translated) {
+            info.name = gettext (info.name);
+            info.rules = gettext (info.rules);
+            translated = true;
+        }
+        
         return &info;
     }
 

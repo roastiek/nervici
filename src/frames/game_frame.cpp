@@ -530,7 +530,7 @@ void GameFrame::preapare () {
 
     const ustring& last_mod = set.read_string ("game", "last_mod", "");
     for (size_t mi = 0; mi < mods.count (); mi++) {
-        if (last_mod.compare (mods[mi].name) == 0) {
+        if (last_mod.compare (mods[mi].id) == 0) {
             cb_mod->set_selected (mi);
             break;
         }
@@ -618,38 +618,39 @@ void GameFrame::cb_mob_selected_changed (Combobox* box, int selected) {
 void GameFrame::load_mod (const Mod& mod) {
     Setting& set = settings.game ();
 
+    ml_rules->set_text (mod.rules);
+
     max_players
             = (mod.spec.max_players <= PLAYERS_SLOTS) ? mod.spec.max_players
                     : PLAYERS_SLOTS;
-    nb_bonus->set_value (set.read_int (mod.name,
-        "bonus",
-        mod.spec.defaults.bonus));
-    nb_timer->set_value (set.read_int (mod.name,
+    nb_bonus->set_value (set.read_int (mod.id, "bonus", mod.spec.defaults.bonus));
+    nb_timer->set_value (set.read_int (mod.id,
         "timer",
         mod.spec.defaults.game_time));
-    nb_max_length->set_value (set.read_int (mod.name,
+    nb_max_length->set_value (set.read_int (mod.id,
         "max_length",
         mod.spec.defaults.max_length));
-    nb_max_score->set_value (set.read_int (mod.name,
+    nb_max_score->set_value (set.read_int (mod.id,
         "max_score",
         mod.spec.defaults.max_score));
-    nb_rounds->set_value (set.read_int (mod.name,
+    nb_rounds->set_value (set.read_int (mod.id,
         "rounds",
         mod.spec.defaults.rounds));
-    sa_speed->set_value (-set.read_int (mod.name,
+    sa_speed->set_value (-set.read_int (mod.id,
         "speed",
         mod.spec.defaults.speed));
-    nb_step->set_value (set.read_int (mod.name, "step", mod.spec.defaults.step));
+    nb_step->set_value (set.read_int (mod.id, "step", mod.spec.defaults.step));
 
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
-            sc_smiles[si][li]->set_value (set.read_int (mod.name,
+            sc_smiles[si][li]->set_value (set.read_int (mod.id,
                 ustring ("smile") + int_to_string (si) + "-"
                         + int_to_string (li),
                 mod.spec.default_smiles.counts[si][li]));
-            sc_smiles[si][li]->set_smile_enabled (set.read_int (mod.name,
+            sc_smiles[si][li]->set_smile_enabled (set.read_int (mod.id,
                 ustring ("smile_enabled") + int_to_string (si) + "-"
-                        + int_to_string (li), true));
+                        + int_to_string (li),
+                true));
         }
     }
 
@@ -721,7 +722,7 @@ void GameFrame::update_players () {
 void GameFrame::save_state () {
     Setting& set = settings.game ();
 
-    const ustring& mod_name = mods[cb_mod->get_selected ()].name;
+    const ustring& mod_name = mods[cb_mod->get_selected ()].id;
 
     set.write_string ("game", "last_mod", mod_name);
 

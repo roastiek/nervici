@@ -64,7 +64,7 @@ void Mods::find_mods () {
 }
 
 void Mods::load_mod (size_t mid) {
-    logger.fineln ("loading mod \"%s\"", mods[mid]->name.c_str ());
+    logger.fineln ("loading mod \"%s\"", mods[mid]->id.c_str ());
 
     GetFaceHandle handle;
     const ModRunner& runner = mods[mid]->runner;
@@ -152,7 +152,7 @@ void Mods::find_scripts (const vector<ustring>& files) {
             for (size_t fi = 0; fi < files.size (); fi++) {
                 const ustring& script = files[fi];
                 ustring suffix = script.substr (script.length () - ext_len,
-                        ext_len);
+                    ext_len);
 
                 if (ext.compare (suffix) != 0)
                     continue;
@@ -161,17 +161,27 @@ void Mods::find_scripts (const vector<ustring>& files) {
                 if (minfo == NULL)
                     continue;
 
-                mods.push_back (new Mod (runner, script, minfo->name,
-                        minfo->autor, minfo->rules, minfo->spec));
-                logger.fineln ("found mod %s", minfo->name);
+                mods.push_back (new Mod (runner,
+                    script,
+                    minfo->id,
+                    minfo->name,
+                    minfo->autor,
+                    minfo->rules,
+                    minfo->spec));
+                logger.fineln ("found mod %s", minfo->id);
             }
         }
 
         minfo = face->get_info ("");
         if (minfo != NULL) {
-            mods.push_back (new Mod (runner, "", minfo->name, minfo->autor,
-                    minfo->rules, minfo->spec));
-            logger.fineln ("found mod %s", minfo->name);
+            mods.push_back (new Mod (runner,
+                "",
+                minfo->id,
+                minfo->name,
+                minfo->autor,
+                minfo->rules,
+                minfo->spec));
+            logger.fineln ("found mod %s", minfo->id);
         }
         delete face;
     }
