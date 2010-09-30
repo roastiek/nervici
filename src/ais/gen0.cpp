@@ -33,6 +33,10 @@ static ThreadPool* pool = NULL;
 AIGen0::AIGen0 (Player& pl, const AIGen0Info& inf) :
     player (pl), info (inf) {
 
+    if (info.distance > MAX_STEPS) {
+        info.distance = MAX_STEPS;
+    }
+    
     if (pool == NULL) {
         pool = new ThreadPool ();
     }
@@ -237,7 +241,7 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos,
 
     result.dist = 0;
     result.target = numeric_limits<double>::max ();
-    result.jump_dist = MAX_STEPS;
+    result.jump_dist = info.distance;
     size_t di = 0;
 
     FPoint jump_pos[11];
@@ -249,7 +253,7 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos,
     jump_jumptime[di] = jumptime;
     bool jump_now = false;
 
-    while (di < 10 && !abort) {
+    while (di < 10 && di < info.distance && !abort) {
         if (di <= distance && !jump_now) {
             switch (def) {
             case KS_Left:
@@ -276,7 +280,7 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos,
                     : jump_jumptime[di] - 1;
         }
 
-        if (!will_survive (jump_pos[di + 1], jump_jumptime[di + 1], head + di)) {
+        if (info.jump && !will_survive (jump_pos[di + 1], jump_jumptime[di + 1], head + di)) {
             if (di % 2 == 0) {
                 if (jump_jumptime[di + 1] == 0) {
                     jump_now = true;
@@ -304,7 +308,7 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos,
     jumptime = jump_jumptime[10];
     head += 10;
 
-    for (; di < distance && di < MAX_STEPS && !abort; di += 1) {
+    for (; di < distance && di < info.distance && !abort; di += 1) {
         if (jumptime > 0)
             jumptime--;
 
@@ -331,7 +335,7 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos,
         head++;
     }
 
-    for (; di < MAX_STEPS && !abort; di += 2) {
+    for (; di < info.distance && !abort; di += 2) {
         if (jumptime > 0)
             jumptime--;
 

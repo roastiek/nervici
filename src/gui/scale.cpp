@@ -33,12 +33,17 @@ void Scale::paint () {
     canvas->fill_background (get_background ());
 
     int steps = get_max () - get_min ();
-
+    int reduce = 1;
+    
+    while (fold_width / (steps / reduce) < 5) {
+        reduce++;
+    }
+    
     int degree_height = (get_height () - fold_border) / 2;
     int bottom_degree_y = (get_height () + fold_border) / 2;
 
-    for (int si = 0; si <= steps; si++) {
-        int degree_x = fold_x + si * fold_width / steps;
+    for (int si = 0; si <= steps / reduce; si++) {
+        int degree_x = fold_x + si * fold_width / (steps / reduce);
 
         canvas->draw_vline (degree_x, 0, degree_height, get_foreground ());
 
