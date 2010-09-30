@@ -14,7 +14,8 @@
 #include "gui/sdl_screen.h"
 
 SDLScreen::SDLScreen (SDL_Surface* prim) :
-    Screen (), off_face (NULL), primary (prim), ignore_updates (false) {
+    Screen (), off_face (NULL), primary (prim), ignore_updates (false),
+            abort (false) {
 
 }
 
@@ -55,6 +56,26 @@ void SDLScreen::process_event (const SDL_Event& event) {
     }
 }
 
+bool SDLScreen::process_events () {
+    SDL_Event event;
+
+    while (SDL_PollEvent (&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            abort = true;
+            break;
+        default:
+            process_event (event);
+            break;
+        }
+    }
+    return !is_aborted ();
+}
+
+bool SDLScreen::is_aborted () const {
+    return abort;
+}
+
 void SDLScreen::update (Clip* scrvas) {
     Screen::update (scrvas);
 
@@ -74,6 +95,7 @@ void SDLScreen::set_surface (SDL_Surface* value) {
     set_ignore_updates (true);
     reinitialize ();
     reinitialize_children ();
+    process_events ();
     set_ignore_updates (false);
 }
 

@@ -30,8 +30,6 @@ private:
     
     OptionsFrame* options_frame;
 
-    bool abort;
-
     static App instance;
 
     App ();
@@ -84,10 +82,6 @@ extern App& app;
 
 inline App& App::get_instance() {
     return instance;
-}
-
-inline bool App::is_aborted() const {
-    return abort;
 }
 
 inline const StartFrame& App::get_start_frame () const {

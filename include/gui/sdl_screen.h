@@ -19,24 +19,26 @@ private:
     
     bool ignore_updates;
     
+    bool abort;
+    
 protected:
     void reinitialize ();
 
     void update (Clip* scrvas);
 
-//    int get_screen_width () const;
-
-//    int get_screen_height () const;
+    void process_event (const SDL_Event& event);
 
 public:
 
     SDLScreen (SDL_Surface* primary);
 
-    void process_event (const SDL_Event& event);
-
+    bool process_events ();
+    
     void set_surface (SDL_Surface* value);
     
     void set_ignore_updates (bool value);
+
+    bool is_aborted () const;
 
     friend class SDLScreenFactory;
 };

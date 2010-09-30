@@ -19,24 +19,19 @@
 
 #include "app.h"
 
-static int paint_filter (const SDL_Event* event) {
-    return event->type != E_PAINT;
-}
-
 App App::instance;
 
 App& app = App::get_instance ();
 
 App::App () :
-    active_frame (NULL), abort (false) {
+    active_frame (NULL) {
 
 }
 
 void App::init_gui () {
-    SDL_SetEventFilter (paint_filter);
 
     screen = render.get_screen ();
-    screen->set_ignore_updates(true);
+    screen->set_ignore_updates (true);
     screen->show_all ();
 
     start_frame = StartFrameFactory::create (screen);
@@ -49,9 +44,9 @@ void App::init_gui () {
     pledit_frame->set_visible (false);
     options_frame->set_visible (false);
 
-    SDL_SetEventFilter (NULL);
-    //screen->invalidate ();
-    screen->set_ignore_updates(false);
+    screen->process_events ();
+
+    screen->set_ignore_updates (false);
 
     switch_to_start_frame ();
 }
@@ -100,22 +95,11 @@ void App::uninitialize () {
 
 void App::run () {
     logger.fineln ("entering main loop");
-    SDL_Event event;
 
-    while (!abort) {
+    while (!screen->is_aborted ()) {
         audio.music_update ();
-        if (SDL_PollEvent (&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                abort = true;
-                break;
-            default:
-                screen->process_event (event);
-                break;
-            }
-        } else {
-            SDL_Delay (10);
-        }
+        screen->process_events ();
+        SDL_Delay (10);
     }
 }
 
@@ -123,6 +107,10 @@ void App::quit () {
     SDL_Event event;
     event.type = SDL_QUIT;
     SDL_PushEvent (&event);
+}
+
+bool App::is_aborted () const {
+    return screen->is_aborted ();
 }
 
 void App::hide_previous () {

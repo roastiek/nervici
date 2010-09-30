@@ -35,14 +35,18 @@ protected:
     
     void paint ();
 
+    virtual void process_event (const SDL_Event& event);
+
 public:
     ~Screen ();
 
-    virtual void process_event (const SDL_Event& event);
+    virtual bool process_events () = 0;
     
     virtual void set_ignore_updates (bool value) = 0;
 
     bool is_focusable () const;
+    
+    virtual bool is_aborted () const = 0;
 };
 
 #endif	/* SCREEN_H */
