@@ -11,13 +11,13 @@
 #include "int_type.h"
 
 struct GameSetting {
-    round_tu rounds;
-    score_ti bonus;
-    timer_ti game_time;
     timer_ti speed;
-    plsize_tu max_length;
+    round_tu rounds;
     score_ti max_score;
+    plsize_tu max_length;
+    timer_ti game_time;
     score_ti step;
+    score_ti bonus;
 };
 
 #endif	/* GAME_SETTING_H */

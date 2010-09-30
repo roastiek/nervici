@@ -108,6 +108,7 @@ void Mods::scan_mods_dir (const ustring& path, vector<ustring>& files) {
 
 void Mods::find_mod_runners (const vector<ustring>& files) {
     mod_runners.push_back (new ModRunner ("", get_cervici_face));
+    mod_runners.push_back (new ModRunner ("", get_1cervik_face));
 
     for (size_t fi = 0; fi < files.size (); fi++) {
         const ustring& file = files[fi];

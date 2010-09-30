@@ -57,9 +57,9 @@ bool World::initialize () {
     x /= 2;
     for (startid_tu s = 0; s < starts.size (); s++) {
         starts[s].angle = s * ANGLES / starts.size ();
-        starts[s].pos.x = floor (
-                (width / 2 - (x * icos[starts[s].angle] * 0.8)) * DIGITS)
-                / DIGITS;
+        starts[s].pos.x
+                = floor ((width / 2 - (x * icos[starts[s].angle] * 0.8))
+                        * DIGITS) / DIGITS;
         starts[s].pos.y = floor ((height / 2
                 - (x * isin[starts[s].angle] * 0.8)) * DIGITS) / DIGITS;
         starts[s].ready = 1;
@@ -154,8 +154,11 @@ bool World::simple_will_survive (const Point& pos, const Fields& fields) {
     return true;
 }
 
-bool World::will_survive (const Point& pos, const Fields& fields, plid_tu id,
-        plsize_tu head, DeathCause& cause) {
+bool World::will_survive (const Point& pos,
+        const Fields& fields,
+        plid_tu id,
+        plsize_tu head,
+        DeathCause& cause) {
 
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -201,11 +204,10 @@ bool World::will_survive (const Point& pos, const Fields& fields, plid_tu id,
 }
 
 bool World::good_for_ai (const Point& pos, plid_tu id, plsize_tu head) {
-    bool result = true;
+    bool result = simple_good_for_ai (pos);
 
     for (wsize_tu x = 0; x < 3 && result; x += 2) {
         for (wsize_tu y = 0; y < 3 && result; y += 2) {
-            //if (fields[x][y] != 0) {
             WorldItem& item = get_item (pos.x + x, pos.y + y);
             switch (item.type) {
             case IT_free:
@@ -225,7 +227,6 @@ bool World::good_for_ai (const Point& pos, plid_tu id, plsize_tu head) {
                 result = false;
                 break;
             }
-            //}
         }
     }
     return result;
@@ -244,8 +245,11 @@ void World::queue_changed_item (wsize_tu x, wsize_tu y) {
     get_item (x, y).changed = true;
 }
 
-void World::write_player_head (const Point& pos, const Fields& fields,
-        plid_tu id, plsize_tu head, bool living) {
+void World::write_player_head (const Point& pos,
+        const Fields& fields,
+        plid_tu id,
+        plsize_tu head,
+        bool living) {
 
     for (wsize_tu x = 0; x < 3; x++) {
         for (wsize_tu y = 0; y < 3; y++) {
@@ -277,7 +281,8 @@ void World::write_player_head (const Point& pos, const Fields& fields,
     }
 }
 
-void World::rewrite_player_bottom (const Point& pos, plid_tu id,
+void World::rewrite_player_bottom (const Point& pos,
+        plid_tu id,
         plsize_tu bottom) {
 
     for (wsize_tu x = 0; x < 3; x++) {

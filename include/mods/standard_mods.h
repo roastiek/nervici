@@ -12,4 +12,6 @@
 
 ModInterface* get_cervici_face();
 
+ModInterface* get_1cervik_face();
+
 #endif /* STANDARD_MODS_H_ */

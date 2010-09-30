@@ -18,9 +18,9 @@ struct ModSpecification {
     bool rounds_enabled;
     bool max_score_enabled;
     bool max_length_enabled;
+    bool timer_enabled;
     bool step_enabled;
     bool bonus_enabled;
-    bool timer_enabled;
     bool smiles_enabled[ST_count][3];
     GameSetting defaults;
     SmileSetting default_smiles;

@@ -121,7 +121,7 @@ bool GameImpl::initialize (const GameInfo& info) {
 
     clear_playerground ();
 
-    mods.load_mod (0);
+    mods.load_mod (info.mod_id);
     return true;
 }
 

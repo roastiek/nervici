@@ -558,6 +558,7 @@ void GameFrame::preapare () {
 void GameFrame::btn_start_clicked (Control* ctl) {
     save_state ();
 
+    game_info.mod_id = cb_mod->get_selected ();
     game_info.setting.bonus = nb_bonus->get_value ();
     game_info.setting.game_time = nb_timer->get_value ();
     game_info.setting.max_length = nb_max_length->get_value ();
@@ -641,15 +642,20 @@ void GameFrame::load_mod (const Mod& mod) {
         mod.spec.defaults.speed));
     nb_step->set_value (set.read_int (mod.id, "step", mod.spec.defaults.step));
 
+    ustring key;
+
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
+            key = "smile_";
+            key += int_to_string (si);
+            key += "-";
+            key += int_to_string (li);
             sc_smiles[si][li]->set_value (set.read_int (mod.id,
-                ustring ("smile") + int_to_string (si) + "-"
-                        + int_to_string (li),
+                key,
                 mod.spec.default_smiles.counts[si][li]));
+            key += "_enabled";
             sc_smiles[si][li]->set_smile_enabled (set.read_int (mod.id,
-                ustring ("smile_enabled") + int_to_string (si) + "-"
-                        + int_to_string (li),
+                key,
                 true));
         }
     }
@@ -744,13 +750,17 @@ void GameFrame::save_state () {
     set.write_int (mod_name, "speed", -sa_speed->get_value ());
     set.write_int (mod_name, "step", nb_step->get_value ());
 
+    ustring key;
     for (int si = 0; si < ST_count; si++) {
         for (int li = 0; li < 3; li++) {
-            set.write_int (mod_name, ustring ("smile") + int_to_string (si)
-                    + "-" + int_to_string (li), sc_smiles[si][li]->get_value ());
+            key = "smile_";
+            key += int_to_string (si);
+            key += "-";
+            key += int_to_string (li);
+            set.write_int (mod_name, key, sc_smiles[si][li]->get_value ());
+            key += "_enabled";
             set.write_int (mod_name,
-                ustring ("smile_enabled") + int_to_string (si) + "-"
-                        + int_to_string (li),
+                key,
                 sc_smiles[si][li]->is_smile_enabled ());
         }
     }

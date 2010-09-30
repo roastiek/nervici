@@ -1,7 +1,15 @@
+/*
+ * mod_1cervik.cpp
+ *
+ *  Created on: 30.9.2010
+ *      Author: bobo
+ */
+
 #include <cstddef>
 #include <glibmm/ustring.h>
 
 #include "basic_defs.h"
+#include "logger.h"
 #include "mods/nervici.h"
 #include "mods/mod_runner_info.h"
 #include "mods/mod_info.h"
@@ -21,8 +29,8 @@ static const ModRunnerInfo runner_info = {
 };
 
 static ModInfo info = {
-    "cervici",
-    N_("worms"),
+    "1cervik",
+    N_("1 worm"),
     "bobo",
     N_("proste cervici"),
     {
@@ -32,13 +40,13 @@ static ModInfo info = {
         true,
         false,
         true,
-        false,
-        false,
+        true,
+        true,
         {
             {
-                false,
-                false,
-                false},
+                true,
+                true,
+                true},
             {
                 false,
                 false,
@@ -65,8 +73,8 @@ static ModInfo info = {
             0,
             0,
             0,
-            0,
-            0},
+            1,
+            1000},
         {
             {
                 {
@@ -96,7 +104,7 @@ static ModInfo info = {
 
 #define WAIT_TIME 800
 
-class Cervici: public ModInterface {
+class OneCervik: public ModInterface {
 private:
     GameSetting set;
 
@@ -156,7 +164,7 @@ private:
 
 public:
 
-    Cervici () {
+    OneCervik () {
     }
 
     const ModRunnerInfo* get_runner_info () {
@@ -188,7 +196,7 @@ public:
             IPlayer& p = get_player (pi);
             if (p.is_live ()) {
                 if (!p.is_jumping ()) {
-                    p.inc_score (1);
+                    p.inc_score (set.step);
                 }
                 last_living = pi;
             }
@@ -212,7 +220,7 @@ public:
         }
         if (set.max_score > 0) {
             if (max_score >= set.max_score) {
-                set_status(_("final score has been reached"));
+                set_status (_("final score has been reached"));
                 end_game ();
             }
         }
@@ -223,18 +231,19 @@ public:
         end_round ();
     }
 
-    /*void on_pozi_smile (IPlayer& player, int lvl) {
-     score_ti iron = player.get_ironize ();
+    void on_pozi_smile (IPlayer& player, int lvl) {
+        player.inc_score (set.bonus * lvl);
+    }
 
-     if (iron <= 0) {
-     player.inc_score (set.bonus * lvl);
-     } else {
-     player.dec_score (set.bonus * lvl * iron);
-     player.set_ironize (0);
-     }
-     }
+    void on_killed (IPlayer& victim, IPlayer& murder) {
+        murder.inc_score (set.bonus);
+    }
 
-     void on_nega_smile (IPlayer& player, int lvl) {
+    void on_selfdeath (IPlayer& stupid) {
+        stupid.dec_score (set.bonus);
+    }
+
+    /*     void on_nega_smile (IPlayer& player, int lvl) {
      score_ti iron = player.get_ironize ();
 
      if (iron <= 0) {
@@ -250,7 +259,7 @@ public:
      }*/
 };
 
-ModInterface* get_cervici_face () {
-    return new Cervici ();
+ModInterface* get_1cervik_face () {
+    return new OneCervik ();
 }
 

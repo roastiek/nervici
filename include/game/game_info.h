@@ -17,6 +17,8 @@
 #include "fakes/team_info.h"
 
 struct GameInfo {
+    int mod_id;
+    
     GameSetting setting;
     
     SmileSetting smiles;
