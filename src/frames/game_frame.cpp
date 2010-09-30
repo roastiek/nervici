@@ -452,8 +452,8 @@ void GameFrame::init_neighbours () {
         cb_players[3],
         sc_smiles[ST_pozi][0],
         nb_max_length);
-    nb_max_length->set_neighbours (cb_players[5],
-        nb_max_score,
+    nb_max_length->set_neighbours (nb_max_score,
+        cb_players[5],
         sc_smiles[ST_iron][0],
         nb_timer);
     nb_timer->set_neighbours (nb_max_length,

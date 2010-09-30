@@ -9,7 +9,7 @@ namespace Nervici {
 
 void clear_playerground ();
 
-void set_status (const char* text);
+void set_status (const char* text, ...);
 
 void end_game ();
 

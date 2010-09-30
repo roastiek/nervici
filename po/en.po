@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nervici 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-22 15:34+0200\n"
+"POT-Creation-Date: 2010-09-30 22:41+0200\n"
 "PO-Revision-Date: 2010-09-21 17:59+0200\n"
 "Last-Translator: bobo <bobo@localhost>\n"
 "Language-Team: English\n"
@@ -16,25 +16,203 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/engine/render.cpp:547
+#: src/engine/render.cpp:597
 msgid "name"
 msgstr ""
 
-#: src/engine/render.cpp:548
+#: src/engine/render.cpp:598
 msgid "score"
 msgstr ""
 
-#: src/engine/render.cpp:549
+#: src/engine/render.cpp:599
 msgid "length"
 msgstr ""
 
-#: src/engine/render.cpp:1469
+#: src/engine/render.cpp:1595
 #, c-format
 msgid "round: %d"
 msgstr ""
 
-#: src/engine/render.cpp:1488
+#: src/engine/render.cpp:1614
 msgid "The End"
+msgstr ""
+
+#: src/mods/mod_cervici.cpp:25
+msgid "worms"
+msgstr ""
+
+#: src/mods/mod_cervici.cpp:27
+msgid "proste cervici"
+msgstr ""
+
+#: src/mods/mod_cervici.cpp:110
+msgid "prepare"
+msgstr ""
+
+#: src/mods/mod_cervici.cpp:137
+msgid "run"
+msgstr ""
+
+#: src/mods/mod_cervici.cpp:204
+#, c-format
+msgid "player %s has won this round"
+msgstr ""
+
+#: src/mods/mod_cervici.cpp:207
+msgid "no winner this round"
+msgstr ""
+
+#: src/mods/mod_cervici.cpp:213
+msgid "final score has been reached"
+msgstr ""
+
+#: src/mods/mod_cervici.cpp:220
+msgid "time has run out"
+msgstr ""
+
+#: src/frames/start_frame.cpp:55
+msgid "new game"
+msgstr ""
+
+#: src/frames/start_frame.cpp:63
+msgid "players"
+msgstr ""
+
+#: src/frames/start_frame.cpp:70
+msgid "options"
+msgstr ""
+
+#: src/frames/start_frame.cpp:77
+msgid "quit"
+msgstr ""
+
+#: src/frames/game_frame.cpp:241
+msgid "rules:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:250
+msgid "mod:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:280
+msgid "speed:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:294
+msgid "rounds:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:300
+msgid "final score:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:308
+msgid "max length:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:316
+msgid "timer:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:322
+msgid "step value:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:328
+msgid "bonus:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:334
+msgid "smiles:"
+msgstr ""
+
+#: src/frames/game_frame.cpp:367
+msgid "start game"
+msgstr ""
+
+#: src/frames/game_frame.cpp:374 src/frames/pledit_frame.cpp:289
+#: src/frames/options_frame.cpp:139
+msgid "back to menu"
+msgstr ""
+
+#: src/frames/game_frame.cpp:711 src/frames/pledit_frame.cpp:297
+msgid "(none)"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:211
+msgid "delete"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:217
+msgid "name:"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:221
+msgid "color:"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:239
+msgid "profil:"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:245
+msgid "pitch:"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:252
+msgid "ai version:"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:258
+msgid "vision distance"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:270
+msgid "can jump"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:274
+msgid "keys:"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:276
+msgid "left: "
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:280
+msgid "right: "
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:284
+msgid "jump: "
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:326
+msgid "new player"
+msgstr ""
+
+#: src/frames/pledit_frame.cpp:327
+msgid "new ai"
+msgstr ""
+
+#: src/frames/options_frame.cpp:106
+msgid "sound volume:"
+msgstr ""
+
+#: src/frames/options_frame.cpp:114
+msgid "music volume:"
+msgstr ""
+
+#: src/frames/options_frame.cpp:122
+msgid "screen width:"
+msgstr ""
+
+#: src/frames/options_frame.cpp:128
+msgid "screen height:"
+msgstr ""
+
+#: src/frames/options_frame.cpp:134
+msgid "fullscreen"
 msgstr ""
 
 #~ msgid "cosii"

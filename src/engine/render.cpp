@@ -1747,7 +1747,7 @@ void SDLRender::draw_status (const ustring& text) {
     dest.y = gs_inner.statustext.y + 2 + (gs_inner.statustext.h - src.h) / 2;
 
     SDL_BlitSurface (face, &src, primary, &dest);
-    SDL_UpdateRects (primary, 1, &dest);
+    SDL_UpdateRects (primary, 1, &gs_outer.statustext);
 
     SDL_FreeSurface (face);
 }
@@ -1800,7 +1800,7 @@ void SDLRender::draw_stat (int y,
         stat_screen.columns[STC_score].x,
         y,
         8);
-    draw_score_numbers (stat.steps,
+    draw_score_numbers (stat.steps / 2,
         numbers,
         stat_screen.columns[STC_length].x,
         y,

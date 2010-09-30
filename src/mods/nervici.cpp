@@ -1,4 +1,5 @@
 #include <glibmm/ustring.h>
+#include <stdarg.h>
 
 #include "engine/audio.h"
 #include "engine/render.h"
@@ -17,8 +18,17 @@ void clear_playerground () {
     game.clear_playerground ();
 }
 
-void set_status (const char* text) {
-    render.draw_status (text);
+void set_status (const char* text, ...) {
+#define BUFF_LEN 256
+    static char buffer[BUFF_LEN];
+    
+    va_list arg;
+
+    va_start (arg, text);
+    vsnprintf (buffer, BUFF_LEN, text, arg);
+    va_end (arg);
+    
+    render.draw_status (buffer);
 }
 
 void end_game () {

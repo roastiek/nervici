@@ -335,7 +335,6 @@ void GameImpl::run () {
     sdl_time = SDL_GetTicks ();
     players.update_score ();
     render.draw_timer (timer);
-    render.draw_status ("status");
     mods.face ().on_game_start (set, smile_set);
 
     while (!end && !abort) {
@@ -393,6 +392,7 @@ void GameImpl::run () {
         if (sub_zero) {
             if (timer >= 0) {
                 timer = 0;
+                render.draw_timer (timer);
                 mods.face ().on_timer ();
             }
         }
