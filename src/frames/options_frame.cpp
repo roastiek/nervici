@@ -131,8 +131,8 @@ void OptionsFrame::init_control (Control* par) {
     nb_height = NumberboxFactory::create (this, nb_height_parms, "nb_height");
 
     cb_fullscreen = CheckboxFactory::create (this,
-        cb_fullscreen_parms,
         _("fullscreen"),
+        cb_fullscreen_parms,
         "cb_fullscreen");
 
     btn_back = LabelButtonFactory::create (this,

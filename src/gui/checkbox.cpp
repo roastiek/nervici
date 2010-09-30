@@ -109,8 +109,8 @@ void Checkbox::on_focus_lost () {
 }
 
 Checkbox* CheckboxFactory::create (Control* par,
-        const ControlParameters& parms,
         const ustring& text,
+        const ControlParameters& parms,
         const ustring& name) {
     Checkbox* result = new Checkbox (parms);
     result->set_name (name);

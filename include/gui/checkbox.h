@@ -15,9 +15,9 @@ private:
     bool checked;
 
     Glib::ustring text;
-    
+
     int box_size;
-    
+
     int box_border;
 
 protected:
@@ -28,16 +28,16 @@ protected:
     void init_control (Control* par);
 
     bool process_key_pressed_event (const SDL_KeyboardEvent& event);
-    
+
     void reinitialize ();
 
 public:
     void on_clicked ();
-        
+
     void on_focus_gained ();
-    
+
     void on_focus_lost ();
-    
+
     virtual bool is_checked () const;
 
     virtual void set_checked (bool value);
@@ -52,8 +52,8 @@ public:
 class CheckboxFactory {
 public:
     static Checkbox* create (Control* par,
-            const ControlParameters& parms,
             const Glib::ustring& text,
+            const ControlParameters& parms,
             const Glib::ustring& = "checkbox");
 };
 

@@ -7,7 +7,8 @@
 #include "settings/pl_info.h"
 #include "settings/pl_infos.h"
 #include "frames/game_frame.h"
-#include "gui/button.h"
+#include "gui/label_button.h"
+#include "gui/checkbox.h"
 #include "gui/combobox.h"
 #include "gui/key_graber.h"
 #include "gui/label.h"
@@ -18,27 +19,27 @@
 
 #include "frames/pledit_frame.h"
 
-#define BTN_WIDTH 80
+#define FRAME_WIDTH 200
 
 static const ListboxParameters cb_select_parms = {
-    8,
-    8,
-    3 * BTN_WIDTH + 8 - 24,
+    16,
+    16,
+    FRAME_WIDTH - 8 - 32,
     24,
     12,
     18};
 
 static const ControlParameters btn_del_parms = {
     cb_select_parms.x + cb_select_parms.w + 8,
-    8,
-    24,
+    16,
+    32,
     24,
     12};
 
 static const ControlParameters la_name_parms = {
     cb_select_parms.x,
     cb_select_parms.y + cb_select_parms.h + 8,
-    cb_select_parms.w,
+    FRAME_WIDTH,
     20,
     12};
 
@@ -128,6 +129,27 @@ static const ListboxParameters cb_ai_parms = {
     12,
     18};
 
+static const ControlParameters la_distance_parms = {
+    cb_ai_parms.x,
+    cb_ai_parms.y + cb_ai_parms.h + 8,
+    cb_ai_parms.w,
+    20,
+    12};
+
+static const ControlParameters sa_distance_parms = {
+    la_distance_parms.x,
+    la_distance_parms.y + la_distance_parms.h,
+    la_distance_parms.w,
+    20,
+    12};
+
+static const ControlParameters cb_jump_parms = {
+    sa_distance_parms.x,
+    sa_distance_parms.y + sa_distance_parms.h + 8,
+    sa_distance_parms.w,
+    20,
+    12};
+
 static const ControlParameters la_keys_parms = {
     sa_pitch_parms.x,
     sa_pitch_parms.y + sa_pitch_parms.h + 8,
@@ -138,7 +160,7 @@ static const ControlParameters la_keys_parms = {
 static const ControlParameters kg_left_parms = {
     la_keys_parms.x,
     la_keys_parms.y + la_keys_parms.h,
-    BTN_WIDTH,
+    (FRAME_WIDTH - 16) / 3,
     24,
     12};
 
@@ -156,32 +178,18 @@ static const ControlParameters kg_jump_parms = {
     24,
     12};
 
-static const ControlParameters pa_inner_parms = {
-    0,
-    0,
-    3 * BTN_WIDTH + 4 * 8,
-    cb_ai_parms.y + cb_ai_parms.h + 8,
-    12};
-
-static const ControlParameters btn_save_parms = {
-    0,
-    pa_inner_parms.y + pa_inner_parms.h + 8,
-    BTN_WIDTH,
-    24,
-    12};
-
 static const ControlParameters btn_back_parms = {
-    pa_inner_parms.x + pa_inner_parms.w - BTN_WIDTH,
-    pa_inner_parms.y + pa_inner_parms.h + 8,
-    BTN_WIDTH,
+    cb_jump_parms.x,
+    cb_jump_parms.y + cb_jump_parms.h + 32,
+    FRAME_WIDTH,
     24,
-    12};
+    16};
 
 static const ControlParameters frame_parms = {
-    (1024 - pa_inner_parms.w) / 2,
-    (768 - btn_save_parms.y + btn_save_parms.h) / 2,
-    pa_inner_parms.w,
-    btn_save_parms.y + btn_save_parms.h,
+    (1024 - cb_profil_parms.w - 32) / 2,
+    (768 - btn_back_parms.y + btn_back_parms.h) / 2,
+    cb_profil_parms.w + 32,
+    btn_back_parms.y + btn_back_parms.h + 16,
     12};
 
 #define trans(color) ((color & 0xff) << 24 | (color & 0xff00) << 8 | (color & 0xff0000) >> 8 | 0xff)
@@ -189,98 +197,104 @@ static const ControlParameters frame_parms = {
 //soutretid mysl a delo/hu
 
 PlEditFrame::PlEditFrame () :
-    Frame (frame_parms) {
+    Frame (frame_parms), selected (-1) {
 }
 
 void PlEditFrame::init_control (Control* par) {
     Frame::init_control (par);
 
-    pa_inner = PanelFactory::create (this, pa_inner_parms, "pa_inner");
-
-    btn_del
-            = ButtonFactory::create (pa_inner, "smaz", btn_del_parms, "btn_del");
-    btn_del->register_on_clicked (OnClicked (this,
-        &PlEditFrame::on_btn_del_clicked));
-
-    cb_select
-            = ComboboxFactory::create (pa_inner, cb_select_parms, "cb_select");
+    cb_select = ComboboxFactory::create (this, cb_select_parms, "cb_select");
     cb_select->register_on_selected_changed (Combobox::OnSelectedChanged (this,
         &PlEditFrame::on_cb_select_changed));
 
-    la_name = LabelFactory::create (pa_inner,
-        "menno:",
-        la_name_parms,
-        "la_name");
-    te_name = TextboxFactory::create (pa_inner, te_name_parms, "te_name");
+    btn_del = LabelButtonFactory::create (this,
+        _("delete"),
+        btn_del_parms,
+        "btn_del");
+    btn_del->register_on_clicked (OnClicked (this,
+        &PlEditFrame::on_btn_del_clicked));
 
-    la_color = LabelFactory::create (pa_inner,
-        "barva:",
+    la_name = LabelFactory::create (this, _("name:"), la_name_parms, "la_name");
+    te_name = TextboxFactory::create (this, te_name_parms, "te_name");
+
+    la_color = LabelFactory::create (this,
+        _("color:"),
         la_color_parms,
         "la_color");
-    sa_red = ScaleFactory::create (pa_inner, 1, 16, sa_red_parms, "sa_red");
+    sa_red = ScaleFactory::create (this, 1, 16, sa_red_parms, "sa_red");
     sa_red->set_max (255);
     sa_red->register_on_value_changed (Scale::OnValueChanged (this,
         &PlEditFrame::on_sa_color_changed));
-    sa_green = ScaleFactory::create (pa_inner,
-        1,
-        16,
-        sa_green_parms,
-        "sa_green");
+    sa_green = ScaleFactory::create (this, 1, 16, sa_green_parms, "sa_green");
     sa_green->set_max (255);
     sa_green->register_on_value_changed (Scale::OnValueChanged (this,
         &PlEditFrame::on_sa_color_changed));
-    sa_blue = ScaleFactory::create (pa_inner, 1, 16, sa_blue_parms, "sa_blue");
+    sa_blue = ScaleFactory::create (this, 1, 16, sa_blue_parms, "sa_blue");
     sa_blue->set_max (255);
     sa_blue->register_on_value_changed (Scale::OnValueChanged (this,
         &PlEditFrame::on_sa_color_changed));
-    pa_color = PanelFactory::create (pa_inner, pa_color_parms, "pa_color");
+    pa_color = PanelFactory::create (this, pa_color_parms, "pa_color");
 
-    la_profil = LabelFactory::create (pa_inner,
-        "profil:",
+    la_profil = LabelFactory::create (this,
+        _("profil:"),
         la_profil_parms,
         "la_profil");
-    cb_profil
-            = ComboboxFactory::create (pa_inner, cb_profil_parms, "cb_profil");
+    cb_profil = ComboboxFactory::create (this, cb_profil_parms, "cb_profil");
 
-    la_pitch = LabelFactory::create (pa_inner,
-        "zkresleni:",
+    la_pitch = LabelFactory::create (this,
+        _("pitch:"),
         la_pitch_parms,
         "la_pitch");
-    sa_pitch
-            = ScaleFactory::create (pa_inner, 1, 1, sa_pitch_parms, "sa_pitch");
+    sa_pitch = ScaleFactory::create (this, 1, 1, sa_pitch_parms, "sa_pitch");
     sa_pitch->set_max (20);
     sa_pitch->set_min (5);
 
-    la_ai = LabelFactory::create (pa_inner, "plastik:", la_ai_parms, "la_ai");
-    cb_ai = ComboboxFactory::create (pa_inner, cb_ai_parms, "cb_ai");
+    la_ai = LabelFactory::create (this, _("ai version:"), la_ai_parms, "la_ai");
+    cb_ai = ComboboxFactory::create (this, cb_ai_parms, "cb_ai");
+    cb_ai->register_on_selected_changed (Combobox::OnSelectedChanged (this,
+        &PlEditFrame::on_cb_ai_changed));
 
-    la_keys = LabelFactory::create (pa_inner,
-        "klavesy:",
-        la_keys_parms,
-        "la_keys");
-    kg_left = KeyGraberFactory::create (pa_inner,
-        "vlevo: ",
+    la_distance = LabelFactory::create (this,
+        _("vision distance"),
+        la_distance_parms,
+        "la_distance");
+    sa_distance = ScaleFactory::create (this,
+        1,
+        16,
+        sa_distance_parms,
+        "sa_distance");
+    sa_distance->set_min (10);
+    sa_distance->set_max (160);
+
+    cb_jump = CheckboxFactory::create (this,
+        _("can jump"),
+        cb_jump_parms,
+        "cb_jump");
+
+    la_keys = LabelFactory::create (this, _("keys:"), la_keys_parms, "la_keys");
+    kg_left = KeyGraberFactory::create (this,
+        _("left: "),
         kg_left_parms,
         "btn_left");
-    kg_right = KeyGraberFactory::create (pa_inner,
-        "vpravo: ",
+    kg_right = KeyGraberFactory::create (this,
+        _("right: "),
         kg_right_parms,
         "btn_right");
-    kg_jump = KeyGraberFactory::create (pa_inner,
-        "skok: ",
+    kg_jump = KeyGraberFactory::create (this,
+        _("jump: "),
         kg_jump_parms,
         "btn_jump");
 
-    btn_save = ButtonFactory::create (this, "uloz", btn_save_parms, "btn_save");
-    btn_save->register_on_clicked (OnClicked (this,
-        &PlEditFrame::on_btn_save_clicked));
-    btn_back = ButtonFactory::create (this, "zpet", btn_back_parms, "btn_back");
+    btn_back = LabelButtonFactory::create (this,
+        _("back to menu"),
+        btn_back_parms,
+        "btn_back");
     btn_back->register_on_clicked (OnClicked (this,
         &PlEditFrame::on_btn_back_clicked));
 
-    cb_ai->add_item ("zadny");
+    cb_ai->add_item ("gen 0");
 
-    cb_profil->add_item ("zadny");
+    cb_profil->add_item (_("(none)"));
     for (size_t pi = 0; pi < audio.get_profiles_count (); pi++) {
         cb_profil->add_item (audio.get_profile (pi).name);
     }
@@ -289,8 +303,8 @@ void PlEditFrame::init_control (Control* par) {
 void PlEditFrame::preapare () {
     cb_select->clear ();
 
-    cb_select->add_item ("novy", 0xffffffff);
-    cb_select->add_item ("novy plastik", 0xffffffff);
+    cb_select->add_item (_("new player"), 0xffffffff);
+    cb_select->add_item (_("new ai"), 0xffffffff);
 
     for (size_t pi = 0; pi < pl_infos.count (); pi++) {
         const PlInfo& info = pl_infos[pi];
@@ -310,7 +324,7 @@ void PlEditFrame::on_btn_del_clicked (Control* ctl) {
     }
 }
 
-void PlEditFrame::on_btn_save_clicked (Control* ctl) {
+void PlEditFrame::save_actual_player () {
     PlInfo info;
 
     info.type = pl_type;
@@ -327,11 +341,16 @@ void PlEditFrame::on_btn_save_clicked (Control* ctl) {
             info.keys.right = kg_right->get_key ();
             info.keys.jump = kg_jump->get_key ();
         } else {
-            //info.ai.id = cb_ai->get_selected ();
+            info.ai.gen = cb_ai->get_selected ();
+            switch (info.ai.gen) {
+            case AI_GEN_0:
+                info.ai.gen0.distance = sa_distance->get_value ();
+                info.ai.gen0.jump = cb_jump->is_checked ();
+                break;
+            }
         }
 
-        int index = cb_select->get_selected ();
-        switch (index) {
+        switch (selected) {
         case 0:
             pl_infos.add (info);
             cb_select->insert_item (pl_infos.players_count () + 1,
@@ -345,14 +364,15 @@ void PlEditFrame::on_btn_save_clicked (Control* ctl) {
             cb_select->set_selected (cb_select->get_items_count () - 1);
             break;
         default:
-            pl_infos[index - 2] = info;
-            cb_select->update_item (index, info.name, trans (info.color));
+            pl_infos[selected - 2] = info;
+            cb_select->update_item (selected, info.name, trans (info.color));
             break;
         }
     }
 }
 
 void PlEditFrame::on_btn_back_clicked (Control* ctl) {
+    save_actual_player ();
     app.switch_to_start_frame ();
     app.get_game_frame ().update_players ();
 }
@@ -363,8 +383,19 @@ void PlEditFrame::on_sa_color_changed (Scale* ctl, int value) {
     pa_color->set_background (trans (color));
 }
 
+void PlEditFrame::on_cb_ai_changed (Combobox* ctl, int value) {
+    la_distance->set_visible (value == AI_GEN_0);
+    sa_distance->set_visible (value == AI_GEN_0);
+    cb_jump->set_visible (value == AI_GEN_0);
+}
+
 void PlEditFrame::on_cb_select_changed (Combobox* ctl, int value) {
     if (value != -1) {
+        if (selected != -1) {
+            save_actual_player ();
+        }
+        selected = value;
+
         switch (value) {
         case 0:
             pl_type = PT_Human;
@@ -387,6 +418,8 @@ void PlEditFrame::on_cb_select_changed (Combobox* ctl, int value) {
             cb_profil->set_selected (0);
             sa_pitch->set_value (10);
             cb_ai->set_selected (0);
+            sa_distance->set_value (sa_distance->get_max ());
+            cb_jump->set_checked (true);
             break;
         default:
             const PlInfo& info = pl_infos[value - 2];
@@ -410,7 +443,15 @@ void PlEditFrame::on_cb_select_changed (Combobox* ctl, int value) {
                 kg_right->set_key (info.keys.right);
                 kg_jump->set_key (info.keys.jump);
             } else {
-                //cb_ai->set_selected (info.ai.id);
+                cb_ai->set_selected (info.ai.gen);
+                switch (info.ai.gen) {
+                case AI_GEN_0:
+                    sa_distance->set_value (info.ai.gen0.distance);
+                    sa_distance->set_visible (true);
+                    cb_jump->set_checked (info.ai.gen0.jump);
+                    cb_jump->set_visible (true);
+                    break;
+                }
             }
             break;
         }
@@ -423,11 +464,11 @@ void PlEditFrame::on_cb_select_changed (Combobox* ctl, int value) {
         la_ai->set_visible (pl_type == PT_AI);
         cb_ai->set_visible (pl_type == PT_AI);
 
-        /*if (pl_type == PT_Human) {
-         btn_left->set_text ("left: " + to_string<int>(key_left));
-         btn_right->set_text ("right: " + to_string<int>(key_right));
-         btn_jump->set_text ("jump: " + to_string<int>(key_jump));
-         }*/
+        if (pl_type != PT_AI) {
+            la_distance->set_visible (false);
+            sa_distance->set_visible (false);
+            cb_jump->set_visible (false);
+        }
     }
 }
 
