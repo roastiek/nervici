@@ -55,6 +55,8 @@ protected:
     void on_clicked ();
 
     bool process_key_pressed_event (const SDL_KeyboardEvent& event);
+    
+    void process_mouse_button_event (const SDL_MouseButtonEvent& event);
 
     void on_focus_gained ();
 

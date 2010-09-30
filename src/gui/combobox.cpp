@@ -176,6 +176,20 @@ bool Combobox::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     return Control::process_key_pressed_event (event);
 }
 
+void Combobox::process_mouse_button_event (const SDL_MouseButtonEvent& event) {
+    if (event.state == SDL_PRESSED) {
+        switch (event.button) {
+        case SDL_BUTTON_WHEELDOWN:
+            select_down ();
+            break;
+        case SDL_BUTTON_WHEELUP:
+            select_up ();
+            break;
+        }
+    }
+    InputControl::process_mouse_button_event (event);
+}
+
 void Combobox::on_focus_gained () {
     set_frame (NC_FOCUSED);
     Control::on_focus_gained ();
