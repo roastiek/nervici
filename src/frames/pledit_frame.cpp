@@ -189,14 +189,11 @@ static const ControlParameters frame_parms = {
 //soutretid mysl a delo/hu
 
 PlEditFrame::PlEditFrame () :
-    Control (frame_parms) {
+    Frame (frame_parms) {
 }
 
 void PlEditFrame::init_control (Control* par) {
-    Control::init_control (par);
-
-    set_frame (0);
-    set_background (C_SCREEN_BACKGROUND);
+    Frame::init_control (par);
 
     pa_inner = PanelFactory::create (this, pa_inner_parms, "pa_inner");
 
@@ -434,9 +431,9 @@ void PlEditFrame::on_cb_select_changed (Combobox* ctl, int value) {
     }
 }
 
-PlEditFrame* PlEditFrame::create_frame (Control* parent) {
+PlEditFrame* PlEditFrameFactory::create (Control* parent) {
     PlEditFrame* result = new PlEditFrame ();
-    result->set_name ("pl edit frame");
+    result->set_name ("pledit_frame");
     result->init_control (parent);
     result->show_all ();
     return result;

@@ -36,7 +36,7 @@ void App::init_gui () {
 
     start_frame = StartFrameFactory::create (screen);
     game_frame = GameFrameFactory::create (screen);
-    pledit_frame = PlEditFrame::create_frame (screen);
+    pledit_frame = PlEditFrameFactory::create (screen);
     options_frame = OptionsFrameFactory::create (screen);
 
     start_frame->set_visible (false);

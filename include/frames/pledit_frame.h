@@ -8,7 +8,7 @@
 #ifndef PLEDIT_FRAME_H
 #define	PLEDIT_FRAME_H
 
-#include "gui/control.h"
+#include "gui/frame.h"
 #include "settings/pl_type.h"
 #include "fakes/gui/combobox.h"
 #include "fakes/gui/button.h"
@@ -18,7 +18,7 @@
 #include "fakes/gui/panel.h"
 #include "fakes/gui/key_graber.h"
 
-class PlEditFrame: public Control {
+class PlEditFrame: public Frame {
 private:
     Panel* pa_inner;
     Combobox* cb_select;
@@ -61,9 +61,14 @@ protected:
 
 public:
 
-    static PlEditFrame* create_frame (Control* parent);
-
     void preapare ();
+    
+    friend class PlEditFrameFactory; 
+};
+
+class PlEditFrameFactory {
+public:
+    static PlEditFrame* create (Control* parent);
 };
 
 #endif	/* PLEDIT_FRAME_H */
