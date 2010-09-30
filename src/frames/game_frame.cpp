@@ -647,6 +647,9 @@ void GameFrame::load_mod (const Mod& mod) {
                 ustring ("smile") + int_to_string (si) + "-"
                         + int_to_string (li),
                 mod.spec.default_smiles.counts[si][li]));
+            sc_smiles[si][li]->set_smile_enabled (set.read_int (mod.name,
+                ustring ("smile_enabled") + int_to_string (si) + "-"
+                        + int_to_string (li), true));
         }
     }
 
@@ -744,6 +747,10 @@ void GameFrame::save_state () {
         for (int li = 0; li < 3; li++) {
             set.write_int (mod_name, ustring ("smile") + int_to_string (si)
                     + "-" + int_to_string (li), sc_smiles[si][li]->get_value ());
+            set.write_int (mod_name,
+                ustring ("smile_enabled") + int_to_string (si) + "-"
+                        + int_to_string (li),
+                sc_smiles[si][li]->is_smile_enabled ());
         }
     }
 }
