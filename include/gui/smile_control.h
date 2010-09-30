@@ -24,7 +24,7 @@ private:
     int count;
 
     int step;
-    
+
     int bar_height;
 
     void update_value (int y);
@@ -47,8 +47,8 @@ protected:
 
     bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
-public:
     void reinitialize ();
+public:
 
     virtual void set_value (int val);
 

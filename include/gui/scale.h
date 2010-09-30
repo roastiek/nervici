@@ -62,9 +62,9 @@ protected:
 
     void process_mouse_move_event (const SDL_MouseMotionEvent& event);
 
-public:
-
     void reinitialize ();
+
+public:
 
     virtual void on_value_changed (int val);
 

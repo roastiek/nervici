@@ -139,6 +139,14 @@ public:
     void free_players ();
 
     void play_effect (plid_tu plid, EffectType effect);
+    
+    int get_sound_volume () const;
+
+    void set_sound_volume (int value);
+    
+    int get_music_volume () const;
+    
+    void set_music_volume (int value); 
 
     static AudioOpenAL& get_instance ();
 };
@@ -345,6 +353,8 @@ void AudioOpenAL::music_play (MusicType type) {
     if (music_is_playing ()) {
         if (music_type == type)
             return;
+    } else {
+        logger.fineln("update: not playing music");
     }
 
     music_stop ();
@@ -358,6 +368,7 @@ void AudioOpenAL::music_play (MusicType type) {
 
             break;
         }
+        logger.fineln("queueing buffer");
         alSourceQueueBuffers (music_source, 1, &music_buffers[bi]);
     }
 
@@ -669,6 +680,27 @@ void AudioOpenAL::play_effect (plid_tu plid, EffectType effect) {
 
             alSourcePlay (source);
         }
+    }
+}
+
+int AudioOpenAL::get_sound_volume() const {
+    return setting.sound;
+}
+
+void AudioOpenAL::set_sound_volume(int value) {
+    if (setting.sound != value) {
+        setting.sound = value;
+    }
+}
+
+int AudioOpenAL::get_music_volume() const {
+    return setting.music;
+}
+
+void AudioOpenAL::set_music_volume(int value) {
+    if (setting.music != value) {
+        setting.music = value;
+        alSourcef (music_source, AL_GAIN, setting.music / 20.0);
     }
 }
 

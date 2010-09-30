@@ -91,6 +91,8 @@ bool MplayerDecoder::open (const Glib::ustring& filename) {
             frequency = ((header[27] * 256 + header[26]) * 256 + header[25])
                     * 256 + header[24];
 
+            logger.fineln ("wav header readed");
+
             return true;
         } catch (IOChannelError) {
         } catch (FileError) {
@@ -156,8 +158,9 @@ double MplayerDecoder::get_length (const Glib::ustring& filename) {
     cmd = set.read_string_list ("audio", "info_cmd", cmd);
     cmd.push_back (filename);
 
-    ustring length_pattern = set.read_string ("audio", "length_pattern",
-            "ID_LENGTH=([0-9]+\\.[0-9]+)");
+    ustring length_pattern = set.read_string ("audio",
+        "length_pattern",
+        "ID_LENGTH=([0-9]+\\.[0-9]+)");
     RefPtr<Regex> pat = Regex::create (length_pattern);
 
     Pid info_pid;

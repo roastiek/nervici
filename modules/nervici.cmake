@@ -49,6 +49,7 @@ set (NERVICI_SOURCES
     src/gui/key_graber.cpp
     src/gui/label_button.cpp
     src/gui/frame.cpp
+    src/gui/checkbox.cpp
     src/frames/start_frame.cpp 
     src/frames/game_frame.cpp 
     src/frames/pledit_frame.cpp

@@ -15,6 +15,7 @@
 #include "frames/start_frame.h"
 #include "frames/game_frame.h"
 #include "frames/pledit_frame.h"
+#include "frames/options_frame.h"
 
 #include "app.h"
 
@@ -34,20 +35,23 @@ App::App () :
 void App::init_gui () {
     SDL_SetEventFilter (paint_filter);
 
-    screen = render.create_screen ("nervici");
-    Control::screen = screen;
+    screen = render.get_screen ();
+    screen->set_ignore_updates(true);
     screen->show_all ();
 
     start_frame = StartFrameFactory::create (screen);
     game_frame = GameFrameFactory::create (screen);
     pledit_frame = PlEditFrame::create_frame (screen);
+    options_frame = OptionsFrameFactory::create (screen);
 
     start_frame->set_visible (false);
     game_frame->set_visible (false);
     pledit_frame->set_visible (false);
+    options_frame->set_visible (false);
 
     SDL_SetEventFilter (NULL);
-    screen->invalidate ();
+    //screen->invalidate ();
+    screen->set_ignore_updates(false);
 
     switch_to_start_frame ();
 }
@@ -82,7 +86,7 @@ bool App::initialize () {
 
 void App::uninitialize () {
     logger.fineln ("uninitialize whole program");
-    delete screen;
+    //delete screen;
 
     audio.music_stop ();
 
@@ -143,5 +147,9 @@ void App::switch_to_game_frame () {
 
 void App::switch_to_pledit_frame () {
     switch_to_frame (pledit_frame);
+}
+
+void App::switch_to_options_frame () {
+    switch_to_frame (options_frame);
 }
 

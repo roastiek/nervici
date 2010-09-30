@@ -21,11 +21,11 @@ private:
     Control* content;
 
     Scrollbar* bar;
-    
+
     bool ignore_content_y_changed;
 
     bool ignore_bar_value_changed;
-    
+
     const ScrollbarParameters bar_parms;
 
     static ControlParameters view_parms;
@@ -54,9 +54,10 @@ protected:
     void on_height_changed (int value);
 
     void process_mouse_button_event (const SDL_MouseButtonEvent& event);
-    
-public:
+
     void reinitialize ();
+
+public:
 
     bool is_focusable () const;
 

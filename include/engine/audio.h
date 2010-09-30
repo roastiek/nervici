@@ -36,6 +36,14 @@ public:
     size_t get_profiles_count () const;
 
     const SoundProfile& get_profile (size_t id) const;
+
+    virtual int get_sound_volume () const = 0;
+    
+    virtual void set_sound_volume (int value) = 0;
+    
+    virtual int get_music_volume () const = 0;
+    
+    virtual void set_music_volume (int value) = 0; 
 };
 
 extern Audio& audio;

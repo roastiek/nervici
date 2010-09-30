@@ -2,6 +2,7 @@
 #include "gui/label_button.h"
 #include "frames/game_frame.h"
 #include "frames/pledit_frame.h"
+#include "frames/options_frame.h"
 
 #include "frames/start_frame.h"
 
@@ -48,14 +49,12 @@ StartFrame::StartFrame () :
 }
 
 void StartFrame::init_control (Control* par) {
-    Control::init_control (par);
+    Frame::init_control (par);
 
     LabelButton* btn_new_game = LabelButtonFactory::create (this,
         _("new game"),
         btn_new_game_parms,
         "btn_new_game");
-
-    //btn_new_game->set_background (0x00);
 
     btn_new_game->register_on_clicked (OnClicked (this,
         &StartFrame::btn_new_game_clicked));
@@ -85,9 +84,6 @@ void StartFrame::init_control (Control* par) {
     btn_pledit->set_neighbours (btn_new_game, NULL, NULL, btn_options);
     btn_options->set_neighbours (btn_pledit, NULL, NULL, btn_quit);
     btn_quit->set_neighbours (btn_options, NULL, NULL, btn_new_game);
-
-    set_background (0x20);
-    set_frame (0x00);
 }
 
 void StartFrame::btn_new_game_clicked (Control* ctl) {
@@ -105,7 +101,8 @@ void StartFrame::btn_quit_clicked (Control* ctl) {
 }
 
 void StartFrame::btn_options_clicked (Control* ctl) {
-
+    app.switch_to_options_frame ();
+    app.get_options_frame ().prepare ();
 }
 
 StartFrame* StartFrameFactory::create (Control* par) {

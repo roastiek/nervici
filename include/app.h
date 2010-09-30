@@ -11,6 +11,7 @@
 #include "fakes/start_frame.h"
 #include "fakes/game_frame.h"
 #include "fakes/pledit_frame.h"
+#include "fakes/options_frame.h"
 #include "fakes/gui/control.h"
 #include "fakes/gui/screen.h"
 
@@ -26,6 +27,8 @@ private:
     GameFrame* game_frame;
 
     PlEditFrame* pledit_frame;
+    
+    OptionsFrame* options_frame;
 
     bool abort;
 
@@ -54,6 +57,8 @@ public:
 
     void switch_to_pledit_frame ();
 
+    void switch_to_options_frame ();
+
     const StartFrame& get_start_frame () const;
 
     StartFrame& get_start_frame ();
@@ -65,6 +70,10 @@ public:
     const PlEditFrame& get_pledit_frame () const;
 
     PlEditFrame& get_pledit_frame ();
+
+    const OptionsFrame& get_options_frame () const;
+
+    OptionsFrame& get_options_frame ();
 
     bool is_aborted () const;
     
@@ -103,6 +112,14 @@ inline const PlEditFrame& App::get_pledit_frame () const {
 
 inline PlEditFrame& App::get_pledit_frame () {
     return *pledit_frame;
+}
+
+inline const OptionsFrame& App::get_options_frame () const {
+    return *options_frame;
+}
+
+inline OptionsFrame& App::get_options_frame () {
+    return *options_frame;
 }
 
 

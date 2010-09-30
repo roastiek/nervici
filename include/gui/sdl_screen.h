@@ -17,14 +17,16 @@ private:
     
     SDL_Surface* primary;
     
+    bool ignore_updates;
+    
 protected:
     void reinitialize ();
 
     void update (Clip* scrvas);
 
-    int get_screen_width () const;
+//    int get_screen_width () const;
 
-    int get_screen_height () const;
+//    int get_screen_height () const;
 
 public:
 
@@ -32,7 +34,16 @@ public:
 
     void process_event (const SDL_Event& event);
 
-    friend class SDLRender;
+    void set_surface (SDL_Surface* value);
+    
+    void set_ignore_updates (bool value);
+
+    friend class SDLScreenFactory;
+};
+
+class SDLScreenFactory {
+public:
+    static SDLScreen* create (SDL_Surface* primary);
 };
 
 #endif /* SDL_SCREEN_H_ */

@@ -69,9 +69,10 @@ protected:
     void on_focus_lost ();
 
     void on_height_changed (int value);
+
+    void reinitialize ();
     
 public:
-    void reinitialize ();
 
     virtual void register_on_value_changed (const OnValueChanged& handler);
 

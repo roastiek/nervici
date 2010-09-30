@@ -41,8 +41,9 @@ protected:
 
     bool process_key_pressed_event (const SDL_KeyboardEvent& event);
 
-public:
     void reinitialize ();
+
+public:
 
     virtual void clear ();
 

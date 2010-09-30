@@ -14,8 +14,11 @@ class Frame: public Control {
 protected:
     Frame (const ControlParameters& parms);
 
-public:
+    void init_control (Control* par);
+
     void reinitialize ();
+    
+public:
 
     bool is_focusable () const;
 

@@ -226,7 +226,7 @@ static const char* render_speed (float value) {
 }
 
 void GameFrame::init_control (Control* par) {
-    Control::init_control (par);
+    Frame::init_control (par);
 
     update_team_colors ();
 
@@ -379,9 +379,6 @@ void GameFrame::init_control (Control* par) {
 
     update_mods ();
     update_players ();
-
-    set_background (0x20);
-    set_frame (0);
 
     init_neighbours ();
 }
@@ -753,7 +750,7 @@ void GameFrame::save_state () {
 
 GameFrame* GameFrameFactory::create (Control* par) {
     GameFrame* result = new GameFrame ();
-    result->set_name ("game frame");
+    result->set_name ("game_frame");
     result->init_control (par);
     result->show_all ();
     return result;

@@ -4,7 +4,7 @@
 
 #include "gui/screen.h"
 
-ControlParameters Screen::parms = ControlParameters (0, 0, 0, 0, 10);
+ControlParameters Screen::parms = ControlParameters (0, 0, STANDARD_WIDTH, STANDARD_HEIGHT, 10);
 
 Screen::Screen () :
     Control (parms), be_clicked (NULL), mouse_target (NULL), popup (NULL),

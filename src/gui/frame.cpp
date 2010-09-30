@@ -11,6 +11,13 @@ Frame::Frame (const ControlParameters& parms) :
     Control (parms) {
 }
 
+void Frame::init_control (Control* par) {
+    Control::init_control (par);
+
+    set_background (0x20);
+    set_frame (0);
+}
+
 void Frame::reinitialize() {
     Control::reinitialize ();
     set_y ((screen->get_height () - get_height ()) / 2);

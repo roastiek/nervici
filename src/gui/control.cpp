@@ -68,8 +68,12 @@ void Control::reinitialize () {
     set_y (p.y * sw / STANDARD_WIDTH);
     set_font_size (p.font_size * sw / STANDARD_WIDTH);
 
+}
+
+void Control::reinitialize_children () {
     for (Control* child = first_child; child != NULL; child = child->next) {
         child->reinitialize ();
+        child->reinitialize_children ();
     }
 }
 
@@ -351,32 +355,36 @@ bool Control::process_key_pressed_event (const SDL_KeyboardEvent& event) {
     switch (event.keysym.sym) {
     case SDLK_LEFT:
         for (Control* focus = west; focus != NULL; focus = focus->west) {
-            if (focus->is_visible() && focus->is_enabled() && focus->is_focusable()) {
-                focus->grab_focus();
+            if (focus->is_visible () && focus->is_enabled ()
+                    && focus->is_focusable ()) {
+                focus->grab_focus ();
                 return true;
             }
         }
         break;
     case SDLK_UP:
         for (Control* focus = north; focus != NULL; focus = focus->north) {
-            if (focus->is_visible() && focus->is_enabled() && focus->is_focusable()) {
-                focus->grab_focus();
+            if (focus->is_visible () && focus->is_enabled ()
+                    && focus->is_focusable ()) {
+                focus->grab_focus ();
                 return true;
             }
         }
         break;
     case SDLK_RIGHT:
         for (Control* focus = east; focus != NULL; focus = focus->east) {
-            if (focus->is_visible() && focus->is_enabled() && focus->is_focusable()) {
-                focus->grab_focus();
+            if (focus->is_visible () && focus->is_enabled ()
+                    && focus->is_focusable ()) {
+                focus->grab_focus ();
                 return true;
             }
         }
         break;
     case SDLK_DOWN:
         for (Control* focus = south; focus != NULL; focus = focus->south) {
-            if (focus->is_visible() && focus->is_enabled() && focus->is_focusable()) {
-                focus->grab_focus();
+            if (focus->is_visible () && focus->is_enabled ()
+                    && focus->is_focusable ()) {
+                focus->grab_focus ();
                 return true;
             }
         }

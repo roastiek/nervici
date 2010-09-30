@@ -239,10 +239,13 @@ protected:
 
     virtual void process_mouse_move_event (const SDL_MouseMotionEvent& event);
 
+    virtual void reinitialize ();
+
+    virtual void reinitialize_children ();
+
 public:
     virtual ~Control ();
 
-    virtual void reinitialize ();
 
     virtual void invalidate ();
 

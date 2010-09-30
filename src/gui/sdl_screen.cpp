@@ -14,7 +14,7 @@
 #include "gui/sdl_screen.h"
 
 SDLScreen::SDLScreen (SDL_Surface* prim) :
-    Screen (), off_face (NULL), primary (prim) {
+    Screen (), off_face (NULL), primary (prim), ignore_updates (false) {
 
 }
 
@@ -41,9 +41,10 @@ void SDLScreen::process_event (const SDL_Event& event) {
     switch (event.type) {
     case E_PAINT: {
         SDL_Rect* area = static_cast<SDL_Rect*> (event.user.data1);
-        SDLClip clip (off_face, area->w, area->h, area->x, area->y);
-
-        update (&clip);
+        if (!ignore_updates) {
+            SDLClip clip (off_face, area->w, area->h, area->x, area->y);
+            update (&clip);
+        }
 
         delete area;
         break;
@@ -68,11 +69,38 @@ void SDLScreen::update (Clip* scrvas) {
     SDL_UpdateRects (primary, 1, &dest);
 }
 
-int SDLScreen::get_screen_width () const {
-    return primary->w;
+void SDLScreen::set_surface (SDL_Surface* value) {
+    primary = value;
+    set_ignore_updates (true);
+    reinitialize ();
+    reinitialize_children ();
+    set_ignore_updates (false);
 }
 
-int SDLScreen::get_screen_height () const {
-    return primary->h;
+void SDLScreen::set_ignore_updates (bool value) {
+    if (ignore_updates != value) {
+        ignore_updates = value;
+        if (!ignore_updates) {
+            SDL_Rect *area = new SDL_Rect;
+            SDL_Event event;
+
+            area->x = 0;
+            area->y = 0;
+            area->w = get_width ();
+            area->h = get_height ();
+
+            event.user.type = E_PAINT;
+            event.user.data1 = area;
+            SDL_PushEvent (&event);
+        }
+    }
 }
 
+SDLScreen* SDLScreenFactory::create (SDL_Surface* primary) {
+    SDLScreen* result = new SDLScreen (primary);
+    Control::screen = result;
+    result->set_name ("nervici");
+    result->init_control (NULL);
+
+    return result;
+}

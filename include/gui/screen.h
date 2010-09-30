@@ -39,6 +39,8 @@ public:
     ~Screen ();
 
     virtual void process_event (const SDL_Event& event);
+    
+    virtual void set_ignore_updates (bool value) = 0;
 
     bool is_focusable () const;
 };
