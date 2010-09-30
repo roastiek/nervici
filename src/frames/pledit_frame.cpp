@@ -298,6 +298,26 @@ void PlEditFrame::init_control (Control* par) {
     for (size_t pi = 0; pi < audio.get_profiles_count (); pi++) {
         cb_profil->add_item (audio.get_profile (pi).name);
     }
+
+    init_neighbours ();
+}
+
+void PlEditFrame::init_neighbours () {
+    cb_select->set_neighbours (btn_back, btn_del, btn_del, te_name);
+    btn_del->set_neighbours (btn_back, cb_select, cb_select, te_name);
+    te_name->set_neighbours (cb_select, NULL, NULL, sa_red);
+    sa_red->set_neighbours (te_name, NULL, NULL, sa_green);
+    sa_green->set_neighbours (sa_red, NULL, NULL, sa_blue);
+    sa_blue->set_neighbours (sa_green, NULL, NULL, cb_profil);
+    cb_profil->set_neighbours (sa_blue, NULL, NULL, sa_pitch);
+    sa_pitch->set_neighbours (cb_profil, NULL, NULL, kg_left);
+    kg_left->set_neighbours (sa_pitch, kg_jump, kg_right, cb_ai);
+    kg_right->set_neighbours (sa_pitch, kg_left, kg_jump, cb_ai);
+    kg_jump->set_neighbours (sa_pitch, kg_right, kg_left, cb_ai);
+    cb_ai->set_neighbours (kg_left, NULL, NULL, sa_distance);
+    sa_distance->set_neighbours (cb_ai, NULL, NULL, cb_jump);
+    cb_jump->set_neighbours (sa_distance, NULL, NULL, btn_back);
+    btn_back->set_neighbours (cb_jump, NULL, NULL, cb_select);
 }
 
 void PlEditFrame::preapare () {

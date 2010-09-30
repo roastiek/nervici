@@ -61,6 +61,8 @@ private:
 
     void on_cb_ai_changed (Combobox* ctl, int value);
 
+    void init_neighbours ();
+    
 protected:
     PlEditFrame ();
 
