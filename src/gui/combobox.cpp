@@ -111,30 +111,34 @@ void Combobox::paint () {
 }
 
 void Combobox::on_clicked () {
-    int real_y = get_y ();
-    for (Control* par = get_parent (); par != NULL; par = par->get_parent ()) {
-        real_y += par->get_y ();
+    if (port->get_parent () == NULL) {
+
+        int real_y = get_y ();
+        for (Control* par = get_parent (); par != NULL; par
+                = par->get_parent ()) {
+            real_y += par->get_y ();
+        }
+        int remain = screen->get_height () - (real_y + get_height () + 1 + 4);
+
+        int items_count =
+                (16 > list->get_items_count ()) ? list->get_items_count () : 16;
+        int list_min_height = items_count * list->get_item_height ();
+
+        if (list->get_height () < list_min_height) {
+            list->set_height (list_min_height);
+        }
+
+        list_min_height += 2;
+
+        port->set_x (-1);
+        port->set_y (get_height () + 1);
+        port->set_width (get_width () + 2);
+        port->set_height ((remain > list_min_height) ? list_min_height : remain);
+
+        list->set_selected (get_selected ());
+
+        show_popup (port, this);
     }
-    int remain = screen->get_height () - (real_y + get_height () + 1 + 4);
-
-    int items_count =
-            (16 > list->get_items_count ()) ? list->get_items_count () : 16;
-    int list_min_height = items_count * list->get_item_height ();
-
-    if (list->get_height () < list_min_height) {
-        list->set_height (list_min_height);
-    }
-
-    list_min_height += 2;
-
-    port->set_x (-1);
-    port->set_y (get_height () + 1);
-    port->set_width (get_width () + 2);
-    port->set_height ((remain > list_min_height) ? list_min_height : remain);
-
-    list->set_selected (get_selected ());
-
-    show_popup (port, this);
 
     Control::on_clicked ();
 }
