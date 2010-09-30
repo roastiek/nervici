@@ -14,8 +14,11 @@ class KeyGraber: public Button {
 
 private:
     int key;
+    
     Glib::ustring text;
 
+    void format_text ();
+    
 protected:
     KeyGraber (const ControlParameters& parms);
 
@@ -27,9 +30,9 @@ public:
 
     virtual void set_key (int value);
 
-    void set_text (const Glib::ustring& value);
+    virtual void set_text_part (const Glib::ustring& value);
 
-    const Glib::ustring& get_text () const;
+    virtual const Glib::ustring& get_text_part () const;
 
     friend class KeyGraberFactory;
 };

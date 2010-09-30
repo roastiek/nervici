@@ -19,7 +19,7 @@
 
 #include "frames/pledit_frame.h"
 
-#define FRAME_WIDTH 200
+#define FRAME_WIDTH 300
 
 static const ListboxParameters cb_select_parms = {
     16,

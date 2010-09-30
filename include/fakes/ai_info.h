@@ -5,6 +5,6 @@
  *      Author: bobo
  */
 
-#ifndef AIInfo;
+#ifndef AIInfo
 struct AIInfo;
 #endif 

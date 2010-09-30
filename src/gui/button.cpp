@@ -38,7 +38,6 @@ bool Button::process_key_pressed_event (const SDL_KeyboardEvent& event) {
 }
 
 void Button::paint () {
-    canvas->clear ();
     canvas->fill_background (get_background ());
     canvas->draw_text (0,
         0,
@@ -50,12 +49,12 @@ void Button::paint () {
 }
 
 void Button::on_focus_gained () {
-    set_frame (C_FOC_FOREGROUND);
+    set_frame (NC_FOCUSED);
     Control::on_focus_gained ();
 }
 
 void Button::on_focus_lost () {
-    set_frame (C_FOREGROUND);
+    set_frame (NC_HIGHGROUND);
     Control::on_focus_lost ();
 }
 
