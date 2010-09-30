@@ -3,7 +3,9 @@
 
 #include <vector>
 
+#include "fakes/ai_info.h"
 #include "fakes/pl_info.h"
+#include "fakes/glibmm_decl.h"
 
 class PlInfos {
 private:
@@ -25,6 +27,10 @@ private:
     void save_players ();
 
     void save_ais ();
+    
+    void load_ai (AIInfo& info, const Glib::ustring& section);
+    
+    void save_ai (const AIInfo& info, const Glib::ustring& section);
 
 public:
     void load ();

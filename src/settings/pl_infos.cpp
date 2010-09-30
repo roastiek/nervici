@@ -16,17 +16,17 @@ using namespace std;
 #define DEFAULT_AI_COUNT 11
 
 static PlInfo def_ais[DEFAULT_AI_COUNT] = {
-    PlInfo (0x6600ff, "Bunnie", 0, "mucha", 1),
-    PlInfo (0x00cc00, "Feeze", 0, "mucha", 1),
-    PlInfo (0x66ffff, "Dyzzi", 0, "mucha", 1),
-    PlInfo (0x6666ff, "Mexx", 0, "mucha", 1),
-    PlInfo (0x999900, "Mr. Magor", 0, "mucha", 1),
-    PlInfo (0x99ccff, "Der Křeček", 0, "mucha", 1),
-    PlInfo (0x0066ff, "Butterflyek", 0, "mucha", 1),
-    PlInfo (0xff3366, "cw. Orange", 0, "mucha", 1),
-    PlInfo (0xccffff, "Lemonie", 0, "mucha", 1),
-    PlInfo (0x66ff00, "Rabbyte", 0, "mucha", 1),
-    PlInfo (0x0099ff, "Mortzsche", 0, "mucha", 1)};
+    PlInfo (0x6600ff, "Bunnie", true, 160, "mucha", 1),
+    PlInfo (0x00cc00, "Feeze", true, 160, "mucha", 1),
+    PlInfo (0x66ffff, "Dyzzi", true, 160, "mucha", 1),
+    PlInfo (0x6666ff, "Mexx", true, 160, "mucha", 1),
+    PlInfo (0x999900, "Mr. Magor", true, 160, "mucha", 1),
+    PlInfo (0x99ccff, "Der Křeček", true, 160, "mucha", 1),
+    PlInfo (0x0066ff, "Butterflyek", true, 160, "mucha", 1),
+    PlInfo (0xff3366, "cw. Orange", true, 160, "mucha", 1),
+    PlInfo (0xccffff, "Lemonie", true, 160, "mucha", 1),
+    PlInfo (0x66ff00, "Rabbyte", true, 160, "mucha", 1),
+    PlInfo (0x0099ff, "Mortzsche", true, 160, "mucha", 1)};
 
 PlInfos PlInfos::instance;
 
@@ -79,7 +79,7 @@ void PlInfos::load_ais () {
         for (size_t pi = 0; pi < DEFAULT_AI_COUNT; pi++) {
             PlInfo* info = new PlInfo ();
             info->type = PT_AI;
-            info->ai.id = def_ais[pi].ai.id;
+            info->ai = def_ais[pi].ai;
             info->color = def_ais[pi].color;
             info->name = def_ais[pi].name;
             info->profil = def_ais[pi].profil;
@@ -91,13 +91,25 @@ void PlInfos::load_ais () {
             const ustring& section = sections[pi];
             PlInfo* info = new PlInfo ();
             info->type = PT_AI;
-            info->ai.id = set.read_int (section, "id", 0);
+            load_ai (info->ai, section);
             info->color = set.read_hex (section, "color", 0xff);
             info->name = set.read_string (section, "name", "none");
             info->profil = set.read_string (section, "profil", "");
             info->pitch = set.read_int (section, "pitch", 10);
             ais.push_back (info);
         }
+    }
+}
+
+void PlInfos::load_ai (AIInfo& info, const Glib::ustring& section) {
+    Setting& set = settings.ais ();
+    info.gen = set.read_int (section, "gen", 0);
+
+    switch (info.gen) {
+    case AI_GEN_0:
+        info.gen0.jump = set.read_int (section, "gen0_jump", false);
+        info.gen0.distance = set.read_int (section, "gen0_distance", 160);
+        break;
     }
 }
 
@@ -140,8 +152,20 @@ void PlInfos::save_ais () {
         set.write_hex (section, "color", info->color);
         set.write_string (section, "name", info->name);
         set.write_string (section, "profil", info->profil);
-        set.write_int (section, "ai", info->ai.id);
+        save_ai (info->ai, section);
         set.write_int (section, "pitch", info->pitch);
+    }
+}
+
+void PlInfos::save_ai (const AIInfo& info, const Glib::ustring& section) {
+    Setting& set = settings.ais ();
+    set.write_int (section, "gen", info.gen);
+
+    switch (info.gen) {
+    case AI_GEN_0:
+        set.write_int (section, "gen0_jump", info.gen0.jump);
+        set.write_int (section, "gen0_distance", info.gen0.distance);
+        break;
     }
 }
 

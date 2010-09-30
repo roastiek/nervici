@@ -28,11 +28,10 @@ using namespace Glib;
 #define MAX_TARGET_TRIES 40
 #define MAX_STEPS 160
 
-
 static ThreadPool* pool = NULL;
 
-AIGen0::AIGen0 (Player& pl) :
-    player (pl) {
+AIGen0::AIGen0 (Player& pl, const AIGen0Info& inf) :
+    player (pl), info (inf) {
 
     if (pool == NULL) {
         pool = new ThreadPool ();
@@ -66,7 +65,8 @@ void AIGen0::calc (int jumptime, plsize_tu head) {
     pool->push (sigc::mem_fun<void, AIGen0> (this, &AIGen0::work));
 }
 
-inline bool AIGen0::will_survive (const FPoint& pos, int jumptime,
+inline bool AIGen0::will_survive (const FPoint& pos,
+        int jumptime,
         plsize_tu head) {
     Point ipos;
 
@@ -94,29 +94,57 @@ void AIGen0::work () {
     Result res_right;
     Result test;
 
-    res_none = test_plan (player.get_position (), player.get_angle (),
-            calc_jumptime, calc_head, KS_None, 0);
-    
-    res_left = test_plan (player.get_position (), player.get_angle (),
-            calc_jumptime, calc_head, KS_Left, 10);
+    res_none = test_plan (player.get_position (),
+        player.get_angle (),
+        calc_jumptime,
+        calc_head,
+        KS_None,
+        0);
 
-    res_right = test_plan (player.get_position (), player.get_angle (),
-            calc_jumptime, calc_head, KS_Right, 10);
+    res_left = test_plan (player.get_position (),
+        player.get_angle (),
+        calc_jumptime,
+        calc_head,
+        KS_Left,
+        10);
 
-    test = test_plan (player.get_position (), player.get_angle (),
-            calc_jumptime, calc_head, KS_Left, 40);
+    res_right = test_plan (player.get_position (),
+        player.get_angle (),
+        calc_jumptime,
+        calc_head,
+        KS_Right,
+        10);
+
+    test = test_plan (player.get_position (),
+        player.get_angle (),
+        calc_jumptime,
+        calc_head,
+        KS_Left,
+        40);
     res_left = (res_left >= test) ? res_left : test;
 
-    test = test_plan (player.get_position (), player.get_angle (),
-            calc_jumptime, calc_head, KS_Right, 40);
+    test = test_plan (player.get_position (),
+        player.get_angle (),
+        calc_jumptime,
+        calc_head,
+        KS_Right,
+        40);
     res_right = (res_right >= test) ? res_right : test;
 
-    test = test_plan (player.get_position (), player.get_angle (),
-            calc_jumptime, calc_head, KS_Left, 80);
+    test = test_plan (player.get_position (),
+        player.get_angle (),
+        calc_jumptime,
+        calc_head,
+        KS_Left,
+        80);
     res_left = (res_left >= test) ? res_left : test;
 
-    test = test_plan (player.get_position (), player.get_angle (),
-            calc_jumptime, calc_head, KS_Right, 80);
+    test = test_plan (player.get_position (),
+        player.get_angle (),
+        calc_jumptime,
+        calc_head,
+        KS_Right,
+        80);
     res_right = (res_right >= test) ? res_right : test;
 
     if (res_none >= res_left && res_none >= res_right) {
@@ -197,8 +225,12 @@ smileid_tu AIGen0::find_closest_smile () {
     return result;
 }
 
-AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptime,
-        plsize_tu head, KeySt def, size_t distance) {
+AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos,
+        int angle,
+        int jumptime,
+        plsize_tu head,
+        KeySt def,
+        size_t distance) {
 
     FPoint pos = prev_pos;
     Result result;
@@ -211,12 +243,12 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptim
     FPoint jump_pos[11];
     int jump_angle[11];
     int jump_jumptime[11];
-    
+
     jump_pos[di] = prev_pos;
     jump_angle[di] = angle;
     jump_jumptime[di] = jumptime;
     bool jump_now = false;
-    
+
     while (di < 10 && !abort) {
         if (di <= distance && !jump_now) {
             switch (def) {
@@ -240,9 +272,10 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptim
             jump_now = false;
             result.jump_dist = di;
         } else {
-            jump_jumptime[di + 1] = (jump_jumptime[di] <= 1) ? 0 : jump_jumptime[di] - 1; 
+            jump_jumptime[di + 1] = (jump_jumptime[di] <= 1) ? 0
+                    : jump_jumptime[di] - 1;
         }
-        
+
         if (!will_survive (jump_pos[di + 1], jump_jumptime[di + 1], head + di)) {
             if (di % 2 == 0) {
                 if (jump_jumptime[di + 1] == 0) {
@@ -265,13 +298,13 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptim
         }
         di++;
     }
-    
+
     pos = jump_pos[10];
     angle = jump_angle[10];
     jumptime = jump_jumptime[10];
-    head+= 10;
+    head += 10;
 
-    for (; di < distance && di < MAX_STEPS && !abort; di+= 1) {
+    for (; di < distance && di < MAX_STEPS && !abort; di += 1) {
         if (jumptime > 0)
             jumptime--;
 
@@ -298,7 +331,7 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptim
         head++;
     }
 
-    for (; di < MAX_STEPS && !abort; di+= 2) {
+    for (; di < MAX_STEPS && !abort; di += 2) {
         if (jumptime > 0)
             jumptime--;
 
@@ -328,17 +361,17 @@ AIGen0::Result AIGen0::test_plan (const FPoint& prev_pos, int angle, int jumptim
     return result;
 }
 
-inline AIGen0::Result::Result(size_t d, double t) :
+inline AIGen0::Result::Result (size_t d, double t) :
     dist (d), target (t), jump_dist (MAX_STEPS) {
 
 }
 
 inline AIGen0::Result::Result () {
-    
+
 }
 
 inline void AIGen0::Result::min_target (double value) {
-    target = (target <= value) ? target : value; 
+    target = (target <= value) ? target : value;
 }
 
 inline bool AIGen0::Result::operator >= (const Result& other) const {

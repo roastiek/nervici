@@ -330,7 +330,7 @@ void PlEditFrame::on_btn_save_clicked (Control* ctl) {
             info.keys.right = kg_right->get_key ();
             info.keys.jump = kg_jump->get_key ();
         } else {
-            info.ai.id = cb_ai->get_selected ();
+            //info.ai.id = cb_ai->get_selected ();
         }
 
         int index = cb_select->get_selected ();
@@ -413,7 +413,7 @@ void PlEditFrame::on_cb_select_changed (Combobox* ctl, int value) {
                 kg_right->set_key (info.keys.right);
                 kg_jump->set_key (info.keys.jump);
             } else {
-                cb_ai->set_selected (info.ai.id);
+                //cb_ai->set_selected (info.ai.id);
             }
             break;
         }

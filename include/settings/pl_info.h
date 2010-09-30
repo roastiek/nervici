@@ -11,15 +11,12 @@
 #include <glibmm/ustring.h>
 
 #include "pl_type.h"
+#include "ais/ai_info.h"
 
 struct PlKeys {
     int left;
     int right;
     int jump;
-};
-
-struct AIInfo {
-    int id;
 };
 
 struct PlInfo {
@@ -35,8 +32,12 @@ struct PlInfo {
 
     PlInfo ();
 
-    PlInfo (uint32_t nc, const Glib::ustring& nn, int nai,
-            const Glib::ustring& np, int npi);
+    PlInfo (uint32_t nc,
+            const Glib::ustring& nn,
+            bool jump,
+            int distance,
+            const Glib::ustring& np,
+            int npi);
 };
 
 #endif	/* PL_INFO_H */

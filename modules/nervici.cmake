@@ -56,6 +56,7 @@ set (NERVICI_SOURCES
     src/frames/options_frame.cpp
     src/app.cpp
     src/main.cpp 
+    src/ais/ai.cpp
     src/ais/gen0.cpp
 )
 

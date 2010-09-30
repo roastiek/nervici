@@ -10,13 +10,12 @@
 
 #include <vector>
 
-#include "int_type.h"
 #include "fpoint.h"
 #include "point.h"
-#include "game/key_state.h"
-#include "fakes/player.h"
+#include "ai.h"
+#include "ai_info.h"
 
-class AIGen0 {
+class AIGen0 : public AI {
 private:
     struct Result {
         size_t dist;
@@ -54,6 +53,8 @@ private:
     
     int target_tries;
     
+    AIGen0Info info;
+    
     bool will_survive (const FPoint& pos, int jumptime, plsize_tu head);
 
     double target_distance (const FPoint& pos);
@@ -70,7 +71,7 @@ private:
             plsize_tu head, KeySt def, size_t distance);
     
 public:
-    AIGen0 (Player& player);
+    AIGen0 (Player& player, const AIGen0Info& info);
 
     void calc (int jumptime, plsize_tu head);
 

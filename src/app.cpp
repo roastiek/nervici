@@ -119,10 +119,13 @@ void App::hide_previous () {
 }
 
 void App::switch_to_frame (Control* frame) {
+    screen->set_ignore_updates (true);
     hide_previous ();
     frame->set_visible (true);
     frame->grab_focus ();
     active_frame = frame;
+    screen->process_events ();
+    screen->set_ignore_updates (false);
 }
 
 void App::switch_to_start_frame () {

@@ -16,13 +16,15 @@
 #include "game/teams.h"
 #include "game/start.h"
 #include "game/death_cause.h"
+#include "ais/ai.h"
 
 #include "game/player.h"
 
 using namespace std;
 using namespace Glib;
 
-void Player::write_body_part (const Point& pos, const Fields& fields,
+void Player::write_body_part (const Point& pos,
+        const Fields& fields,
         bool living) {
     world.write_player_head (pos, fields, id, head, living);
     add_part (pos);
@@ -56,7 +58,8 @@ Player::Player (plid_tu ID, Team& nteam, const PlInfo& ninfo, int max_len) :
     team.inc_state (state);
     ironize_lvl = 0;
 
-    ai = (info.type == PT_AI) ? new AIGen0 (*this) : NULL;
+    ai = AI::create (*this);
+    //    ai = (info.type == PT_AI) ? new AIGen0 (*this) : NULL;
 }
 
 Player::~Player () {

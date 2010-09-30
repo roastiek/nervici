@@ -12,7 +12,7 @@
 #include "fakes/point.h"
 #include "fakes/pl_info.h"
 #include "fakes/team.h"
-#include "ais/gen0.h"
+#include "fakes/ai.h"
 
 class Player: public IPlayer {
 private:
@@ -59,7 +59,7 @@ private:
 
     std::vector<Point> updates;
 
-    AIGen0* ai;
+    AI* ai;
     
     /*
      * add part to players body
