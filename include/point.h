@@ -1,8 +1,10 @@
 /* 
  * File:   point.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 22. červenec 2010, 16:27
+ * 
+ * Contains a point structure with integer coordinates.
  */
 
 #ifndef POINT_H
