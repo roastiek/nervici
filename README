@@ -1,0 +1,12 @@
+Nervici is a simple game in which players draw lines on the screen and try avoid collisions. Last one standing becomes the winner.
+
+Installation
+
+Before installation you need C++ compile (gcc), cmake and these libraries: SDL, SDL_image, SDL_gfx, SDL_pango, gettext, glibmm, giomm, OpenAL. Typically you make new directory "build" and run there following commands.
+
+cmake .. -DCMAKE_INSTALL_PREFIX=there you fill in directory to install 
+make
+make install
+
+the main executable will be placed in bin/nervici.
+
