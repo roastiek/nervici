@@ -1,8 +1,10 @@
 /* 
  * File:   app.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 15. červenec 2010, 2:12
+ * 
+ * Contains main class of application.
  */
 
 #ifndef APP_H
@@ -15,30 +17,39 @@
 #include "fakes/gui/control.h"
 #include "fakes/gui/screen.h"
 
+/*
+ * Using singleton patern.
+ * Intializes and uninitializes the whole application and runs the main loop.
+ * Switching between frames.  
+ */
 class App {
 private:
 
-    Control* active_frame;
-
     Screen* screen;
+
+    Control* active_frame;
 
     StartFrame* start_frame;
 
     GameFrame* game_frame;
 
     PlEditFrame* pledit_frame;
-    
+
     OptionsFrame* options_frame;
 
     static App instance;
 
     App ();
 
+    /*
+     * Initializes screen and frames.
+     */
     void init_gui ();
 
+    /*
+     * Hides actual frame and shows frame "frame".
+     */
     void switch_to_frame (Control* frame);
-
-    void hide_previous ();
 
 public:
     bool initialize ();
@@ -47,6 +58,9 @@ public:
 
     void run ();
 
+    /*
+     * Send quit event to the main loop.
+     */
     void quit ();
 
     void switch_to_start_frame ();
@@ -73,14 +87,20 @@ public:
 
     OptionsFrame& get_options_frame ();
 
+    /*
+     * Returns if the main loop has processed quit event. 
+     */
     bool is_aborted () const;
-    
+
     static App& get_instance ();
 };
 
+/*
+ * Helper variable for accessing the instance of App.
+ */
 extern App& app;
 
-inline App& App::get_instance() {
+inline App& App::get_instance () {
     return instance;
 }
 
@@ -115,7 +135,6 @@ inline const OptionsFrame& App::get_options_frame () const {
 inline OptionsFrame& App::get_options_frame () {
     return *options_frame;
 }
-
 
 #endif	/* APP_H */
 

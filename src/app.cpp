@@ -81,7 +81,6 @@ bool App::initialize () {
 
 void App::uninitialize () {
     logger.fineln ("uninitialize whole program");
-    //delete screen;
 
     audio.music_stop ();
 
@@ -113,18 +112,17 @@ bool App::is_aborted () const {
     return screen->is_aborted ();
 }
 
-void App::hide_previous () {
-    if (active_frame != NULL)
-        active_frame->set_visible (false);
-}
-
 void App::switch_to_frame (Control* frame) {
     screen->set_ignore_updates (true);
-    hide_previous ();
+
+    if (active_frame != NULL)
+        active_frame->set_visible (false);
+
     frame->set_visible (true);
     frame->grab_focus ();
     active_frame = frame;
     screen->process_events ();
+
     screen->set_ignore_updates (false);
 }
 
