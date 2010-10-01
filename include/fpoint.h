@@ -1,8 +1,10 @@
 /* 
  * File:   fpoint.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 22. červenec 2010, 16:27
+ * 
+ * Represent a point with float coordinates
  */
 
 #ifndef FPOINT_H
