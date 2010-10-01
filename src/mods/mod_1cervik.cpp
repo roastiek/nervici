@@ -213,6 +213,7 @@ public:
             if (last_living != -1) {
                 set_status (_("player %s has won this round"),
                     get_player (last_living).get_name ().c_str ());
+                get_player (last_living).inc_score (set.bonus);
             } else {
                 set_status (_("no winner this round"));
             }
