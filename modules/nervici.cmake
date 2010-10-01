@@ -75,7 +75,7 @@ target_link_libraries (nervici
     m
 )
 
-install (TARGETS nervici RUNTIME DESTINATION ${DATA_DIR}/bin)
+install (TARGETS nervici RUNTIME DESTINATION ${DATA_DIR})
 
 
 
