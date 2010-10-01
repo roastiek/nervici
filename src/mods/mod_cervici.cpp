@@ -33,7 +33,7 @@ static ModInfo info = {
         false,
         true,
         false,
-        false,
+        true,
         {
             {
                 false,
@@ -66,7 +66,7 @@ static ModInfo info = {
             0,
             0,
             0,
-            0},
+            1000},
         {
             {
                 {
@@ -197,7 +197,7 @@ public:
         }
 
         int living_count = (set.game_time > 0) ? 0 : 1;
-        
+
         if (live_pls_count () <= living_count) {
             stop_music ();
             set_semafor (SEMAFOR_OFF);
@@ -205,6 +205,7 @@ public:
             if (last_living != -1) {
                 set_status (_("player %s has won this round"),
                     get_player (last_living).get_name ().c_str ());
+                get_player (last_living).inc_score (set.bonus);
             } else {
                 set_status (_("no winner this round"));
             }
@@ -212,7 +213,7 @@ public:
         }
         if (set.max_score > 0) {
             if (max_score >= set.max_score) {
-                set_status(_("final score has been reached"));
+                set_status (_("final score has been reached"));
                 end_game ();
             }
         }
