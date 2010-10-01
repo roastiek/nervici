@@ -1,0 +1,3 @@
+#!/bin/sh
+export NERVICI_DIR=${NERVICI_DIR}
+${NERVICI_DIR}/bin/nervici

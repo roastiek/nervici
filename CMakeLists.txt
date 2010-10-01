@@ -25,6 +25,9 @@ set (CMAKE_CXX_FLAGS_DEBUG "-Wall -O0 -pedantic -g3 -gdwarf-2")
 set (CMAKE_CXX_FLAGS_PROFILE "-pg")
 
 set (DATA_DIR "share/nervici")
+file (TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${DATA_DIR} NERVICI_DIR)
+
+configure_file (src/nervici.sh.in nervici.sh)
 
 include_directories ("include")
 
@@ -43,6 +46,10 @@ include (nervici)
 include (images)
 include (sounds)
 include (music)
+
+install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nervici.sh
+    DESTINATION bin
+    RENAME nervici)
 
 add_subdirectory (po)
 
