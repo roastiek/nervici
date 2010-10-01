@@ -1,12 +1,21 @@
-Nervici is a simple game in which players draw lines on the screen and try avoid collisions. Last one standing becomes the winner.
+Nervici is a simple game in which players draw lines on a screen and try not to bump into each other. The longer player survives, the more points will he get. A player with the most points will become a winner. There some other options to get points, for example collecting of smiles.
 
-Installation
+Compilation ad installation
 
-Before installation you need C++ compile (gcc), cmake and these libraries: SDL, SDL_image, SDL_gfx, SDL_pango, gettext, glibmm, giomm, OpenAL. Typically you make new directory "build" and run there following commands.
+Before compilation you will need C++ compile (gcc), cmake and these libraries and theirs headers: SDL, SDL_image, SDL_gfx, SDL_pango, gettext, glibmm, giomm, OpenAL. Now open a terminal in a root directory of sources and type following commands:
 
-cmake .. -DCMAKE_INSTALL_PREFIX=there you fill in directory to install 
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=there you fill in a directory, where you want to install the game
 make
 make install
 
-the main executable will be placed in bin/nervici.
+First one will made a new directory "build", in which the game will be compiled, Third one will setup a compilation configuration. Next one will compile the whole game and last one will copy all needed files into an installation directory. The main executable will be placed in bin/nervici.
+
+Organization of the sources
+
+Sources are located in two directories. "include" directory contains all headers and c++ sources are stored in "src" directory. Both of them share same subdirectories structure, only "includes" has additional directory "fakes". It is used for simple header files with forward declarations of structures, classes and unions.
+"modules" directory contains cmake configuration files and "po" directory translations. Game data are separated in "images", "sounds" and "music" folders.
+
+
 
