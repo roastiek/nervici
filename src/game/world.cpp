@@ -59,9 +59,9 @@ bool World::initialize () {
         starts[s].angle = s * ANGLES / starts.size ();
         starts[s].pos.x
                 = floor ((width / 2 - (x * icos[starts[s].angle] * 0.8))
-                        * DIGITS) / DIGITS;
+                        * DECIMALS) / DECIMALS;
         starts[s].pos.y = floor ((height / 2
-                - (x * isin[starts[s].angle] * 0.8)) * DIGITS) / DIGITS;
+                - (x * isin[starts[s].angle] * 0.8)) * DECIMALS) / DECIMALS;
         starts[s].ready = 1;
     }
     return true;

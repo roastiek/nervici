@@ -24,8 +24,8 @@ float isin[ANGLES];
 
 static void calc_angles () {
     for (int a = 0; a < ANGLES; a++) {
-        icos[a] = floor (cos (M_PI * 2 * a / ANGLES) * DIGITS) / DIGITS;
-        isin[a] = floor (sin (M_PI * 2 * a / ANGLES) * DIGITS) / DIGITS;
+        icos[a] = floor (cos (M_PI * 2 * a / ANGLES) * DECIMALS) / DECIMALS;
+        isin[a] = floor (sin (M_PI * 2 * a / ANGLES) * DECIMALS) / DECIMALS;
     }
 }
 

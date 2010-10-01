@@ -415,11 +415,11 @@ void GameImpl::run () {
 
 void GameImpl::set_speed (timer_ti value) {
     speed = value;
-    if (speed < base_speed / 2)
-        speed = base_speed / 2;
-    if (speed > base_speed * 2)
-        speed = base_speed * 2;
-    audio.music_set_rate ((base_speed * 1.0) / speed);
+    if (speed < BASE_SPEED / 2)
+        speed = BASE_SPEED / 2;
+    if (speed > BASE_SPEED * 2)
+        speed = BASE_SPEED * 2;
+    audio.music_set_rate ((BASE_SPEED * 1.0) / speed);
 }
 
 void GameImpl::wait (timer_ti time) {

@@ -199,7 +199,7 @@ GameFrame::GameFrame () :
     game_info.setting.max_length = 0;
     game_info.setting.max_score = 0;
     game_info.setting.rounds = 10;
-    game_info.setting.speed = base_speed;
+    game_info.setting.speed = BASE_SPEED;
     game_info.setting.step = 1;
 
     for (int sti = ST_pozi; sti < ST_count; sti++) {
@@ -285,8 +285,8 @@ void GameFrame::init_control (Control* par) {
         la_speed_text_parms,
         "la_speed_text");
     sa_speed = ScaleFactory::create (this, 1, 1, sa_speed_parms, "sa_speed");
-    sa_speed->set_min (-base_speed * 2);
-    sa_speed->set_max (-base_speed / 2);
+    sa_speed->set_min (-BASE_SPEED * 2);
+    sa_speed->set_max (-BASE_SPEED / 2);
     sa_speed->register_on_value_changed (Scale::OnValueChanged (this,
         &GameFrame::speed_value_changed));
 
@@ -520,7 +520,7 @@ void GameFrame::init_neighbours () {
 }
 
 void GameFrame::speed_value_changed (Scale* ctl, int value) {
-    la_speed_text->set_text (ustring (render_speed (float(-base_speed) / value)));
+    la_speed_text->set_text (ustring (render_speed (float(-BASE_SPEED) / value)));
 }
 
 void GameFrame::preapare () {
