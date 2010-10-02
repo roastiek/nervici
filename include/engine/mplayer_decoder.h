@@ -1,8 +1,10 @@
 /* 
  * File:   mplayer_decoder.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 15. srpen 2010, 17:05
+ * 
+ * Loads audio file via mplayer.
  */
 
 #ifndef MPLAYER_DECODER_H
@@ -13,18 +15,39 @@
 
 #include "audio_decoder.h"
 
+/*
+ * Opens an audio file with mplayer and reads PCM data from its standard output.
+ */
 class MplayerDecoder: public AudioDecoder {
 private:
+    /*
+     * Pid of mplayer procces.
+     */
     Glib::Pid pid;
 
+    /*
+     * Standart output of mplayer.
+     */
     int source_fd;
 
+    /*
+     * Accesing stadard output of mplayer.
+     */
     Glib::RefPtr<Glib::IOChannel> source;
 
+    /*
+     * Format of audio data (8 bit, 16 bit, mono, stereo).
+     */
     ALenum format;
-
+    
+    /*
+     * Sample freqency of audio data. 
+     */
     ALsizei frequency;
 
+    /*
+     * Close mplayer procces after reading is finnished.
+     */
     void close ();
 
 public:
