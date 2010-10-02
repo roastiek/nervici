@@ -1,6 +1,6 @@
 /* 
  * File:   effect_type.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 22. červenec 2010, 15:51
  */
@@ -8,8 +8,38 @@
 #ifndef EFFECT_TYPE_H
 #define	EFFECT_TYPE_H
 
+/*
+ * Represents sound effects for players actions.
+ */
 enum EffectType {
-    ET_Jump, ET_Au, ET_Self, ET_SmilePlus, ET_SmileMinus, ET_Wall, ET_Count
+    /*
+     * Player has jumped.
+     */
+    ET_Jump, 
+    /*
+     * Player has bumped into another.
+     */
+    ET_Au,
+    /*
+     * Player has bimped into himsefl.
+     */
+    ET_Self,
+    /*
+     * Player has eaten good smile.
+     */
+    ET_SmilePlus,
+    /*
+     * Player has eaten bad smile.
+     */
+    ET_SmileMinus, 
+    /*
+     * Player has crshed into a wall.
+     */
+    ET_Wall,
+    /*
+     * Count of effects.
+     */
+    ET_Count
 };
 
 #endif	/* EFFECT_TYPE_H */
