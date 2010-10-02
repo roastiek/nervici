@@ -1,6 +1,7 @@
 #include "app.h"
 #include "utils.h"
 #include "engine/render.h"
+#include "engine/audio.h"
 #include "settings/team_info.h"
 #include "settings/team_infos.h"
 #include "settings/setting.h"
@@ -601,9 +602,11 @@ void GameFrame::btn_start_clicked (Control* ctl) {
         }
     }
 
+    audio.music_stop ();
     game.initialize (game_info);
     game.run ();
     game.uninitialize ();
+    audio.music_play (MT_Menu);
     get_parent ()->invalidate ();
 }
 

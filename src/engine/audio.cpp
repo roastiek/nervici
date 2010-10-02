@@ -347,8 +347,11 @@ void AudioOpenAL::music_play (MusicType type) {
     if (!initialized)
         return;
     
-    if (setting.music == 0)
+    if (setting.music == 0) {
+        music_type = type;
+        music_loop = true;
         return;
+    }
 
     if (music_is_playing ()) {
         if (music_type == type)

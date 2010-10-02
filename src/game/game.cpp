@@ -100,15 +100,16 @@ bool GameImpl::initialize (const GameInfo& info) {
 
     if (!world.initialize ())
         return false;
-   
+
     if (!teams.initialize (info.team_infos))
         return false;
-    
-    if (!players.initialize (info.pl_infos, info.pl_teams,
-            info.setting.max_length))
+
+    if (!players.initialize (info.pl_infos,
+        info.pl_teams,
+        info.setting.max_length))
         return false;
-    
-    if (!smiles.initialize (info.smiles)) 
+
+    if (!smiles.initialize (info.smiles))
         return false;
 
     end = false;
@@ -150,7 +151,8 @@ void GameImpl::sleep (timer_ti pause) {
     }
 }
 
-static int compare_stat (const Statistic& st1, const Statistic& st2,
+static int compare_stat (const Statistic& st1,
+        const Statistic& st2,
         StatColumn col) {
     int sub;
 
@@ -219,6 +221,7 @@ void GameImpl::run_statistic () {
 
     StatColumn order_col = STC_score;
 
+    audio.music_play (MT_Stat);
     players.calc_stats ();
     teams.calc_stats ();
     players.draw_stat ();
@@ -230,7 +233,7 @@ void GameImpl::run_statistic () {
     team_orders.resize (teams.count ());
 
     while (!abort) {
-        if (SDL_WaitEvent (&event)) {
+        while (SDL_PollEvent (&event)) {
             switch (event.type) {
             case SDL_QUIT:
                 abort = true;
@@ -246,7 +249,7 @@ void GameImpl::run_statistic () {
                 }
             case SDL_MOUSEBUTTONDOWN: {
                 StatColumn col = render.get_column_from_pos (event.button.x,
-                        event.button.y);
+                    event.button.y);
                 if (col != STC_count) {
                     switch (event.button.button) {
                     case SDL_BUTTON_RIGHT:
@@ -283,8 +286,9 @@ void GameImpl::run_statistic () {
                                 for (plid_tu otheri = 0; otheri
                                         < teams.count (); otheri++) {
                                     const Team& other = teams[otheri];
-                                    int cmp = compare_team (te, other,
-                                            order_col);
+                                    int cmp = compare_team (te,
+                                        other,
+                                        order_col);
                                     if (cmp < 0) {
                                         team_orders[tid]++;
                                     } else if (cmp == 0) {
@@ -318,9 +322,9 @@ void GameImpl::run_statistic () {
             default:
                 break;
             }
-        } else {
-            abort = true;
         }
+        audio.music_update ();
+        SDL_Delay (10);
     }
 }
 
@@ -401,6 +405,7 @@ void GameImpl::run () {
     }
 
     audio.music_stop ();
+    audio.music_set_rate (1);
 
     if (!abort) {
         render.draw_end ();
