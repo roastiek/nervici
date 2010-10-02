@@ -1,26 +1,33 @@
 /* 
  * File:   team_infos.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 22. červenec 2010, 15:40
+ * 
+ * Global collection of TeamInfo objects.
  */
 
 #ifndef TEAM_INFOS_H
 #define	TEAM_INFOS_H
 
-#include <vector>
+#include "basic_defs.h"
 
 #include "fakes/team_info.h"
 
+/*
+ * Using singleton pattern
+ * There are allways TEAMS_COUNT teams. The first one is hidden and used as a 
+ * fall back for players without an assigned team.   
+ */
 class TeamInfos {
 private:
 
-    std::vector<TeamInfo*> infos;
+    TeamInfo* infos[TEAMS_COUNT];
 
     static TeamInfos instance;
-    
+
     TeamInfos ();
-    
+
     ~TeamInfos ();
 
 public:
@@ -30,17 +37,16 @@ public:
 
     size_t count () const;
 
+    TeamInfo& operator[] (size_t index);
     const TeamInfo& operator[] (size_t index) const;
 
-    TeamInfo& operator[] (size_t index);
-    
     static TeamInfos& get_instance ();
 };
 
 extern TeamInfos& team_infos;
 
 inline size_t TeamInfos::count () const {
-    return infos.size ();
+    return TEAMS_COUNT;
 }
 
 inline const TeamInfo& TeamInfos::operator [] (size_t id) const {
@@ -51,10 +57,9 @@ inline TeamInfo& TeamInfos::operator [] (size_t id) {
     return *infos[id];
 }
 
-inline TeamInfos& TeamInfos::get_instance() {
+inline TeamInfos& TeamInfos::get_instance () {
     return instance;
 }
-
 
 #endif	/* TEAM_INFOS_H */
 

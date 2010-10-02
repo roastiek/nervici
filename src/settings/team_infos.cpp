@@ -10,7 +10,6 @@
 #include "settings/team_infos.h"
 
 using namespace Glib;
-using namespace std;
 
 const static TeamInfo def_infos[TEAMS_COUNT] = {
     {
@@ -43,12 +42,10 @@ TeamInfos::TeamInfos () {
 
 TeamInfos::~TeamInfos () {
     logger.fineln ("freeing teams setting");
-    for (size_t ti = 1; ti < infos.size (); ti++) {
+    for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
         delete infos[ti];
+        infos[ti] = NULL;
     }
-
-    infos.clear ();
-
 }
 
 void TeamInfos::load () {
@@ -58,10 +55,7 @@ void TeamInfos::load () {
 
     ustring section;
 
-    infos.resize (TEAMS_COUNT);
-
-    infos[0] = new TeamInfo ();
-    *infos[0] = def_infos[0];
+    infos[0] = new TeamInfo (def_infos[0]);
 
     for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
         section = "team";
@@ -81,7 +75,7 @@ void TeamInfos::save () {
 
     ustring section;
 
-    for (size_t ti = 1; ti < infos.size (); ti++) {
+    for (size_t ti = 1; ti < TEAMS_COUNT; ti++) {
         section = "team";
         section+= uint_to_string (ti);
 
