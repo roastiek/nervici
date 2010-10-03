@@ -1,6 +1,6 @@
 /* 
  * File:   start.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 22. červenec 2010, 14:12
  */
