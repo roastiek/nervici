@@ -20,8 +20,6 @@ using namespace std;
 float icos[ANGLES];
 float isin[ANGLES];
 
-//proc neni cisarsky rez jako zakusek
-
 static void calc_angles () {
     for (int a = 0; a < ANGLES; a++) {
         icos[a] = floor (cos (M_PI * 2 * a / ANGLES) * DECIMALS) / DECIMALS;

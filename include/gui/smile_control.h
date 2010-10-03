@@ -11,8 +11,6 @@
 #include "control.h"
 #include "screen.h"
 
-// za-sunuty, vy-sunuty, se-sunuty, ji-sunuty
-
 class SmileControl: public Control {
 private:
     Canvas* smile;
