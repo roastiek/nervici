@@ -22,6 +22,12 @@
 /*
  * Interface to Render. There is only SDL implementation. It load all images and
  * draw game graphics. GUI is separeted. It only creates sdl_screen for GUI.
+ * Drawing of players bodies and smiles is little special, becasue SDL needs 
+ * draw into to a window and then tell to refresh. Bodies are drawn by seprated 
+ * pixel, but refreshed all at once by one method call. So drawing player's 
+ * bodies needs two methods calls. The other drawing methods do render and 
+ * refresh together. Smiles handling is similar.
+ * It provides basic functions for the statistic table. 
  */
 class Render {
 
@@ -136,47 +142,100 @@ public:
     virtual void clear_smile (const Point& pos) = 0;
 
     /*
-     * Makes drawing players visible.
+     * Makes drawing players visible. Refreshs 3x3 area of window around 
+     * a specifed position.
      */
     virtual void update_player (const Point& pos) = 0;
 
+    /*
+     * Refreshs whole screen. Used for debuging graphics problems. It is faster
+     * to do only needed updates.  
+     */
     virtual void update_screen () = 0;
 
+    /*
+     * Refresh area of window around a smile at a specifed position.
+     */
     virtual void update_smile (const Point& pos) = 0;
 
+    /*
+     * Draws player's statistic into a table on position specifed by order.
+     */
     virtual void draw_player_stat (plid_tu id,
             plid_tu order,
             const PlInfo& info,
             const Statistic& stat) = 0;
 
+    /*
+     * Draws team's statistic into a table on position specifed by order.
+     */
     virtual void draw_team_stat (plid_tu id,
             plid_tu order,
             const TeamInfo& info,
             const Statistic& stat) = 0;
 
-    // rest function
+    /*
+     * Returns root gui control screen. 
+     */
     virtual Screen* get_screen () = 0;
 
+    /*
+     * Returns width of main window.
+     */
     virtual int get_width () const = 0;
 
+    /*
+     * Returns height of main window.
+     */
     virtual int get_height () const = 0;
 
+    /*
+     * Returns if applications runs in fullscreen.
+     */
     virtual bool is_fullscreen () const = 0;
 
+    /*
+     * Changes resolution and fullscreen options for main window and gui 
+     * controls.
+     */
     virtual void change_resolution (int width, int height, bool fullscreen) = 0;
 
+    /*
+     * Returns maximum size of playground width. It depends on screen width.
+     */
     virtual wsize_tu get_playerground_width () const = 0;
 
+    /*
+     * Returns maximum size of playground height. It depends on screen height.
+     */
     virtual wsize_tu get_playerground_height () const = 0;
 
-    virtual void reset_columns_sub () = 0;
-
+    /*
+     * Culumn sub is used on statistic table for columns with suboptions like
+     * smiles counts. Values go from 0 to 3. (0 for all smiles, 1 to 3 for 
+     * different smiles levels)  
+     */
     virtual int get_column_sub (StatColumn col) = 0;
 
+    /*
+     * Sets all comuns subs to 0.
+     */
+    virtual void reset_columns_sub () = 0;
+
+    /*
+     * Incraces comun sub by one. If value is becomes higher than 3, it is sets
+     * back to 0.
+     */
     virtual void cycle_column_sub (StatColumn col) = 0;
 
+    /*
+     * Returns actual column sub.
+     */
     virtual StatColumn get_column_from_pos (int x, int y) = 0;
 
+    /*
+     * Draw a GUI image. Used for testing only.
+     */
     virtual void draw_image (Canvas* canvas, int x, int y) = 0;
 };
 
