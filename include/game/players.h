@@ -1,8 +1,9 @@
 /* 
  * File:   players.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 8. červenec 2010, 1:02
+ * Stores all players for a game.
  */
 
 #ifndef PLAYERS_H
@@ -14,10 +15,20 @@
 #include "fakes/player.h"
 #include "fakes/pl_info.h"
 
+/*
+ * Collection of all players which play the game. Most of the methods just call 
+ * theirs conterparts on all players.
+ */
 class Players {
 private:
+    /*
+     * List of players.
+     */
     std::vector<Player*> players;
 
+    /*
+     * Used for ordering players. 
+     */
     std::vector<plid_tu> orders;
 
     static Players instance;
@@ -25,9 +36,15 @@ private:
     Players ();
 
 public:
+    /*
+     * Creates players for the game.
+     */
     bool initialize (const std::vector<const PlInfo*>& infos,
             const std::vector<plid_tu>& pl_teams, plsize_tu max_length);
 
+    /*
+     * Frees players after the game
+     */
     void uninitialize ();
 
     void finish_step_preparation ();
@@ -44,10 +61,15 @@ public:
 
     void erase ();
 
+    /*
+     * Returns count of players.
+     */
     plid_tu count () const;
 
+    /*
+     * Accessing players by index.
+     */
     const Player& operator [] (plid_tu index) const;
-
     Player& operator [] (plid_tu index);
 
     void calc_stats ();
