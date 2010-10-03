@@ -1,6 +1,6 @@
 /* 
  * File:   world_item.h
- * Author: bobo
+ * Author: deedrah
  *
  * Created on 22. červenec 2010, 14:12
  */
@@ -10,31 +10,83 @@
 
 #include "int_type.h"
 
-/*#define IT_FREE         0
-#define IT_PLAYER       1
-#define IT_STONE        3
-#define IT_WALL         4
-#define IT_SOFT_SMILE   5
-#define IT_HARD_SMILE   6*/
-
+/*
+ * Type of world item.
+ */
 enum ItemType {
-    IT_free, IT_player, IT_stone, IT_wall, IT_soft_smile, IT_hard_smile
+    /*
+     * Item is free. Can be occupied be player or smile.
+     */
+    IT_free,
+    /*
+     * Item belongs to a player.
+     */
+    IT_player,
+    /*
+     * Item is a stone. Not used now.
+     */
+    IT_stone,
+    /*
+     * Item is a wall. Used to make border around the playerground.
+     */
+    IT_wall,
+    /*
+     * Item is soft smile, can be eaten.
+     */
+    IT_soft_smile,
+    /*
+     * Item is hard smile, cannot be eaten.
+     */
+    IT_hard_smile
 };
 
+/*
+ * Additional informations for item with a player.
+ */
 struct WIPlayer {
+    /*
+     * Player's id.
+     */
     plid_tu ID;
+    
+    /*
+     * Player's body density
+     */
     plpart_tu body;
+    
+    /*
+     * Index of the body part. Used to identify head and bottom.
+     */
     plsize_tu order;
 };
 
+/*
+ * Additional informations for item with a smile.
+ */
 struct WISmile {
+    /*
+     * Smile's id.
+     */
     smileid_tu ID;
 };
 
+/*
+ * Generic world item.
+ */
 struct WorldItem {
+    /*
+     * Type of world item.
+     */
     ItemType type;
+    
+    /*
+     * Item was changed from the last render.
+     */
     bool changed;
 
+    /*
+     * Item specializations.
+     */
     union {
         WIPlayer player;
         WISmile smile;
